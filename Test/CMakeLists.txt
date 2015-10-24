@@ -31,3 +31,16 @@ target_link_libraries(test ${OPENGL_LIBRARIES})
 
 # Use the OpenGL module from Qt 5.
 # qt5_use_modules(test OpenGL)
+
+# copy shaders to build directory:
+
+add_custom_command(TARGET test POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/shader
+        $<TARGET_FILE_DIR:test>/shader)
+
+add_custom_command(TARGET test POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_SOURCE_DIR}/test.obj
+        $<TARGET_FILE_DIR:test>/test.obj)
+
