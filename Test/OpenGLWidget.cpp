@@ -8,6 +8,12 @@
 OpenGLWidget::OpenGLWidget(QWidget *parent) :
     QOpenGLWidget(parent)
 {
+    // enformce opengl 3.0
+    QSurfaceFormat format;
+    format.setMajorVersion(3);
+    format.setMinorVersion(0);
+    this->setFormat(format);
+
     // render as fast as possible!
     m_timer.setInterval(16); // ~60fps
     connect(&m_timer, &QTimer::timeout, this, &OpenGLWidget::paintGL);
