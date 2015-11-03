@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "glslhighlighter.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
@@ -49,8 +50,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     vstextbox->setPlainText(MyGLWidget::defaultVertexShader);
     fstextbox->setPlainText(MyGLWidget::defaultFragmentShader);
 
+    //set fancy highlighter:
+    highlighterVS = new GLSLHighlighter(vstextbox->document());
+    highlighterFS = new GLSLHighlighter(fstextbox->document());
+
     //connect signals:
     connect(acceptButton, SIGNAL(clicked()), this, SLOT(updateShader()));
+
+    //set Color values:
+    allFineColor = QColor::fromRgb(210,255,210);
+    errorColor = QColor::fromRgb(255,210,210);
 
 }
 
@@ -69,6 +78,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::updateShader()
 {
+
     OpenglErrorType retVal;
     retVal = glwidget->createShaderProgram(vstextbox->toPlainText(), fstextbox->toPlainText());
     switch (retVal)
@@ -76,16 +86,26 @@ void MainWindow::updateShader()
     case OpenglErrorType::noError:
     {
         statusLabel->setText("all good");
+        QPalette p = vstextbox->palette();
+        p.setColor(QPalette::Base, allFineColor);
+        vstextbox->setPalette(p);
+        fstextbox->setPalette(p);
         break;
     }
     case OpenglErrorType::vertexShaderError:
     {
         statusLabel->setText("vertex Shader failed");
+        QPalette p = vstextbox->palette();
+        p.setColor(QPalette::Base, errorColor);
+        vstextbox->setPalette(p);
         break;
     }
     case OpenglErrorType::fragmentShaderError:
     {
         statusLabel->setText("fragment Shader failed");
+        QPalette p = fstextbox->palette();
+        p.setColor(QPalette::Base, errorColor);
+        fstextbox->setPalette(p);
         break;
     }
     case OpenglErrorType::linkingError:

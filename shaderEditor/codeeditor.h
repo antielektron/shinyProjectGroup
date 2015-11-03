@@ -10,7 +10,7 @@ QT_FORWARD_DECLARE_CLASS(LineNumberArea);
  * @brief The CodeEditor class
  * source: http://doc.qt.io/qt-5/qtwidgets-widgets-codeeditor-example.html
  */
-class CodeEditor : public QPlainTextEdit
+class CodeEditor : public QTextEdit
 {
     Q_OBJECT
 public:

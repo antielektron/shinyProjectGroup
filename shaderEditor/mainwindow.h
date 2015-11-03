@@ -12,6 +12,7 @@
 
 #include "myglwidget.h"
 #include "codeeditor.h"
+#include "glslhighlighter.h"
 
 class MainWindow : public QMainWindow
 {
@@ -37,6 +38,14 @@ protected:
     QLabel *statusLabel;
 
     QPushButton *acceptButton;
+
+    GLSLHighlighter *highlighterVS;
+    GLSLHighlighter *highlighterFS;
+
+    QColor errorColor;
+    QColor allFineColor;
+
+
 
 protected slots:
     void updateShader();

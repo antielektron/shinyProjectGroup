@@ -16,7 +16,7 @@ find_package(Qt5Widgets)
 find_package(OpenGL)
 
 
-set(SOURCE_FILES main.cpp myglwidget.cpp mainwindow.cpp linenumberarea.cpp codeeditor.cpp)
+set(SOURCE_FILES main.cpp myglwidget.cpp mainwindow.cpp linenumberarea.cpp codeeditor.cpp glslhighlighter.cpp)
 add_executable(shaderEditor ${SOURCE_FILES})
 
 # Use the Widgets module from Qt 5.

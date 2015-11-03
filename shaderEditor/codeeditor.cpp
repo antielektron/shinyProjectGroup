@@ -6,12 +6,13 @@
 
 //=============================================================================
 
-CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
+CodeEditor::CodeEditor(QWidget *parent) : QTextEdit(parent)
 {
     lineNumberArea = new LineNumberArea(this);
 
-    connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
-    connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
+    //FIXME: these signals are not available when using QTextEdit!!!
+    //connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
+    //connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
 
     updateLineNumberAreaWidth(0);
@@ -23,7 +24,7 @@ CodeEditor::CodeEditor(QWidget *parent) : QPlainTextEdit(parent)
 int CodeEditor::lineNumberAreaWidth()
 {
     int digits = 1;
-    int max = qMax(1, blockCount());
+    int max = qMax(1, this->document()->blockCount());
     while (max >= 10)
     {
         max /= 10;
@@ -65,7 +66,7 @@ void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
 
 void CodeEditor::resizeEvent(QResizeEvent *event)
 {
-    QPlainTextEdit::resizeEvent(event);
+    QTextEdit::resizeEvent(event);
     QRect cr = contentsRect();
 
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
@@ -97,10 +98,12 @@ void CodeEditor::highlightCurrentLine()
 
 void CodeEditor::lineNumberPaintEvent(QPaintEvent *event)
 {
+    /* TODO: reimplement for QTextEdit as parent!
+
     QPainter painter(lineNumberArea);
     painter.fillRect(event->rect(),Qt::lightGray);
 
-    QTextBlock block = firstVisibleBlock();
+    QTextBlock block = document()->firstBlock(); //<-- will not work properly!
     int blockNumber = block.blockNumber();
     int top = (int) blockBoundingGeometry(block).translated(contentOffset()).top();
     int bottom = top + (int) blockBoundingRect(block).height();
@@ -120,5 +123,6 @@ void CodeEditor::lineNumberPaintEvent(QPaintEvent *event)
         bottom = top + (int) blockBoundingRect(block).height();
         ++blockNumber;
     }
+    */
 
 }
