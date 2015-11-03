@@ -3,6 +3,7 @@
 #include <iostream>
 #include <QTextBlock>
 #include <QPainter>
+#include <QScrollBar>
 
 //=============================================================================
 
@@ -10,13 +11,15 @@ CodeEditor::CodeEditor(QWidget *parent) : QTextEdit(parent)
 {
     lineNumberArea = new LineNumberArea(this);
 
-    //FIXME: these signals are not available when using QTextEdit!!!
-    //connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
-    //connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(updateLineNumberArea(QRect,int)));
+
+    connect(this->document(), SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
+    connect(this->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateLineNumberArea()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+    connect(this, SIGNAL(textChanged()), this, SLOT(updateLineNumberArea()));
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
+
 }
 
 //=============================================================================
@@ -45,20 +48,30 @@ void CodeEditor::updateLineNumberAreaWidth(int newBlockCount)
 
 //=============================================================================
 
-void CodeEditor::updateLineNumberArea(const QRect &rect, int dy)
+void CodeEditor::updateLineNumberArea()
 {
-    if (dy)
+    //Q_UNUSED(sliderPos)
+
+    //I'm not sure if this is really necessary, but according to
+    //http://stackoverflow.com/a/24596246
+    //it is.
+
+    this->verticalScrollBar()->setSliderPosition(this->verticalScrollBar()->sliderPosition());
+
+    QRect rect = this->contentsRect();
+    lineNumberArea->update(0, rect.y(), lineNumberArea->width(),rect.height());
+    updateLineNumberAreaWidth(0);
+
+    int dy = this->verticalScrollBar()->sliderPosition();
+    if (dy > -1)
     {
         lineNumberArea->scroll(0,dy);
     }
-    else
-    {
-        lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
-    }
 
-    if (rect.contains(viewport()->rect()))
+    int firstVisibleBlockId = getFirstVisibleBlock();
+    if (firstVisibleBlockId == 0 || this->textCursor().block().blockNumber() == firstVisibleBlockId-1)
     {
-        updateLineNumberAreaWidth(0);
+        this->verticalScrollBar()->setSliderPosition(dy-document()->documentMargin());
     }
 }
 
@@ -70,6 +83,33 @@ void CodeEditor::resizeEvent(QResizeEvent *event)
     QRect cr = contentsRect();
 
     lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+}
+
+//=============================================================================
+
+int CodeEditor::getFirstVisibleBlock()
+{
+
+    //TODO: this seems to be a horrible solution...
+
+    QTextCursor curs = QTextCursor(this->document());
+    curs.movePosition(QTextCursor::Start);
+    for(int i=0; i < this->document()->blockCount(); ++i)
+    {
+        QTextBlock block = curs.block();
+
+        QRect r1 = this->viewport()->geometry();
+        QRect r2 = this->document()->documentLayout()->blockBoundingRect(block).translated(
+                    this->viewport()->geometry().x(), this->viewport()->geometry().y() - (
+                        this->verticalScrollBar()->sliderPosition()
+                        ) ).toRect();
+
+        if (r1.contains(r2, true)) { return i; }
+
+        curs.movePosition(QTextCursor::NextBlock);
+    }
+
+    return 0;
 }
 
 //=============================================================================
@@ -98,15 +138,19 @@ void CodeEditor::highlightCurrentLine()
 
 void CodeEditor::lineNumberPaintEvent(QPaintEvent *event)
 {
-    /* TODO: reimplement for QTextEdit as parent!
+
+    this->verticalScrollBar()->setSliderPosition(this->verticalScrollBar()->sliderPosition());
 
     QPainter painter(lineNumberArea);
     painter.fillRect(event->rect(),Qt::lightGray);
+    int firstVisibleBlock = this->getFirstVisibleBlock();
 
-    QTextBlock block = document()->firstBlock(); //<-- will not work properly!
+    QTextBlock block = document()->findBlockByNumber(firstVisibleBlock);
     int blockNumber = block.blockNumber();
-    int top = (int) blockBoundingGeometry(block).translated(contentOffset()).top();
-    int bottom = top + (int) blockBoundingRect(block).height();
+    int top = this->viewport()->geometry().top();
+    int bottom = top + (int) this->document()->documentLayout()->blockBoundingRect(block).height();
+
+    //TODO: get an offset while scrolling
 
     while (block.isValid() && top <= event->rect().bottom())
     {
@@ -120,9 +164,9 @@ void CodeEditor::lineNumberPaintEvent(QPaintEvent *event)
 
         block = block.next();
         top = bottom;
-        bottom = top + (int) blockBoundingRect(block).height();
+        bottom = top + (int) this->document()->documentLayout()->blockBoundingRect(block).height();
         ++blockNumber;
     }
-    */
+
 
 }
