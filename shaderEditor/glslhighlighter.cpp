@@ -43,7 +43,27 @@ GLSLHighlighter::GLSLHighlighter(QTextDocument *parent)
         << "\\bfalse\\b"
         << "\\binvariant\\b"
         << "\\bdiscard\\b"
-        << "\\breturn\\b"; //to be continued...
+        << "\\breturn\\b"
+        << "\\b(|d)mat[2-4]\\b"
+        << "\\b(|d)mat[2-4]x[2-4]\\b"
+        << "\\b(|i|b|d|u)vec[2-4]\\b"
+        << "\\buint\\b"
+        << "\\blowp\\b"
+        << "\\bmediump\\b"
+        << "\\bhighp\\b"
+        << "\\bprecision\\b"
+        << "\\b(|i|u)sampler[1-3]D\\b"
+        << "\\b(|i|u)samplerCube\\b"
+        << "\\bsampler([1-2]D|Cube|)Shadow\\b"
+        << "\\b(|i|u)sampler[1-2]DArray\\b"
+        << "\\bsampler[1-2]DArrayShadow\\b"
+        << "\\b(|u|i)sampler2DRect\\b"
+        << "\\bsampler2DRectShadow\\b"
+        << "\\b(|u|i)samplerBuffer\\b"
+        << "\\b(|u|i)sampler2DMS(|Array)\\b"
+        << "\\b(|u|i)samplerCubeArray\\b"
+        << "\\bsamplerCubeArrayShadow\\b";
+
 
     foreach (const QString &pattern, keywordPatterns) {
         rule.pattern = QRegExp(pattern);
