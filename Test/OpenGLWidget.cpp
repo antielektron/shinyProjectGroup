@@ -10,8 +10,9 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) :
 {
     // enformce opengl 3.0
     QSurfaceFormat format;
-    format.setMajorVersion(3);
-    format.setMinorVersion(0);
+    format.setMajorVersion(4);
+    format.setMinorVersion(1);
+    format.setProfile(QSurfaceFormat::CoreProfile);
     this->setFormat(format);
 
     // render as fast as possible!

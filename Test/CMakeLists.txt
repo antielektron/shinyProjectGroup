@@ -23,6 +23,8 @@ add_executable(test ${SOURCE_FILES})
 # Use the Widgets module from Qt 5.
 qt5_use_modules(test Widgets)
 
+# qt5_use_modules(test OpenGl)
+
 # Include OpenGL
 include_directories(${OPENGL_INCLUDE_DIRS})
 
