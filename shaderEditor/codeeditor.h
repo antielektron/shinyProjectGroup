@@ -29,10 +29,18 @@ protected:
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     LineNumberArea *lineNumberArea;
 
+    int prevCursorLine;
+    int currentCursorLine;
+
 protected slots:
+
+
     void updateLineNumberAreaWidth(int newBlockCount);
     void highlightCurrentLine();
     void updateLineNumberArea();
+    void onTextChanged();
+    void onCursorChanged();
+
 };
 
 #endif // CODEEDITOR_H

@@ -16,9 +16,25 @@ CodeEditor::CodeEditor(QWidget *parent) : QTextEdit(parent)
     connect(this->verticalScrollBar(), SIGNAL(valueChanged(int)),this, SLOT(updateLineNumberArea()));
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     connect(this, SIGNAL(textChanged()), this, SLOT(updateLineNumberArea()));
+    connect(this, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorChanged()));
 
     updateLineNumberAreaWidth(0);
     highlightCurrentLine();
+
+    QFont font;
+    font.setFamily("Courier");
+    font.setStyleHint(QFont::Monospace);
+    font.setFixedPitch(true);
+    font.setPointSize(10);
+
+    QFontMetrics metrics(font);
+    setTabStopWidth(4 * metrics.width(' '));
+
+    setFont(font);
+
+    prevCursorLine = textCursor().blockNumber();
+
 
 }
 
@@ -168,5 +184,51 @@ void CodeEditor::lineNumberPaintEvent(QPaintEvent *event)
         ++blockNumber;
     }
 
+
+}
+
+//=============================================================================
+
+void CodeEditor::onTextChanged()
+{
+    //if we have a newline, we will indent the new line like the previous one
+
+    if (currentCursorLine > prevCursorLine)
+    {
+
+        QTextBlock block = document()->findBlockByNumber(prevCursorLine);
+        QString text = block.text();
+
+        if (text.length() != 0)
+        {
+            //find indents;
+            QChar firstChar = text.at(0);
+
+            if (firstChar == '\t' || firstChar == ' ')
+            {
+                QString indent = "";
+                //counting:
+                for (int i = 0; text.length() > i && text.at(i) == firstChar; i++)
+                {
+                    indent.push_back(firstChar);
+                }
+                textCursor().insertText(indent);
+            }
+
+        }
+
+
+
+
+    }
+
+}
+
+//=============================================================================
+
+void CodeEditor::onCursorChanged()
+{
+    prevCursorLine = currentCursorLine;
+    currentCursorLine = textCursor().block().blockNumber();
 
 }
