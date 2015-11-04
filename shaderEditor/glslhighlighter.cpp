@@ -62,7 +62,8 @@ GLSLHighlighter::GLSLHighlighter(QTextDocument *parent)
         << "\\b(|u|i)samplerBuffer\\b"
         << "\\b(|u|i)sampler2DMS(|Array)\\b"
         << "\\b(|u|i)samplerCubeArray\\b"
-        << "\\bsamplerCubeArrayShadow\\b";
+        << "\\bsamplerCubeArrayShadow\\b"
+        << "\\bstruct\\b";
 
 
     foreach (const QString &pattern, keywordPatterns) {
