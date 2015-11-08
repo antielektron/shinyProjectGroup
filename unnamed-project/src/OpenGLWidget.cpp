@@ -10,10 +10,10 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) :
 {
     // enformce opengl 3.0
     QSurfaceFormat format;
-    format.setMajorVersion(4);
-    format.setMinorVersion(1);
-    format.setProfile(QSurfaceFormat::CoreProfile);
-    this->setFormat(format);
+    // format.setMajorVersion(4);
+    // format.setMinorVersion(1);
+    // format.setProfile(QSurfaceFormat::CoreProfile);
+    // this->setFormat(format);
 
     // render as fast as possible!
     m_timer.setInterval(16); // ~60fps
@@ -31,8 +31,8 @@ void OpenGLWidget::initializeGL()
     // initializeOpenGLFunctions();
     glClearColor(0, 0, 0, 1);
 
-    std::string vertexShaderSource = loadTextFile("shader/vertex.glsl");
-    std::string fragmentShaderSource = loadTextFile("shader/fragment.glsl");
+    std::string vertexShaderSource = loadTextFile("shaders/vertex.glsl");
+    std::string fragmentShaderSource = loadTextFile("shaders/fragment.glsl");
 
     if (!m_program.addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource.c_str()))
     {
@@ -57,7 +57,7 @@ void OpenGLWidget::initializeGL()
 
     m_program.release();
 
-    m_object.reset(new Model("test.obj"));
+    m_object.reset(new Model("models/test.obj"));
 
     auto version = context()->format().version();
     std::cout << "Using OpenGL Version " << version.first << "." << version.second << std::endl;
