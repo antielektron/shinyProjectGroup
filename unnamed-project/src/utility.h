@@ -1,8 +1,8 @@
-#ifndef QTESTCLION_UTIL_H
-#define QTESTCLION_UTIL_H
+#ifndef UNNAMED_PROJECT_UTILITY_H
+#define UNNAMED_PROJECT_UTILITY_H
 
 #include <string>
 
 std::string loadTextFile(const std::string &fileName);
 
-#endif // QTESTCLION_UTIL_H
+#endif // UNNAMED_PROJECT_UTILITY_H

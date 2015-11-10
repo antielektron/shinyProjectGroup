@@ -1,5 +1,5 @@
-#ifndef QTESTCLION_OPENGLWIDGET_H
-#define QTESTCLION_OPENGLWIDGET_H
+#ifndef UNNAMED_PROJECT_OPENGLWIDGET_H
+#define UNNAMED_PROJECT_OPENGLWIDGET_H
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
@@ -12,12 +12,16 @@
 #include <memory>
 #include <chrono>
 
-#include "Model.h"
+#include "IGame.h"
+#include "Renderer.h"
 
 class OpenGLWidget : public QOpenGLWidget
 {
 public:
     OpenGLWidget(QWidget *parent = nullptr);
+    OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent = nullptr);
+
+    void setGame(std::shared_ptr<IGame> game);
 
 public slots:
     void cleanup();
@@ -28,20 +32,12 @@ protected:
     void resizeGL(int width, int height) Q_DECL_OVERRIDE;
 
 private:
+    std::shared_ptr<IGame> m_game;
+    std::unique_ptr<Renderer> m_renderer;
+
     QTimer m_timer;
     std::chrono::system_clock::time_point start;
     size_t frame_count;
-
-    // Renderer
-    QOpenGLShaderProgram m_program;
-    int m_mvpMatrixLoc;
-
-    // Scene?
-    QMatrix4x4 m_proj;
-    QMatrix4x4 m_world;
-    QMatrix4x4 m_camera;
-
-    std::unique_ptr<Model> m_object;
 };
 
-#endif // QTESTCLION_OPENGLWIDGET_H
+#endif // UNNAMED_PROJECT_OPENGLWIDGET_H

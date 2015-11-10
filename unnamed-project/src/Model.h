@@ -1,5 +1,5 @@
-#ifndef QTESTCLION_MODEL_H
-#define QTESTCLION_MODEL_H
+#ifndef UNNAMED_PROJECT_MODEL_H
+#define UNNAMED_PROJECT_MODEL_H
 
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
@@ -28,4 +28,4 @@ private:
 
 };
 
-#endif // QTESTCLION_MODEL_H
+#endif // UNNAMED_PROJECT_MODEL_H
