@@ -21,6 +21,7 @@ private:
     std::unique_ptr<Scene> m_scene;
 
     Object *m_dummy;
+    float r;
 };
 
 #endif // UNNAMED_PROJECT_PRIMITIVE_GAME_H

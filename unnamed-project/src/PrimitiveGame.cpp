@@ -1,5 +1,7 @@
 #include "PrimitiveGame.h"
 
+#include <iostream>
+
 void PrimitiveGame::initialize()
 {
     m_scene = std::unique_ptr<Scene>(new Scene());
@@ -8,9 +10,14 @@ void PrimitiveGame::initialize()
     auto &camera = m_scene->getCamera();
     camera.setToIdentity();
     camera.translate(0, 0, -10);
+    camera.lookAt(QVector3D(0, 5, -10), QVector3D(0, 0, 0), QVector3D(0, 1, 0));
 
     m_scene->addModel("test", std::unique_ptr<Model>(new Model("models/test.obj")));
+    m_scene->addModel("audi", std::unique_ptr<Model>(new Model("models/Audi_R8.obj")));
     m_dummy = m_scene->createObject("test");
+
+    m_dummy->getWorld().setToIdentity();
+    r = 0.;
 }
 
 void PrimitiveGame::resize(int width, int height)
@@ -22,9 +29,11 @@ void PrimitiveGame::resize(int width, int height)
 
 void PrimitiveGame::tick()
 {
-    QMatrix4x4 world;
-    world.setToIdentity(); // lame!
-    m_dummy->setWorld(world);
+    auto &world = m_dummy->getWorld();
+    world.setToIdentity();
+
+    r+= 1.f;
+    world.rotate(r, 0, 1, 0);
 }
 
 Scene *PrimitiveGame::getScene()

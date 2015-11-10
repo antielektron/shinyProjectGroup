@@ -5,6 +5,8 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLFunctions>
 
+#include <QVector3D>
+
 #include <string>
 #include <vector>
 
@@ -16,12 +18,14 @@ public:
     void draw();
 
 private:
-    std::vector<float> m_vertices;
-    std::vector<unsigned short> m_indices;
+    std::vector<QVector3D> m_vertices;
+    std::vector<QVector3D> m_normals;
+    std::vector<unsigned int> m_indices;
 
     QOpenGLVertexArrayObject m_vao;
-    QOpenGLBuffer m_vbo;
-    QOpenGLBuffer m_ibo;
+    QOpenGLBuffer m_vertexBuffer;
+    QOpenGLBuffer m_normalBuffer;
+    QOpenGLBuffer m_indexBuffer;
 
     void loadObj(const std::string &fileName);
     void createOpenGLStuff();

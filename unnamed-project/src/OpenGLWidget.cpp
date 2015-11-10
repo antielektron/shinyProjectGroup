@@ -18,7 +18,7 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) :
 
     // render as fast as possible!
     m_timer.setInterval(16); // ~60fps
-    connect(&m_timer, &QTimer::timeout, this, &OpenGLWidget::paintGL);
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
     m_timer.start();
 
     start = std::chrono::system_clock::now() + std::chrono::seconds(1);
@@ -32,7 +32,7 @@ OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
 {
     // render as fast as possible!
     m_timer.setInterval(16); // ~60fps
-    connect(&m_timer, &QTimer::timeout, this, &OpenGLWidget::paintGL);
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
     m_timer.start();
 
     start = std::chrono::system_clock::now() + std::chrono::seconds(1);
@@ -65,7 +65,11 @@ void OpenGLWidget::paintGL()
     }
     frame_count++;
 
+    m_game->tick();
+
     m_renderer->render(m_game->getScene());
+
+
 }
 
 void OpenGLWidget::resizeGL(int width, int height)

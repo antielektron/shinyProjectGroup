@@ -21,14 +21,16 @@ void Renderer::initialize()
     {
         std::cerr << "could not load fragment shader" << std::endl;
     }
-    m_program.bindAttributeLocation("position", 0);
+    m_program.bindAttributeLocation("v_position", 0);
+    m_program.bindAttributeLocation("v_normal", 1);
     if (!m_program.link())
     {
         std::cerr << "could not link shader program" << std::endl;
     }
 
     m_program.bind();
-    m_mvpMatrixLoc = m_program.uniformLocation("mvpMatrix");
+    m_modelViewLoc = m_program.uniformLocation("modelView");
+    m_projectionLoc = m_program.uniformLocation("projection");
 
     m_program.release();
 }
@@ -41,12 +43,12 @@ void Renderer::render(Scene *scene)
 
     m_program.bind();
 
-    QMatrix4x4 view = scene->getProjection() * scene->getCamera();
+    m_program.setUniformValue(m_projectionLoc, scene->getProjection());
 
     for (auto it = scene->objectsBegin(); it != scene->objectsEnd(); it++)
     {
         auto *object = it->get();
-        m_program.setUniformValue(m_mvpMatrixLoc, view * object->getWorld());
+        m_program.setUniformValue(m_modelViewLoc, scene->getCamera() * object->getWorld());
         object->getModel()->draw();
     }
 

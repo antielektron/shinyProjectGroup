@@ -11,7 +11,7 @@ public:
     Object(Model *model);
 
     void setWorld(const QMatrix4x4 &world);
-    const QMatrix4x4 &getWorld();
+    QMatrix4x4 &getWorld();
 
     Model *getModel();
 

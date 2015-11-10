@@ -14,7 +14,8 @@ public:
 
 private:
     QOpenGLShaderProgram m_program;
-    int m_mvpMatrixLoc;
+    int m_modelViewLoc;
+    int m_projectionLoc;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H
