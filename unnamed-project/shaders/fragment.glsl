@@ -8,5 +8,5 @@ out vec4 outputColor;
 
 void main()
 {
-    outputColor = vec4(normalize(normal),1.); // color;
+    outputColor = vec4(normalize(normal*normal),1.); // color;
 }
