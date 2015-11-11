@@ -5,9 +5,9 @@
 Object::Object(Model *model) :
     m_model(model)
 {
-    alpha = 0.0;
+    alpha = 1.0;
     specularAmount = 1;
-    diffuseAmount = 0.1;
+    diffuseAmount = 0.5;
 }
 
 void Object::setWorld(const QMatrix4x4 &world)

@@ -2,7 +2,7 @@
 //fragment phong shader, see also: https://en.wikipedia.org/wiki/Phong_reflection_model
 
 in vec3 normal;             // aka N
-out vec4 worldPosition;     //aka -v
+in vec4 worldPosition;     //aka -v
 uniform vec3 v_lightDirection;   //aka L
 uniform vec3 v_lightColor;
 
@@ -16,13 +16,12 @@ out vec4 outputColor;
 
 void main()
 {
-    //TODO: make the following fixed values variable (taken from openGL superbible):
-
     vec3 n = normalize(normal);
     vec3 l = normalize(-1.0 *v_lightDirection);
     vec3 c = v_lightColor;
     vec3 v = normalize(-worldPosition.xyz);
 
+    //reflection
     vec3 r = normalize((2 * dot(l,n))* n - l);
 
     vec3 diffuse = (max(dot(n,l), 0.0) * k_d) * c;
