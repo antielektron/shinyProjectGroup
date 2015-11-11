@@ -20,6 +20,7 @@ private:
     Model *m_model;
     QMatrix4x4 m_world;
 
+
     // TODO material information
 };
 

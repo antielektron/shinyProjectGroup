@@ -13,12 +13,16 @@ void PrimitiveGame::initialize()
    // camera.translate(0, 0, -10);
     camera.lookAt(m_position, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
 
-    m_scene->addModel("test", std::unique_ptr<Model>(new Model("models/test.obj")));
-   // m_scene->addModel("audi", std::unique_ptr<Model>(new Model("models/Audi_R8.obj")));
-    m_dummy = m_scene->createObject("test");
+    //m_scene->addModel("test", std::unique_ptr<Model>(new Model("models/test.obj")));
+    m_scene->addModel("audi", std::unique_ptr<Model>(new Model("models/Audi_R8.obj")));
+    m_dummy = m_scene->createObject("audi");
 
     m_dummy->getWorld().setToIdentity();
     r = 0.;
+
+    //set directional light:
+    m_scene->setDirectionalLightDirection(QVector3D(0.0,0.0,-1.0));
+    m_scene->setLightColor(QVector3D(1.0,1.0,1.0));
 }
 
 void PrimitiveGame::resize(int width, int height)

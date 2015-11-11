@@ -53,6 +53,7 @@ void Renderer::render(Scene *scene)
         auto *object = it->get();
         m_program.setUniformValue(m_modelViewLoc, scene->getCamera() * object->getWorld());
         m_program.setUniformValue(m_lightDirectionLoc, scene->getDirectionalLightDirection());
+
         m_program.setUniformValue(m_lightColorLoc, scene->getLightColor());
         object->getModel()->draw();
     }
