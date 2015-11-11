@@ -8,10 +8,11 @@ void PrimitiveGame::initialize()
 
     // static camera
     auto &camera = m_scene->getCamera();
-	m_position = QVector3D(0, 5, -10);
+	m_position = QVector3D(0, 0, -10);
+	m_centre = QVector3D(0, 0, 0);
     camera.setToIdentity();
    // camera.translate(0, 0, -10);
-    camera.lookAt(m_position, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+    camera.lookAt(m_position, m_centre, QVector3D(0, 1, 0));
 
     m_scene->addModel("test", std::unique_ptr<Model>(new Model("models/test.obj")));
    // m_scene->addModel("audi", std::unique_ptr<Model>(new Model("models/Audi_R8.obj")));
@@ -45,33 +46,42 @@ Scene *PrimitiveGame::getScene()
 void PrimitiveGame::onDoubleClick()
 {
 	//m_scene->getCamera().translate(0, 0, -5);
+	
 }
 
 void PrimitiveGame::onKeyEvent(int key)
 {
-	std::cout << key << std::endl;
+	
 	if (key == Qt::Key_Right) 
 	{
-		m_position += QVector3D(0.5, 0, 0);
+		m_position += QVector3D(0.0, 0.0, 0.0);
+		rotY += 1.0;
+		QMatrix4x4 matrix44x;
+		matrix44x.setToIdentity();
+		matrix44x.rotate(rotY, 0, 1, 0);
+		QVector3D alpha = matrix44x*QVector3D(0, 0, 1);
 		m_scene->getCamera().setToIdentity();
-		m_scene->getCamera().lookAt(m_position, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+		m_scene->getCamera().lookAt(m_position, m_position+alpha, QVector3D(0, 1, 0));
 	}
 	else if (key == Qt::Key_Left)
 	{
-		m_position -= QVector3D(0.5, 0, 0);
+		m_position -= QVector3D(0, 0, 0);
+		rotX += 1.0;
 		m_scene->getCamera().setToIdentity();
-		m_scene->getCamera().lookAt(m_position, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+		m_scene->getCamera().lookAt(m_position, m_centre, QVector3D(0, 1, 0));
 	}
 	else if (key == Qt::Key_Up)
 	{
-		m_position += QVector3D(0, 0.5, 0);
+		m_position += QVector3D(0, 0, 0.5);
+		m_centre += QVector3D(0, 0, 0);
 		m_scene->getCamera().setToIdentity();
-		m_scene->getCamera().lookAt(m_position, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+		m_scene->getCamera().lookAt(m_position, m_centre, QVector3D(0, 1, 0));
 	}
 	else if (key == Qt::Key_Down)
 	{
-		m_position -= QVector3D(0, 0.5, 0);
+		m_position -= QVector3D(0, 0, 0.5);
+		m_centre -= QVector3D(0, 0, 0);
 		m_scene->getCamera().setToIdentity();
-		m_scene->getCamera().lookAt(m_position, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+		m_scene->getCamera().lookAt(m_position, m_centre, QVector3D(0, 1, 0));
 	}
 }
