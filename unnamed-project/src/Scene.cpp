@@ -46,3 +46,24 @@ Scene::ObjectIterator Scene::objectsEnd()
 {
     return m_objects.cend();
 }
+
+QVector3D &Scene::getDirectionalLightDirection()
+{
+    return m_directionalLightDirection;
+}
+
+QVector3D &Scene::getLightColor()
+{
+    return m_lightColor;
+}
+
+void Scene::setLightColor(const QVector3D &color)
+{
+    this->m_lightColor = color;
+}
+
+void Scene::setDirectionalLightDirection(const QVector3D &direction)
+{
+    this->m_directionalLightDirection = direction;
+}
+
