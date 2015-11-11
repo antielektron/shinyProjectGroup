@@ -1,6 +1,8 @@
 #version 130
 
 in vec3 normal;
+in vec3 v_lightDirection;
+in vec3 v_lightColor;
 
 uniform vec4 color;
 

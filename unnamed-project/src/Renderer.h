@@ -17,6 +17,8 @@ private:
     QOpenGLShaderProgram m_program;
     int m_modelViewLoc;
     int m_projectionLoc;
+    int m_lightDirectionLoc;
+    int m_lightColorLoc;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H

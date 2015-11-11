@@ -23,6 +23,7 @@ void Renderer::initialize()
     }
     m_program.bindAttributeLocation("v_position", 0);
     m_program.bindAttributeLocation("v_normal", 1);
+
     if (!m_program.link())
     {
         std::cerr << "could not link shader program" << std::endl;
@@ -31,6 +32,8 @@ void Renderer::initialize()
     m_program.bind();
     m_modelViewLoc = m_program.uniformLocation("modelView");
     m_projectionLoc = m_program.uniformLocation("projection");
+    m_lightDirectionLoc = m_program.uniformLocation("v_lightDirection");
+    m_lightColorLoc = m_program.uniformLocation("v_lightColor");
 
     m_program.release();
 }
@@ -49,6 +52,8 @@ void Renderer::render(Scene *scene)
     {
         auto *object = it->get();
         m_program.setUniformValue(m_modelViewLoc, scene->getCamera() * object->getWorld());
+        m_program.setUniformValue(m_lightDirectionLoc, scene->getDirectionalLightDirection());
+        m_program.setUniformValue(m_lightColorLoc, scene->getLightColor());
         object->getModel()->draw();
     }
 
