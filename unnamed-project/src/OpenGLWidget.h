@@ -13,7 +13,7 @@
 #include <chrono>
 
 #include "IGame.h"
-#include "Renderer.h"
+#include "IRenderer.h"
 
 class OpenGLWidget : public QOpenGLWidget
 {
@@ -22,6 +22,7 @@ public:
     OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent = nullptr);
 
     void setGame(std::shared_ptr<IGame> game);
+    void setRenderer(std::unique_ptr<IRenderer> renderer);
 
 public slots:
     void cleanup();
@@ -33,7 +34,7 @@ protected:
 
 private:
     std::shared_ptr<IGame> m_game;
-    std::unique_ptr<Renderer> m_renderer;
+    std::unique_ptr<IRenderer> m_renderer;
 
     QTimer m_timer;
     std::chrono::system_clock::time_point start;

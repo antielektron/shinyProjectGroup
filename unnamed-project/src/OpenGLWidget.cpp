@@ -2,8 +2,7 @@
 #include <fstream>
 
 #include "OpenGLWidget.h"
-
-#include "utility.h"
+#include "Renderer.h"
 
 OpenGLWidget::OpenGLWidget(QWidget *parent) :
     QOpenGLWidget(parent),
@@ -42,6 +41,11 @@ OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
 void OpenGLWidget::setGame(std::shared_ptr<IGame> game)
 {
     m_game = std::move(game);
+}
+
+void OpenGLWidget::setRenderer(std::unique_ptr<IRenderer> renderer)
+{
+    m_renderer = std::move(renderer);
 }
 
 void OpenGLWidget::initializeGL()

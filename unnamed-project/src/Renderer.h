@@ -3,14 +3,15 @@
 
 #include <QOpenGLShaderProgram>
 
-class Scene;
+#include "IRenderer.h"
+#include "Scene.h"
 
-class Renderer
+class Renderer : public IRenderer
 {
 public:
-    void initialize();
-    void render(Scene *scene);
-    void resize(int width, int height);
+    virtual void initialize() override;
+    virtual void render(Scene *scene) override;
+    virtual void resize(int width, int height) override;
 
 private:
     QOpenGLShaderProgram m_program;

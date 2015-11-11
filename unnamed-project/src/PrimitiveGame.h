@@ -7,17 +7,13 @@
 class PrimitiveGame : public IGame
 {
 public:
-
     virtual void initialize() override;
-
     virtual void resize(int width, int height) override;
-
     virtual void tick() override;
 
     virtual Scene *getScene() override;
 
 private:
-
     std::unique_ptr<Scene> m_scene;
 
     Object *m_dummy;

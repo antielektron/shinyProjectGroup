@@ -14,7 +14,7 @@ void PrimitiveGame::initialize()
 
     m_scene->addModel("test", std::unique_ptr<Model>(new Model("models/test.obj")));
     m_scene->addModel("audi", std::unique_ptr<Model>(new Model("models/Audi_R8.obj")));
-    m_dummy = m_scene->createObject("test");
+    m_dummy = m_scene->createObject("audi");
 
     m_dummy->getWorld().setToIdentity();
     r = 0.;
