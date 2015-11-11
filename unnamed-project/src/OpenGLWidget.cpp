@@ -71,9 +71,7 @@ void OpenGLWidget::paintGL()
 
     m_game->tick();
 
-    m_renderer->render(m_game->getScene());
-
-
+    m_renderer->render(this->defaultFramebufferObject(), m_game->getScene());
 }
 
 void OpenGLWidget::resizeGL(int width, int height)
