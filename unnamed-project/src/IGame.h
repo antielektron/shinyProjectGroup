@@ -16,6 +16,8 @@ public:
     virtual void tick() = 0;
 
     virtual Scene *getScene() = 0;
+	virtual void onDoubleClick() = 0;
+	virtual void onKeyEvent(int Key) = 0;
 
     // TODO add interface for mouse movements and key strokes
 };

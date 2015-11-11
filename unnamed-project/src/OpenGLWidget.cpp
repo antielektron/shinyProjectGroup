@@ -88,3 +88,13 @@ void OpenGLWidget::cleanup()
     // m_logoVbo.destroy();
     doneCurrent();
 }
+
+void OpenGLWidget::mouseDoubleClickEvent(QMouseEvent * event)
+{
+	m_game->onDoubleClick();
+}
+
+void OpenGLWidget::keyPressEvent(QKeyEvent * event)
+{
+	m_game->onKeyEvent(event->key());
+}

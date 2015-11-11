@@ -13,11 +13,16 @@ public:
 
     virtual Scene *getScene() override;
 
+	virtual void onDoubleClick() override;
+
+	virtual void onKeyEvent(int key) override;
+
 private:
     std::unique_ptr<Scene> m_scene;
 
     Object *m_dummy;
     float r;
+	QVector3D m_position;
 };
 
 #endif // UNNAMED_PROJECT_PRIMITIVE_GAME_H

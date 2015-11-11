@@ -4,6 +4,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QTimer>
+#include <QKeyEvent>
 
 #include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
@@ -31,6 +32,8 @@ protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void resizeGL(int width, int height) Q_DECL_OVERRIDE;
+	void mouseDoubleClickEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
+	void keyPressEvent(QKeyEvent * event) Q_DECL_OVERRIDE;
 
 private:
     std::shared_ptr<IGame> m_game;
