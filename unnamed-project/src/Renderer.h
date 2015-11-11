@@ -25,6 +25,9 @@ private:
     int m_projectionLoc;
     int m_lightDirectionLoc;
     int m_lightColorLoc;
+    int m_alphaLoc;
+    int m_specularAmountLoc;
+    int m_diffuseAmountLoc;
 
     QOpenGLShaderProgram m_composeProgram;
     int m_samplerLoc;

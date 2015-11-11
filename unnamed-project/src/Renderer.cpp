@@ -53,6 +53,9 @@ void Renderer::initialize()
     m_projectionLoc = m_program.uniformLocation("projection");
     m_lightDirectionLoc = m_program.uniformLocation("v_lightDirection");
     m_lightColorLoc = m_program.uniformLocation("v_lightColor");
+    m_alphaLoc = m_program.uniformLocation("mat_alpha");
+    m_specularAmountLoc = m_program.uniformLocation("k_s");
+    m_diffuseAmountLoc = m_program.uniformLocation("k_d");
 
     m_program.release();
 
@@ -127,6 +130,9 @@ void Renderer::render(GLuint fbo, Scene *scene)
         m_program.setUniformValue(m_modelViewLoc, scene->getCamera() * object->getWorld());
         m_program.setUniformValue(m_lightDirectionLoc, scene->getDirectionalLightDirection());
         m_program.setUniformValue(m_lightColorLoc, scene->getLightColor());
+        m_program.setUniformValue(m_alphaLoc, object->getAlpha());
+        m_program.setUniformValue(m_specularAmountLoc, object->getSpecularAmount());
+        m_program.setUniformValue(m_diffuseAmountLoc, object->getDiffuseAmount());
         object->getModel()->draw();
     }
 
