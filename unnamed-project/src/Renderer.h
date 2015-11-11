@@ -19,6 +19,9 @@ private:
     int m_projectionLoc;
     int m_lightDirectionLoc;
     int m_lightColorLoc;
+    int m_alphaLoc;
+    int m_specularAmountLoc;
+    int m_diffuseAmountLoc;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H
