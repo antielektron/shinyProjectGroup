@@ -10,7 +10,7 @@ public:
 
     // OpenGL might not be ready, while the constructor was called!
     virtual void initialize() = 0;
-    virtual void render(Scene *scene) = 0;
+    virtual void render(GLuint fbo, Scene *scene) = 0;
     virtual void resize(int width, int height) = 0;
 };
 
