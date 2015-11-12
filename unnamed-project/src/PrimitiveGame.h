@@ -3,7 +3,7 @@
 
 #include "IGame.h"
 #include "Scene.h"
-#include "QMatrix4x4.h"
+#include <QMatrix4x4>
 
 class PrimitiveGame : public IGame
 {
