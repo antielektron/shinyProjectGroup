@@ -42,8 +42,8 @@ MyGLWidget::MyGLWidget(QWidget *parent) : QOpenGLWidget(parent)
     this->shaderProg = nullptr;
 
     QSurfaceFormat format;
-    format.setMajorVersion(3);
-    format.setMinorVersion(0);
+    format.setMajorVersion(4);
+    format.setMinorVersion(5);
     this->setFormat(format);
 }
 
