@@ -11,25 +11,24 @@ ShaderEditorBox::ShaderEditorBox(IRenderer *renderer, QWidget *parent):
     QDockWidget(parent),
     m_renderer(renderer)
 {
-    m_multiWidget = std::unique_ptr<QWidget>(new QWidget(this));
+    m_multiWidget = new QWidget(this);
 
-    m_layout = std::unique_ptr<QVBoxLayout>(new QVBoxLayout(m_multiWidget.get()));
-    m_vsEditor = std::unique_ptr<CodeEditor>(new CodeEditor(m_multiWidget.get()));
-    m_fsEditor = std::unique_ptr<CodeEditor>(new CodeEditor(m_multiWidget.get()));
+    m_layout = new QVBoxLayout(m_multiWidget);
+    m_vsEditor = new CodeEditor(m_multiWidget);
+    m_fsEditor = new CodeEditor(m_multiWidget);
 
 
-    m_layout->addWidget(m_vsEditor.get());
-    m_layout->addWidget(m_fsEditor.get());
+    m_layout->addWidget(m_vsEditor);
+    m_layout->addWidget(m_fsEditor);
 
-    m_multiWidget->setLayout(m_layout.get());
+    m_multiWidget->setLayout(m_layout);
 
-    this->setWidget(m_multiWidget.get());
+    this->setWidget(m_multiWidget);
 
     //set fancy highlighter:
-    m_highlighterVS = std::unique_ptr<GLSLHighlighter>(
-                new GLSLHighlighter(m_vsEditor->document()));
-    m_highlighterFS = std::unique_ptr<GLSLHighlighter>(
-                new GLSLHighlighter(m_fsEditor->document()));
+    m_highlighterVS = new GLSLHighlighter(m_vsEditor->document());
+    m_highlighterFS = new GLSLHighlighter(m_fsEditor->document());
+
 
 
     m_vsEditor->setPlainText("//vertexShader");

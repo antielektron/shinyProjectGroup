@@ -24,14 +24,14 @@ public:
 
 protected:
 
-    std::unique_ptr<QVBoxLayout> m_layout;
-    std::unique_ptr<CodeEditor> m_vsEditor;
-    std::unique_ptr<CodeEditor> m_fsEditor;
+    QVBoxLayout* m_layout;
+    CodeEditor* m_vsEditor;
+    CodeEditor* m_fsEditor;
 
-    std::unique_ptr<GLSLHighlighter> m_highlighterVS;
-    std::unique_ptr<GLSLHighlighter> m_highlighterFS;
+    GLSLHighlighter* m_highlighterVS;
+    GLSLHighlighter* m_highlighterFS;
 
-    std::unique_ptr<QWidget> m_multiWidget;
+    QWidget* m_multiWidget;
 
     static const QColor errorColor;
     static const QColor allFineColor;
