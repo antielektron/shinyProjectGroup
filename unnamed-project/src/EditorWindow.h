@@ -6,8 +6,10 @@
 #include <QMainWindow>
 #include <QToolBar>
 #include <QAction>
+#include <QLabel>
 
 #include "OpenGLWidget.h"
+#include "ShaderEditorBox.h"
 
 
 class EditorWindow : public QMainWindow
@@ -21,6 +23,7 @@ public:
 protected:
     void createActions();
     void createToolbar();
+    void createStatusbar();
     void createDocks();
 
 
@@ -30,6 +33,10 @@ protected:
     std::unique_ptr<QAction> m_saveScene;
     std::unique_ptr<QAction> m_loadScene;
     std::unique_ptr<QAction> m_newScene;
+    std::unique_ptr<QAction> m_updateShader;
+    std::unique_ptr<QStatusBar> m_statusBar;
+    std::unique_ptr<QLabel> m_fpsLabel;
+    std::unique_ptr<ShaderEditorBox> m_shaderEditorBox;
 
 protected slots:
     void loadScene();

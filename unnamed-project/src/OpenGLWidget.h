@@ -18,21 +18,27 @@
 
 class OpenGLWidget : public QOpenGLWidget
 {
+    Q_OBJECT
 public:
     OpenGLWidget(QWidget *parent = nullptr);
     OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent = nullptr);
 
     void setGame(std::shared_ptr<IGame> game);
     void setRenderer(std::unique_ptr<IRenderer> renderer);
+    IRenderer* getRenderer();
 
 public slots:
     void cleanup();
+
+signals:
+    void glInitEvent();
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
     void resizeGL(int width, int height) Q_DECL_OVERRIDE;
 	void mouseDoubleClickEvent(QMouseEvent * event) Q_DECL_OVERRIDE;
+    void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 	void keyPressEvent(QKeyEvent * event) Q_DECL_OVERRIDE;
 
 private:

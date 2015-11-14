@@ -18,8 +18,9 @@ int main(int argc, char **argv)
     QApplication::setApplicationName("unnamed Project");
     QApplication::setApplicationVersion("build: " __DATE__ " " __TIME__);
 
+    //setup command line argument parser
     QCommandLineParser parser;
-    parser.setApplicationDescription("set description here");
+    parser.setApplicationDescription("set description here"); //TODO: description
     parser.addVersionOption();
     QCommandLineOption editorOption("e", "use scene- and shader editor window");
     parser.addOption(editorOption);
@@ -28,8 +29,6 @@ int main(int argc, char **argv)
     parser.process(app);
 
     bool useDeveloperView = parser.isSet(editorOption);
-
-    //TODO: parse command line argument
 
     if (!useDeveloperView)
     {
@@ -45,9 +44,6 @@ int main(int argc, char **argv)
     editorWindow.show();
 
     return app.exec();
-
-
-    //TODO: useDeveloperView:
 
     return 0;
 }

@@ -48,6 +48,11 @@ void OpenGLWidget::setRenderer(std::unique_ptr<IRenderer> renderer)
     m_renderer = std::move(renderer);
 }
 
+IRenderer *OpenGLWidget::getRenderer()
+{
+    return m_renderer.get();
+}
+
 void OpenGLWidget::initializeGL()
 {
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &OpenGLWidget::cleanup);
@@ -57,6 +62,8 @@ void OpenGLWidget::initializeGL()
 
     auto version = context()->format().version();
     std::cout << "Using OpenGL Version " << version.first << "." << version.second << std::endl;
+
+    emit glInitEvent();
 }
 
 void OpenGLWidget::paintGL()
@@ -90,6 +97,11 @@ void OpenGLWidget::cleanup()
 void OpenGLWidget::mouseDoubleClickEvent(QMouseEvent * event)
 {
 	m_game->onDoubleClick();
+}
+
+void OpenGLWidget::mousePressEvent(QMouseEvent *event)
+{
+    this->setFocus();
 }
 
 void OpenGLWidget::keyPressEvent(QKeyEvent * event)

@@ -2,6 +2,7 @@
 #define UNNAMED_PROJECT_RENDERER_H
 
 #include <QOpenGLShaderProgram>
+#include <memory>
 
 #include "IRenderer.h"
 #include "Scene.h"
@@ -15,12 +16,18 @@ public:
     virtual void initialize() override;
     virtual void render(GLuint fbo, Scene *scene) override;
     virtual void resize(int width, int height) override;
+    virtual OpenglErrorType createShaderProgram(
+            std::string vs, std::string fs) override;
+    virtual std::string &getVertexShader() override;
+    virtual std::string &getFragmentShader() override;
 
 private:
     int m_width;
     int m_height;
 
-    QOpenGLShaderProgram m_program;
+    std::string m_currentVertexShader;
+    std::string m_currentFragmentShader;
+    std::unique_ptr<QOpenGLShaderProgram> m_program;
     int m_modelViewLoc;
     int m_projectionLoc;
     int m_lightDirectionLoc;
