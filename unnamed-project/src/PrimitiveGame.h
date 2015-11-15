@@ -3,6 +3,7 @@
 
 #include "IGame.h"
 #include "Scene.h"
+#include <QMatrix4x4>
 
 class PrimitiveGame : public IGame
 {
@@ -22,7 +23,13 @@ private:
 
     Object *m_dummy;
     float r;
+	float rotY = 0;
+	float rotX = 0;
+
 	QVector3D m_position;
+	QVector3D m_centre;
+	
+
 };
 
 #endif // UNNAMED_PROJECT_PRIMITIVE_GAME_H
