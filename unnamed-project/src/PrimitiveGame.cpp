@@ -8,7 +8,7 @@ void PrimitiveGame::initialize()
 
     // static camera
     auto &camera = m_scene->getCamera();
-	m_position = QVector3D(0, 0, -10);
+	m_position = QVector3D(0, 2, -10);
 	m_centre = QVector3D(0, 0, 0);
     camera.setToIdentity();
    // camera.translate(0, 0, -10);
@@ -58,23 +58,26 @@ void PrimitiveGame::onKeyEvent(int key)
 	
 	if (key == Qt::Key_Right) 
 	{
-		m_position += QVector3D(0.0, 0.0, 0.0);
+		//m_position += QVector3D(0.0, 0.0, 0.0);
 		rotY += 1.0;
 		QMatrix4x4 matrix44x;
 		matrix44x.setToIdentity();
 		matrix44x.rotate(rotY, 0, 1, 0);
 		QVector3D alpha = matrix44x*QVector3D(0, 0, 1);
+		m_centre = m_centre + alpha;
 		m_scene->getCamera().setToIdentity();
-		m_scene->getCamera().lookAt(m_position, m_position+alpha, QVector3D(0, 1, 0));
+		m_scene->getCamera().lookAt(m_position, m_centre, QVector3D(0, 1, 0));
+		
 	}
 	else if (key == Qt::Key_Left)
 	{
-		m_position -= QVector3D(0, 0, 0);
-		rotX += 1.0;
-		QMatrix4x4 matrix44y;
-		matrix44y.setToIdentity();
-		matrix44y.rotate(rotX, 1, 0, 0);
-		QVector3D beta = matrix44y*QVector3D(0, 0, 1);
+		
+		rotY += 1.0;
+		QMatrix4x4 matrix44x;
+		matrix44x.setToIdentity();
+		matrix44x.rotate(rotY, 0, -1, 0);
+		QVector3D alpha = matrix44x*QVector3D(0, 0, 1);
+		m_centre = m_centre + alpha;
 		m_scene->getCamera().setToIdentity();
 		m_scene->getCamera().lookAt(m_position, m_centre, QVector3D(0, 1, 0));
 	}
