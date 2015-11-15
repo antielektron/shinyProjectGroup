@@ -71,6 +71,10 @@ void PrimitiveGame::onKeyEvent(int key)
 	{
 		m_position -= QVector3D(0, 0, 0);
 		rotX += 1.0;
+		QMatrix4x4 matrix44y;
+		matrix44y.setToIdentity();
+		matrix44y.rotate(rotX, 1, 0, 0);
+		QVector3D beta = matrix44y*QVector3D(0, 0, 1);
 		m_scene->getCamera().setToIdentity();
 		m_scene->getCamera().lookAt(m_position, m_centre, QVector3D(0, 1, 0));
 	}
