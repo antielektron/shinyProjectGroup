@@ -38,7 +38,7 @@ void PrimitiveGame::tick()
     auto &world = m_dummy->getWorld();
     world.setToIdentity();
 
-    //r+= 1.f;
+    r+= 1.f;
     world.rotate(r, 0, 1, 0);
 }
 
