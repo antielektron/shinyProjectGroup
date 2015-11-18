@@ -38,7 +38,7 @@ ShaderEditorBox::ShaderEditorBox(IRenderer *renderer, QWidget *parent):
     m_fsEditor->setToolTip("Fragment Shader");
 
     this->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-    this->setTitleBarWidget(new QLabel("shader Editor"));
+    this->setWindowTitle("Shader Editor");
 
 }
 

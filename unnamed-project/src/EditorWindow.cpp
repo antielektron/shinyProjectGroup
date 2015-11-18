@@ -64,6 +64,16 @@ void EditorWindow::createDocks()
     m_shaderEditorBox->setAllowedAreas(
                 Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     addDockWidget(Qt::RightDockWidgetArea,m_shaderEditorBox.get());
+
+    //create object Toolbox:
+    m_objectToolbox = std::unique_ptr<ObjectToolbox>(
+                new ObjectToolbox(this));
+    m_objectToolbox->setAllowedAreas(
+                Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, m_objectToolbox.get());
+
+    this->tabifyDockWidget(m_shaderEditorBox.get(), m_objectToolbox.get());
+
 }
 
 void EditorWindow::createStatusbar()

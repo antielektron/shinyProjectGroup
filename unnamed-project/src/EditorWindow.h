@@ -10,6 +10,7 @@
 
 #include "OpenGLWidget.h"
 #include "ShaderEditorBox.h"
+#include "ObjectToolbox.h"
 
 
 class EditorWindow : public QMainWindow
@@ -37,6 +38,7 @@ protected:
     std::unique_ptr<QStatusBar> m_statusBar;
     std::unique_ptr<QLabel> m_fpsLabel;
     std::unique_ptr<ShaderEditorBox> m_shaderEditorBox;
+    std::unique_ptr<ObjectToolbox> m_objectToolbox;
 
 protected slots:
     void loadScene();
