@@ -17,6 +17,7 @@ public:
 	virtual void onDoubleClick() override;
 
 	virtual void onKeyEvent(int key) override;
+	
 
 private:
     std::unique_ptr<Scene> m_scene;
@@ -25,9 +26,14 @@ private:
     float r;
 	float rotY = 0;
 	float rotX = 0;
+	float pos_height = 0;
+	
 
 	QVector3D m_position;
 	QVector3D m_centre;
+	QMatrix4x4 posMatrix;
+
+	void updatePosMatrix(QVector3D deltaPos);
 	
 
 };
