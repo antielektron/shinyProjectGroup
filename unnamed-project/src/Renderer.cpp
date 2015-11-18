@@ -181,13 +181,13 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+    f->glActiveTexture(GL_TEXTURE0);
+    f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
     m_composeProgram.setUniformValue(m_samplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
 
-    glDrawArrays(GL_QUADS, 0, 4);
+    f->glDrawArrays(GL_QUADS, 0, 4);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    f->glBindTexture(GL_TEXTURE_2D, 0);
 
     m_composeProgram.release();
 
@@ -195,6 +195,8 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
 void Renderer::resize(int width, int height)
 {
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+
     m_width = width;
     m_height = height;
 
@@ -205,34 +207,31 @@ void Renderer::resize(int width, int height)
     // hm
     // glViewport(0, 0, width, height);
 
-    // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-    glGenFramebuffers(1, &m_frameBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
-
-    // The texture we're going to render to
-    glGenTextures(1, &m_renderTexture);
-
-    // "Bind" the newly created texture : all future texture functions will modify this texture
-    glBindTexture(GL_TEXTURE_2D, m_renderTexture);
-
+    // Create texture
+    f->glGenTextures(1, &m_renderTexture);
+    f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
+    f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     // Poor filtering. Needed!
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    f->glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create depth buffer!
-    glGenRenderbuffers(1, &m_depthBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_depthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
+    f->glGenRenderbuffers(1, &m_depthBuffer);
+    f->glBindRenderbuffer(GL_RENDERBUFFER, m_depthBuffer);
+    f->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
+    f->glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-    // Set "renderedTexture" as our colour attachement #0
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_renderTexture, 0);
-    // f->glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_renderTexture, 0);
+    // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
+    f->glGenFramebuffers(1, &m_frameBuffer);
+    f->glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
+    f->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
+    // Set "renderTexture" as our colour attachement #0
+    f->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_renderTexture, 0);
+    // glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_renderTexture, 0);
 
     // Set the list of draw buffers.
-    GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, drawBuffers); // "1" is the size of DrawBuffers
+    // GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    // glDrawBuffers(1, drawBuffers); // "1" is the size of DrawBuffers
 }
