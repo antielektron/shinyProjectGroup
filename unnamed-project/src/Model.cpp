@@ -121,7 +121,7 @@ void Model::loadObj(const std::string &fileName)
         }
         else
         {
-            //std::cout << "Ignoring '" << command << "' option in .obj file" << std::endl;
+            // std::cout << "Ignoring '" << command << "' option in .obj file" << std::endl;
         }
     }
     std::cout << m_vertices.size() << std::endl;

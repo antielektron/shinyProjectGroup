@@ -7,7 +7,7 @@ Object::Object(Model *model) :
 {
     alpha = 1.0;
     specularAmount = 1;
-    diffuseAmount = 0.5;
+    diffuseAmount = 0.2;
 }
 
 void Object::setWorld(const QMatrix4x4 &world)
