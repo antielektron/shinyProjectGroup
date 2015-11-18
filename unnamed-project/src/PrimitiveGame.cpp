@@ -7,8 +7,9 @@ void PrimitiveGame::initialize()
     m_scene = std::unique_ptr<Scene>(new Scene());
 
     // static camera
+    m_position = QVector3D(0, 0, 5);
 	updatePosMatrix(QVector3D(0,0,0));
-	m_position = QVector3D(0, 0, 5);
+
 
 
     //m_scene->addModel("test", std::unique_ptr<Model>(new Model("models/test.obj")));
@@ -57,7 +58,7 @@ void PrimitiveGame::onKeyEvent(int key)
 
 	if (key == Qt::Key_Right) 
 	{
-		rotY += 1.0;
+        rotY -= 1.0;
 		 /*QMatrix4x4 matrix44x;
 		matrix44x.setToIdentity();
 		matrix44x.rotate(rotY, 0, 1, 0);
@@ -70,29 +71,29 @@ void PrimitiveGame::onKeyEvent(int key)
 	}
 	else if (key == Qt::Key_Left)
 	{
-		rotY -= 1.0;
+        rotY += 1.0;
 	}
 	else if (key == Qt::Key_Up)
 	{
-		rotX -= 1.0;
+        rotX += 1.0;
 	}
 	else if (key == Qt::Key_Down)
 	{
-		rotX += 1.0;
+        rotX -= 1.0;
 	}
-	else if (key == Qt::Key_W)
+    else if (key == Qt::Key_S)
 	{
 		deltaPos += QVector3D(0, 0, 0.5);
 	}
-	else if (key == Qt::Key_S)
+    else if (key == Qt::Key_W)
 	{
 		deltaPos += QVector3D(0, 0, -0.5);
 	}
-	else if (key == Qt::Key_A)
+    else if (key == Qt::Key_D)
 	{
 		deltaPos += QVector3D(0.5, 0, 0);
 	}
-	else if (key == Qt::Key_D)
+    else if (key == Qt::Key_A)
 	{
 		deltaPos += QVector3D(-0.5, 0, 0);
 	}
@@ -112,6 +113,10 @@ void PrimitiveGame::updatePosMatrix(QVector3D deltaPos)
 	QMatrix4x4 xRotation;
 	QMatrix4x4 yRotation;
 
+    xRotation.setToIdentity();
+    yRotation.setToIdentity();
+    translate.setToIdentity();
+
 	camera.setToIdentity();
 	xRotation.rotate(rotX, 1, 0, 0);
 	yRotation.rotate(rotY, 0, 1, 0);
@@ -119,7 +124,13 @@ void PrimitiveGame::updatePosMatrix(QVector3D deltaPos)
 
 	m_position += (xRotation * yRotation) * deltaPos;
 
-	translate.translate(m_position);
+    xRotation.setToIdentity();
+    yRotation.setToIdentity();
+    translate.setToIdentity();
+
+    xRotation.rotate(-rotX, 1, 0, 0);
+    yRotation.rotate(-rotY, 0, 1, 0);
+    translate.translate(-1 * m_position);
 
 	camera = ((xRotation * yRotation *translate));
 	
