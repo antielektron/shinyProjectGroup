@@ -65,20 +65,20 @@ void PrimitiveGame::onKeyEvent(int key)
 		matrix44x.setToIdentity();
 		matrix44x.rotate(rotY, 0, 1, 0);
 		QVector3D alpha = matrix44x*QVector3D(0, 0, 1);
-		m_centre = m_centre + alpha;
+		m_centre = m_position + alpha;
 		m_scene->getCamera().setToIdentity();
 		m_scene->getCamera().lookAt(m_position, m_centre, QVector3D(0, 1, 0));
+		std::cout << rotY << " alpha-Wert ";
 		
 	}
 	else if (key == Qt::Key_Left)
 	{
-		
 		rotY += 1.0;
 		QMatrix4x4 matrix44x;
 		matrix44x.setToIdentity();
 		matrix44x.rotate(rotY, 0, -1, 0);
 		QVector3D alpha = matrix44x*QVector3D(0, 0, 1);
-		m_centre = m_centre + alpha;
+		m_centre = m_position + alpha;
 		m_scene->getCamera().setToIdentity();
 		m_scene->getCamera().lookAt(m_position, m_centre, QVector3D(0, 1, 0));
 	}
