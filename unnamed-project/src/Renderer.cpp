@@ -18,10 +18,12 @@ Renderer::Renderer() :
 
 Renderer::~Renderer()
 {
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+
     // Delete the manually created objects!
-    glDeleteFramebuffers(1, &m_frameBuffer);
-    glDeleteTextures(1, &m_renderTexture);
-    glDeleteRenderbuffers(1, &m_depthBuffer);
+    f->glDeleteFramebuffers(1, &m_frameBuffer);
+    f->glDeleteTextures(1, &m_renderTexture);
+    f->glDeleteRenderbuffers(1, &m_depthBuffer);
 }
 
 OpenglErrorType Renderer::createShaderProgram(std::string vs, std::string fs)
@@ -200,9 +202,9 @@ void Renderer::resize(int width, int height)
     m_width = width;
     m_height = height;
 
-    glDeleteFramebuffers(1, &m_frameBuffer);
-    glDeleteTextures(1, &m_renderTexture);
-    glDeleteRenderbuffers(1, &m_depthBuffer);
+    f->glDeleteFramebuffers(1, &m_frameBuffer);
+    f->glDeleteTextures(1, &m_renderTexture);
+    f->glDeleteRenderbuffers(1, &m_depthBuffer);
 
     // hm
     // glViewport(0, 0, width, height);
