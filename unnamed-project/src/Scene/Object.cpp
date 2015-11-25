@@ -1,6 +1,6 @@
-#include "Object.h"
+#include "Scene/Object.h"
 
-#include "Model.h"
+#include "Scene/Model.h"
 
 Object::Object(Model *model) :
     m_model(model)
@@ -8,11 +8,6 @@ Object::Object(Model *model) :
     alpha = 1.0;
     specularAmount = 1;
     diffuseAmount = 0.2;
-}
-
-void Object::setWorld(const QMatrix4x4 &world)
-{
-    m_world = world;
 }
 
 void Object::setAlpha(float a)
@@ -28,11 +23,6 @@ void Object::setDiffuseAmount(float diff)
 void Object::setSpecularAmount(float spec)
 {
     this->specularAmount = spec;
-}
-
-QMatrix4x4 &Object::getWorld()
-{
-    return m_world;
 }
 
 Model *Object::getModel()

@@ -1,5 +1,5 @@
-#ifndef UNNAMED_PROJECT_MODEL_H
-#define UNNAMED_PROJECT_MODEL_H
+#ifndef UNNAMED_PROJECT_SCENE_MODEL_H
+#define UNNAMED_PROJECT_SCENE_MODEL_H
 
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
@@ -32,4 +32,4 @@ private:
 
 };
 
-#endif // UNNAMED_PROJECT_MODEL_H
+#endif // UNNAMED_PROJECT_SCENE_MODEL_H

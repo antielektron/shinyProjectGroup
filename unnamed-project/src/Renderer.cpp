@@ -5,7 +5,7 @@
 #include <QtGui/qopenglframebufferobject.h>
 
 #include "Renderer.h"
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 #include "utility.h"
 

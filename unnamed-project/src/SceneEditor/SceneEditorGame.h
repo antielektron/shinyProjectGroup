@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "IGame.h"
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 class SceneEditorGame : public IGame
 {

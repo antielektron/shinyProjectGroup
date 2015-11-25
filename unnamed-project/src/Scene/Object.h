@@ -1,16 +1,16 @@
-#ifndef UNNAMED_PROJECT_OBJECT_H
-#define UNNAMED_PROJECT_OBJECT_H
+#ifndef UNNAMED_PROJECT_SCENE_OBJECT_H
+#define UNNAMED_PROJECT_SCENE_OBJECT_H
 
 #include <QMatrix4x4>
 
+#include "Scene/ObjectBase.h"
+
 class Model;
 
-class Object
+class Object : public ObjectBase
 {
 public:
     Object(Model *model);
-
-    void setWorld(const QMatrix4x4 &world);
 
     void setAlpha(float a);
     void setSpecularAmount(float spec);
@@ -20,22 +20,18 @@ public:
     float getSpecularAmount();
     float getDiffuseAmount();
 
-    QMatrix4x4 &getWorld();
-
     Model *getModel();
 
 private:
     // model not owned
     Model *m_model;
-    QMatrix4x4 m_world;
 
     //material information for phong shading:
     float alpha;
     float specularAmount;
     float diffuseAmount;
 
-
     // TODO material information
 };
 
-#endif // UNNAMED_PROJECT_OBJECT_H
+#endif // UNNAMED_PROJECT_SCENE_OBJECT_H

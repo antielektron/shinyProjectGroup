@@ -1,6 +1,6 @@
 #include <cassert>
 
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 void Scene::setCamera(const QMatrix4x4 &camera)
 {

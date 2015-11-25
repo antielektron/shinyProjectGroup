@@ -1,9 +1,10 @@
 #ifndef UNNAMED_PROJECT_PRIMITIVE_GAME_H
 #define UNNAMED_PROJECT_PRIMITIVE_GAME_H
 
-#include "IGame.h"
-#include "Scene.h"
 #include <QMatrix4x4>
+
+#include "IGame.h"
+#include "Scene/Scene.h"
 
 class PrimitiveGame : public IGame
 {

@@ -8,7 +8,6 @@
 #include "LineNumberArea.h"
 
 //=============================================================================
-
 CodeEditor::CodeEditor(QWidget *parent) :
     QTextEdit(parent)
 {
@@ -191,7 +190,6 @@ void CodeEditor::lineNumberPaintEvent(QPaintEvent *event)
 }
 
 //=============================================================================
-
 void CodeEditor::onTextChanged()
 {
     //if we have a newline, we will indent the new line like the previous one
@@ -217,18 +215,11 @@ void CodeEditor::onTextChanged()
                 }
                 textCursor().insertText(indent);
             }
-
         }
-
-
-
-
     }
-
 }
 
 //=============================================================================
-
 void CodeEditor::onCursorChanged()
 {
     prevCursorLine = currentCursorLine;

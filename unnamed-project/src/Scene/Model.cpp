@@ -3,7 +3,7 @@
 #include <sstream>
 #include <cassert>
 
-#include "Model.h"
+#include "Scene/Model.h"
 
 namespace std
 {

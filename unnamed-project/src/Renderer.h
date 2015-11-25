@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "IRenderer.h"
-#include "Scene.h"
+#include "Scene/Scene.h"
 
 class Renderer : public IRenderer
 {

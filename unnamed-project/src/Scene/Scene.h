@@ -1,5 +1,5 @@
-#ifndef UNNAMED_PROJECT_SCENE_H
-#define UNNAMED_PROJECT_SCENE_H
+#ifndef UNNAMED_PROJECT_SCENE_SCENE_H
+#define UNNAMED_PROJECT_SCENE_SCENE_H
 
 #include <QMatrix4x4>
 #include <QColor>
@@ -9,8 +9,8 @@
 #include <string>
 #include <memory>
 
-#include "Model.h"
-#include "Object.h"
+#include "Scene/Model.h"
+#include "Scene/Object.h"
 
 class Scene
 {
@@ -49,4 +49,4 @@ private:
     std::vector<std::unique_ptr<Object>> m_objects;
 };
 
-#endif // UNNAMED_PROJECT_SCENE_H
+#endif // UNNAMED_PROJECT_SCENE_SCENE_H
