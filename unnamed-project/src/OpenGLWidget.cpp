@@ -127,13 +127,3 @@ void OpenGLWidget::keyReleaseEvent(QKeyEvent *event)
 {
     m_game->onKeyUp(event->key());
 }
-
-/*
-void grabMouse();
-#ifndef QT_NO_CURSOR
-void grabMouse(const QCursor &);
-#endif
-void releaseMouse();
-void grabKeyboard();
-void releaseKeyboard();
-*/
