@@ -18,6 +18,9 @@ find_package(OpenGL REQUIRED)
 file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
 add_executable(unnamed-project ${SOURCE_FILES})
 
+# Specify absolute paths when including files
+include_directories(src/)
+
 # Use the Widgets module from Qt 5.
 qt5_use_modules(unnamed-project Widgets)
 

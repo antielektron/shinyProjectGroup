@@ -6,6 +6,7 @@
 #include "OpenGLWidget.h"
 #include "PrimitiveGame.h"
 #include "EditorWindow.h"
+#include "sceneeditor/SceneEditorWidget.h"
 
 
 // http://www.ics.com/blog/qt-and-opengl-part-2-rendering-3d-model
@@ -22,28 +23,36 @@ int main(int argc, char **argv)
     QCommandLineParser parser;
     parser.setApplicationDescription("set description here"); //TODO: description
     parser.addVersionOption();
-    QCommandLineOption editorOption("e", "use scene- and shader editor window");
-    parser.addOption(editorOption);
-    parser.addHelpOption();
 
+    QCommandLineOption shaderEditorOption("e", "Start the shader editor");
+    parser.addOption(shaderEditorOption);
+
+    QCommandLineOption sceneEditorOption("sceneeditor", "Start the scene editor");
+    parser.addOption(sceneEditorOption);
+
+    parser.addHelpOption();
     parser.process(app);
 
-    bool useDeveloperView = parser.isSet(editorOption);
-
-    if (!useDeveloperView)
+    if (parser.isSet(shaderEditorOption))
     {
+        EditorWindow editorWindow(new OpenGLWidget(std::make_shared<PrimitiveGame>()));
+        editorWindow.show();
 
+        return app.exec();
+    }
+    else if (parser.isSet(sceneEditorOption))
+    {
+        SceneEditorWidget sceneEditor;
+        sceneEditor.show();
+
+        return app.exec();
+    }
+    else
+    {
+        // Start the regular primitive game ..
         OpenGLWidget widget(std::make_shared<PrimitiveGame>());
         widget.show();
 
         return app.exec();
     }
-    //else:
-
-    EditorWindow editorWindow(new OpenGLWidget(std::make_shared<PrimitiveGame>()));
-    editorWindow.show();
-
-    return app.exec();
-
-    return 0;
 }
