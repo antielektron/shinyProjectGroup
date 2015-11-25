@@ -1,9 +1,11 @@
-#include "CodeEditor.h"
-#include "LineNumberArea.h"
 #include <iostream>
+
 #include <QTextBlock>
 #include <QPainter>
 #include <QScrollBar>
+
+#include "CodeEditor.h"
+#include "LineNumberArea.h"
 
 //=============================================================================
 

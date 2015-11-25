@@ -1,5 +1,5 @@
-#ifndef CODEEDITOR_H
-#define CODEEDITOR_H
+#ifndef UNNAMED_PROJECT_SHADER_EDITOR_CODE_EDITOR_H
+#define UNNAMED_PROJECT_SHADER_EDITOR_CODE_EDITOR_H
 
 #include <QPlainTextEdit>
 #include <QPaintEvent>
@@ -43,4 +43,4 @@ protected slots:
 
 };
 
-#endif // CODEEDITOR_H
+#endif // UNNAMED_PROJECT_SHADER_EDITOR_CODE_EDITOR_H

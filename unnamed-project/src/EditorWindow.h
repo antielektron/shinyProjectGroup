@@ -9,7 +9,7 @@
 #include <QLabel>
 
 #include "OpenGLWidget.h"
-#include "ShaderEditorBox.h"
+#include "shadereditor/ShaderEditorWidget.h"
 #include "ObjectToolbox.h"
 
 
@@ -27,18 +27,17 @@ protected:
     void createStatusbar();
     void createDocks();
 
-
-    std::unique_ptr<QToolBar> m_toolbar;
+    QToolBar *m_toolbar;
     OpenGLWidget* m_glWidget;
 
-    std::unique_ptr<QAction> m_saveScene;
-    std::unique_ptr<QAction> m_loadScene;
-    std::unique_ptr<QAction> m_newScene;
-    std::unique_ptr<QAction> m_updateShader;
-    std::unique_ptr<QStatusBar> m_statusBar;
-    std::unique_ptr<QLabel> m_fpsLabel;
-    std::unique_ptr<ShaderEditorBox> m_shaderEditorBox;
-    std::unique_ptr<ObjectToolbox> m_objectToolbox;
+    QAction *m_saveScene;
+    QAction *m_loadScene;
+    QAction *m_newScene;
+    QAction *m_updateShader;
+    QStatusBar *m_statusBar;
+    QLabel *m_fpsLabel;
+    ShaderEditorWidget *m_shaderEditorWidget;
+    ObjectToolbox *m_objectToolbox;
 
 protected slots:
     void loadScene();

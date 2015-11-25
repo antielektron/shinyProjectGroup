@@ -1,13 +1,13 @@
-#include "ShaderEditorBox.h"
 #include <iostream>
-#include <QLabel>
 
-const QColor ShaderEditorBox::allFineColor = QColor::fromRgb(210,255,210);
-const QColor ShaderEditorBox::errorColor = QColor::fromRgb(255,210,210);
+#include "shadereditor/ShaderEditorWidget.h"
+
+const QColor ShaderEditorWidget::allFineColor = QColor::fromRgb(210,255,210);
+const QColor ShaderEditorWidget::errorColor = QColor::fromRgb(255,210,210);
 
 //=============================================================================
 
-ShaderEditorBox::ShaderEditorBox(IRenderer *renderer, QWidget *parent):
+ShaderEditorWidget::ShaderEditorWidget(IRenderer *renderer, QWidget *parent):
     QDockWidget(parent),
     m_renderer(renderer)
 {
@@ -44,22 +44,21 @@ ShaderEditorBox::ShaderEditorBox(IRenderer *renderer, QWidget *parent):
 
 //=============================================================================
 
-ShaderEditorBox::~ShaderEditorBox()
+ShaderEditorWidget::~ShaderEditorWidget()
 {
     //nothing to do here!
 }
 
 //=============================================================================
 
-void ShaderEditorBox::createShaderProgram()
+void ShaderEditorWidget::createShaderProgram()
 {
-    OpenglErrorType errCode;
-    errCode = m_renderer->createShaderProgram(
+    auto errCode = m_renderer->createShaderProgram(
                 m_vsEditor->toPlainText().toStdString(),
                 m_fsEditor->toPlainText().toStdString());
-    switch(errCode)
+    switch (errCode)
     {
-    case OpenglErrorType::noError:
+    case ShaderErrorType::NoError:
     {
         QPalette p = m_vsEditor->palette();
         p.setColor(QPalette::Base, allFineColor);
@@ -67,21 +66,21 @@ void ShaderEditorBox::createShaderProgram()
         m_fsEditor->setPalette(p);
         break;
     }
-    case OpenglErrorType::vertexShaderError:
+    case ShaderErrorType::VertexShaderError:
     {
         QPalette p = m_vsEditor->palette();
         p.setColor(QPalette::Base, errorColor);
         m_vsEditor->setPalette(p);
         break;
     }
-    case OpenglErrorType::fragmentShaderError:
+    case ShaderErrorType::FragmentShaderError:
     {
         QPalette p = m_fsEditor->palette();
         p.setColor(QPalette::Base, errorColor);
         m_fsEditor->setPalette(p);
         break;
     }
-    case OpenglErrorType::linkingError:
+    case ShaderErrorType::LinkingError:
     {
         std::cout << "LinkingError" << std::endl;
         //TODO: status bar text
@@ -94,14 +93,13 @@ void ShaderEditorBox::createShaderProgram()
         m_vsEditor->setPalette(p);
         m_fsEditor->setPalette(p);
         break;
-
     }
     }
 }
 
 //=============================================================================
 
-void ShaderEditorBox::updateShaderFromRenderer()
+void ShaderEditorWidget::updateShaderFromRenderer()
 {
     std::string vs = m_renderer->getVertexShader();
     std::string fs = m_renderer->getFragmentShader();
@@ -109,4 +107,3 @@ void ShaderEditorBox::updateShaderFromRenderer()
     m_vsEditor->setPlainText(QString::fromStdString(vs));
     m_fsEditor->setPlainText(QString::fromStdString(fs));
 }
-

@@ -16,8 +16,7 @@ public:
     virtual void initialize() override;
     virtual void render(GLuint fbo, Scene *scene) override;
     virtual void resize(int width, int height) override;
-    virtual OpenglErrorType createShaderProgram(
-            std::string vs, std::string fs) override;
+    virtual ShaderErrorType createShaderProgram(const std::string &vs, const std::string &fs) override;
     virtual std::string &getVertexShader() override;
     virtual std::string &getFragmentShader() override;
 

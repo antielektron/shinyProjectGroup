@@ -26,25 +26,19 @@ Renderer::~Renderer()
     f->glDeleteRenderbuffers(1, &m_depthBuffer);
 }
 
-OpenglErrorType Renderer::createShaderProgram(std::string vs, std::string fs)
+ShaderErrorType Renderer::createShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource)
 {
-    OpenglErrorType retVal = OpenglErrorType::noError;
-
-    std::string vertexShaderSource = vs;
-    std::string fragmentShaderSource = fs;
-
-    std::unique_ptr<QOpenGLShaderProgram> prog(
-                new QOpenGLShaderProgram());
+    std::unique_ptr<QOpenGLShaderProgram> prog(new QOpenGLShaderProgram());
 
     if (!prog->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource.c_str()))
     {
         std::cerr << "could not load vertex shader" << std::endl;
-        retVal = OpenglErrorType::vertexShaderError;
+        return ShaderErrorType::VertexShaderError;
     }
     if (!prog->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource.c_str()))
     {
         std::cerr << "could not load fragment shader" << std::endl;
-        retVal = OpenglErrorType::fragmentShaderError;
+        return ShaderErrorType::FragmentShaderError;
     }
     prog->bindAttributeLocation("v_position", 0);
     prog->bindAttributeLocation("v_normal", 1);
@@ -52,28 +46,25 @@ OpenglErrorType Renderer::createShaderProgram(std::string vs, std::string fs)
     if (!prog->link())
     {
         std::cerr << "could not link shader program" << std::endl;
-        retVal = OpenglErrorType::linkingError;
+        return ShaderErrorType::LinkingError;
     }
 
-    if (retVal == OpenglErrorType::noError)
-    {
-        m_program = std::move(prog);
-        m_currentVertexShader = vertexShaderSource;
-        m_currentFragmentShader = fragmentShaderSource;
+    m_program = std::move(prog);
+    m_currentVertexShader = vertexShaderSource;
+    m_currentFragmentShader = fragmentShaderSource;
 
-        m_program->bind();
-        m_modelViewLoc = m_program->uniformLocation("modelView");
-        m_projectionLoc = m_program->uniformLocation("projection");
-        m_lightDirectionLoc = m_program->uniformLocation("v_lightDirection");
-        m_lightColorLoc = m_program->uniformLocation("v_lightColor");
-        m_alphaLoc = m_program->uniformLocation("mat_alpha");
-        m_specularAmountLoc = m_program->uniformLocation("k_s");
-        m_diffuseAmountLoc = m_program->uniformLocation("k_d");
+    m_program->bind();
+    m_modelViewLoc = m_program->uniformLocation("modelView");
+    m_projectionLoc = m_program->uniformLocation("projection");
+    m_lightDirectionLoc = m_program->uniformLocation("v_lightDirection");
+    m_lightColorLoc = m_program->uniformLocation("v_lightColor");
+    m_alphaLoc = m_program->uniformLocation("mat_alpha");
+    m_specularAmountLoc = m_program->uniformLocation("k_s");
+    m_diffuseAmountLoc = m_program->uniformLocation("k_d");
 
-        m_program->release();
-    }
+    m_program->release();
 
-    return retVal;
+    return ShaderErrorType::NoError;
 }
 
 std::string &Renderer::getVertexShader()

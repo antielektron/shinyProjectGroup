@@ -20,7 +20,7 @@ EditorWindow::EditorWindow(OpenGLWidget* widget, QWidget *parent) :
     createActions();
     createToolbar();
 
-    connect(m_glWidget, SIGNAL(glInitEvent()),m_shaderEditorBox.get(), SLOT(updateShaderFromRenderer()));
+    connect(m_glWidget, SIGNAL(glInitEvent()),m_shaderEditorWidget, SLOT(updateShaderFromRenderer()));
 
     setMinimumWidth(800);
     setMinimumHeight(600);
@@ -31,57 +31,52 @@ void EditorWindow::createActions()
     //create Actions:
     QStyle* style = QApplication::style();
 
-    m_loadScene = std::unique_ptr<QAction>(new QAction(style->standardIcon(QStyle::SP_DirOpenIcon),"load Scene", this));
-    m_saveScene = std::unique_ptr<QAction>(new QAction(style->standardIcon(QStyle::SP_DialogSaveButton), "save Scene", this));
-    m_newScene = std::unique_ptr<QAction>(new QAction(style->standardIcon(QStyle::SP_FileIcon), "new Scene", this));
-    m_updateShader = std::unique_ptr<QAction>(new QAction(style->standardIcon(QStyle::SP_BrowserReload), "update Shader",this));
+    m_loadScene = new QAction(style->standardIcon(QStyle::SP_DirOpenIcon),"load Scene", this);
+    m_saveScene = new QAction(style->standardIcon(QStyle::SP_DialogSaveButton), "save Scene", this);
+    m_newScene = new QAction(style->standardIcon(QStyle::SP_FileIcon), "new Scene", this);
+    m_updateShader = new QAction(style->standardIcon(QStyle::SP_BrowserReload), "update Shader",this);
 
     m_loadScene->setShortcut(QKeySequence::Open);
     m_saveScene->setShortcut(QKeySequence::Save);
     m_newScene->setShortcut(QKeySequence::New);
     m_updateShader->setShortcut(QKeySequence::Refresh);
 
-    connect(m_loadScene.get(), SIGNAL(triggered()), this, SLOT(loadScene()));
-    connect(m_saveScene.get(), SIGNAL(triggered()), this, SLOT(saveScene()));
-    connect(m_newScene.get(), SIGNAL(triggered()), this, SLOT(newScene()));
-    connect(m_updateShader.get(), SIGNAL(triggered()), m_shaderEditorBox.get(), SLOT(createShaderProgram()));
+    connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
+    connect(m_saveScene, SIGNAL(triggered()), this, SLOT(saveScene()));
+    connect(m_newScene, SIGNAL(triggered()), this, SLOT(newScene()));
+    connect(m_updateShader, SIGNAL(triggered()), m_shaderEditorWidget, SLOT(createShaderProgram()));
 }
 
 void EditorWindow::createToolbar()
 {
-    m_toolbar = std::unique_ptr<QToolBar>(addToolBar("Toolbar"));
+    m_toolbar = addToolBar("Toolbar");
     m_toolbar->setMovable(false);
-    m_toolbar->addAction(m_newScene.get());
-    m_toolbar->addAction(m_saveScene.get());
-    m_toolbar->addAction(m_loadScene.get());
-    m_toolbar->addAction(m_updateShader.get());
+    m_toolbar->addAction(m_newScene);
+    m_toolbar->addAction(m_saveScene);
+    m_toolbar->addAction(m_loadScene);
+    m_toolbar->addAction(m_updateShader);
 }
 
 void EditorWindow::createDocks()
 {
-    m_shaderEditorBox = std::unique_ptr<ShaderEditorBox>(
-                new ShaderEditorBox(m_glWidget->getRenderer()));
-    m_shaderEditorBox->setAllowedAreas(
-                Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    addDockWidget(Qt::RightDockWidgetArea,m_shaderEditorBox.get());
+    m_shaderEditorWidget = new ShaderEditorWidget(m_glWidget->getRenderer(), this);
+    m_shaderEditorWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, m_shaderEditorWidget);
 
     //create object Toolbox:
-    m_objectToolbox = std::unique_ptr<ObjectToolbox>(
-                new ObjectToolbox(this));
-    m_objectToolbox->setAllowedAreas(
-                Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-    addDockWidget(Qt::RightDockWidgetArea, m_objectToolbox.get());
+    m_objectToolbox = new ObjectToolbox(this);
+    m_objectToolbox->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    addDockWidget(Qt::RightDockWidgetArea, m_objectToolbox);
 
-    this->tabifyDockWidget(m_shaderEditorBox.get(), m_objectToolbox.get());
-
+    this->tabifyDockWidget(m_shaderEditorWidget, m_objectToolbox);
 }
 
 void EditorWindow::createStatusbar()
 {
-    m_statusBar = std::unique_ptr<QStatusBar>(new QStatusBar(this));
-    m_fpsLabel = std::unique_ptr<QLabel>(new QLabel("fps: TODO", this));
-    m_statusBar->addWidget(m_fpsLabel.get());
-    setStatusBar(m_statusBar.get());
+    m_statusBar = new QStatusBar(this);
+    m_fpsLabel = new QLabel("fps: TODO", this);
+    m_statusBar->addWidget(m_fpsLabel);
+    setStatusBar(m_statusBar);
 }
 
 void EditorWindow::loadScene()

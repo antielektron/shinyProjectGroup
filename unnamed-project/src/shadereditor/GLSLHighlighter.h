@@ -1,13 +1,11 @@
-#ifndef GLSLHIGHLIGHTER_H
-#define GLSLHIGHLIGHTER_H
+#ifndef UNNAMED_PROJECT_SHADER_EDITOR_GLSL_HIGHLIGHTER_H
+#define UNNAMED_PROJECT_SHADER_EDITOR_GLSL_HIGHLIGHTER_H
 
-#include <QObject>
-#include "CodeEditor.h"
-#include <QString>
+#include <vector>
+
 #include <QSyntaxHighlighter>
 #include <QTextDocument>
 #include <QRegExp>
-#include <vector>
 
 /**
  * based on: http://doc.qt.io/qt-5/qtwidgets-richtext-syntaxhighlighter-example.html
@@ -47,4 +45,4 @@ signals:
 public slots:
 };
 
-#endif // GLSLHIGHLIGHTER_H
+#endif // UNNAMED_PROJECT_SHADER_EDITOR_GLSL_HIGHLIGHTER_H

@@ -17,11 +17,20 @@ public:
     virtual void tick();
 
     virtual Scene *getScene();
-    virtual void onDoubleClick();
-    virtual void onKeyEvent(int Key);
+
+    virtual void onDoubleClick() override;
+
+    virtual void onMouseButtonDown(int button) override;
+    virtual void onMouseButtonUp(int button) override;
+    virtual void onMouseMove(int x, int y) override;
+
+    virtual void onKeyDown(int key) override;
+    virtual void onKeyUp(int key) override;
 
 private:
     std::unique_ptr<Scene> m_scene;
+
+    std::vector<Object *> m_objects;
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_GAME_H

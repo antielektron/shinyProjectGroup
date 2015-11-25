@@ -25,7 +25,27 @@ void SceneEditorGame::onDoubleClick()
 
 }
 
-void SceneEditorGame::onKeyEvent(int Key)
+void SceneEditorGame::onMouseButtonDown(int button)
 {
-    // blupp
+
+}
+
+void SceneEditorGame::onMouseButtonUp(int button)
+{
+
+}
+
+void SceneEditorGame::onMouseMove(int x, int y)
+{
+
+}
+
+void SceneEditorGame::onKeyDown(int key)
+{
+
+}
+
+void SceneEditorGame::onKeyUp(int key)
+{
+
 }

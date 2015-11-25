@@ -1,4 +1,4 @@
-#include "GLSLHighlighter.h"
+#include "shadereditor/GLSLHighlighter.h"
 
 GLSLHighlighter::GLSLHighlighter(QTextDocument *parent)
     : QSyntaxHighlighter(parent)
