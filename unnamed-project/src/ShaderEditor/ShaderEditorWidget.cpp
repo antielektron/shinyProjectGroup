@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "shadereditor/ShaderEditorWidget.h"
+#include "ShaderEditor/ShaderEditorWidget.h"
 
 const QColor ShaderEditorWidget::allFineColor = QColor::fromRgb(210,255,210);
 const QColor ShaderEditorWidget::errorColor = QColor::fromRgb(255,210,210);

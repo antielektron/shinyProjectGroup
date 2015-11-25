@@ -9,7 +9,7 @@
 #include <QLabel>
 
 #include "OpenGLWidget.h"
-#include "shadereditor/ShaderEditorWidget.h"
+#include "ShaderEditor/ShaderEditorWidget.h"
 #include "ObjectToolbox.h"
 
 

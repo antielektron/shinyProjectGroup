@@ -1,4 +1,4 @@
-#include "sceneeditor/SceneEditorGame.h"
+#include "SceneEditor/SceneEditorGame.h"
 
 void SceneEditorGame::initialize()
 {

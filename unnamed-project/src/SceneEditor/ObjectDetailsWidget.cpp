@@ -1,4 +1,4 @@
-#include "sceneeditor/ObjectDetailsWidget.h"
+#include "SceneEditor/ObjectDetailsWidget.h"
 
 ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent)
 {

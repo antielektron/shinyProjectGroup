@@ -1,7 +1,7 @@
-#include "sceneeditor/SceneEditorWidget.h"
+#include "SceneEditor/SceneEditorWidget.h"
 
-#include "sceneeditor/SceneEditorGame.h"
-#include "sceneeditor/ObjectDetailsWidget.h"
+#include "SceneEditor/SceneEditorGame.h"
+#include "SceneEditor/ObjectDetailsWidget.h"
 
 #include "OpenGLWidget.h"
 

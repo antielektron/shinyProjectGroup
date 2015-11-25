@@ -1,5 +1,5 @@
-#include "shadereditor/LineNumberArea.h"
-#include "shadereditor/CodeEditor.h"
+#include "ShaderEditor/LineNumberArea.h"
+#include "ShaderEditor/CodeEditor.h"
 
 //=============================================================================
 

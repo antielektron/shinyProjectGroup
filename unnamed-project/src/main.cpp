@@ -6,7 +6,7 @@
 #include "OpenGLWidget.h"
 #include "PrimitiveGame.h"
 #include "EditorWindow.h"
-#include "sceneeditor/SceneEditorWidget.h"
+#include "SceneEditor/SceneEditorWidget.h"
 
 
 // http://www.ics.com/blog/qt-and-opengl-part-2-rendering-3d-model

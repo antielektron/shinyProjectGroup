@@ -8,8 +8,8 @@
 #include <QColor>
 #include <QOpenGLFunctions>
 
-#include "shadereditor/CodeEditor.h"
-#include "shadereditor/GLSLHighlighter.h"
+#include "ShaderEditor/CodeEditor.h"
+#include "ShaderEditor/GLSLHighlighter.h"
 
 #include "utility.h"
 #include "IRenderer.h"
