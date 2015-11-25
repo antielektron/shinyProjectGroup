@@ -52,7 +52,22 @@ void PrimitiveGame::onDoubleClick()
 	
 }
 
-void PrimitiveGame::onKeyEvent(int key)
+void PrimitiveGame::onMouseButtonDown(int button)
+{
+
+}
+
+void PrimitiveGame::onMouseButtonUp(int button)
+{
+
+}
+
+void PrimitiveGame::onMouseMove(int x, int y)
+{
+
+}
+
+void PrimitiveGame::onKeyDown(int key)
 {
 	QVector3D deltaPos(0, 0, 0);
 
@@ -104,6 +119,11 @@ void PrimitiveGame::onKeyEvent(int key)
 		rotY = 0;
 	}
 	updatePosMatrix(deltaPos);
+}
+
+void PrimitiveGame::onKeyUp(int key)
+{
+	// TODO
 }
 
 void PrimitiveGame::updatePosMatrix(QVector3D deltaPos) 

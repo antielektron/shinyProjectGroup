@@ -16,8 +16,12 @@ public:
 
 	virtual void onDoubleClick() override;
 
-	virtual void onKeyEvent(int key) override;
-	
+	virtual void onMouseButtonDown(int button) override;
+	virtual void onMouseButtonUp(int button) override;
+	virtual void onMouseMove(int x, int y) override;
+
+	virtual void onKeyDown(int key) override;
+	virtual void onKeyUp(int key) override;
 
 private:
     std::unique_ptr<Scene> m_scene;

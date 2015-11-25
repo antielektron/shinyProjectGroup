@@ -16,8 +16,16 @@ public:
     virtual void tick() = 0;
 
     virtual Scene *getScene() = 0;
-	virtual void onDoubleClick() = 0;
-	virtual void onKeyEvent(int Key) = 0;
+
+    virtual void onDoubleClick() = 0;
+
+    // TODO replace by KeyboardMouseState class!!!
+    virtual void onMouseButtonDown(int button) = 0;
+    virtual void onMouseButtonUp(int button) = 0;
+    virtual void onMouseMove(int x, int y) = 0;
+
+	virtual void onKeyDown(int key) = 0;
+	virtual void onKeyUp(int key) = 0;
 
     // TODO add interface for mouse movements and key strokes
 };
