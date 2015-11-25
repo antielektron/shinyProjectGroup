@@ -2,6 +2,11 @@
 
 #include <iostream>
 
+PrimitiveGame::PrimitiveGame()
+{
+	keymanager = nullptr;
+}
+
 void PrimitiveGame::initialize()
 {
     m_scene = std::unique_ptr<Scene>(new Scene());
@@ -39,6 +44,56 @@ void PrimitiveGame::tick()
 
     r+= 1.f;
     world.rotate(r, 0, 1, 0);
+
+
+	QVector3D deltaPos(0, 0, 0);
+
+	if (keymanager)
+	{
+		
+
+		if (keymanager->isKeyPressed(Qt::Key_Right))
+		{
+			rotY -= 0.5;
+			
+
+		}
+		if (keymanager->isKeyPressed(Qt::Key_Left))
+		{
+			rotY += 0.5;
+		}
+		if (keymanager->isKeyPressed(Qt::Key_Up))
+		{
+			rotX += 0.5;
+		}
+		if (keymanager->isKeyPressed(Qt::Key_Down))
+		{
+			rotX -= 0.5;
+		}
+		if (keymanager->isKeyPressed(Qt::Key_S))
+		{
+			deltaPos += QVector3D(0, 0, 0.5);
+		}
+		if (keymanager->isKeyPressed(Qt::Key_W))
+		{
+			deltaPos += QVector3D(0, 0, -0.5);
+		}
+		if (keymanager->isKeyPressed(Qt::Key_D))
+		{
+			deltaPos += QVector3D(0.5, 0, 0);
+		}
+		if (keymanager->isKeyPressed(Qt::Key_A))
+		{
+			deltaPos += QVector3D(-0.5, 0, 0);
+		}
+		if (keymanager->isKeyPressed(Qt::Key_Space))
+		{
+			m_position = QVector3D(0, 0, 0);
+			rotX = 0;
+			rotY = 0;
+		}
+	}
+	updatePosMatrix(deltaPos);
 }
 
 Scene *PrimitiveGame::getScene()
@@ -69,61 +124,16 @@ void PrimitiveGame::onMouseMove(int x, int y)
 
 void PrimitiveGame::onKeyDown(int key)
 {
-	QVector3D deltaPos(0, 0, 0);
-
-	if (key == Qt::Key_Right) 
-	{
-        rotY -= 1.0;
-		 /*QMatrix4x4 matrix44x;
-		matrix44x.setToIdentity();
-		matrix44x.rotate(rotY, 0, 1, 0);
-		QVector3D alpha = matrix44x*QVector3D(0, 0, 1);
-		m_centre = m_position + alpha;
-		m_scene->getCamera().setToIdentity();
-		m_scene->getCamera().lookAt(m_position, m_centre, QVector3D(0, 1, 0));
-		std::cout << rotY << " alpha-Wert "; */
-		
-	}
-	else if (key == Qt::Key_Left)
-	{
-        rotY += 1.0;
-	}
-	else if (key == Qt::Key_Up)
-	{
-        rotX += 1.0;
-	}
-	else if (key == Qt::Key_Down)
-	{
-        rotX -= 1.0;
-	}
-    else if (key == Qt::Key_S)
-	{
-		deltaPos += QVector3D(0, 0, 0.5);
-	}
-    else if (key == Qt::Key_W)
-	{
-		deltaPos += QVector3D(0, 0, -0.5);
-	}
-    else if (key == Qt::Key_D)
-	{
-		deltaPos += QVector3D(0.5, 0, 0);
-	}
-    else if (key == Qt::Key_A)
-	{
-		deltaPos += QVector3D(-0.5, 0, 0);
-	}
-	else if (key == Qt::Key_Space)
-	{
-		m_position = QVector3D(0, 0, 0);
-		rotX = 0;
-		rotY = 0;
-	}
-	updatePosMatrix(deltaPos);
 }
 
 void PrimitiveGame::onKeyUp(int key)
 {
 	// TODO
+}
+
+void PrimitiveGame::setKeyManager(KeyManager* keymanager)
+{
+	this->keymanager = keymanager;
 }
 
 void PrimitiveGame::updatePosMatrix(QVector3D deltaPos) 

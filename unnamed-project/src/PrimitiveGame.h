@@ -2,6 +2,7 @@
 #define UNNAMED_PROJECT_PRIMITIVE_GAME_H
 
 #include <QMatrix4x4>
+#include "KeyManager.h"
 
 #include "IGame.h"
 #include "Scene/Scene.h"
@@ -9,6 +10,7 @@
 class PrimitiveGame : public IGame
 {
 public:
+	PrimitiveGame();
     virtual void initialize() override;
     virtual void resize(int width, int height) override;
     virtual void tick() override;
@@ -23,6 +25,7 @@ public:
 
 	virtual void onKeyDown(int key) override;
 	virtual void onKeyUp(int key) override;
+	virtual void setKeyManager(KeyManager* keymanager) override;
 
 private:
     std::unique_ptr<Scene> m_scene;
@@ -38,7 +41,10 @@ private:
 	QVector3D m_centre;
 	QMatrix4x4 posMatrix;
 
+	KeyManager* keymanager;
+
 	void updatePosMatrix(QVector3D deltaPos);
+
 	
 
 };

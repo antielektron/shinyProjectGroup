@@ -15,6 +15,7 @@
 
 #include "IGame.h"
 #include "IRenderer.h"
+#include "KeyManager.h"
 
 class OpenGLWidget : public QOpenGLWidget
 {
@@ -46,14 +47,16 @@ protected:
 
 	virtual void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 	virtual void keyReleaseEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
-
+	 
 private:
     std::shared_ptr<IGame> m_game;
     std::unique_ptr<IRenderer> m_renderer;
+	std::unique_ptr<KeyManager> m_keyManager;
 
     QTimer m_timer;
     std::chrono::system_clock::time_point start;
     size_t frame_count;
+
 };
 
 #endif // UNNAMED_PROJECT_OPENGLWIDGET_H

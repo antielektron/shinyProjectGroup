@@ -40,11 +40,15 @@ OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
     frame_count = 0;
 
     this->setMouseTracking(true);
+	m_keyManager = std::unique_ptr<KeyManager>(new KeyManager());
+	m_game->setKeyManager(m_keyManager.get());
 }
 
 void OpenGLWidget::setGame(std::shared_ptr<IGame> game)
 {
     m_game = std::move(game);
+	m_keyManager = std::unique_ptr<KeyManager>(new KeyManager());
+	m_game->setKeyManager(m_keyManager.get());
 }
 
 void OpenGLWidget::setRenderer(std::unique_ptr<IRenderer> renderer)
@@ -120,10 +124,10 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void OpenGLWidget::keyPressEvent(QKeyEvent * event)
 {
-	m_game->onKeyDown(event->key());
+	m_keyManager->pressKey(event->key());
 }
 
 void OpenGLWidget::keyReleaseEvent(QKeyEvent *event)
 {
-    m_game->onKeyUp(event->key());
+	m_keyManager->releaseKey(event->key());
 }

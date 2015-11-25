@@ -4,6 +4,7 @@
 #include <memory>
 
 class Scene;
+class KeyManager;
 
 class IGame
 {
@@ -26,6 +27,8 @@ public:
 
 	virtual void onKeyDown(int key) = 0;
 	virtual void onKeyUp(int key) = 0;
+
+	virtual void setKeyManager(KeyManager* keymanager) = 0;
 
     // TODO add interface for mouse movements and key strokes
 };
