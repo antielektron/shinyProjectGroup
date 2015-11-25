@@ -22,6 +22,8 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) :
 
     start = std::chrono::system_clock::now() + std::chrono::seconds(1);
     frame_count = 0;
+
+    this->setMouseTracking(true);
 }
 
 OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
@@ -36,6 +38,8 @@ OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
 
     start = std::chrono::system_clock::now() + std::chrono::seconds(1);
     frame_count = 0;
+
+    this->setMouseTracking(true);
 }
 
 void OpenGLWidget::setGame(std::shared_ptr<IGame> game)
@@ -70,7 +74,7 @@ void OpenGLWidget::paintGL()
 {
     if (start < std::chrono::system_clock::now())
     {
-        std::cout << frame_count << " fps" << std::endl;
+        // std::cout << frame_count << " fps" << std::endl;
         frame_count = 0;
         start += std::chrono::seconds(1);
     }
@@ -101,10 +105,35 @@ void OpenGLWidget::mouseDoubleClickEvent(QMouseEvent * event)
 
 void OpenGLWidget::mousePressEvent(QMouseEvent *event)
 {
-    this->setFocus();
+    m_game->onMouseButtonDown(event->button());
+}
+
+void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    m_game->onMouseButtonUp(event->button());
+}
+
+void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    m_game->onMouseMove(event->pos().x(), event->pos().y());
 }
 
 void OpenGLWidget::keyPressEvent(QKeyEvent * event)
 {
-	m_game->onKeyEvent(event->key());
+	m_game->onKeyDown(event->key());
 }
+
+void OpenGLWidget::keyReleaseEvent(QKeyEvent *event)
+{
+    m_game->onKeyUp(event->key());
+}
+
+/*
+void grabMouse();
+#ifndef QT_NO_CURSOR
+void grabMouse(const QCursor &);
+#endif
+void releaseMouse();
+void grabKeyboard();
+void releaseKeyboard();
+*/
