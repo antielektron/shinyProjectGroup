@@ -1,6 +1,6 @@
 #include "SceneEditor/ObjectDetailsWidget.h"
 
-ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent)
+ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
 {
     m_layout =  new QFormLayout(this);
 

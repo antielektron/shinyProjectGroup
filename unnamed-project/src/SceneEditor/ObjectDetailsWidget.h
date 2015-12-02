@@ -32,6 +32,8 @@ private:
     QFormLayout *m_layout;
 
     QLineEdit *createNumericField(const QString &name);
+
+    std::shared_ptr<SceneEditorGame> m_game;
 };
 
 #endif // UNNAMED_PROJECT_OBJECT_DETAILS_WIDGET_H

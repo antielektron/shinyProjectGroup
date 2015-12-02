@@ -6,7 +6,7 @@
 #include "OpenGLWidget.h"
 #include "PrimitiveGame.h"
 #include "ShaderEditor/EditorWindow.h"
-#include "SceneEditor/SceneEditorWidget.h"
+#include "SceneEditor/SceneEditorWindow.h"
 
 
 // http://www.ics.com/blog/qt-and-opengl-part-2-rendering-3d-model
@@ -24,16 +24,18 @@ int main(int argc, char **argv)
     parser.setApplicationDescription("set description here"); //TODO: description
     parser.addVersionOption();
 
-    QCommandLineOption shaderEditorOption("e", "Start the shader editor");
+    QCommandLineOption shaderEditorOption("shader", "Start the shader editor");
+    QCommandLineOption shaderEditorOption2("e", "Start the shader editor");
     parser.addOption(shaderEditorOption);
+    parser.addOption(shaderEditorOption2);
 
-    QCommandLineOption sceneEditorOption("sceneeditor", "Start the scene editor");
+    QCommandLineOption sceneEditorOption("scene", "Start the scene editor");
     parser.addOption(sceneEditorOption);
 
     parser.addHelpOption();
     parser.process(app);
 
-    if (parser.isSet(shaderEditorOption))
+    if (parser.isSet(shaderEditorOption) || parser.isSet(shaderEditorOption2))
     {
         EditorWindow editorWindow(new OpenGLWidget(std::make_shared<PrimitiveGame>()));
         editorWindow.show();
@@ -42,7 +44,7 @@ int main(int argc, char **argv)
     }
     else if (parser.isSet(sceneEditorOption))
     {
-        SceneEditorWidget sceneEditor;
+        SceneEditorWindow sceneEditor;
         sceneEditor.show();
 
         return app.exec();
