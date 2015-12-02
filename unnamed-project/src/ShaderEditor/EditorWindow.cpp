@@ -1,10 +1,10 @@
-#include "EditorWindow.h"
-
 #include <iostream>
 
 #include <QStyle>
 #include <QApplication>
 #include <QStatusBar>
+
+#include "EditorWindow.h"
 
 EditorWindow::EditorWindow(OpenGLWidget* widget, QWidget *parent) :
     QMainWindow(parent),

@@ -1,5 +1,5 @@
-#ifndef EDITORWINDOW_H
-#define EDITORWINDOW_H
+#ifndef UNNAMED_PROJECT_EDITOR_WINDOW_H
+#define UNNAMED_PROJECT_EDITOR_WINDOW_H
 
 #include <memory>
 
@@ -10,12 +10,10 @@
 
 #include "OpenGLWidget.h"
 #include "ShaderEditor/ShaderEditorWidget.h"
-#include "ObjectToolbox.h"
-
+#include "ShaderEditor/ObjectToolbox.h"
 
 class EditorWindow : public QMainWindow
 {
-
     Q_OBJECT
 public:
     EditorWindow(OpenGLWidget* widget, QWidget *parent = nullptr);
@@ -44,7 +42,6 @@ protected slots:
     void saveScene();
     void newScene();
 
-
 };
 
-#endif // EDITORWINDOW_H
+#endif // UNNAMED_PROJECT_EDITOR_WINDOW_H

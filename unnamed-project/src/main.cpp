@@ -5,7 +5,7 @@
 
 #include "OpenGLWidget.h"
 #include "PrimitiveGame.h"
-#include "EditorWindow.h"
+#include "ShaderEditor/EditorWindow.h"
 #include "SceneEditor/SceneEditorWidget.h"
 
 
