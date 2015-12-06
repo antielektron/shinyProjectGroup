@@ -19,6 +19,9 @@ public:
     void removeObject(Object *object);
     void removeObjectGroup(ObjectGroup *group);
 
+    // NOT VIRTUAL (not because we forgot it, but we know what we do.)
+    void updateWorld();
+
     // hide smartpointers from user.
     typedef smart_iterator<std::vector<std::unique_ptr<Object>>::iterator> object_iterator_type;
     typedef smart_iterator<std::vector<std::unique_ptr<ObjectGroup>>::iterator> group_iterator_type;

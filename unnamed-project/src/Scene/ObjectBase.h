@@ -7,7 +7,7 @@
 class ObjectBase
 {
 public:
-    ObjectBase();
+    ObjectBase(ObjectBase *parent = nullptr);
 
     // void setWorld(const QMatrix4x4 &world);
     void updateWorld();
@@ -23,7 +23,12 @@ public:
 
     const QMatrix4x4 &getWorld();
 
+    void setParent(ObjectBase *parent);
+    ObjectBase *getParent();
+
 protected:
+    ObjectBase *m_parent;
+
     QVector3D m_position;
     QVector3D m_scaling;
     QVector3D m_rotation;
