@@ -6,6 +6,9 @@
 #include "IGame.h"
 #include "Scene/Scene.h"
 
+class ObjectGroup;
+class Object;
+
 class SceneEditorGame : public QObject, public IGame
 {
     Q_OBJECT
