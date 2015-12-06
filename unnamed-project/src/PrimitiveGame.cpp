@@ -3,7 +3,7 @@
 #include <iostream>
 
 PrimitiveGame::PrimitiveGame() :
-		m_keyManager(nullptr),
+        m_keyManager(nullptr),
         m_wasEscDown(false)
 {
 }
@@ -14,17 +14,17 @@ void PrimitiveGame::initialize()
 
     // static camera
     m_position = QVector3D(0, 0, 5);
-	updatePosMatrix(QVector3D(0,0,0));
+    updatePosMatrix(QVector3D(0,0,0));
 
 
 
     //m_scene->addModel("test", std::unique_ptr<Model>(new Model("models/test.obj")));
     //m_scene->addModel("audi", std::unique_ptr<Model>(new Model("models/Audi_R8.obj")));
-	//m_scene->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
-	m_scene->addModel("house", std::unique_ptr<Model>(new Model("models/castle.obj")));
+    //m_scene->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
+    m_scene->addModel("house", std::unique_ptr<Model>(new Model("models/castle.obj")));
     m_dummy = m_scene->createObject("house");
 
-	m_dummy->updateWorld();
+    m_dummy->updateWorld();
 
     //set directional light:
     m_scene->setDirectionalLightDirection(QVector3D(0.0,0.0,-1.0));
@@ -42,7 +42,7 @@ void PrimitiveGame::tick()
 {
     QVector3D deltaPos(0, 0, 0);
 
-	if (!m_keyManager)
+    if (!m_keyManager)
         return;
 
     m_keyManager->tick();
@@ -108,7 +108,7 @@ void PrimitiveGame::tick()
     if (rotX < -90.f)
         rotX = -90.f;
 
-	updatePosMatrix(deltaPos);
+    updatePosMatrix(deltaPos);
 
     // Start/Stop catching mouse
     if (m_keyManager->isKeyPressed(Qt::Key_Escape) && !m_wasEscDown)
@@ -125,24 +125,24 @@ Scene *PrimitiveGame::getScene()
 
 void PrimitiveGame::setKeyManager(KeyManager *keyManager)
 {
-	this->m_keyManager = keyManager;
+    this->m_keyManager = keyManager;
 }
 
 void PrimitiveGame::updatePosMatrix(QVector3D deltaPos) 
 {
-	QMatrix4x4 &camera = m_scene->getCamera();
-	QMatrix4x4 translation;
-	QMatrix4x4 xRotation;
-	QMatrix4x4 yRotation;
+    QMatrix4x4 &camera = m_scene->getCamera();
+    QMatrix4x4 translation;
+    QMatrix4x4 xRotation;
+    QMatrix4x4 yRotation;
 
-	xRotation.rotate(rotX, 1, 0, 0);
-	yRotation.rotate(rotY, 0, 1, 0);
-	translation.translate(-1 * m_position);
+    xRotation.rotate(rotX, 1, 0, 0);
+    yRotation.rotate(rotY, 0, 1, 0);
+    translation.translate(-1 * m_position);
 
-	QMatrix4x4 rotation = xRotation * yRotation;
+    QMatrix4x4 rotation = xRotation * yRotation;
 
-	m_position += rotation.transposed() * deltaPos;
+    m_position += rotation.transposed() * deltaPos;
 
-	camera = rotation * translation;
-	
+    camera = rotation * translation;
+    
 }
