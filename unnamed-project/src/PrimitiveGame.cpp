@@ -23,8 +23,7 @@ void PrimitiveGame::initialize()
 	m_scene->addModel("house", std::unique_ptr<Model>(new Model("models/house.obj")));
     m_dummy = m_scene->createObject("house");
 
-    m_dummy->getWorld().setToIdentity();
-    r = 0.;
+	m_dummy->updateWorld();
 
     //set directional light:
     m_scene->setDirectionalLightDirection(QVector3D(0.0,0.0,-1.0));
@@ -40,13 +39,6 @@ void PrimitiveGame::resize(int width, int height)
 
 void PrimitiveGame::tick()
 {
-    auto &world = m_dummy->getWorld();
-    world.setToIdentity();
-
-    r+= 1.f;
-    world.rotate(r, 0, 1, 0);
-
-
 	QVector3D deltaPos(0, 0, 0);
 
 	if (keymanager)

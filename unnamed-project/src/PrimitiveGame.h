@@ -31,7 +31,6 @@ private:
     std::unique_ptr<Scene> m_scene;
 
     Object *m_dummy;
-    float r;
 	float rotY = 0;
 	float rotX = 0;
 	float pos_height = 0;
