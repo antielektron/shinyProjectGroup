@@ -28,15 +28,10 @@ bool KeyManager::isKeyPressed(int keycode)
 
 void KeyManager::tick()
 {
-	relativeX = m_currentPosX - m_oldPosX;
-	relativeY = m_currentPosY - m_oldPosY;
-
-	m_oldPosX = m_currentPosX;
-	m_oldPosY = m_currentPosY;
-	
-	//std::cout << "X: " << m_oldPosX << "\n" << "Y: " << m_oldPosX << "\n";
-	//std::cout << "X: " << relativeX << "\n" << "Y: " << relativeY << "\n";
-
+	relativeX = m_currentPosX;// - m_oldPosX;
+	relativeY = m_currentPosY;// - m_oldPosY;
+	m_currentPosX = 0;
+	m_currentPosY = 0;
 }
 
 float KeyManager::getRelativeX()
@@ -52,8 +47,8 @@ float KeyManager::getRelativeY()
 
 void KeyManager::mouseMove(float posX, float posY)
 {
-	m_currentPosX = posX;
-	m_currentPosY = posY;
+	m_currentPosX += posX;
+	m_currentPosY += posY;
 	
 }
 

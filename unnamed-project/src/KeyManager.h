@@ -19,9 +19,7 @@ public:
 
 protected:
 	std::map<int, bool> m_keyMap;
-	float m_oldPosX = 0;
 	float m_currentPosX = 0;
-	float m_oldPosY = 0;
 	float m_currentPosY = 0;
 	float relativeX = 0;
 	float relativeY = 0;

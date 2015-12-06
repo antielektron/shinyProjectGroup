@@ -43,9 +43,8 @@ void PrimitiveGame::tick()
 
 	keymanager->tick();
 
-	rotX += keymanager->getRelativeX();
-	rotY += keymanager->getRelativeY();
-	
+	rotX -= keymanager->getRelativeY()*.1;
+	rotY -= keymanager->getRelativeX()*.1;
 
 	if (keymanager)
 	{
