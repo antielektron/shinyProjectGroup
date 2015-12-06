@@ -15,8 +15,8 @@ void ObjectBase::updateWorld()
 
     m_world.scale(m_scaling);
 
-    m_world.rotate(m_rotation.x(), 1., 0., 0.);
     m_world.rotate(m_rotation.y(), 0., 1., 0.);
+    m_world.rotate(m_rotation.x(), 1., 0., 0.);
     m_world.rotate(m_rotation.z(), 0., 0., 1.);
 
     m_world.translate(m_position);
