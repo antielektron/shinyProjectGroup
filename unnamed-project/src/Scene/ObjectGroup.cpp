@@ -6,12 +6,12 @@ void ObjectGroup::updateWorld()
 {
     ObjectBase::updateWorld();
 
-    for (auto obj : m_objects)
+    for (auto &obj : m_objects)
     {
         obj->updateWorld();
     }
 
-    for (auto obj : m_groups)
+    for (auto &obj : m_groups)
     {
         obj->updateWorld();
     }
