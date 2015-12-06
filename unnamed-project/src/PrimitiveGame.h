@@ -26,6 +26,7 @@ public:
 	virtual void onKeyDown(int key) override;
 	virtual void onKeyUp(int key) override;
 	virtual void setKeyManager(KeyManager* keymanager) override;
+	
 
 private:
     std::unique_ptr<Scene> m_scene;

@@ -41,15 +41,17 @@ void PrimitiveGame::tick()
 {
 	QVector3D deltaPos(0, 0, 0);
 
+	keymanager->tick();
+
+	rotX += keymanager->getRelativeX();
+	rotY += keymanager->getRelativeY();
+	
+
 	if (keymanager)
 	{
-		
-
 		if (keymanager->isKeyPressed(Qt::Key_Right))
 		{
 			rotY -= 0.5;
-			
-
 		}
 		if (keymanager->isKeyPressed(Qt::Key_Left))
 		{
@@ -112,7 +114,7 @@ void PrimitiveGame::onMouseButtonUp(int button)
 
 void PrimitiveGame::onMouseMove(int x, int y)
 {
-
+	// Not used anymore...
 }
 
 void PrimitiveGame::onKeyDown(int key)

@@ -119,7 +119,7 @@ void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    m_game->onMouseMove(event->pos().x(), event->pos().y());
+    m_keyManager->mouseMove(event->pos().x(), event->pos().y());
 }
 
 void OpenGLWidget::keyPressEvent(QKeyEvent * event)
