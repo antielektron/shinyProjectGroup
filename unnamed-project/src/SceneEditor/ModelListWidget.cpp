@@ -24,3 +24,13 @@ ModelListWidget::ModelListWidget(std::shared_ptr<SceneEditorGame> game, QWidget 
 ModelListWidget::~ModelListWidget()
 {
 }
+
+void ModelListWidget::updateModelTree()
+{
+
+}
+
+ObjectBase* ModelListWidget::getCurrentWidget()
+{
+    return m_currentWidget;
+}

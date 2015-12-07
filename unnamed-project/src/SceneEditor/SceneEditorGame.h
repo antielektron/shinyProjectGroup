@@ -6,6 +6,8 @@
 #include "IGame.h"
 #include "Scene/Scene.h"
 
+class ObjectBase;
+
 class SceneEditorGame : public IGame
 {
 public:
@@ -28,10 +30,16 @@ public:
     virtual void onKeyUp(int key) override;
 
     virtual void setKeyManager(KeyManager* keymanager) {};
+
+    virtual ObjectBase* getRootObject();
 private:
     std::unique_ptr<Scene> m_scene;
 
     std::vector<Object *> m_objects;
+
+    ObjectBase* m_objectRoot;
+
+
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_GAME_H

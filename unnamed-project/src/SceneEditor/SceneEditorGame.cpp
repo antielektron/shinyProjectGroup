@@ -1,4 +1,5 @@
 #include "SceneEditor/SceneEditorGame.h"
+#include "Scene/ObjectBase.h"
 
 void SceneEditorGame::initialize()
 {
@@ -48,4 +49,9 @@ void SceneEditorGame::onKeyDown(int key)
 void SceneEditorGame::onKeyUp(int key)
 {
 
+}
+
+ObjectBase *SceneEditorGame::getRootObject()
+{
+    return m_objectRoot;
 }

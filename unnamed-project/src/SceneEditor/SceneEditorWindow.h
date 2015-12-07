@@ -16,6 +16,8 @@ class ObjectDetailsWidget;
 class ObjectListWidget;
 class ModelListWidget;
 
+class ObjectBase;
+
 class SceneEditorWindow : public QMainWindow
 {
     Q_OBJECT
