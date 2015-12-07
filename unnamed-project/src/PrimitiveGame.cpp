@@ -20,7 +20,7 @@ void PrimitiveGame::initialize()
     //m_scene->addModel("test", std::unique_ptr<Model>(new Model("models/test.obj")));
     //m_scene->addModel("audi", std::unique_ptr<Model>(new Model("models/Audi_R8.obj")));
 	//m_scene->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
-	m_scene->addModel("house", std::unique_ptr<Model>(new Model("models/house.obj")));
+	m_scene->addModel("house", std::unique_ptr<Model>(new Model("models/castle.obj")));
     m_dummy = m_scene->createObject("house");
 
 	m_dummy->updateWorld();
@@ -41,15 +41,21 @@ void PrimitiveGame::tick()
 {
 	QVector3D deltaPos(0, 0, 0);
 
+	keymanager->tick();
+
+	rotX += keymanager->getRelativeY()*.1;
+	rotY += keymanager->getRelativeX()*.1;
+
+	if (rotX > 90.f)
+		rotX = 90.f;
+	if (rotX < -90.f)
+		rotX = -90.f;
+
 	if (keymanager)
 	{
-		
-
 		if (keymanager->isKeyPressed(Qt::Key_Right))
 		{
 			rotY -= 0.5;
-			
-
 		}
 		if (keymanager->isKeyPressed(Qt::Key_Left))
 		{
@@ -112,7 +118,7 @@ void PrimitiveGame::onMouseButtonUp(int button)
 
 void PrimitiveGame::onMouseMove(int x, int y)
 {
-
+	// Not used anymore...
 }
 
 void PrimitiveGame::onKeyDown(int key)
@@ -132,29 +138,18 @@ void PrimitiveGame::setKeyManager(KeyManager* keymanager)
 void PrimitiveGame::updatePosMatrix(QVector3D deltaPos) 
 {
 	QMatrix4x4 &camera = m_scene->getCamera();
-	QMatrix4x4 translate;
+	QMatrix4x4 translation;
 	QMatrix4x4 xRotation;
 	QMatrix4x4 yRotation;
 
-    xRotation.setToIdentity();
-    yRotation.setToIdentity();
-    translate.setToIdentity();
-
-	camera.setToIdentity();
 	xRotation.rotate(rotX, 1, 0, 0);
 	yRotation.rotate(rotY, 0, 1, 0);
-	translate.translate(m_position);
+	translation.translate(-1 * m_position);
 
-	m_position += (xRotation * yRotation) * deltaPos;
+	QMatrix4x4 rotation = xRotation * yRotation;
 
-    xRotation.setToIdentity();
-    yRotation.setToIdentity();
-    translate.setToIdentity();
+	m_position += rotation.transposed() * deltaPos;
 
-    xRotation.rotate(-rotX, 1, 0, 0);
-    yRotation.rotate(-rotY, 0, 1, 0);
-    translate.translate(-1 * m_position);
-
-	camera = ((xRotation * yRotation *translate));
+	camera = rotation * translation;
 	
 }

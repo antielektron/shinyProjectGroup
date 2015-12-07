@@ -2,6 +2,21 @@
 
 #include "Scene/Object.h"
 
+void ObjectGroup::updateWorld()
+{
+    ObjectBase::updateWorld();
+
+    for (auto &obj : m_objects)
+    {
+        obj->updateWorld();
+    }
+
+    for (auto &obj : m_groups)
+    {
+        obj->updateWorld();
+    }
+}
+
 void ObjectGroup::addObject(std::unique_ptr<Object> object)
 {
     m_objects.push_back(std::move(object));

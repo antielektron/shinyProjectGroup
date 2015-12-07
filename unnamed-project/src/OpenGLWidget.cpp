@@ -40,6 +40,7 @@ OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
     frame_count = 0;
 
     this->setMouseTracking(true);
+
 	m_keyManager = std::unique_ptr<KeyManager>(new KeyManager());
 	m_game->setKeyManager(m_keyManager.get());
 }
@@ -119,7 +120,17 @@ void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    m_game->onMouseMove(event->pos().x(), event->pos().y());
+    // This is a "reset" event
+    if (event->globalPos() == mapToGlobal(rect().center()))
+        return;
+
+    std::cout << event->globalPos().x() - mapToGlobal(rect().center()).x() << " " << event->globalPos().y() - mapToGlobal(rect().center()).y() << std::endl;
+
+    // Reset mouse position
+    // this->cursor().setPos(mapToGlobal(QPoint(this->width()/2, this->height()/2)));
+    m_keyManager->mouseMove(event->pos().x() - this->width()/2, event->pos().y() - this->height()/2);
+
+    QCursor::setPos(mapToGlobal(rect().center()));
 }
 
 void OpenGLWidget::keyPressEvent(QKeyEvent * event)
