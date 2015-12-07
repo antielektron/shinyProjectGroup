@@ -18,19 +18,7 @@ public:
 
     virtual Scene *getScene() = 0;
 
-    virtual void onDoubleClick() = 0;
-
-    // TODO replace by KeyboardMouseState class!!!
-    virtual void onMouseButtonDown(int button) = 0;
-    virtual void onMouseButtonUp(int button) = 0;
-    virtual void onMouseMove(int x, int y) = 0;
-
-	virtual void onKeyDown(int key) = 0;
-	virtual void onKeyUp(int key) = 0;
-
-	virtual void setKeyManager(KeyManager* keymanager) = 0;
-
-    // TODO add interface for mouse movements and key strokes
+	virtual void setKeyManager(KeyManager *keyManager) {}
 };
 
 #endif // UNNAMED_PROJECT_IGAME_H

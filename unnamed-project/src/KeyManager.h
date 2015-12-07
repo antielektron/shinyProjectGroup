@@ -9,21 +9,39 @@ class KeyManager
 public:
 	KeyManager();
 	~KeyManager();
+
+	void tick();
+
 	void pressKey(int keycode);
 	void releaseKey(int keycode);
+
 	bool isKeyPressed(int keycode);
-	void mouseMove(float rotX, float rotY);
-	void tick();
+
+	void mouseMoveRelative(float posX, float posY);
+    void mouseMoveAbsolute(float posX, float posY);
+
 	float getRelativeX();
 	float getRelativeY();
 
+    float getAbsoluteX();
+    float getAbsoluteY();
+
+	void setCatchMouse(bool catchMouse);
+	bool shouldCatchMouse();
+
 protected:
 	std::map<int, bool> m_keyMap;
-	float m_currentPosX = 0;
-	float m_currentPosY = 0;
-	float relativeX = 0;
-	float relativeY = 0;
 
+	float m_absoluteX;
+	float m_absoluteY;
+
+	float m_relativeX;
+	float m_relativeY;
+
+    float m_currentRelativeX;
+    float m_currentRelativeY;
+
+	bool m_catchMouse;
 };
 
-#endif //UNNAMED_PROJECT_KEYMANAGER
+#endif // UNNAMED_PROJECT_KEYMANAGER

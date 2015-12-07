@@ -77,6 +77,12 @@ void OpenGLWidget::initializeGL()
 
 void OpenGLWidget::paintGL()
 {
+    // TODO do somewhere else!
+    if (m_keyManager->shouldCatchMouse())
+        this->setCursor(Qt::BlankCursor);
+    else
+        this->unsetCursor();
+
     if (start < std::chrono::system_clock::now())
     {
         // std::cout << frame_count << " fps" << std::endl;
@@ -103,34 +109,34 @@ void OpenGLWidget::cleanup()
     doneCurrent();
 }
 
-void OpenGLWidget::mouseDoubleClickEvent(QMouseEvent * event)
-{
-	m_game->onDoubleClick();
-}
-
 void OpenGLWidget::mousePressEvent(QMouseEvent *event)
 {
-    m_game->onMouseButtonDown(event->button());
+    // m_game->onMouseButtonDown(event->button());
 }
 
 void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_game->onMouseButtonUp(event->button());
+    // m_game->onMouseButtonUp(event->button());
 }
 
 void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    // This is a "reset" event
-    if (event->globalPos() == mapToGlobal(rect().center()))
-        return;
+    if (m_keyManager->shouldCatchMouse())
+    {
+        // This is a "reset" event
+        if (event->globalPos() == mapToGlobal(rect().center()))
+            return;
 
-    std::cout << event->globalPos().x() - mapToGlobal(rect().center()).x() << " " << event->globalPos().y() - mapToGlobal(rect().center()).y() << std::endl;
+        // "Relative" mouse position
+        m_keyManager->mouseMoveRelative(event->pos().x() - this->width() / 2, event->pos().y() - this->height() / 2);
 
-    // Reset mouse position
-    // this->cursor().setPos(mapToGlobal(QPoint(this->width()/2, this->height()/2)));
-    m_keyManager->mouseMove(event->pos().x() - this->width()/2, event->pos().y() - this->height()/2);
-
-    QCursor::setPos(mapToGlobal(rect().center()));
+        // Reset mouse position
+        QCursor::setPos(mapToGlobal(rect().center()));
+    }
+    else
+    {
+        m_keyManager->mouseMoveAbsolute(event->pos().x(), event->pos().y());
+    }
 }
 
 void OpenGLWidget::keyPressEvent(QKeyEvent * event)

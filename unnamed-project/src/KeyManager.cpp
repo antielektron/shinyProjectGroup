@@ -1,7 +1,14 @@
 #include "KeyManager.h"
 #include <iostream>
 
-KeyManager::KeyManager()
+KeyManager::KeyManager() :
+		m_absoluteX(0),
+		m_absoluteY(0),
+		m_relativeX(0),
+		m_relativeY(0),
+        m_currentRelativeX(0),
+        m_currentRelativeY(0),
+		m_catchMouse(false)
 {
 
 }
@@ -28,27 +35,54 @@ bool KeyManager::isKeyPressed(int keycode)
 
 void KeyManager::tick()
 {
-	relativeX = m_currentPosX;// - m_oldPosX;
-	relativeY = m_currentPosY;// - m_oldPosY;
-	m_currentPosX = 0;
-	m_currentPosY = 0;
+    m_relativeX = m_currentRelativeX;
+    m_relativeY = m_currentRelativeY;
+
+    m_currentRelativeX = 0;
+    m_currentRelativeY = 0;
 }
 
 float KeyManager::getRelativeX()
 {
-	return relativeX;
+	return m_relativeX;
 }
 
 float KeyManager::getRelativeY()
 {
-	return relativeY;
+	return m_relativeY;
 }
 
-
-void KeyManager::mouseMove(float posX, float posY)
+float KeyManager::getAbsoluteX()
 {
-	m_currentPosX += posX;
-	m_currentPosY += posY;
-	
+    return m_absoluteX;
 }
 
+float KeyManager::getAbsoluteY()
+{
+    return m_absoluteY;
+}
+
+void KeyManager::mouseMoveRelative(float posX, float posY)
+{
+    // Collect relative mouse movements
+    m_currentRelativeX += posX;
+    m_currentRelativeY += posY;
+}
+
+void KeyManager::mouseMoveAbsolute(float posX, float posY)
+{
+    // Collect relative mouse movements as well
+    mouseMoveRelative(posX - m_absoluteX, posY - m_absoluteY);
+    m_absoluteX = posX;
+    m_absoluteY = posY;
+}
+
+void KeyManager::setCatchMouse(bool catchMouse)
+{
+	m_catchMouse = catchMouse;
+}
+
+bool KeyManager::shouldCatchMouse()
+{
+	return m_catchMouse;
+}

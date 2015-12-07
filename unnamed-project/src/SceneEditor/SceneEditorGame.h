@@ -23,16 +23,7 @@ public:
 
     virtual Scene *getScene();
 
-    virtual void onDoubleClick() override;
-
-    virtual void onMouseButtonDown(int button) override;
-    virtual void onMouseButtonUp(int button) override;
-    virtual void onMouseMove(int x, int y) override;
-
-    virtual void onKeyDown(int key) override;
-    virtual void onKeyUp(int key) override;
-
-    virtual void setKeyManager(KeyManager* keymanager) {};
+    virtual void setKeyManager(KeyManager *keyManager) {};
 
     void getModels(std::vector<Model *> &models);
     ObjectGroup *getRootObject();

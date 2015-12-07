@@ -17,15 +17,7 @@ public:
 
     virtual Scene *getScene() override;
 
-	virtual void onDoubleClick() override;
-
-	virtual void onMouseButtonDown(int button) override;
-	virtual void onMouseButtonUp(int button) override;
-	virtual void onMouseMove(int x, int y) override;
-
-	virtual void onKeyDown(int key) override;
-	virtual void onKeyUp(int key) override;
-	virtual void setKeyManager(KeyManager* keymanager) override;
+	virtual void setKeyManager(KeyManager *keymanager) override;
 	
 
 private:
@@ -41,7 +33,8 @@ private:
 	QVector3D m_centre;
 	QMatrix4x4 posMatrix;
 
-	KeyManager* keymanager;
+	KeyManager *m_keyManager;
+	bool m_wasEscDown;
 
 	void updatePosMatrix(QVector3D deltaPos);
 
