@@ -2,9 +2,10 @@
 
 #include <iostream>
 
-PrimitiveGame::PrimitiveGame()
+PrimitiveGame::PrimitiveGame() :
+		m_keyManager(nullptr),
+        m_wasEscDown(false)
 {
-	keymanager = nullptr;
 }
 
 void PrimitiveGame::initialize()
@@ -39,60 +40,82 @@ void PrimitiveGame::resize(int width, int height)
 
 void PrimitiveGame::tick()
 {
-	QVector3D deltaPos(0, 0, 0);
+    QVector3D deltaPos(0, 0, 0);
 
-	keymanager->tick();
+	if (!m_keyManager)
+        return;
 
-	rotX += keymanager->getRelativeY()*.1;
-	rotY += keymanager->getRelativeX()*.1;
+    m_keyManager->tick();
 
-	if (rotX > 90.f)
-		rotX = 90.f;
-	if (rotX < -90.f)
-		rotX = -90.f;
+    if (m_keyManager->shouldCatchMouse())
+    {
+        rotX += m_keyManager->getRelativeY() * .1;
+        rotY += m_keyManager->getRelativeX() * .1;
+    }
 
-	if (keymanager)
-	{
-		if (keymanager->isKeyPressed(Qt::Key_Right))
-		{
-			rotY -= 0.5;
-		}
-		if (keymanager->isKeyPressed(Qt::Key_Left))
-		{
-			rotY += 0.5;
-		}
-		if (keymanager->isKeyPressed(Qt::Key_Up))
-		{
-			rotX += 0.5;
-		}
-		if (keymanager->isKeyPressed(Qt::Key_Down))
-		{
-			rotX -= 0.5;
-		}
-		if (keymanager->isKeyPressed(Qt::Key_S))
-		{
-			deltaPos += QVector3D(0, 0, 0.5);
-		}
-		if (keymanager->isKeyPressed(Qt::Key_W))
-		{
-			deltaPos += QVector3D(0, 0, -0.5);
-		}
-		if (keymanager->isKeyPressed(Qt::Key_D))
-		{
-			deltaPos += QVector3D(0.5, 0, 0);
-		}
-		if (keymanager->isKeyPressed(Qt::Key_A))
-		{
-			deltaPos += QVector3D(-0.5, 0, 0);
-		}
-		if (keymanager->isKeyPressed(Qt::Key_Space))
-		{
-			m_position = QVector3D(0, 0, 0);
-			rotX = 0;
-			rotY = 0;
-		}
-	}
+    if (m_keyManager->isKeyPressed(Qt::Key_Right))
+    {
+        rotY -= 0.5;
+    }
+    if (m_keyManager->isKeyPressed(Qt::Key_Left))
+    {
+        rotY += 0.5;
+    }
+    if (m_keyManager->isKeyPressed(Qt::Key_Up))
+    {
+        rotX += 0.5;
+    }
+    if (m_keyManager->isKeyPressed(Qt::Key_Down))
+    {
+        rotX -= 0.5;
+    }
+    if (m_keyManager->isKeyPressed(Qt::Key_S))
+    {
+        deltaPos += QVector3D(0, 0, 0.5);
+    }
+    if (m_keyManager->isKeyPressed(Qt::Key_W))
+    {
+        deltaPos += QVector3D(0, 0, -0.5);
+    }
+    if (m_keyManager->isKeyPressed(Qt::Key_D))
+    {
+        deltaPos += QVector3D(0.5, 0, 0);
+    }
+    if (m_keyManager->isKeyPressed(Qt::Key_A))
+    {
+        deltaPos += QVector3D(-0.5, 0, 0);
+    }
+    if (m_keyManager->isKeyPressed(Qt::Key_Q))
+    {
+        deltaPos += QVector3D(0, 0.5, 0);
+    }
+    // !!! Keyboard layout
+    if (m_keyManager->isKeyPressed(Qt::Key_Z))
+    {
+        deltaPos += QVector3D(0, -0.5, 0);
+    }
+
+    // Reset camera
+    if (m_keyManager->isKeyPressed(Qt::Key_Space))
+    {
+        m_position = QVector3D(0, 0, 0);
+        rotX = 0;
+        rotY = 0;
+    }
+
+    if (rotX > 90.f)
+        rotX = 90.f;
+    if (rotX < -90.f)
+        rotX = -90.f;
+
 	updatePosMatrix(deltaPos);
+
+    // Start/Stop catching mouse
+    if (m_keyManager->isKeyPressed(Qt::Key_Escape) && !m_wasEscDown)
+    {
+        m_keyManager->setCatchMouse(!m_keyManager->shouldCatchMouse());
+    }
+    m_wasEscDown = m_keyManager->isKeyPressed(Qt::Key_Escape);
 }
 
 Scene *PrimitiveGame::getScene()
@@ -100,39 +123,9 @@ Scene *PrimitiveGame::getScene()
     return m_scene.get();
 }
 
-void PrimitiveGame::onDoubleClick()
+void PrimitiveGame::setKeyManager(KeyManager *keyManager)
 {
-	//m_scene->getCamera().translate(0, 0, -5);
-	
-}
-
-void PrimitiveGame::onMouseButtonDown(int button)
-{
-
-}
-
-void PrimitiveGame::onMouseButtonUp(int button)
-{
-
-}
-
-void PrimitiveGame::onMouseMove(int x, int y)
-{
-	// Not used anymore...
-}
-
-void PrimitiveGame::onKeyDown(int key)
-{
-}
-
-void PrimitiveGame::onKeyUp(int key)
-{
-	// TODO
-}
-
-void PrimitiveGame::setKeyManager(KeyManager* keymanager)
-{
-	this->keymanager = keymanager;
+	this->m_keyManager = keyManager;
 }
 
 void PrimitiveGame::updatePosMatrix(QVector3D deltaPos) 

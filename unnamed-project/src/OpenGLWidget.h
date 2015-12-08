@@ -39,8 +39,6 @@ protected:
     void paintGL() Q_DECL_OVERRIDE;
     void resizeGL(int width, int height) Q_DECL_OVERRIDE;
 
-	virtual void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
-
 	virtual void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 	virtual void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 	virtual void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
