@@ -35,9 +35,8 @@ public:
 
     virtual void setKeyManager(KeyManager* keymanager) {};
 
-    virtual ObjectBase* getRootObject();
+    ObjectBase *getRootObject();
     void getModels(std::vector<Model *> &models);
-    ObjectGroup *getRootObject();
 
     ObjectGroup *getCurrentObjectGroup();
     Object *getCurrentObject();
@@ -53,12 +52,10 @@ private:
 
     std::vector<Object *> m_objects;
 
-    ObjectBase* m_objectRoot;
+    std::unique_ptr<ObjectBase> m_objectRoot;
 
-
-=======
     Object *m_dummyCurrentObject;
->>>>>>> 5dd476d6755cae1df8191257b8ae14206c7573c8
+
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_GAME_H

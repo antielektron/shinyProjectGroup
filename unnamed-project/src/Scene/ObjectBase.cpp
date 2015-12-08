@@ -1,7 +1,9 @@
 #include "Scene/ObjectBase.h"
 
 ObjectBase::ObjectBase(ObjectBase *parent) : m_parent(parent), m_scaling(1., 1., 1.)
-{}
+{
+    m_name = "unnamedObject";
+}
 
 const QMatrix4x4 &ObjectBase::getWorld()
 {
@@ -63,4 +65,14 @@ void ObjectBase::setParent(ObjectBase *parent)
 ObjectBase *ObjectBase::getParent()
 {
     return m_parent;
+}
+
+void ObjectBase::setName(QString name)
+{
+    m_name = name;
+}
+
+QString ObjectBase::getName()
+{
+    return m_name;
 }

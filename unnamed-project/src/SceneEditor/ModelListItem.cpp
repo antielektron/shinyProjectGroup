@@ -47,6 +47,11 @@ int ModelListItem::getDepth()
     return m_depth;
 }
 
+QVariant ModelListItem::getData()
+{
+    return m_object->getName();
+}
+
 ModelListItem *ModelListItem::getParent()
 {
     return m_parent;
@@ -56,10 +61,4 @@ ObjectBase *ModelListItem::getObject()
 {
     return m_object;
 }
-
-
-
-
-
-
 

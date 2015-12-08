@@ -1,11 +1,11 @@
-#ifndef TREEMODEL_H
-#define TREEMODEL_H
+#ifndef UNNAMED_PROJECT_TREEMODEL_H
+#define UNNAMED_PROJECT_TREEMODEL_H
 
 #include <QAbstractItemModel>
 #include <memory>
+#include <SceneEditor/ModelListItem.h>
 
 class ObjectBase;
-class ModelListItem;
 
 class TreeModel : public QAbstractItemModel
 {
@@ -30,4 +30,4 @@ protected:
 
 };
 
-#endif // TREEMODEL_H
+#endif // UNNAMED_PROJECT_TREEMODEL_H

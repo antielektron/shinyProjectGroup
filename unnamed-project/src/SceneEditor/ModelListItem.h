@@ -2,6 +2,7 @@
 #define MODELLISTITEM_H
 
 #include <QList>
+#include <QVariant>
 
 class ObjectBase;
 
@@ -19,6 +20,13 @@ public:
     int getIndex();
     int getDepth();
 
+    /**
+     * returns the object's identifier as a QString
+     * (analog to the data() function in the Qt examples)
+     * @return object's identifier as a QString
+     */
+    QVariant getData();
+
     ObjectBase *getObject();
 
     ModelListItem *getParent();
@@ -31,6 +39,8 @@ protected:
     ObjectBase* m_object;
 
     int m_depth;
+
+    QString m_objectName;
 };
 
 #endif // MODELLISTITEM_H

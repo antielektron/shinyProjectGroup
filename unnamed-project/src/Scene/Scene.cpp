@@ -33,6 +33,7 @@ Object *Scene::createObject(const std::string &modelName)
     assert(m_models.find(modelName) != m_models.end());
     Model *model = m_models[modelName].get();
     Object *object = new Object(model);
+    object->setName(QString::fromStdString(modelName)); //TODO: discuss how to choose identifiers!
     m_objects.push_back(std::unique_ptr<Object>(object)); // construct unique_ptr automatically
     return object;
 }

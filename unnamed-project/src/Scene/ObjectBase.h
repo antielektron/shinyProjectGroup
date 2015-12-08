@@ -2,6 +2,7 @@
 #define UNNAMED_PROJECT_SCENE_OBJECT_BASE_H
 
 #include <QVector3D>
+#include <QString>
 #include <QMatrix4x4>
 
 class ObjectBase
@@ -26,6 +27,9 @@ public:
     void setParent(ObjectBase *parent);
     ObjectBase *getParent();
 
+    void setName(QString name);
+    QString getName();
+
 protected:
     ObjectBase *m_parent;
 
@@ -34,6 +38,8 @@ protected:
     QVector3D m_rotation;
 
     QMatrix4x4 m_world;
+
+    QString m_name;
 };
 
 #endif // UNNAMED_PROJECT_SCENE_OBJECT_BASE_H

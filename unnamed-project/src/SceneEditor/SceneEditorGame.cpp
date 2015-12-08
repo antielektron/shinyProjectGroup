@@ -1,5 +1,6 @@
 #include "SceneEditor/SceneEditorGame.h"
-#include "Scene/ObjectBase.h"
+#include "Scene/Object.h"
+#include "Scene/ObjectGroup.h"
 
 SceneEditorGame::SceneEditorGame() : QObject(nullptr), m_dummyCurrentObject(nullptr)
 {}
@@ -8,8 +9,20 @@ void SceneEditorGame::initialize()
 {
     m_scene.reset(new Scene());
 
+    //create a Root object
+    //(so far only managed by us)
+    m_objectRoot.reset(new ObjectGroup());
+
+    //such casting, much wow
+    ObjectGroup *root = static_cast<ObjectGroup*>(m_objectRoot.get());
+
+    root->setName("Root Object");
+
     m_scene->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
     m_dummyCurrentObject = m_scene->createObject("octo");
+
+    //FIXME: this will result in a double free!
+    root->addObject(std::unique_ptr<Object>(m_dummyCurrentObject));
 
     m_scene->getCamera().translate(0., 0., -10);
 
@@ -68,7 +81,7 @@ void SceneEditorGame::onKeyUp(int key)
 
 ObjectBase *SceneEditorGame::getRootObject()
 {
-    return m_objectRoot;
+    return m_objectRoot.get();
 }
 void SceneEditorGame::currentObjectModified()
 {
@@ -81,11 +94,6 @@ void SceneEditorGame::getModels(std::vector<Model *> &models)
     // TODO
 }
 
-ObjectGroup *SceneEditorGame::getRootObject()
-{
-    // TODO
-    return nullptr;
-}
 
 ObjectGroup *SceneEditorGame::getCurrentObjectGroup()
 {

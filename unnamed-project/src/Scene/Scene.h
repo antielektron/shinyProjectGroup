@@ -43,6 +43,9 @@ private:
     QVector3D m_directionalLightDirection;
     QVector3D m_lightColor;
 
+    //TODO: get names directly from objects
+    //(is more efficient than ask the scene
+    // every time for it! )
     // Model <- SceneModel <- SceneObject hm
     std::map<std::string, std::unique_ptr<Model>> m_models; // all basic models that are available (only for construction purposes, if needed!)
 
