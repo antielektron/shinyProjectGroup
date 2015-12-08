@@ -17,7 +17,7 @@ public:
     ModelListItem *getChild(int index);
 
     int getNumberOfChilds();
-    int getIndex();
+    int getRow();
     int getDepth();
 
     /**
@@ -39,8 +39,6 @@ protected:
     ObjectBase* m_object;
 
     int m_depth;
-
-    QString m_objectName;
 };
 
 #endif // MODELLISTITEM_H

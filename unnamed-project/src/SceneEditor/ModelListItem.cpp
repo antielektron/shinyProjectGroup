@@ -33,7 +33,7 @@ int ModelListItem::getNumberOfChilds()
     return m_childItems.count();
 }
 
-int ModelListItem::getIndex()
+int ModelListItem::getRow()
 {
     if (m_parent)
     {

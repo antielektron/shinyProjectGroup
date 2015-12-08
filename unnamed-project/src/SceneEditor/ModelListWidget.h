@@ -4,12 +4,14 @@
 #include <memory>
 
 #include <QWidget>
-#include <QListWidget>
+#include <QTreeWidget>
 #include <QBoxLayout>
 #include <QPushButton>
+#include "Scene/ObjectGroup.h"
 
 class SceneEditorGame;
 class ObjectBase;
+class TreeModel;
 
 class ModelListWidget : public QWidget
 {
@@ -25,7 +27,9 @@ public slots:
     void updateModelTree();
 
 private:
-    QListWidget *m_listWidget;
+    QTreeView *m_treeWidget;
+    TreeModel *m_treeModel;
+
 
     QPushButton *m_add;
     QPushButton *m_remove;
@@ -33,6 +37,12 @@ private:
     std::shared_ptr<SceneEditorGame> m_game;
 
     ObjectBase* m_currentWidget;
+
+    //just a test:
+    std::unique_ptr<ObjectGroup> g1;
+    std::unique_ptr<ObjectGroup> g2;
+    std::unique_ptr<ObjectGroup> g3;
+    std::unique_ptr<ObjectGroup> g4;
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_MODEL_LIST_WIDGET_H

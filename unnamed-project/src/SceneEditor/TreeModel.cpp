@@ -57,7 +57,7 @@ QModelIndex TreeModel::parent(const QModelIndex &index) const
         return QModelIndex();
     }
 
-    return createIndex(parentItem->getIndex(),0,parentItem);
+    return createIndex(parentItem->getRow(),0,parentItem);
 }
 
 int TreeModel::rowCount(const QModelIndex &parent) const
