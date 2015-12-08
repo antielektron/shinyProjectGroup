@@ -1,10 +1,14 @@
 #include "TreeModel.h"
 #include "ModelListItem.h"
+#include "Scene/ObjectGroup.h"
+#include "Scene/Object.h"
 #include <memory>
 
-TreeModel::TreeModel()
+TreeModel::TreeModel(ObjectGroup *rootObject, QObject *parent) : QAbstractItemModel(parent)
 {
-    m_rootItem.reset();
+    m_rootObjectGroup = rootObject;
+    m_rootItem.reset(new ModelListItem(m_rootObjectGroup));
+    setupModelData(m_rootItem.get());
 }
 
 //just implemented as explained by:
@@ -121,6 +125,33 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
     }
 
     return QVariant();
+}
+
+void TreeModel::setRoot(ObjectGroup *rootObject)
+{
+    m_rootObjectGroup = rootObject;
+    m_rootItem.reset(new ModelListItem(m_rootObjectGroup));
+    setupModelData(m_rootItem.get());
+}
+
+void TreeModel::setupModelData(ModelListItem *rootItem)
+{
+    ObjectGroup *rootGroup = static_cast<ObjectGroup*>(rootItem->getObject());
+
+    //iterate through child groups:
+    for (auto &objGroup : rootGroup->getGroups())
+    {
+        ModelListItem *childGroup = new ModelListItem(objGroup, rootItem);
+        rootItem->appendChild(childGroup);
+        setupModelData(childGroup);
+    }
+
+    //iterate through child objects:
+    for (auto &obj : rootGroup->getObjects())
+    {
+        ModelListItem *childObject = new ModelListItem(obj, rootItem);
+        rootItem->appendChild(childObject);
+    }
 }
 
 

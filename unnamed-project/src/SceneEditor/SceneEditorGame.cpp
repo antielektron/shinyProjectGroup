@@ -22,7 +22,7 @@ void SceneEditorGame::initialize()
     m_dummyCurrentObject = m_scene->createObject("octo");
 
     //FIXME: this will result in a double free!
-    root->addObject(std::unique_ptr<Object>(m_dummyCurrentObject));
+    root->addObject(m_dummyCurrentObject);
 
     m_scene->getCamera().translate(0., 0., -10);
 
