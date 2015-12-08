@@ -1,3 +1,5 @@
 build/
 .idea/
-/unnamed-project-build/
+*-build/
+*.user
+
