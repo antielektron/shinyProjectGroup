@@ -38,14 +38,14 @@ Object *Scene::createObject(const std::string &modelName)
     return object;
 }
 
-Scene::ObjectIterator Scene::objectsBegin()
+range<Scene::ObjectIterator> Scene::getObjects()
 {
-    return m_objects.cbegin();
+    return range<ObjectIterator>(m_objects.cbegin(),m_objects.cend());
 }
 
-Scene::ObjectIterator Scene::objectsEnd()
+range<Scene::ModelIterator> Scene::getModels()
 {
-    return m_objects.cend();
+    return range<ModelIterator>(m_models.cbegin(), m_models.cend());
 }
 
 QVector3D &Scene::getDirectionalLightDirection()

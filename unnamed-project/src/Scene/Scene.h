@@ -11,6 +11,7 @@
 
 #include "Scene/Model.h"
 #include "Scene/Object.h"
+#include "smartiterator.h"
 
 class Scene
 {
@@ -23,6 +24,9 @@ public:
     void setLightColor(const QVector3D &color);
     void setDirectionalLightDirection(const QVector3D &direction);
 
+    typedef std::map<std::string, std::unique_ptr<Model>>::const_iterator ModelIterator;
+    range<ModelIterator> getModels();
+
     QMatrix4x4 &getCamera();
     QMatrix4x4 &getProjection();
     QVector3D &getDirectionalLightDirection();
@@ -32,8 +36,7 @@ public:
     Object *createObject(const std::string &modelName);
 
     typedef std::vector<std::unique_ptr<Object>>::const_iterator ObjectIterator;
-    ObjectIterator objectsBegin();
-    ObjectIterator objectsEnd();
+    range<ObjectIterator> getObjects();
 
 private:
     QMatrix4x4 m_proj;

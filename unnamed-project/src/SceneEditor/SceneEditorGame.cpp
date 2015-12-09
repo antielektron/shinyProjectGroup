@@ -18,7 +18,7 @@ void SceneEditorGame::initialize()
 
     root->setName("Root Object");
 
-    m_scene->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
+    this->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
     m_dummyCurrentObject = m_scene->createObject("octo");
 
     //FIXME: this will result in a double free!
@@ -73,3 +73,10 @@ Object *SceneEditorGame::getCurrentObject()
     // TODO
     return m_dummyCurrentObject;
 }
+
+void SceneEditorGame::addModel(const std::string &name, std::unique_ptr<Model> model)
+{
+    m_scene->addModel(name,std::move(model));
+    emit modelsChanged();
+}
+
