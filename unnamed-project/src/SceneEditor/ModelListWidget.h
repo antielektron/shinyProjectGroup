@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <QWidget>
-#include <QTreeWidget>
+#include <QListWidget>
 #include <QBoxLayout>
 #include <QPushButton>
 #include "Scene/ObjectGroup.h"
@@ -22,13 +22,8 @@ public:
 
     ObjectBase* getCurrentWidget();
 
-public slots:
-
-    void updateModelTree();
-
 private:
-    QTreeView *m_treeWidget;
-    TreeModel *m_treeModel;
+    QListWidget *m_listView;
 
 
     QPushButton *m_add;
@@ -38,11 +33,6 @@ private:
 
     ObjectBase* m_currentWidget;
 
-    //just a test:
-    std::unique_ptr<ObjectGroup> g1;
-    std::unique_ptr<ObjectGroup> g2;
-    std::unique_ptr<ObjectGroup> g3;
-    std::unique_ptr<ObjectGroup> g4;
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_MODEL_LIST_WIDGET_H

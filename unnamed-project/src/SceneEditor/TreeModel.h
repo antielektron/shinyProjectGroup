@@ -3,7 +3,7 @@
 
 #include <QAbstractItemModel>
 #include <memory>
-#include <SceneEditor/ModelListItem.h>
+#include <SceneEditor/ObjectListItem.h>
 
 class ObjectGroup;
 
@@ -26,11 +26,11 @@ public:
     void setRoot(ObjectGroup *rootObject);
 
 protected:
-    std::unique_ptr<ModelListItem> m_rootItem;
+    std::unique_ptr<ObjectListItem> m_rootItem;
 
     ObjectGroup* m_rootObjectGroup;
 
-    void setupModelData(ModelListItem *rootItem);
+    void setupModelData(ObjectListItem *rootItem);
 
 };
 

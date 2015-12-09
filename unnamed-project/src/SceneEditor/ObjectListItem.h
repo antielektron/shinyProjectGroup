@@ -6,15 +6,15 @@
 
 class ObjectBase;
 
-class ModelListItem
+class ObjectListItem
 {
 public:
 
-    ModelListItem(ObjectBase *object, ModelListItem *parent = nullptr);
-    ~ModelListItem();
+    ObjectListItem(ObjectBase *object, ObjectListItem *parent = nullptr);
+    ~ObjectListItem();
 
-    void appendChild(ModelListItem *child);
-    ModelListItem *getChild(int index);
+    void appendChild(ObjectListItem *child);
+    ObjectListItem *getChild(int index);
 
     int getNumberOfChilds();
     int getRow();
@@ -29,12 +29,12 @@ public:
 
     ObjectBase *getObject();
 
-    ModelListItem *getParent();
+    ObjectListItem *getParent();
 
 protected:
 
-    QList<ModelListItem*> m_childItems;
-    ModelListItem* m_parent;
+    QList<ObjectListItem*> m_childItems;
+    ObjectListItem* m_parent;
 
     ObjectBase* m_object;
 

@@ -1,5 +1,5 @@
 #include "TreeModel.h"
-#include "ModelListItem.h"
+#include "SceneEditor/ObjectListItem.h"
 #include "Scene/ObjectGroup.h"
 #include "Scene/Object.h"
 #include <memory>
@@ -7,7 +7,7 @@
 TreeModel::TreeModel(ObjectGroup *rootObject, QObject *parent) : QAbstractItemModel(parent)
 {
     m_rootObjectGroup = rootObject;
-    m_rootItem.reset(new ModelListItem(m_rootObjectGroup));
+    m_rootItem.reset(new ObjectListItem(m_rootObjectGroup));
     setupModelData(m_rootItem.get());
 }
 
@@ -20,7 +20,7 @@ QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) con
         return QModelIndex();
     }
 
-    ModelListItem *parentItem;
+    ObjectListItem *parentItem;
 
     if (!parent.isValid())
     {
@@ -28,10 +28,10 @@ QModelIndex TreeModel::index(int row, int column, const QModelIndex &parent) con
     }
     else
     {
-        parentItem = static_cast<ModelListItem*>(parent.internalPointer());
+        parentItem = static_cast<ObjectListItem*>(parent.internalPointer());
     }
 
-    ModelListItem *childItem = parentItem->getChild(row);
+    ObjectListItem *childItem = parentItem->getChild(row);
 
     if (childItem)
     {
@@ -49,8 +49,8 @@ QModelIndex TreeModel::parent(const QModelIndex &index) const
         return QModelIndex();
     }
 
-    ModelListItem *childItem = static_cast<ModelListItem*>(index.internalPointer());
-    ModelListItem *parentItem = childItem->getParent();
+    ObjectListItem *childItem = static_cast<ObjectListItem*>(index.internalPointer());
+    ObjectListItem *parentItem = childItem->getParent();
 
     if (parentItem == m_rootItem.get())
     {
@@ -62,7 +62,7 @@ QModelIndex TreeModel::parent(const QModelIndex &index) const
 
 int TreeModel::rowCount(const QModelIndex &parent) const
 {
-    ModelListItem *parentItem;
+    ObjectListItem *parentItem;
 
     if (parent.column() > 0)
     {
@@ -75,7 +75,7 @@ int TreeModel::rowCount(const QModelIndex &parent) const
     }
     else
     {
-        parentItem = static_cast<ModelListItem* >(parent.internalPointer());
+        parentItem = static_cast<ObjectListItem* >(parent.internalPointer());
     }
 
     return parentItem->getNumberOfChilds();
@@ -100,7 +100,7 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
 
-    ModelListItem *item = static_cast<ModelListItem *>(index.internalPointer());
+    ObjectListItem *item = static_cast<ObjectListItem *>(index.internalPointer());
 
     return item->getData();
 
@@ -130,18 +130,18 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
 void TreeModel::setRoot(ObjectGroup *rootObject)
 {
     m_rootObjectGroup = rootObject;
-    m_rootItem.reset(new ModelListItem(m_rootObjectGroup));
+    m_rootItem.reset(new ObjectListItem(m_rootObjectGroup));
     setupModelData(m_rootItem.get());
 }
 
-void TreeModel::setupModelData(ModelListItem *rootItem)
+void TreeModel::setupModelData(ObjectListItem *rootItem)
 {
     ObjectGroup *rootGroup = static_cast<ObjectGroup*>(rootItem->getObject());
 
     //iterate through child groups:
     for (auto &objGroup : rootGroup->getGroups())
     {
-        ModelListItem *childGroup = new ModelListItem(objGroup, rootItem);
+        ObjectListItem *childGroup = new ObjectListItem(objGroup, rootItem);
         rootItem->appendChild(childGroup);
         setupModelData(childGroup);
     }
@@ -149,7 +149,7 @@ void TreeModel::setupModelData(ModelListItem *rootItem)
     //iterate through child objects:
     for (auto &obj : rootGroup->getObjects())
     {
-        ModelListItem *childObject = new ModelListItem(obj, rootItem);
+        ObjectListItem *childObject = new ObjectListItem(obj, rootItem);
         rootItem->appendChild(childObject);
     }
 }
