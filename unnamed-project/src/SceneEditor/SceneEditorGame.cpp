@@ -6,7 +6,8 @@ SceneEditorGame::SceneEditorGame() :
 		QObject(nullptr), 
 		m_dummyCurrentObject(nullptr), 
 		m_keyManager(nullptr)
-{}
+{
+}
 
 void SceneEditorGame::initialize()
 {
