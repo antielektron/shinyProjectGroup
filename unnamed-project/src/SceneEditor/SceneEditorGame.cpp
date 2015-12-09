@@ -2,8 +2,12 @@
 #include "Scene/Object.h"
 #include "Scene/ObjectGroup.h"
 
-SceneEditorGame::SceneEditorGame() : QObject(nullptr), m_dummyCurrentObject(nullptr)
-{}
+SceneEditorGame::SceneEditorGame() : 
+		QObject(nullptr), 
+		m_dummyCurrentObject(nullptr), 
+		m_keyManager(nullptr)
+{
+}
 
 void SceneEditorGame::initialize()
 {
@@ -41,7 +45,82 @@ void SceneEditorGame::resize(int width, int height)
 
 void SceneEditorGame::tick()
 {
+	QVector3D deltaPos(0, 0, 0);
 
+	if (!m_keyManager)
+		return;
+
+	m_keyManager->tick();
+
+	if (m_keyManager->shouldCatchMouse())
+	{
+		rotX += m_keyManager->getRelativeY() * .1;
+		rotY += m_keyManager->getRelativeX() * .1;
+	}
+
+	if (m_keyManager->isKeyPressed(Qt::Key_Right))
+	{
+		rotY -= 0.5;
+	}
+	if (m_keyManager->isKeyPressed(Qt::Key_Left))
+	{
+		rotY += 0.5;
+	}
+	if (m_keyManager->isKeyPressed(Qt::Key_Up))
+	{
+		rotX += 0.5;
+	}
+	if (m_keyManager->isKeyPressed(Qt::Key_Down))
+	{
+		rotX -= 0.5;
+	}
+	if (m_keyManager->isKeyPressed(Qt::Key_S))
+	{
+		deltaPos += QVector3D(0, 0, 0.5);
+	}
+	if (m_keyManager->isKeyPressed(Qt::Key_W))
+	{
+		deltaPos += QVector3D(0, 0, -0.5);
+	}
+	if (m_keyManager->isKeyPressed(Qt::Key_D))
+	{
+		deltaPos += QVector3D(0.5, 0, 0);
+	}
+	if (m_keyManager->isKeyPressed(Qt::Key_A))
+	{
+		deltaPos += QVector3D(-0.5, 0, 0);
+	}
+	if (m_keyManager->isKeyPressed(Qt::Key_Q))
+	{
+		deltaPos += QVector3D(0, 0.5, 0);
+	}
+	// !!! Keyboard layout
+	if (m_keyManager->isKeyPressed(Qt::Key_Z))
+	{
+		deltaPos += QVector3D(0, -0.5, 0);
+	}
+
+	// Reset camera
+	if (m_keyManager->isKeyPressed(Qt::Key_Space))
+	{
+		m_position = QVector3D(0, 0, 0);
+		rotX = 0;
+		rotY = 0;
+	}
+
+	if (rotX > 90.f)
+		rotX = 90.f;
+	if (rotX < -90.f)
+		rotX = -90.f;
+
+	updatePosMatrix(deltaPos);
+
+	// Start/Stop catching mouse
+	if (m_keyManager->isKeyPressed(Qt::Key_Escape) && !m_wasEscDown)
+	{
+		m_keyManager->setCatchMouse(!m_keyManager->shouldCatchMouse());
+	}
+	m_wasEscDown = m_keyManager->isKeyPressed(Qt::Key_Escape);
 }
 
 Scene *SceneEditorGame::getScene()
@@ -49,6 +128,28 @@ Scene *SceneEditorGame::getScene()
     return m_scene.get();
 }
 
+void SceneEditorGame::setKeyManager(KeyManager *keyManager)
+{
+	this->m_keyManager = keyManager;
+}
+
+void SceneEditorGame::updatePosMatrix(QVector3D deltaPos)
+{
+	QMatrix4x4 &camera = m_scene->getCamera();
+	QMatrix4x4 translation;
+	QMatrix4x4 xRotation;
+	QMatrix4x4 yRotation;
+
+	xRotation.rotate(rotX, 1, 0, 0);
+	yRotation.rotate(rotY, 0, 1, 0);
+	translation.translate(-1 * m_position);
+
+	QMatrix4x4 rotation = xRotation * yRotation;
+
+	m_position += rotation.transposed() * deltaPos;
+
+	camera = rotation * translation;
+}
 
 void SceneEditorGame::currentObjectModified()
 {

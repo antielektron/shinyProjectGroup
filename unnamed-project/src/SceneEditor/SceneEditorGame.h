@@ -5,6 +5,7 @@
 
 #include "IGame.h"
 #include "Scene/Scene.h"
+#include "KeyManager.h"
 
 class ObjectBase;
 class ObjectGroup;
@@ -24,7 +25,7 @@ public:
 
     virtual Scene *getScene();
 
-    virtual void setKeyManager(KeyManager *keyManager) {};
+    virtual void setKeyManager(KeyManager *keyManager);
 
     ObjectBase *getRootObject();
     void getModels(std::vector<Model *> &models);
@@ -48,6 +49,20 @@ private:
     std::unique_ptr<ObjectBase> m_objectRoot;
 
     Object *m_dummyCurrentObject;
+
+	float rotY = 0;
+	float rotX = 0;
+	float pos_height = 0;
+
+
+	QVector3D m_position;
+	QVector3D m_centre;
+	QMatrix4x4 posMatrix;
+
+	KeyManager *m_keyManager;
+	bool m_wasEscDown;
+
+	void updatePosMatrix(QVector3D deltaPos);
 
 };
 

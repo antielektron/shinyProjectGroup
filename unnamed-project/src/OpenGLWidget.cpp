@@ -112,6 +112,7 @@ void OpenGLWidget::cleanup()
 void OpenGLWidget::mousePressEvent(QMouseEvent *event)
 {
     // m_game->onMouseButtonDown(event->button());
+	this->setFocus();
 }
 
 void OpenGLWidget::mouseReleaseEvent(QMouseEvent *event)
