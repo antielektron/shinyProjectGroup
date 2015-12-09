@@ -44,9 +44,9 @@ void ObjectListWidget::updateModelTree()
     obj3->setName("obj3");
     obj4->setName("obj4");
 
-    obj1->addObjectGroup(obj2);
-    obj1->addObjectGroup(obj3);
-    obj2->addObjectGroup(obj4);
+    obj1->addObjectGroup(std::unique_ptr<ObjectGroup>(obj2));
+    obj1->addObjectGroup(std::unique_ptr<ObjectGroup>(obj3));
+    obj2->addObjectGroup(std::unique_ptr<ObjectGroup>(obj4));
 
     g1.reset(obj1);
     g2.reset(obj2);

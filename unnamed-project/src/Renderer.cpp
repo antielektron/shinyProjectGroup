@@ -151,9 +151,8 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     m_program->setUniformValue(m_projectionLoc, scene->getProjection());
 
-    for (auto &it : scene->getObjects())
+    for (auto &object : scene->getObjects())
     {
-        auto *object = it.get();
         m_program->setUniformValue(m_modelViewLoc, scene->getCamera() * object->getWorld());
         m_program->setUniformValue(m_lightDirectionLoc, scene->getDirectionalLightDirection());
         m_program->setUniformValue(m_lightColorLoc, scene->getLightColor());

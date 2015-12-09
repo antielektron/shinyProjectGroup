@@ -139,7 +139,7 @@ void TreeModel::setupModelData(ObjectListItem *rootItem)
     ObjectGroup *rootGroup = static_cast<ObjectGroup*>(rootItem->getObject());
 
     //iterate through child groups:
-    for (auto &objGroup : rootGroup->getGroups())
+    for (const auto &objGroup : rootGroup->getGroups())
     {
         ObjectListItem *childGroup = new ObjectListItem(objGroup, rootItem);
         rootItem->appendChild(childGroup);
@@ -147,7 +147,7 @@ void TreeModel::setupModelData(ObjectListItem *rootItem)
     }
 
     //iterate through child objects:
-    for (auto &obj : rootGroup->getObjects())
+    for (const auto &obj : rootGroup->getObjects())
     {
         ObjectListItem *childObject = new ObjectListItem(obj, rootItem);
         rootItem->appendChild(childObject);

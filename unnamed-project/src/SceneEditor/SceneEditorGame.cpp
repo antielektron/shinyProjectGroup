@@ -25,8 +25,7 @@ void SceneEditorGame::initialize()
     this->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
     m_dummyCurrentObject = m_scene->createObject("octo");
 
-    //FIXME: this will result in a double free!
-    root->addObject(m_dummyCurrentObject);
+    root->addObject(std::unique_ptr<Object>(m_dummyCurrentObject));
 
     m_scene->getCamera().translate(0., 0., -10);
 
