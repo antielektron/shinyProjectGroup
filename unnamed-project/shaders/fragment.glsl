@@ -85,7 +85,7 @@ float cooktorranceTerm(vec3 v, vec3 n, vec3 l)
 void main()
 {
     vec3 n = normalize(normal);
-    vec3 l = normalize(-lightDirection);
+    vec3 l = normalize(lightDirection);
     vec3 v = normalize(-world); // eye is in the origin.
     float diffuseTerm = cdot(n, l);
 

@@ -18,16 +18,21 @@ void PrimitiveGame::initialize()
 
 
 
-    //m_scene->addModel("test", std::unique_ptr<Model>(new Model("models/test.obj")));
-    //m_scene->addModel("audi", std::unique_ptr<Model>(new Model("models/Audi_R8.obj")));
-    //m_scene->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
-    m_scene->addModel("house", std::unique_ptr<Model>(new Model("models/castle.obj")));
-    m_dummy = m_scene->createObject("house");
+    m_scene->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
+    m_scene->addModel("sphere", std::unique_ptr<Model>(new Model("models/sphere.obj")));
+    m_scene->addModel("suzanne", std::unique_ptr<Model>(new Model("models/suzanne.obj")));
 
-    m_dummy->updateWorld();
+    auto octo = m_scene->createObject("octo");
+    auto sphere = m_scene->createObject("sphere");
+    auto suzanne = m_scene->createObject("suzanne");
+    sphere->setPosition(QVector3D(3, 0, 0));
+    suzanne->setPosition(QVector3D(6, 0, 0));
+
+
+    m_scene->getSceneRoot()->updateWorld();
 
     //set directional light:
-    m_scene->setDirectionalLightDirection(QVector3D(0.0, 1.0, 0.0));
+    m_scene->setDirectionalLightDirection(QVector3D(0.3, 1.0, 0.3));
     m_scene->setLightColor(QVector3D(1.0, 1.0, 1.0));
 }
 
@@ -46,6 +51,8 @@ void PrimitiveGame::tick()
         return;
 
     m_keyManager->tick();
+
+    float speed = 7./60;
 
     if (m_keyManager->shouldCatchMouse())
     {
@@ -71,28 +78,28 @@ void PrimitiveGame::tick()
     }
     if (m_keyManager->isKeyPressed(Qt::Key_S))
     {
-        deltaPos += QVector3D(0, 0, 0.5);
+        deltaPos += QVector3D(0, 0, speed);
     }
     if (m_keyManager->isKeyPressed(Qt::Key_W))
     {
-        deltaPos += QVector3D(0, 0, -0.5);
+        deltaPos += QVector3D(0, 0, -speed);
     }
     if (m_keyManager->isKeyPressed(Qt::Key_D))
     {
-        deltaPos += QVector3D(0.5, 0, 0);
+        deltaPos += QVector3D(speed, 0, 0);
     }
     if (m_keyManager->isKeyPressed(Qt::Key_A))
     {
-        deltaPos += QVector3D(-0.5, 0, 0);
+        deltaPos += QVector3D(-speed, 0, 0);
     }
     if (m_keyManager->isKeyPressed(Qt::Key_Q))
     {
-        deltaPos += QVector3D(0, 0.5, 0);
+        deltaPos += QVector3D(0, speed, 0);
     }
     // !!! Keyboard layout
     if (m_keyManager->isKeyPressed(Qt::Key_Z))
     {
-        deltaPos += QVector3D(0, -0.5, 0);
+        deltaPos += QVector3D(0, -speed, 0);
     }
 
     // Reset camera
