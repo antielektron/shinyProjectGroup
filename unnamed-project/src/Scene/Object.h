@@ -12,13 +12,13 @@ class Object : public ObjectBase
 public:
     Object(Model *model);
 
-    void setAlpha(float a);
-    void setSpecularAmount(float spec);
-    void setDiffuseAmount(float diff);
+    void setSpecularAmount(float specular);
+    void setDiffuseAmount(float diffuse);
+    void setAmbientAmount(float ambient);
 
-    float getAlpha();
     float getSpecularAmount();
     float getDiffuseAmount();
+    float getAmbientAmount();
 
     Model *getModel();
 
@@ -26,10 +26,10 @@ private:
     // model not owned
     Model *m_model;
 
-    //material information for phong shading:
-    float alpha;
+    // TODO color
     float specularAmount;
     float diffuseAmount;
+    float ambientAmount;
 
     // TODO material information
 };

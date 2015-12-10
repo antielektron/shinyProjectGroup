@@ -56,11 +56,13 @@ ShaderErrorType Renderer::createShaderProgram(const std::string &vertexShaderSou
     m_program->bind();
     m_modelViewLoc = m_program->uniformLocation("modelView");
     m_projectionLoc = m_program->uniformLocation("projection");
-    m_lightDirectionLoc = m_program->uniformLocation("v_lightDirection");
-    m_lightColorLoc = m_program->uniformLocation("v_lightColor");
-    m_alphaLoc = m_program->uniformLocation("mat_alpha");
-    m_specularAmountLoc = m_program->uniformLocation("k_s");
-    m_diffuseAmountLoc = m_program->uniformLocation("k_d");
+
+    m_lightDirectionLoc = m_program->uniformLocation("lightDirection");
+    m_lightColorLoc = m_program->uniformLocation("lightColor");
+
+    m_specularColorLoc = m_program->uniformLocation("specularColor");
+    m_diffuseColorLoc = m_program->uniformLocation("diffuseColor");
+    m_ambientColorLoc = m_program->uniformLocation("ambientColor");
 
     m_program->release();
 
@@ -154,12 +156,17 @@ void Renderer::render(GLuint fbo, Scene *scene)
     for (auto it = scene->objectsBegin(); it != scene->objectsEnd(); it++)
     {
         auto *object = it->get();
-        m_program->setUniformValue(m_modelViewLoc, scene->getCamera() * object->getWorld());
-        m_program->setUniformValue(m_lightDirectionLoc, scene->getDirectionalLightDirection());
+        auto modelView = scene->getCamera() * object->getWorld();
+
+        auto lightDir = scene->getCamera() * QVector4D(scene->getDirectionalLightDirection(), 0.);
+        lightDir.setW(1.);
+
+        m_program->setUniformValue(m_modelViewLoc, modelView);
+        m_program->setUniformValue(m_lightDirectionLoc, QVector3D(lightDir));
         m_program->setUniformValue(m_lightColorLoc, scene->getLightColor());
-        m_program->setUniformValue(m_alphaLoc, object->getAlpha());
-        m_program->setUniformValue(m_specularAmountLoc, object->getSpecularAmount());
-        m_program->setUniformValue(m_diffuseAmountLoc, object->getDiffuseAmount());
+        m_program->setUniformValue(m_specularColorLoc, object->getSpecularAmount() * QVector3D(1., 1., 1.));
+        m_program->setUniformValue(m_diffuseColorLoc, object->getDiffuseAmount() * QVector3D(1., 1., 1.));
+        m_program->setUniformValue(m_ambientColorLoc, object->getAmbientAmount() * QVector3D(1., 1., 1.));
         object->getModel()->draw();
     }
 

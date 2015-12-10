@@ -27,8 +27,8 @@ void PrimitiveGame::initialize()
     m_dummy->updateWorld();
 
     //set directional light:
-    m_scene->setDirectionalLightDirection(QVector3D(0.0,0.0,-1.0));
-    m_scene->setLightColor(QVector3D(1.0,1.0,1.0));
+    m_scene->setDirectionalLightDirection(QVector3D(0.0, 1.0, 0.0));
+    m_scene->setLightColor(QVector3D(1.0, 1.0, 1.0));
 }
 
 void PrimitiveGame::resize(int width, int height)
