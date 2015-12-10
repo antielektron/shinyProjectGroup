@@ -35,6 +35,8 @@ public:
 
     void currentObjectModified();
 
+    void addModel(const std::string &name, std::unique_ptr<Model> model);
+
 Q_SIGNALS:
     void currentObjectChanged();
     void modelsChanged();

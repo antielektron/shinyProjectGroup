@@ -17,14 +17,14 @@ void ObjectGroup::updateWorld()
     }
 }
 
-void ObjectGroup::addObject(Object* object)
+void ObjectGroup::addObject(std::unique_ptr<Object> object)
 {
-    m_objects.push_back(object);
+    m_objects.push_back(std::move(object));
 }
 
-void ObjectGroup::addObjectGroup(ObjectGroup* group)
+void ObjectGroup::addObjectGroup(std::unique_ptr<ObjectGroup> group)
 {
-    m_groups.push_back(group);
+    m_groups.push_back(std::move(group));
 }
 
 void ObjectGroup::removeObject(Object *object)
@@ -32,7 +32,7 @@ void ObjectGroup::removeObject(Object *object)
     // TODO consider using a set or sort the vector..
     for (auto it = m_objects.begin(); it != m_objects.end(); it++)
     {
-        if (*it == object)
+        if (it->get() == object)
         {
             m_objects.erase(it);
             break;
@@ -44,7 +44,7 @@ void ObjectGroup::removeObjectGroup(ObjectGroup *group)
 {
     for (auto it = m_groups.begin(); it != m_groups.end(); it++)
     {
-        if (*it == group)
+        if (it->get() == group)
         {
             m_groups.erase(it);
             break;

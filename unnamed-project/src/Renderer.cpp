@@ -153,9 +153,8 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     m_program->setUniformValue(m_projectionLoc, scene->getProjection());
 
-    for (auto it = scene->objectsBegin(); it != scene->objectsEnd(); it++)
+    for (auto &object : scene->getObjects())
     {
-        auto *object = it->get();
         auto modelView = scene->getCamera() * object->getWorld();
 
         auto lightDir = scene->getCamera() * QVector4D(scene->getDirectionalLightDirection(), 0.);

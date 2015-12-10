@@ -1,7 +1,8 @@
 #include "SceneEditor/ModelListWidget.h"
 
 #include "SceneEditor/SceneEditorGame.h"
-
+#include <iostream>
+#include <cassert>
 
 ModelListWidget::ModelListWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
 {
@@ -20,13 +21,37 @@ ModelListWidget::ModelListWidget(std::shared_ptr<SceneEditorGame> game, QWidget 
 
     m_remove = new QPushButton("Remove Model", container);
     container->layout()->addWidget(m_remove);
+
+    updateModelList();
+
+    connect(m_game.get(),SIGNAL(modelsChanged()), this, SLOT(updateModelList()));
 }
+//------------------------------------------------------------------------------
 
 ModelListWidget::~ModelListWidget()
 {
+
 }
+
+//------------------------------------------------------------------------------
 
 ObjectBase* ModelListWidget::getCurrentWidget()
 {
     return m_currentWidget;
 }
+
+//------------------------------------------------------------------------------
+
+void ModelListWidget::updateModelList()
+{
+    Scene *scene = m_game->getScene();
+
+    if (scene)
+    {
+        for (auto &model : scene->getModels())
+        {
+            m_listView->addItem(QString::fromStdString(model.first));
+        }
+    }
+}
+

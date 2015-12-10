@@ -22,6 +22,9 @@ public:
 
     ObjectBase* getCurrentWidget();
 
+public slots:
+    void updateModelList();
+
 private:
     QListWidget *m_listView;
 
@@ -31,7 +34,9 @@ private:
 
     std::shared_ptr<SceneEditorGame> m_game;
 
-    ObjectBase* m_currentWidget;
+    ObjectBase* m_currentWidget; //?
+
+
 
 };
 
