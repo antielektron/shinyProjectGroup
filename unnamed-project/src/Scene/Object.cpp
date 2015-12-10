@@ -5,9 +5,9 @@
 Object::Object(Model *model) :
     m_model(model)
 {
-    specularAmount = 1.;
-    diffuseAmount = 0.; //0.4;
-    ambientAmount = 0.1;
+    specularAmount = 0.5;
+    diffuseAmount = 0.5; //0.4;
+    ambientAmount = 0.4;
 }
 
 void Object::setDiffuseAmount(float diff)
