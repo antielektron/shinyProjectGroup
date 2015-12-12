@@ -36,6 +36,8 @@ ModelListWidget::~ModelListWidget()
 //------------------------------------------------------------------------------
 void ModelListWidget::updateModelList()
 {
+
+    m_listView->clear();
     Scene *scene = m_game->getScene();
 
     if (scene)

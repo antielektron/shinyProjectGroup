@@ -30,6 +30,11 @@ Model *Object::getModel()
     return m_model;
 }
 
+void Object::setModel(Model *model)
+{
+    m_model = model;
+}
+
 float Object::getDiffuseAmount()
 {
     return diffuseAmount;

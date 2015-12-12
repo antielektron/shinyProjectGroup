@@ -58,8 +58,6 @@ private:
 
     ObjectBase *m_currentObject;
 
-    std::vector<Model *> m_models;
-
     std::shared_ptr<SceneEditorGame> m_game;
 };
 

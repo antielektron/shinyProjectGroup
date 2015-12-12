@@ -127,5 +127,12 @@ ObjectGroup *Scene::getSceneRoot()
     return m_rootGroup.get();
 }
 
+//------------------------------------------------------------------------------
+Model *Scene::getModel(const std::string &modelName)
+{
+    assert(m_models.find(modelName) != m_models.end());
+    return m_models[modelName].get();
+}
+
 
 

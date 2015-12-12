@@ -47,6 +47,8 @@ public:
     typedef std::vector<Object *>::const_iterator ObjectIterator;
     range<ObjectIterator> getObjects();
 
+    Model *getModel(const std::string &modelName);
+
 private:
     QMatrix4x4 m_proj;
     QMatrix4x4 m_camera;

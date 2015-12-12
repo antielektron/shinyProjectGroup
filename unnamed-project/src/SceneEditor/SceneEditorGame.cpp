@@ -17,12 +17,18 @@ void SceneEditorGame::initialize()
     m_initialized = true;
 
     this->addModel(std::unique_ptr<Model>(new Model("models/octonorm.obj")));
-    m_dummyCurrentObject = this->createObject("octonorm");
+    this->createObject("octonorm")->setPosition(QVector3D(3, 0, 0));
+    this->addModel(std::unique_ptr<Model>(new Model("models/suzanne.obj")));
+    this->createObject("suzanne")->setPosition(QVector3D(-3, 0, 0));
+    this->addModel(std::unique_ptr<Model>(new Model("models/sphere.obj")));
+    m_dummyCurrentObject = this->createObject("sphere");
 
     m_scene->getCamera().translate(0., 0., -10);
 
     m_scene->setDirectionalLightDirection(QVector3D(0.0,0.0,-1.0));
     m_scene->setLightColor(QVector3D(1.0,1.0,1.0));
+
+    m_scene->getSceneRoot()->updateWorld();
 
     emit currentObjectChanged();
 

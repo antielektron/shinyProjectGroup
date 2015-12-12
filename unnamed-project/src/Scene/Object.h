@@ -23,6 +23,7 @@ public:
     virtual ObjectType getObjectType();
 
     Model *getModel();
+    void setModel(Model *model);
 
 private:
     // model not owned

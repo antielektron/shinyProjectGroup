@@ -48,8 +48,6 @@ QLineEdit *ObjectDetailsWidget::createNumericField(const QString &name)
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::modelsChanged()
 {
-    m_models.clear();
-    m_game->getModels(m_models);
     fillModelSelection();
 }
 
@@ -137,7 +135,8 @@ void ObjectDetailsWidget::updateCurrentObjectBase(ObjectBase *object)
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::applyCurrentObject(Object *object)
 {
-    // TODO
+    object->setModel(m_game->getScene()->getModel(
+                         m_modelSelection->currentText().toStdString()));
     applyCurrentObjectBase(object);
 }
 
@@ -157,14 +156,18 @@ void ObjectDetailsWidget::applyCurrentObjectBase(ObjectBase *object)
     object->getRotation().setY(m_rotYaw->text().toFloat());
     object->getRotation().setX(m_rotPitch->text().toFloat());
     object->getRotation().setZ(m_rotRoll->text().toFloat());
+
+    object->updateWorld();
 }
 
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::fillModelSelection()
 {
+    m_modelSelection->clear();
+    auto models = m_game->getScene()->getModels();
     std::cout << "update models" << std::endl;
-    for (Model *model : m_models)
+    for (auto &model : models)
     {
-        m_modelSelection->addItem(QString::fromStdString( model->getName()));
+        m_modelSelection->addItem(QString::fromStdString( model.second->getName()));
     }
 }
