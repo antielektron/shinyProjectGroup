@@ -26,13 +26,38 @@ namespace std
     };
 }
 
-Model::Model(const std::string &fileName) :
+//------------------------------------------------------------------------------
+Model::Model(const std::string &filename) :
+    m_indexBuffer(QOpenGLBuffer::IndexBuffer)
+{
+    loadObj(filename);
+    createOpenGLStuff();
+
+    //split filename to generate a model name automatically:
+    std::istringstream stream(filename);
+    std::string modelName;
+    //split away directories:
+    while(std::getline(stream, modelName, '/'));
+
+    //split away file extension:
+    std::istringstream stream2(modelName);
+    std::getline(stream2, modelName, '.');
+
+    assert(modelName.length() > 0);
+    m_name = modelName;
+}
+
+//------------------------------------------------------------------------------
+Model::Model(const std::string &fileName, std::string &name) :
     m_indexBuffer(QOpenGLBuffer::IndexBuffer)
 {
     loadObj(fileName);
     createOpenGLStuff();
+
+    m_name = name;
 }
 
+//------------------------------------------------------------------------------
 void Model::loadObj(const std::string &fileName)
 {
     std::ifstream input(fileName);
@@ -127,6 +152,7 @@ void Model::loadObj(const std::string &fileName)
     std::cout << m_vertices.size() << std::endl;
 }
 
+//------------------------------------------------------------------------------
 void Model::createOpenGLStuff()
 {
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
@@ -161,10 +187,17 @@ void Model::createOpenGLStuff()
     m_indexBuffer.release();
 }
 
+//------------------------------------------------------------------------------
 void Model::draw()
 {
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
 
     m_indexBuffer.bind();
     glDrawElements(GL_TRIANGLES, m_indices.size(), GL_UNSIGNED_INT, NULL);
+}
+
+//------------------------------------------------------------------------------
+std::string &Model::getName()
+{
+    return m_name;
 }

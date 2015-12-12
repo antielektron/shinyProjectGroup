@@ -7,6 +7,7 @@
 
 #include "OpenGLWidget.h"
 
+//------------------------------------------------------------------------------
 SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
 {
     this->setMinimumSize(800, 600);
@@ -37,8 +38,23 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     this->addDockWidget(Qt::RightDockWidgetArea, m_objectDetailsDock);
     this->addDockWidget(Qt::RightDockWidgetArea, m_objectListDock);
     this->addDockWidget(Qt::RightDockWidgetArea, m_modelListDock);
+
+    connectStuff();
 }
 
+//------------------------------------------------------------------------------
 SceneEditorWindow::~SceneEditorWindow()
 {
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorWindow::connectStuff()
+{
+    connect(m_objectList, SIGNAL(currentObjectChanged(ObjectBase*)),
+            m_objectDetails, SLOT(currentObjectChanged(ObjectBase*)));
+
+    connect(m_game.get(), SIGNAL(modelsChanged()),
+            m_objectDetails, SLOT(modelsChanged()));
+
+
 }

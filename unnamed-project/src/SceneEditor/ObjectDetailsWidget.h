@@ -25,9 +25,8 @@ public:
     virtual ~ObjectDetailsWidget() {}
 
 public slots:
-    void onModelsChanged();
-    void onCurrentObjectChanged();
-
+    void modelsChanged();
+    void currentObjectChanged(ObjectBase *object);
     void applyClicked();
 
 private:
@@ -38,6 +37,8 @@ private:
     void applyCurrentObject(Object *object);
     void applyCurrentObjectGroup(ObjectGroup *objectGroup);
     void applyCurrentObjectBase(ObjectBase *object);
+
+    void fillModelSelection();
 
     QComboBox *m_modelSelection;
 
@@ -55,8 +56,7 @@ private:
 
     QLineEdit *createNumericField(const QString &name);
 
-    Object *m_currentObject;
-    ObjectGroup *m_currentObjectGroup;
+    ObjectBase *m_currentObject;
 
     std::vector<Model *> m_models;
 

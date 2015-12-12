@@ -3,6 +3,7 @@
 #include "Scene/ObjectGroup.h"
 #include "Scene/Object.h"
 #include <memory>
+#include <cassert>
 
 TreeModel::TreeModel(ObjectGroup *rootObject, QObject *parent) : QAbstractItemModel(parent)
 {
@@ -103,7 +104,15 @@ QVariant TreeModel::data(const QModelIndex &index, int role) const
     ObjectListItem *item = static_cast<ObjectListItem *>(index.internalPointer());
 
     return item->getData();
+}
 
+ObjectBase *TreeModel::getGameObject(const QModelIndex &index)
+{
+    assert(index.isValid());
+
+    ObjectListItem *item = static_cast<ObjectListItem *>(index.internalPointer());
+
+    return item->getObject();
 }
 
 Qt::ItemFlags TreeModel::flags(const QModelIndex &index) const

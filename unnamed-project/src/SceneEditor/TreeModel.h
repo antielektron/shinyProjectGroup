@@ -25,6 +25,8 @@ public:
 
     void setRoot(ObjectGroup *rootObject);
 
+    ObjectBase *getGameObject(const QModelIndex &index);
+
 protected:
     std::unique_ptr<ObjectListItem> m_rootItem;
 

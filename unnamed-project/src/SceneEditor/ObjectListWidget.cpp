@@ -3,6 +3,10 @@
 #include "SceneEditor/SceneEditorGame.h"
 #include "Scene/Object.h"
 
+//DEBUG
+#include <iostream>
+
+//------------------------------------------------------------------------------
 ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
 {
     m_currentObject = nullptr; //maybe should be set to root by default
@@ -26,17 +30,24 @@ ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, QWidge
     //fill Tree widget with data:
     m_treeModel = nullptr;
     updateModelTree();
+
+    //connect stuff:
+    connect(m_treeView, SIGNAL(clicked(QModelIndex)),
+            this, SLOT(setCurrentObject(QModelIndex)));
 }
 
+//------------------------------------------------------------------------------
 ObjectListWidget::~ObjectListWidget()
 {
 }
 
+//------------------------------------------------------------------------------
 ObjectBase *ObjectListWidget::getCurrentObject()
 {
     return m_currentObject;
 }
 
+//------------------------------------------------------------------------------
 void ObjectListWidget::updateModelTree()
 {
 
@@ -64,8 +75,15 @@ void ObjectListWidget::updateModelTree()
     m_treeView->setModel(m_treeModel);
 }
 
-void ObjectListWidget::setCurrentObject(ObjectBase *object)
+//------------------------------------------------------------------------------
+void ObjectListWidget::setCurrentObject(const QModelIndex &index)
 {
-    m_currentObject = object;
+    m_currentObject = m_treeModel->getGameObject(index);
+    emit currentObjectChanged(m_currentObject);
+
+    //debug output
+    std::cout << "Current Object changed to: "
+              << m_currentObject->getName().toStdString()
+              << std::endl;
 }
 

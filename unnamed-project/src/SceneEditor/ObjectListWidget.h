@@ -23,10 +23,15 @@ public:
 public slots:
 
     void updateModelTree();
-    void setCurrentObject(ObjectBase *object);
+
+    /**
+     * will be triggered, if the corresponding treeview item is clicked
+     * @param index corresponding Tree Model index
+     */
+    void setCurrentObject(const QModelIndex &index);
 
 signals:
-    void currentObjectChanged();
+    void currentObjectChanged(ObjectBase *object);
 
 private:
 

@@ -26,6 +26,8 @@ public:
     virtual ~SceneEditorWindow();
 
 private:
+    void connectStuff();
+
     OpenGLWidget *m_glWidget;
 
     QDockWidget *m_objectDetailsDock;

@@ -4,6 +4,7 @@
 #include "Scene/Object.h"
 #include "Scene/ObjectGroup.h"
 
+//------------------------------------------------------------------------------
 ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
 {
     m_layout =  new QFormLayout(this);
@@ -29,13 +30,11 @@ ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, 
     this->setLayout(m_layout);
 
     connect(m_applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
-    connect(m_game.get(), SIGNAL(currentObjectChanged()), this, SLOT(onCurrentObjectChanged()));
-    connect(m_game.get(), SIGNAL(modelsChanged()), this, SLOT(onModelsChanged()));
 
-    // Get current object from game if there is already any.
-    onCurrentObjectChanged();
+    m_currentObject = nullptr;
 }
 
+//------------------------------------------------------------------------------
 QLineEdit *ObjectDetailsWidget::createNumericField(const QString &name)
 {
     QLineEdit *widget = new QLineEdit(this);
@@ -43,45 +42,64 @@ QLineEdit *ObjectDetailsWidget::createNumericField(const QString &name)
     return widget;
 }
 
-void ObjectDetailsWidget::onModelsChanged()
+//------------------------------------------------------------------------------
+void ObjectDetailsWidget::modelsChanged()
 {
     m_models.clear();
     m_game->getModels(m_models);
 }
 
-void ObjectDetailsWidget::onCurrentObjectChanged()
+//------------------------------------------------------------------------------
+void ObjectDetailsWidget::currentObjectChanged(ObjectBase *object)
 {
-    m_currentObject = m_game->getCurrentObject();
-    m_currentObjectGroup = m_game->getCurrentObjectGroup();
+    m_currentObject = object;
 
-    if (m_currentObject != nullptr)
+    //update Widgets:
+    switch (object->getObjectType())
     {
-        updateCurrentObject(m_currentObject);
+    case ObjectType::Object:
+    {
+        updateCurrentObject(static_cast<Object *>(object));
+        break;
     }
-    else if (m_currentObjectGroup != nullptr)
+    case ObjectType::ObjectGroup:
     {
-        updateCurrentObjectGroup(m_currentObjectGroup);
+        updateCurrentObjectGroup(static_cast<ObjectGroup *>(object));
+        break;
     }
-    else
+    default:
     {
-        // TODO set empty
+        updateCurrentObjectBase(object);
+    }
     }
 }
 
+//------------------------------------------------------------------------------
 void ObjectDetailsWidget::applyClicked()
 {
-    if (m_currentObject != nullptr)
+    switch(m_currentObject->getObjectType())
     {
-        applyCurrentObject(m_currentObject);
+    case ObjectType::Object:
+    {
+        //such casting, much static!
+        applyCurrentObject(static_cast<Object *>(m_currentObject));
+        break;
     }
-    else if (m_currentObjectGroup != nullptr)
+    case ObjectType::ObjectGroup:
     {
-        applyCurrentObjectGroup(m_currentObjectGroup);
+        applyCurrentObjectGroup(static_cast<ObjectGroup *>(m_currentObject));
+        break;
+    }
+    default:
+    {
+        applyCurrentObjectBase(m_currentObject);
+    }
     }
 
     m_game->currentObjectModified();
 }
 
+//------------------------------------------------------------------------------
 void ObjectDetailsWidget::updateCurrentObject(Object *object)
 {
     m_modelSelection->setEnabled(true);
@@ -92,12 +110,14 @@ void ObjectDetailsWidget::updateCurrentObject(Object *object)
     updateCurrentObjectBase(object);
 }
 
+//------------------------------------------------------------------------------
 void ObjectDetailsWidget::updateCurrentObjectGroup(ObjectGroup *objectGroup)
 {
     m_modelSelection->setEnabled(false);
     updateCurrentObjectBase(objectGroup);
 }
 
+//------------------------------------------------------------------------------
 void ObjectDetailsWidget::updateCurrentObjectBase(ObjectBase *object)
 {
     m_posX->setText(QString::number(object->getPosition().x()));
@@ -109,17 +129,20 @@ void ObjectDetailsWidget::updateCurrentObjectBase(ObjectBase *object)
     m_rotRoll->setText(QString::number(object->getRotation().z()));
 }
 
+//------------------------------------------------------------------------------
 void ObjectDetailsWidget::applyCurrentObject(Object *object)
 {
     // TODO
     applyCurrentObjectBase(object);
 }
 
+//------------------------------------------------------------------------------
 void ObjectDetailsWidget::applyCurrentObjectGroup(ObjectGroup *objectGroup)
 {
     applyCurrentObjectBase(objectGroup);
 }
 
+//------------------------------------------------------------------------------
 void ObjectDetailsWidget::applyCurrentObjectBase(ObjectBase *object)
 {
     object->getPosition().setX(m_posX->text().toFloat());
@@ -129,4 +152,13 @@ void ObjectDetailsWidget::applyCurrentObjectBase(ObjectBase *object)
     object->getRotation().setY(m_rotYaw->text().toFloat());
     object->getRotation().setX(m_rotPitch->text().toFloat());
     object->getRotation().setZ(m_rotRoll->text().toFloat());
+}
+
+//------------------------------------------------------------------------------
+void ObjectDetailsWidget::fillModelSelection()
+{
+    for (Model *model : m_models)
+    {
+        m_modelSelection->addItem("test");
+    }
 }
