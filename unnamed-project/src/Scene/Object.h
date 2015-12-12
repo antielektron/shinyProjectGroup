@@ -20,6 +20,8 @@ public:
     float getDiffuseAmount();
     float getAmbientAmount();
 
+    virtual ObjectType getObjectType();
+
     Model *getModel();
 
 private:

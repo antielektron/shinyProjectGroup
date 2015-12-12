@@ -76,3 +76,8 @@ QString ObjectBase::getName()
 {
     return m_name;
 }
+
+ObjectType ObjectBase::getObjectType()
+{
+    return ObjectType::Undefined;
+}

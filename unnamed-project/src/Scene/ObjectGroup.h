@@ -18,6 +18,8 @@ public:
     void removeObject(Object *object);
     void removeObjectGroup(ObjectGroup *group);
 
+    virtual ObjectType getObjectType();
+
     // NOT VIRTUAL (not because we forgot it, but we know what we do.)
     void updateWorld();
 

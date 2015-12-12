@@ -5,6 +5,14 @@
 #include <QString>
 #include <QMatrix4x4>
 
+// not sure if this is the smartest solution (Yes)
+enum class ObjectType
+{
+    Undefined,
+    ObjectGroup,
+    Object
+};
+
 class ObjectBase
 {
 public:
@@ -29,6 +37,8 @@ public:
 
     void setName(QString name);
     QString getName();
+
+    virtual ObjectType getObjectType();
 
 protected:
     ObjectBase *m_parent;

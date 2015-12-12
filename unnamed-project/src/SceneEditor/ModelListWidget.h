@@ -20,8 +20,6 @@ public:
     ModelListWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent = nullptr);
     virtual ~ModelListWidget();
 
-    ObjectBase* getCurrentWidget();
-
 public slots:
     void updateModelList();
 
@@ -33,8 +31,6 @@ private:
     QPushButton *m_remove;
 
     std::shared_ptr<SceneEditorGame> m_game;
-
-    ObjectBase* m_currentWidget; //?
 
 
 

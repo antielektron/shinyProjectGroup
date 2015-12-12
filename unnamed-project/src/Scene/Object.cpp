@@ -40,8 +40,13 @@ float Object::getSpecularAmount()
     return specularAmount;
 }
 
+
 float Object::getAmbientAmount()
 {
     return ambientAmount;
 }
 
+ObjectType Object::getObjectType()
+{
+    return ObjectType::Object;
+}

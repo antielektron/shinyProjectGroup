@@ -61,3 +61,9 @@ range<ObjectGroup::group_iterator_type> ObjectGroup::getGroups()
 {
     return range<group_iterator_type>(m_groups.begin(), m_groups.end());
 }
+
+ObjectType ObjectGroup::getObjectType()
+{
+    return ObjectType::ObjectGroup;
+}
+

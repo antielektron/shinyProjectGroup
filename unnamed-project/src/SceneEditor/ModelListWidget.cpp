@@ -34,14 +34,6 @@ ModelListWidget::~ModelListWidget()
 }
 
 //------------------------------------------------------------------------------
-
-ObjectBase* ModelListWidget::getCurrentWidget()
-{
-    return m_currentWidget;
-}
-
-//------------------------------------------------------------------------------
-
 void ModelListWidget::updateModelList()
 {
     Scene *scene = m_game->getScene();

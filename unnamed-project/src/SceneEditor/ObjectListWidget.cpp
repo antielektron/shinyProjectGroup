@@ -5,6 +5,8 @@
 
 ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
 {
+    m_currentObject = nullptr; //maybe should be set to root by default
+
     this->setLayout(new QVBoxLayout(this));
 
     m_treeView = new QTreeView(this);
@@ -28,6 +30,11 @@ ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, QWidge
 
 ObjectListWidget::~ObjectListWidget()
 {
+}
+
+ObjectBase *ObjectListWidget::getCurrentObject()
+{
+    return m_currentObject;
 }
 
 void ObjectListWidget::updateModelTree()
@@ -55,5 +62,10 @@ void ObjectListWidget::updateModelTree()
 
     m_treeModel = new TreeModel(obj1, this);
     m_treeView->setModel(m_treeModel);
+}
+
+void ObjectListWidget::setCurrentObject(ObjectBase *object)
+{
+    m_currentObject = object;
 }
 

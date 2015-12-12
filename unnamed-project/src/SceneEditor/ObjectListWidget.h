@@ -18,10 +18,15 @@ class ObjectListWidget : public QWidget
 public:
     ObjectListWidget(std::shared_ptr<SceneEditorGame>, QWidget *parent = nullptr);
     virtual ~ObjectListWidget();
+    ObjectBase *getCurrentObject();
 
 public slots:
 
     void updateModelTree();
+    void setCurrentObject(ObjectBase *object);
+
+signals:
+    void currentObjectChanged();
 
 private:
 
@@ -30,6 +35,8 @@ private:
 
     QPushButton *m_add;
     QPushButton *m_remove;
+
+    ObjectBase *m_currentObject;
 
     // TODO buttons for adding/removing and moving objects!
 
