@@ -27,7 +27,9 @@ public:
 
     virtual void setKeyManager(KeyManager *keyManager);
 
-    ObjectBase *getRootObject();
+    virtual bool isInitialized();
+
+    ObjectGroup *getRootObject();
     void getModels(std::vector<Model *> &models);
 
     ObjectGroup *getCurrentObjectGroup();
@@ -35,18 +37,20 @@ public:
 
     void currentObjectModified();
 
-    void addModel(const std::string &name, std::unique_ptr<Model> model);
+    void addModel(std::unique_ptr<Model> model);
+
+    Object *createObject(const std::string &name);
+    ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
 Q_SIGNALS:
     void currentObjectChanged();
     void modelsChanged();
+    void objectsChanged();
 
 private:
     std::unique_ptr<Scene> m_scene;
 
     std::vector<Object *> m_objects;
-
-    std::unique_ptr<ObjectBase> m_objectRoot;
 
     Object *m_dummyCurrentObject;
 
@@ -61,6 +65,7 @@ private:
 
 	KeyManager *m_keyManager;
 	bool m_wasEscDown;
+    bool m_initialized;
 
 	void updatePosMatrix(QVector3D deltaPos);
 

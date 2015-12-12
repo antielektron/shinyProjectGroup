@@ -5,6 +5,7 @@
 
 //DEBUG
 #include <iostream>
+#include <cassert>
 
 //------------------------------------------------------------------------------
 ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
@@ -50,29 +51,17 @@ ObjectBase *ObjectListWidget::getCurrentObject()
 //------------------------------------------------------------------------------
 void ObjectListWidget::updateModelTree()
 {
+    if (m_game->isInitialized())
+    {
 
-    //just a Test so far:
-    ObjectGroup* obj1 = new ObjectGroup();
-    ObjectGroup* obj2 = new ObjectGroup();
-    ObjectGroup* obj3 = new ObjectGroup();
-    ObjectGroup* obj4 = new ObjectGroup();
-
-    obj1->setName("obj1");
-    obj2->setName("obj2");
-    obj3->setName("obj3");
-    obj4->setName("obj4");
-
-    obj1->addObjectGroup(std::unique_ptr<ObjectGroup>(obj2));
-    obj1->addObjectGroup(std::unique_ptr<ObjectGroup>(obj3));
-    obj2->addObjectGroup(std::unique_ptr<ObjectGroup>(obj4));
-
-    g1.reset(obj1);
-    g2.reset(obj2);
-    g3.reset(obj3);
-    g4.reset(obj4);
-
-    m_treeModel = new TreeModel(obj1, this);
-    m_treeView->setModel(m_treeModel);
+        ObjectGroup *root = m_game->getRootObject();
+        assert(root);
+        m_treeModel = new TreeModel(root, this);
+        m_treeView->setModel(m_treeModel);
+    }
+    else{
+        //TODO: maybe a default root?
+    }
 }
 
 //------------------------------------------------------------------------------

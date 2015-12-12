@@ -18,6 +18,8 @@ public:
     virtual Scene *getScene() override;
 
 	virtual void setKeyManager(KeyManager *keymanager) override;
+
+    virtual bool isInitialized();
 	
 
 private:
@@ -36,6 +38,8 @@ private:
 	bool m_wasEscDown;
 
 	void updatePosMatrix(QVector3D deltaPos);
+
+    bool m_initialized;
 
 	
 

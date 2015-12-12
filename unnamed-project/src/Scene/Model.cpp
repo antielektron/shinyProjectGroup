@@ -27,6 +27,11 @@ namespace std
 }
 
 //------------------------------------------------------------------------------
+/**
+ * this constructor generates also the model name automatically based on the
+ * filename
+ * @param filename
+ */
 Model::Model(const std::string &filename) :
     m_indexBuffer(QOpenGLBuffer::IndexBuffer)
 {

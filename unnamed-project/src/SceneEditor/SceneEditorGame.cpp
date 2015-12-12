@@ -5,7 +5,8 @@
 SceneEditorGame::SceneEditorGame() : 
 		QObject(nullptr), 
 		m_dummyCurrentObject(nullptr), 
-		m_keyManager(nullptr)
+        m_keyManager(nullptr),
+        m_initialized(false)
 {
 }
 
@@ -13,19 +14,10 @@ void SceneEditorGame::initialize()
 {
     m_scene.reset(new Scene());
 
-    //create a Root object
-    //(so far only managed by us)
-    m_objectRoot.reset(new ObjectGroup());
+    m_initialized = true;
 
-    //such casting, much wow
-    ObjectGroup *root = static_cast<ObjectGroup*>(m_objectRoot.get());
-
-    root->setName("Root Object");
-
-    this->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
-    m_dummyCurrentObject = m_scene->createObject("octo");
-
-    root->addObject(std::unique_ptr<Object>(m_dummyCurrentObject));
+    this->addModel(std::unique_ptr<Model>(new Model("models/octonorm.obj")));
+    m_dummyCurrentObject = this->createObject("octonorm");
 
     m_scene->getCamera().translate(0., 0., -10);
 
@@ -33,6 +25,7 @@ void SceneEditorGame::initialize()
     m_scene->setLightColor(QVector3D(1.0,1.0,1.0));
 
     emit currentObjectChanged();
+
 }
 
 void SceneEditorGame::resize(int width, int height)
@@ -132,6 +125,16 @@ void SceneEditorGame::setKeyManager(KeyManager *keyManager)
 	this->m_keyManager = keyManager;
 }
 
+bool SceneEditorGame::isInitialized()
+{
+    return m_initialized;
+}
+
+ObjectGroup *SceneEditorGame::getRootObject()
+{
+    return m_scene->getSceneRoot();
+}
+
 void SceneEditorGame::updatePosMatrix(QVector3D deltaPos)
 {
 	QMatrix4x4 &camera = m_scene->getCamera();
@@ -158,7 +161,10 @@ void SceneEditorGame::currentObjectModified()
 
 void SceneEditorGame::getModels(std::vector<Model *> &models)
 {
-    // TODO
+    for (auto &mapItem : m_scene->getModels())
+    {
+        models.push_back(mapItem.second.get());
+    }
 }
 
 
@@ -174,9 +180,23 @@ Object *SceneEditorGame::getCurrentObject()
     return m_dummyCurrentObject;
 }
 
-void SceneEditorGame::addModel(const std::string &name, std::unique_ptr<Model> model)
+void SceneEditorGame::addModel(std::unique_ptr<Model> model)
 {
-    m_scene->addModel(name,std::move(model));
+    m_scene->addModel(std::move(model));
     emit modelsChanged();
+}
+
+Object *SceneEditorGame::createObject(const std::string &name)
+{
+    Object *obj = m_scene->createObject(name);
+    emit objectsChanged();
+    return obj;
+}
+
+ObjectGroup *SceneEditorGame::createObjectGroup(const std::string &name, ObjectGroup *parent)
+{
+    ObjectGroup *objGrp = m_scene->createObjectGroup(name, parent);
+    emit objectsChanged();
+    return objGrp;
 }
 

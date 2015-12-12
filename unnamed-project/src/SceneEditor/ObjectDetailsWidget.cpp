@@ -4,6 +4,9 @@
 #include "Scene/Object.h"
 #include "Scene/ObjectGroup.h"
 
+//DEBUG
+#include <iostream>
+
 //------------------------------------------------------------------------------
 ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
 {
@@ -47,6 +50,7 @@ void ObjectDetailsWidget::modelsChanged()
 {
     m_models.clear();
     m_game->getModels(m_models);
+    fillModelSelection();
 }
 
 //------------------------------------------------------------------------------
@@ -104,7 +108,8 @@ void ObjectDetailsWidget::updateCurrentObject(Object *object)
 {
     m_modelSelection->setEnabled(true);
 
-    int index = m_modelSelection->findData(qVariantFromValue((void *)object->getModel()));
+    int index = m_modelSelection->findText(
+                QString::fromStdString(object->getModel()->getName()));
     m_modelSelection->setCurrentIndex(index);
 
     updateCurrentObjectBase(object);
@@ -157,8 +162,9 @@ void ObjectDetailsWidget::applyCurrentObjectBase(ObjectBase *object)
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::fillModelSelection()
 {
+    std::cout << "update models" << std::endl;
     for (Model *model : m_models)
     {
-        m_modelSelection->addItem("test");
+        m_modelSelection->addItem(QString::fromStdString( model->getName()));
     }
 }

@@ -39,7 +39,7 @@ public:
     QVector3D &getDirectionalLightDirection();
     QVector3D &getLightColor();
 
-    void addModel(const std::string &name, std::unique_ptr<Model> model);
+    void addModel(std::unique_ptr<Model> model);
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
 
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);

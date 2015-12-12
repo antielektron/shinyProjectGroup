@@ -35,10 +35,10 @@ QMatrix4x4 &Scene::getProjection()
 }
 
 //------------------------------------------------------------------------------
-void Scene::addModel(const std::string &name, std::unique_ptr<Model> model)
+void Scene::addModel(std::unique_ptr<Model> model)
 {
-    assert(m_models.find(name) == m_models.end());
-    m_models[name].swap(model);
+    assert(m_models.find(model->getName()) == m_models.end());
+    m_models[model->getName()].swap(model);
 }
 
 //------------------------------------------------------------------------------

@@ -19,6 +19,8 @@ public:
     virtual Scene *getScene() = 0;
 
 	virtual void setKeyManager(KeyManager *keyManager) {}
+
+    virtual bool isInitialized() = 0;
 };
 
 #endif // UNNAMED_PROJECT_IGAME_H

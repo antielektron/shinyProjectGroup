@@ -56,5 +56,8 @@ void SceneEditorWindow::connectStuff()
     connect(m_game.get(), SIGNAL(modelsChanged()),
             m_objectDetails, SLOT(modelsChanged()));
 
+    connect(m_game.get(), SIGNAL(objectsChanged()),
+            m_objectList, SLOT(updateModelTree()));
+
 
 }

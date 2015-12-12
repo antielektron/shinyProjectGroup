@@ -47,11 +47,6 @@ private:
 
     std::shared_ptr<SceneEditorGame> m_game;
 
-    //just a test:
-    std::unique_ptr<ObjectGroup> g1;
-    std::unique_ptr<ObjectGroup> g2;
-    std::unique_ptr<ObjectGroup> g3;
-    std::unique_ptr<ObjectGroup> g4;
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_OBJECT_LIST_WIDGET_H

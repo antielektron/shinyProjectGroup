@@ -4,7 +4,8 @@
 
 PrimitiveGame::PrimitiveGame() :
         m_keyManager(nullptr),
-        m_wasEscDown(false)
+        m_wasEscDown(false),
+        m_initialized(false)
 {
 }
 
@@ -16,13 +17,15 @@ void PrimitiveGame::initialize()
     m_position = QVector3D(0, 0, 5);
     updatePosMatrix(QVector3D(0,0,0));
 
+    m_initialized = true;
 
 
-    m_scene->addModel("octo", std::unique_ptr<Model>(new Model("models/octonorm.obj")));
-    m_scene->addModel("sphere", std::unique_ptr<Model>(new Model("models/sphere.obj")));
-    m_scene->addModel("suzanne", std::unique_ptr<Model>(new Model("models/suzanne.obj")));
 
-    auto octo = m_scene->createObject("octo");
+    m_scene->addModel(std::unique_ptr<Model>(new Model("models/octonorm.obj")));
+    m_scene->addModel(std::unique_ptr<Model>(new Model("models/sphere.obj")));
+    m_scene->addModel(std::unique_ptr<Model>(new Model("models/suzanne.obj")));
+
+    auto octo = m_scene->createObject("octonorm");
     auto sphere = m_scene->createObject("sphere");
     auto suzanne = m_scene->createObject("suzanne");
     sphere->setPosition(QVector3D(3, 0, 0));
@@ -133,6 +136,11 @@ Scene *PrimitiveGame::getScene()
 void PrimitiveGame::setKeyManager(KeyManager *keyManager)
 {
     this->m_keyManager = keyManager;
+}
+
+bool PrimitiveGame::isInitialized()
+{
+    return m_initialized;
 }
 
 void PrimitiveGame::updatePosMatrix(QVector3D deltaPos) 
