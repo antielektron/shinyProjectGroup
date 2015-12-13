@@ -20,6 +20,12 @@ public:
 
     // OpenGL might not be ready, while the constructor was called!
     virtual void initialize();
+
+    /**
+     * @brief initialize with custom scene
+     * @param scene
+     */
+    void initialize(std::unique_ptr<Scene> scene);
     virtual void resize(int width, int height);
     virtual void tick();
 
@@ -32,10 +38,7 @@ public:
     ObjectGroup *getRootObject();
     void getModels(std::vector<Model *> &models);
 
-    ObjectGroup *getCurrentObjectGroup();
-    Object *getCurrentObject();
-
-    void currentObjectModified();
+    void currentObjectModified(ObjectBase* object);
 
     void addModel(std::unique_ptr<Model> model);
 
@@ -46,13 +49,14 @@ Q_SIGNALS:
     void currentObjectChanged();
     void modelsChanged();
     void objectsChanged();
+    void sceneReloaded();
 
 private:
     std::unique_ptr<Scene> m_scene;
 
     std::vector<Object *> m_objects;
 
-    Object *m_dummyCurrentObject;
+    ObjectBase *m_dummyCurrentObject;
 
 	float rotY = 0;
 	float rotX = 0;

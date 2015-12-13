@@ -8,6 +8,7 @@
 #include <QDockWidget>
 
 #include <QHBoxLayout>
+#include <QToolBar>
 
 class OpenGLWidget;
 class SceneEditorGame;
@@ -25,8 +26,21 @@ public:
     SceneEditorWindow(QWidget *parent = 0);
     virtual ~SceneEditorWindow();
 
+protected slots:
+    void loadScene();
+    void saveScene();
+    void newScene();
+
 private:
     void connectStuff();
+    void createActions();
+    void createToolbar();
+
+    //Toolbar stuff:
+    QToolBar    *m_toolbar;
+    QAction     *m_loadScene;
+    QAction     *m_saveScene;
+    QAction     *m_newScene;
 
     OpenGLWidget *m_glWidget;
 

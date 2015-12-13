@@ -12,26 +12,26 @@ SceneEditorGame::SceneEditorGame() :
 
 void SceneEditorGame::initialize()
 {
-    m_scene.reset(new Scene());
+    //load a test level by default:
+    initialize(std::unique_ptr<Scene>(Scene::loadFromFile("level/test.xml").second));
+}
+
+void SceneEditorGame::initialize(std::unique_ptr<Scene> scene)
+{
+    m_scene = std::move(scene);
 
     m_initialized = true;
 
-    this->addModel(std::unique_ptr<Model>(new Model("models/octonorm.obj")));
-    this->createObject("octonorm")->setPosition(QVector3D(3, 0, 0));
-    this->addModel(std::unique_ptr<Model>(new Model("models/suzanne.obj")));
-    this->createObject("suzanne")->setPosition(QVector3D(-3, 0, 0));
-    this->addModel(std::unique_ptr<Model>(new Model("models/sphere.obj")));
-    m_dummyCurrentObject = this->createObject("sphere");
+    m_dummyCurrentObject = nullptr;
 
     m_scene->getCamera().translate(0., 0., -10);
-
-    m_scene->setDirectionalLightDirection(QVector3D(0.0,0.0,-1.0));
-    m_scene->setLightColor(QVector3D(1.0,1.0,1.0));
 
     m_scene->getSceneRoot()->updateWorld();
 
     emit currentObjectChanged();
-
+    emit modelsChanged();
+    emit objectsChanged();
+    emit sceneReloaded();
 }
 
 void SceneEditorGame::resize(int width, int height)
@@ -159,8 +159,9 @@ void SceneEditorGame::updatePosMatrix(QVector3D deltaPos)
 	camera = rotation * translation;
 }
 
-void SceneEditorGame::currentObjectModified()
+void SceneEditorGame::currentObjectModified(ObjectBase* object)
 {
+    m_dummyCurrentObject = object;
     m_dummyCurrentObject->updateWorld();
     emit currentObjectChanged();
 }
@@ -171,19 +172,6 @@ void SceneEditorGame::getModels(std::vector<Model *> &models)
     {
         models.push_back(mapItem.second.get());
     }
-}
-
-
-ObjectGroup *SceneEditorGame::getCurrentObjectGroup()
-{
-    // TODO
-    return nullptr;
-}
-
-Object *SceneEditorGame::getCurrentObject()
-{
-    // TODO
-    return m_dummyCurrentObject;
 }
 
 void SceneEditorGame::addModel(std::unique_ptr<Model> model)

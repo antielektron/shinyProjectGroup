@@ -98,7 +98,7 @@ void ObjectDetailsWidget::applyClicked()
     }
     }
 
-    m_game->currentObjectModified();
+    m_game->currentObjectModified(m_currentObject);
 }
 
 //------------------------------------------------------------------------------

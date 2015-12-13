@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene name="shinyscene" version="42" author="norby">
+    <Models>
+        <Model name="octonorm" path="models/octonorm.obj"/>
+        <Model name="sphere" path="models/sphere.obj"/>
+        <Model name="suzanne" path="models/suzanne.obj"/>
+    </Models>
+    <Objects>
+        <Object type="Object" name="octonorm" model="octonorm" x="3" y="0" z="0"/>
+        <Object type="Object" name="suzanne" model="suzanne" x="-3" y="0" z="0"/>
+        <Object type="Object" name="sphere" model="sphere" x="0" y="0" z="0"/>
+    </Objects>
+    <DirectionalLight x="0" y="0" z="-1" r="1" g="1" b="1"/>
+    <Player x="0" y="0" z="0"/>
+</Scene>
