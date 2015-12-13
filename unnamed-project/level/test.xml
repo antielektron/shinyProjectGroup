@@ -6,7 +6,9 @@
         <Model name="suzanne" path="models/suzanne.obj"/>
     </Models>
     <Objects>
-        <Object type="Object" name="octonorm" model="octonorm" x="3" y="0" z="0"/>
+        <Object type="ObjectGroup" name="group" x="0" y="0" z="0">
+            <Object type="Object" name="octonorm" model="octonorm" x="3" y="0" z="0"/>
+        </Object>
         <Object type="Object" name="suzanne" model="suzanne" x="-3" y="0" z="0"/>
         <Object type="Object" name="sphere" model="sphere" x="0" y="0" z="0"/>
     </Objects>

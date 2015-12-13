@@ -137,7 +137,7 @@ void Scene::readObjects(Scene *scene, ObjectGroup *root, QDomElement *domElem)
                 ObjectGroup *objGrp = scene->createObjectGroup(name.toStdString(),root);
                 objGrp->setPosition(pos);
 
-                QDomElement objGrpChildDomElem = child.firstChildElement();
+                QDomElement objGrpChildDomElem = child;
 
                 //build object tree recursively
                 readObjects(scene, objGrp, &objGrpChildDomElem);
