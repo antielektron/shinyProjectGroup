@@ -65,11 +65,11 @@ void PrimitiveGame::tick()
 
     if (m_keyManager->isKeyPressed(Qt::Key_Right))
     {
-        rotY -= 0.5;
+        rotY += 0.5;
     }
     if (m_keyManager->isKeyPressed(Qt::Key_Left))
     {
-        rotY += 0.5;
+        rotY -= 0.5;
     }
     if (m_keyManager->isKeyPressed(Qt::Key_Up))
     {
