@@ -100,7 +100,7 @@ void PrimitiveGame::tick()
         deltaPos += QVector3D(0, speed, 0);
     }
     // !!! Keyboard layout
-    if (m_keyManager->isKeyPressed(Qt::Key_Z))
+    if (m_keyManager->isKeyPressed(Qt::Key_E))
     {
         deltaPos += QVector3D(0, -speed, 0);
     }
