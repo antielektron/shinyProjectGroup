@@ -13,11 +13,12 @@
 class Model
 {
 public:
-    Model(const std::string &filename);
-    Model(const std::string &fileName, std::string &name);
+    Model(const std::string &fileName);
+    Model(const std::string &fileName, const std::string &name);
 
     void draw();
     std::string &getName();
+    std::string &getFilename();
 
 private:
     std::vector<QVector3D> m_vertices;
@@ -25,6 +26,7 @@ private:
     std::vector<unsigned int> m_indices;
 
     std::string m_name;
+    std::string m_filename; //remember, for loading and saving
 
     QOpenGLVertexArrayObject m_vao;
     QOpenGLBuffer m_vertexBuffer;

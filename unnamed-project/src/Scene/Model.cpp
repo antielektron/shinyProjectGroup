@@ -32,14 +32,15 @@ namespace std
  * filename
  * @param filename
  */
-Model::Model(const std::string &filename) :
-    m_indexBuffer(QOpenGLBuffer::IndexBuffer)
+Model::Model(const std::string &fileName) :
+    m_indexBuffer(QOpenGLBuffer::IndexBuffer),
+    m_filename(fileName)
 {
-    loadObj(filename);
+    loadObj(fileName);
     createOpenGLStuff();
 
     //split filename to generate a model name automatically:
-    std::istringstream stream(filename);
+    std::istringstream stream(fileName);
     std::string modelName;
     //split away directories:
     while(std::getline(stream, modelName, '/'));
@@ -53,8 +54,9 @@ Model::Model(const std::string &filename) :
 }
 
 //------------------------------------------------------------------------------
-Model::Model(const std::string &fileName, std::string &name) :
-    m_indexBuffer(QOpenGLBuffer::IndexBuffer)
+Model::Model(const std::string &fileName, const std::string &name) :
+    m_indexBuffer(QOpenGLBuffer::IndexBuffer),
+    m_filename(fileName)
 {
     loadObj(fileName);
     createOpenGLStuff();
@@ -205,4 +207,11 @@ void Model::draw()
 std::string &Model::getName()
 {
     return m_name;
+}
+
+//------------------------------------------------------------------------------
+
+std::string &Model::getFilename()
+{
+    return m_filename;
 }

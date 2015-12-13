@@ -8,6 +8,13 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <tuple>
+#include <utility>
+
+//for import-/export functions
+#include <QtXml/QDomDocument>
+#include <QFile>
+#include <QXmlStreamWriter>
 
 #include "Scene/Model.h"
 #include "Scene/Object.h"
@@ -20,14 +27,20 @@ public:
 
     Scene();
 
+    /**
+     * SceneInfo is defined as a tuple containing the scene's
+     * name, version and author as a QString
+     */
+    typedef std::tuple<QString, QString, QString> SceneInfo;
+
+    static std::pair<Scene::SceneInfo, Scene *> loadFromFile(const QString &filename);
+    static void saveToFile(Scene *scene, const QString &filename, SceneInfo &info);
+
     void setCamera(const QMatrix4x4 &camera);
     void setProjection(const QMatrix4x4 &proj);
 
     void setLightColor(const QVector3D &color);
     void setDirectionalLightDirection(const QVector3D &direction);
-
-    void loadScene(std::string &filename);
-    void saveScene(std::string &filename);
 
     ObjectGroup *getSceneRoot();
 
@@ -50,6 +63,12 @@ public:
     Model *getModel(const std::string &modelName);
 
 private:
+    static void readObjects(Scene *scene, ObjectGroup *root,QDomElement *domElem);
+    static QVector3D getPositionFromDomElement(const QDomElement &elem);
+    static void readModels(Scene *scene, QDomElement *domElem);
+    static void writeObjectTree(ObjectGroup *objectgroup,QXmlStreamWriter &writer);
+    static void writePositionToDomElement(QXmlStreamWriter &writer,const QVector3D &pos);
+
     QMatrix4x4 m_proj;
     QMatrix4x4 m_camera;
     /// QMatrix4x4 m_world;

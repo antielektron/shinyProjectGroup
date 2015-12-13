@@ -10,6 +10,7 @@ set(CMAKE_AUTOMOC ON)
 
 # Find the QtWidgets library
 find_package(Qt5Widgets REQUIRED)
+find_package(Qt5Xml REQUIRED)
 
 # Find regular OpenGL
 find_package(OpenGL REQUIRED)
@@ -22,7 +23,7 @@ add_executable(unnamed-project ${SOURCE_FILES})
 include_directories(src/)
 
 # Use the Widgets module from Qt 5.
-qt5_use_modules(unnamed-project Widgets)
+qt5_use_modules(unnamed-project Widgets Xml)
 
 # Include OpenGL
 include_directories(${OPENGL_INCLUDE_DIRS})
