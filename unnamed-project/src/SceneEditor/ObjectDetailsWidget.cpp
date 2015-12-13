@@ -54,9 +54,10 @@ void ObjectDetailsWidget::modelsChanged()
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::currentObjectChanged(ObjectBase *object)
 {
+    // New current object from game
     m_currentObject = object;
 
-    //update Widgets:
+    // Update widgets:
     switch (object->getObjectType())
     {
     case ObjectType::Object:
@@ -71,6 +72,7 @@ void ObjectDetailsWidget::currentObjectChanged(ObjectBase *object)
     }
     default:
     {
+        // Should not happen, just in case..
         updateCurrentObjectBase(object);
     }
     }
@@ -83,7 +85,6 @@ void ObjectDetailsWidget::applyClicked()
     {
     case ObjectType::Object:
     {
-        //such casting, much static!
         applyCurrentObject(static_cast<Object *>(m_currentObject));
         break;
     }
@@ -94,6 +95,7 @@ void ObjectDetailsWidget::applyClicked()
     }
     default:
     {
+        // Should not happen, just in case..
         applyCurrentObjectBase(m_currentObject);
     }
     }

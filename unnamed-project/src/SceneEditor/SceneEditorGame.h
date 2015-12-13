@@ -19,30 +19,26 @@ public:
     virtual ~SceneEditorGame() {}
 
     // OpenGL might not be ready, while the constructor was called!
-    virtual void initialize();
+    virtual void initialize() override;
+    virtual void resize(int width, int height) override;
+    virtual void tick() override;
 
-    /**
-     * @brief initialize with custom scene
-     * @param scene
-     */
-    void initialize(std::unique_ptr<Scene> scene);
-    virtual void resize(int width, int height);
-    virtual void tick();
+    virtual Scene *getScene() override;
 
-    virtual Scene *getScene();
-
-    virtual void setKeyManager(KeyManager *keyManager);
+    virtual void setKeyManager(KeyManager *keyManager) override;
 
     virtual bool isInitialized();
 
-    ObjectGroup *getRootObject();
-    void getModels(std::vector<Model *> &models);
+	void reset(std::unique_ptr<Scene> scene);
 
-    void currentObjectModified(ObjectBase* object);
+	ObjectGroup *getRootObject();
+    void getModels(std::vector<Model *> &models);
 
     void addModel(std::unique_ptr<Model> model);
 
-    Object *createObject(const std::string &name);
+	void currentObjectModified(ObjectBase* object);
+
+	Object *createObject(const std::string &name, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
 Q_SIGNALS:
@@ -54,9 +50,7 @@ Q_SIGNALS:
 private:
     std::unique_ptr<Scene> m_scene;
 
-    std::vector<Object *> m_objects;
-
-    ObjectBase *m_dummyCurrentObject;
+    ObjectBase *m_currentObject;
 
 	float rotY = 0;
 	float rotX = 0;

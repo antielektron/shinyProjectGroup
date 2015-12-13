@@ -19,11 +19,13 @@ void ObjectGroup::updateWorld()
 
 void ObjectGroup::addObject(std::unique_ptr<Object> object)
 {
+    object->setParent(this);
     m_objects.push_back(std::move(object));
 }
 
 void ObjectGroup::addObjectGroup(std::unique_ptr<ObjectGroup> group)
 {
+    group->setParent(this);
     m_groups.push_back(std::move(group));
 }
 

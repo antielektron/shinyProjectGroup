@@ -24,17 +24,12 @@
 class Scene
 {
 public:
-
     Scene();
+    Scene(const QString &filename);
 
-    /**
-     * SceneInfo is defined as a tuple containing the scene's
-     * name, version and author as a QString
-     */
-    typedef std::tuple<QString, QString, QString> SceneInfo;
-
-    static std::pair<Scene::SceneInfo, Scene *> loadFromFile(const QString &filename);
-    static void saveToFile(Scene *scene, const QString &filename, SceneInfo &info);
+    void clear();
+    void loadFromFile(const QString &filename);
+    void saveToFile(const QString &filename);
 
     void setCamera(const QMatrix4x4 &camera);
     void setProjection(const QMatrix4x4 &proj);
@@ -42,32 +37,49 @@ public:
     void setLightColor(const QVector3D &color);
     void setDirectionalLightDirection(const QVector3D &direction);
 
-    ObjectGroup *getSceneRoot();
-
-    typedef std::map<std::string, std::unique_ptr<Model>>::const_iterator ModelIterator;
-    range<ModelIterator> getModels();
-
     QMatrix4x4 &getCamera();
     QMatrix4x4 &getProjection();
+
     QVector3D &getDirectionalLightDirection();
     QVector3D &getLightColor();
 
     void addModel(std::unique_ptr<Model> model);
-    Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
 
+    Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
+
+    ObjectGroup *getSceneRoot();
+
+    typedef std::map<std::string, std::unique_ptr<Model>>::const_iterator ModelIterator;
+    range<ModelIterator> getModels();
 
     typedef std::vector<Object *>::const_iterator ObjectIterator;
     range<ObjectIterator> getObjects();
 
     Model *getModel(const std::string &modelName);
 
+
+    // Access metadata
+    void setName(const QString &name);
+    void setVersion(const QString &version);
+    void setAuthor(const QString &author);
+
+    const QString &getName() const;
+    const QString &getVersion() const;
+    const QString &getAuthor() const;
+
 private:
-    static void readObjects(Scene *scene, ObjectGroup *root,QDomElement *domElem);
-    static QVector3D getPositionFromDomElement(const QDomElement &elem);
-    static void readModels(Scene *scene, QDomElement *domElem);
-    static void writeObjectTree(ObjectGroup *objectgroup,QXmlStreamWriter &writer);
-    static void writePositionToDomElement(QXmlStreamWriter &writer,const QVector3D &pos);
+    void readObjectTreeFromDom(ObjectGroup *root, const QDomElement &domElement);
+    void readModelsFromDom(const QDomElement &domElem);
+    QVector3D getPositionFromDom(const QDomElement &domElement);
+    QVector3D getRotationFromDom(const QDomElement &domElement);
+    QVector3D getScalingFromDom(const QDomElement &domElement);
+
+    void writeObjectTree(ObjectGroup *root, QXmlStreamWriter &writer);
+    void writeModels(QXmlStreamWriter &writer);
+    void writePosition(const QVector3D &position, QXmlStreamWriter &writer);
+    void writeRotation(const QVector3D &rotation, QXmlStreamWriter &writer);
+    void writeScaling(const QVector3D &scaling, QXmlStreamWriter &writer);
 
     QMatrix4x4 m_proj;
     QMatrix4x4 m_camera;
@@ -76,7 +88,8 @@ private:
     QVector3D m_directionalLightDirection;
     QVector3D m_lightColor;
 
-    std::unique_ptr<ObjectGroup> m_rootGroup;
+    // No pointer: force to exist.
+    ObjectGroup m_rootGroup;
 
     //TODO: get names directly from objects
     //(is more efficient than ask the scene
@@ -85,6 +98,11 @@ private:
     std::map<std::string, std::unique_ptr<Model>> m_models; // all basic models that are available (only for construction purposes, if needed!)
 
     std::vector<Object *> m_objects;
+
+    // Meta information
+    QString m_sceneName;
+    QString m_sceneVersion;
+    QString m_sceneAuthor;
 };
 
 #endif // UNNAMED_PROJECT_SCENE_SCENE_H

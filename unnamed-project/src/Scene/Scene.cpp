@@ -1,84 +1,86 @@
 #include <cassert>
 #include <iostream>
+#include <stdexcept>
 
 #include "Scene/Scene.h"
 
 //------------------------------------------------------------------------------
 Scene::Scene()
 {
-    ObjectGroup *rootGroup = new ObjectGroup();
-    rootGroup->setName("SceneRoot");
-    m_rootGroup.reset(rootGroup);
+    m_rootGroup.setName("SceneRoot");
 }
 
 //------------------------------------------------------------------------------
-std::pair<Scene::SceneInfo, Scene *> Scene::loadFromFile(const QString &filename)
+Scene::Scene(const QString &filename)
 {
-    //good example for reading xml files with QT:
-    //http://www.lucidarme.me/?p=2534
+    m_rootGroup.setName("SceneRoot");
+    loadFromFile(filename);
+}
 
-    //open file:
+//------------------------------------------------------------------------------
+void Scene::clear()
+{
+    // TODO
+}
+
+//------------------------------------------------------------------------------
+void Scene::loadFromFile(const QString &filename)
+{
+    // Good example for reading xml files with QT:
+    // http://www.lucidarme.me/?p=2534
+
+    // Open file
     QDomDocument document;
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly))
     {
-        std::cerr << "Could not open file '" << filename.toStdString() << "'"
-                  << std::endl;
-
-        SceneInfo dummyInfo = std::make_tuple("","","");
-        return std::make_pair(dummyInfo, nullptr);
+        throw std::runtime_error("Could not open file '" + filename.toStdString() + "'");
     }
     document.setContent(&file);
     file.close();
 
-    //parse header
+    // Parse header
     QDomElement root = document.documentElement();
-    QString rootType = root.tagName();              //should be 'Scene'
-    QString sceneName = root.attribute("name", "unnamedScene");
-    QString sceneVersion = root.attribute("version", "0.0");
-    QString sceneAuthor = root.attribute("author", "Norby");
+    QString rootType = root.tagName();              // should be 'Scene'
+    m_sceneName = root.attribute("name", "unnamedScene");
+    m_sceneVersion = root.attribute("version", "0.0");
+    m_sceneAuthor = root.attribute("author", "Norby");
 
-    SceneInfo info = std::make_tuple(sceneName, sceneVersion, sceneAuthor);
-
-    //DEBUG
-    std::cout << "Scene Info: "
-              << "\tname: " << sceneName.toStdString()
-              << "\tversion: " << sceneVersion.toStdString()
-              << "\tsceneAuthor " << sceneAuthor.toStdString()
+    // DEBUG
+    std::cout << "Scene Info: " << std::endl
+              << "\tname: " << m_sceneName.toStdString() << std::endl
+              << "\tversion: " << m_sceneVersion.toStdString() << std::endl
+              << "\tauthor: " << m_sceneAuthor.toStdString() << std::endl
               << std::endl;
 
-    //create Scene
-    Scene *scene = new Scene();
-
-    //parse xml body
-    QDomElement currentElement = root.firstChildElement();
-
-    while (!currentElement.isNull())
+    // Parse xml body
+    for (auto currentElement = root.firstChildElement(); !currentElement.isNull(); currentElement = currentElement.nextSiblingElement())
     {
         QString tag = currentElement.tagName();
-
+        std::cout << "TAG " << tag.toStdString() << std::endl;
         if (tag == "Objects")
         {
-            Scene::readObjects(scene, nullptr, &currentElement);
+            readObjectTreeFromDom(&m_rootGroup, currentElement);
         }
         else if (tag == "Models")
         {
-            Scene::readModels(scene, &currentElement);
+            readModelsFromDom(currentElement);
         }
         else if (tag == "DirectionalLight")
         {
-            QVector3D pos = Scene::getPositionFromDomElement(currentElement);
+            QVector3D pos = getPositionFromDom(currentElement);
             float r = currentElement.attribute("r", "0").toFloat();
             float g = currentElement.attribute("g", "0").toFloat();
             float b = currentElement.attribute("b", "0").toFloat();
 
-            scene->setDirectionalLightDirection(pos);
-            scene->setLightColor(QVector3D(r,g,b));
+            this->setDirectionalLightDirection(pos);
+            this->setLightColor(QVector3D(r,g,b));
 
         }
         else if (tag == "Player")
         {
-            QVector3D pos = Scene::getPositionFromDomElement(currentElement);
+            // TODO: embed "Spawn" objects into the object tree, that the "real" game can query for!
+            QVector3D pos = getPositionFromDom(currentElement);
 
             //TODO: set camera/player Position;
             std::cout << "TODO: set player Position to"
@@ -92,90 +94,54 @@ std::pair<Scene::SceneInfo, Scene *> Scene::loadFromFile(const QString &filename
                       << tag.toStdString() << "'"
                       << std::endl;
         }
-
-
-        //get next dom element
-        currentElement = currentElement.nextSiblingElement();
     }
-
-    return std::make_pair(info, scene);
 }
 
 //------------------------------------------------------------------------------
-void Scene::readObjects(Scene *scene, ObjectGroup *root, QDomElement *domElem)
+void Scene::readObjectTreeFromDom(ObjectGroup *root, const QDomElement &domElement)
 {
-    QDomElement child = domElem->firstChildElement();
-
-    while(!child.isNull())
+    for (auto child = domElement.firstChildElement(); !child.isNull(); child = child.nextSiblingElement())
     {
+        // TODO have `Object` and `ObjectGroup` children
         QString tag = child.tagName();
-        if (child.tagName() == "Object")
+
+        if (tag == "Object")
         {
-            QString attr = child.attribute("type","notype");
+            QString name = child.attribute("name", "unnamedObject");
+            QString modelName = child.attribute("model","");
 
-            if (attr == "notype")
-            {
-                std::cout << "WARNING: empty object '"
-                          << child.attribute("name", "unnamed").toStdString()
-                          << "'" << std::endl;
-            }
-            else if (attr == "Object")
-            {
-                QString name = child.attribute("name", "unnamedObject");
-                QVector3D pos = Scene::getPositionFromDomElement(child);
-
-                //getModel
-                QString modelName = child.attribute("model","");
-                Object *obj = scene->createObject(modelName.toStdString(), root);
-                obj->setName(name);
-                obj->setPosition(pos);
-            }
-            else if(attr == "ObjectGroup")
-            {
-                QString name = child.attribute("name", "unnamedGroup");
-                QVector3D pos = Scene::getPositionFromDomElement(child);
-                ObjectGroup *objGrp = scene->createObjectGroup(name.toStdString(),root);
-                objGrp->setPosition(pos);
-
-                QDomElement objGrpChildDomElem = child;
-
-                //build object tree recursively
-                readObjects(scene, objGrp, &objGrpChildDomElem);
-
-            }
-            else
-            {
-                std::cout << "WARNING: unkown objectType '"
-                          << attr.toStdString()
-                          << "' " << std::endl;
-            }
-
+            auto object = createObject(modelName.toStdString(), root);
+            object->setName(name);
+            object->setPosition(getPositionFromDom(child));
+            object->setRotation(getRotationFromDom(child));
+            object->setScaling(getScalingFromDom(child));
         }
-        else{
+        else if(tag == "ObjectGroup")
+        {
+            QString name = child.attribute("name", "unnamedGroup");
+
+            auto objectGroup = createObjectGroup(name.toStdString(), root);
+            objectGroup->setPosition(getPositionFromDom(child));
+            objectGroup->setRotation(getRotationFromDom(child));
+            objectGroup->setScaling(getScalingFromDom(child));
+
+            // Build object tree recursively
+            readObjectTreeFromDom(objectGroup, child);
+        }
+        else
+        {
             std::cout << "WARNING: Unexpected tag '"
                       << tag.toStdString()
                       << "' in Object Tree"
                       << std::endl;
         }
-        child = child.nextSiblingElement();
     }
 }
 
 //------------------------------------------------------------------------------
-QVector3D Scene::getPositionFromDomElement(const QDomElement &elem)
+void Scene::readModelsFromDom(const QDomElement &domElement)
 {
-    float x = elem.attribute("x", "0").toFloat();
-    float y = elem.attribute("y", "0").toFloat();
-    float z = elem.attribute("z", "0").toFloat();
-    return QVector3D(x, y, z);
-}
-
-//------------------------------------------------------------------------------
-void Scene::readModels(Scene *scene, QDomElement *domElem)
-{
-    QDomElement child = domElem->firstChildElement();
-
-    while(!child.isNull())
+    for (auto child = domElement.firstChildElement(); !child.isNull(); child = child.nextSiblingElement())
     {
         if (child.tagName() == "Model")
         {
@@ -186,42 +152,67 @@ void Scene::readModels(Scene *scene, QDomElement *domElem)
             if (path.length() == 0)
             {
                 std::cout << "WARNING: no filepath for model"
-                          << "' " << name.toStdString() << "' given"
-                          << std::endl;
+                << "' " << name.toStdString() << "' given"
+                << std::endl;
             }
             else
             {
                 if (name.length() > 0)
                 {
                     Model *model = new Model(path.toStdString(), name.toStdString());
-                    scene->addModel(std::unique_ptr<Model>(model));
+                    addModel(std::unique_ptr<Model>(model));
                 }
                 else
                 {
-                    //if no name is given it will be automatically
-                    //generated by the Model consructor
+                    // If no name is given it will be automatically
+                    // generated by the Model consructor
                     Model *model = new Model(path.toStdString());
-                    scene->addModel(std::unique_ptr<Model>(model));
+                    addModel(std::unique_ptr<Model>(model));
                 }
             }
         }
         else
         {
             std::cout << "WARNING: Unexpected tag '"
-                      << child.tagName().toStdString()
-                      << "' in Model List"
-                      << std::endl;
+            << child.tagName().toStdString()
+            << "' in Model List"
+            << std::endl;
         }
-
-        //get next dom element:
-        child = child.nextSiblingElement();
     }
 }
 
 //------------------------------------------------------------------------------
-void Scene::saveToFile(Scene *scene, const QString &filename, SceneInfo &info)
+QVector3D Scene::getPositionFromDom(const QDomElement &domElement)
 {
-    //example: https://gist.github.com/lamprosg/2133804
+    float x = domElement.attribute("x", "0").toFloat();
+    float y = domElement.attribute("y", "0").toFloat();
+    float z = domElement.attribute("z", "0").toFloat();
+    return QVector3D(x, y, z);
+}
+
+//------------------------------------------------------------------------------
+QVector3D Scene::getRotationFromDom(const QDomElement &domElement)
+{
+    float x = domElement.attribute("rx", "0").toFloat();
+    float y = domElement.attribute("ry", "0").toFloat();
+    float z = domElement.attribute("rz", "0").toFloat();
+    return QVector3D(x, y, z);
+}
+
+//------------------------------------------------------------------------------
+QVector3D Scene::getScalingFromDom(const QDomElement &domElement)
+{
+    float x = domElement.attribute("sx", "1").toFloat();
+    float y = domElement.attribute("sy", "1").toFloat();
+    float z = domElement.attribute("sz", "1").toFloat();
+    return QVector3D(x, y, z);
+}
+
+//------------------------------------------------------------------------------
+void Scene::saveToFile(const QString &filename)
+{
+    // Example: https://gist.github.com/lamprosg/2133804
+
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly))
     {
@@ -234,36 +225,35 @@ void Scene::saveToFile(Scene *scene, const QString &filename, SceneInfo &info)
     xmlWriter.setAutoFormatting(true);
     xmlWriter.writeStartDocument();
 
-    //write header (= root element)
+    // Write header (= root element)
     xmlWriter.writeStartElement("Scene");
-    xmlWriter.writeAttribute("name",std::get<0>(info));
-    xmlWriter.writeAttribute("version", std::get<1>(info));
-    xmlWriter.writeAttribute("author", std::get<2>(info));
+    xmlWriter.writeAttribute("name", m_sceneName);
+    xmlWriter.writeAttribute("version", m_sceneVersion);
+    xmlWriter.writeAttribute("author", m_sceneAuthor);
 
-    //write models:
+    // Write models:
     xmlWriter.writeStartElement("Models");
-    for (auto &mapItem : scene->getModels())
+    for (auto &mapItem : getModels())
     {
         Model *model = mapItem.second.get();
         xmlWriter.writeStartElement("Model");
-        xmlWriter.writeAttribute("name", QString::fromStdString( model->getName()));
+        xmlWriter.writeAttribute("name", QString::fromStdString(model->getName()));
         xmlWriter.writeAttribute("path", QString::fromStdString(model->getFilename()));
         xmlWriter.writeEndElement();
     }
     xmlWriter.writeEndElement();
 
-    //write object tree:
+    // Write object tree:
     xmlWriter.writeStartElement("Objects");
-    ObjectGroup *root = scene->getSceneRoot();
-    Scene::writeObjectTree(root, xmlWriter);
+    writeObjectTree(&m_rootGroup, xmlWriter);
     xmlWriter.writeEndElement();
 
     //and the little other properties:
 
     //light:
     xmlWriter.writeStartElement("DirectionalLight");
-    Scene::writePositionToDomElement(xmlWriter, scene->getDirectionalLightDirection());
-    QVector3D lightColor = scene->getLightColor();
+    writePosition(getDirectionalLightDirection(), xmlWriter);
+    QVector3D lightColor = getLightColor();
     xmlWriter.writeAttribute("r", QString::number(lightColor.x()));
     xmlWriter.writeAttribute("g", QString::number(lightColor.y()));
     xmlWriter.writeAttribute("b", QString::number(lightColor.z()));
@@ -271,7 +261,7 @@ void Scene::saveToFile(Scene *scene, const QString &filename, SceneInfo &info)
 
     //player:
     xmlWriter.writeStartElement("Player");
-    Scene::writePositionToDomElement(xmlWriter,QVector3D(0,0,0)); //TODO
+    writePosition(QVector3D(0,0,0), xmlWriter); //TODO
     xmlWriter.writeEndElement();
 
     xmlWriter.writeEndDocument();
@@ -280,45 +270,65 @@ void Scene::saveToFile(Scene *scene, const QString &filename, SceneInfo &info)
 }
 
 //------------------------------------------------------------------------------
-void Scene::writeObjectTree(ObjectGroup *objectgroup, QXmlStreamWriter &writer)
+void Scene::writeObjectTree(ObjectGroup *root, QXmlStreamWriter &writer)
 {
-    //write child groups:
-    for (ObjectGroup *group : objectgroup->getGroups())
+    // Write child groups:
+    for (ObjectGroup *group : root->getGroups())
     {
-        QString name = group->getName();
-        QVector3D pos = group->getPosition();
-        writer.writeStartElement("Object");
-        writer.writeAttribute("type","ObjectGroup");
-        writer.writeAttribute("name",name);
-        Scene::writePositionToDomElement(writer, pos);
+        writer.writeStartElement("ObjectGroup");
 
-        //write object tree recursively:
-        Scene::writeObjectTree(group, writer);
+        writer.writeAttribute("name", group->getName());
+
+        writePosition(group->getPosition(), writer);
+        writeRotation(group->getRotation(), writer);
+        writeScaling(group->getScaling(), writer);
+
+        // Write object tree recursively:
+        writeObjectTree(group, writer);
 
         writer.writeEndElement();
     }
 
-    //write child Objects:
-    for (Object *object : objectgroup->getObjects())
+    // Write child objects:
+    for (Object *object : root->getObjects())
     {
-        QString name = object->getName();
-        QVector3D pos = object->getPosition();
         QString modelName = QString::fromStdString(object->getModel()->getName());
+
         writer.writeStartElement("Object");
-        writer.writeAttribute("type","Object");
-        writer.writeAttribute("name",name);
-        writer.writeAttribute("model",modelName);
-        Scene::writePositionToDomElement(writer, pos);
+
+        writer.writeAttribute("name", object->getName());
+        writer.writeAttribute("model", modelName);
+
+        writePosition(object->getPosition(), writer);
+        writeRotation(object->getRotation(), writer);
+        writeScaling(object->getScaling(), writer);
+
         writer.writeEndElement();
     }
 }
 
 //------------------------------------------------------------------------------
-void Scene::writePositionToDomElement(QXmlStreamWriter &writer, const QVector3D &pos)
+void Scene::writePosition(const QVector3D &pos, QXmlStreamWriter &writer)
 {
     writer.writeAttribute("x", QString::number(pos.x()));
     writer.writeAttribute("y", QString::number(pos.y()));
     writer.writeAttribute("z", QString::number(pos.z()));
+}
+
+//------------------------------------------------------------------------------
+void Scene::writeRotation(const QVector3D &pos, QXmlStreamWriter &writer)
+{
+    writer.writeAttribute("rx", QString::number(pos.x()));
+    writer.writeAttribute("ry", QString::number(pos.y()));
+    writer.writeAttribute("rz", QString::number(pos.z()));
+}
+
+//------------------------------------------------------------------------------
+void Scene::writeScaling(const QVector3D &pos, QXmlStreamWriter &writer)
+{
+    writer.writeAttribute("sx", QString::number(pos.x()));
+    writer.writeAttribute("sy", QString::number(pos.y()));
+    writer.writeAttribute("sz", QString::number(pos.z()));
 }
 
 //------------------------------------------------------------------------------
@@ -356,15 +366,15 @@ void Scene::addModel(std::unique_ptr<Model> model)
 Object *Scene::createObject(const std::string &modelName, ObjectGroup *parent)
 {
     if (!parent)
-    {
-        parent = m_rootGroup.get();
-    }
+        parent = &m_rootGroup;
 
     assert(m_models.find(modelName) != m_models.end());
     Model *model = m_models[modelName].get();
+
     Object *object = new Object(model);
-    object->setName(QString::fromStdString(modelName)); //TODO: discuss how to choose identifiers!
-    m_objects.push_back(object); // construct unique_ptr automatically
+    object->setName(QString::fromStdString(modelName));
+
+    m_objects.push_back(object);
     parent->addObject(std::unique_ptr<Object>(object));
     return object;
 }
@@ -373,14 +383,12 @@ Object *Scene::createObject(const std::string &modelName, ObjectGroup *parent)
 ObjectGroup *Scene::createObjectGroup(const std::string &name, ObjectGroup *parent)
 {
     if (!parent)
-    {
-        parent = m_rootGroup.get();
-    }
+        parent = &m_rootGroup;
 
     ObjectGroup *newGroup = new ObjectGroup();
     newGroup->setName(QString::fromStdString(name));
-    parent->addObjectGroup(std::unique_ptr<ObjectGroup>(newGroup));
 
+    parent->addObjectGroup(std::unique_ptr<ObjectGroup>(newGroup));
     return newGroup;
 }
 
@@ -423,7 +431,7 @@ void Scene::setDirectionalLightDirection(const QVector3D &direction)
 //------------------------------------------------------------------------------
 ObjectGroup *Scene::getSceneRoot()
 {
-    return m_rootGroup.get();
+    return &m_rootGroup;
 }
 
 //------------------------------------------------------------------------------
@@ -433,5 +441,38 @@ Model *Scene::getModel(const std::string &modelName)
     return m_models[modelName].get();
 }
 
+//------------------------------------------------------------------------------
+void Scene::setName(const QString &name)
+{
+    m_sceneName = name;
+}
 
+//------------------------------------------------------------------------------
+void Scene::setVersion(const QString &version)
+{
+    m_sceneVersion = version;
+}
 
+//------------------------------------------------------------------------------
+void Scene::setAuthor(const QString &author)
+{
+    m_sceneAuthor = author;
+}
+
+//------------------------------------------------------------------------------
+const QString &Scene::getName() const
+{
+    return m_sceneName;
+}
+
+//------------------------------------------------------------------------------
+const QString &Scene::getVersion() const
+{
+    return m_sceneVersion;
+}
+
+//------------------------------------------------------------------------------
+const QString &Scene::getAuthor() const
+{
+    return m_sceneAuthor;
+}

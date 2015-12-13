@@ -19,7 +19,7 @@ public:
     ObjectBase(ObjectBase *parent = nullptr);
 
     // void setWorld(const QMatrix4x4 &world);
-    void updateWorld();
+    virtual void updateWorld();
 
     void setPosition(const QVector3D &position);
     QVector3D &getPosition();

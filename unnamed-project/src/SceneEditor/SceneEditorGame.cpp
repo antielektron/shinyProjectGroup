@@ -4,7 +4,7 @@
 
 SceneEditorGame::SceneEditorGame() : 
 		QObject(nullptr), 
-		m_dummyCurrentObject(nullptr), 
+		m_currentObject(nullptr),
         m_keyManager(nullptr),
         m_initialized(false)
 {
@@ -12,17 +12,17 @@ SceneEditorGame::SceneEditorGame() :
 
 void SceneEditorGame::initialize()
 {
-    //load a test level by default:
-    initialize(std::unique_ptr<Scene>(Scene::loadFromFile("level/test.xml").second));
+    // Load a test level by default or empty scene
+	reset(std::unique_ptr<Scene>(new Scene("level/test.xml")));
 }
 
-void SceneEditorGame::initialize(std::unique_ptr<Scene> scene)
+void SceneEditorGame::reset(std::unique_ptr<Scene> scene)
 {
     m_scene = std::move(scene);
 
     m_initialized = true;
 
-    m_dummyCurrentObject = nullptr;
+    m_currentObject = nullptr;
 
     m_scene->getCamera().translate(0., 0., -10);
 
@@ -161,8 +161,8 @@ void SceneEditorGame::updatePosMatrix(QVector3D deltaPos)
 
 void SceneEditorGame::currentObjectModified(ObjectBase* object)
 {
-    m_dummyCurrentObject = object;
-    m_dummyCurrentObject->updateWorld();
+	// Called when a new object was selected or the current object has changed.
+    m_currentObject = object;
     emit currentObjectChanged();
 }
 
@@ -180,9 +180,9 @@ void SceneEditorGame::addModel(std::unique_ptr<Model> model)
     emit modelsChanged();
 }
 
-Object *SceneEditorGame::createObject(const std::string &name)
+Object *SceneEditorGame::createObject(const std::string &name, ObjectGroup *parent)
 {
-    Object *obj = m_scene->createObject(name);
+    Object *obj = m_scene->createObject(name, parent);
     emit objectsChanged();
     return obj;
 }

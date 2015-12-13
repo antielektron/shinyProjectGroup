@@ -20,8 +20,7 @@ public:
 
     virtual ObjectType getObjectType();
 
-    // NOT VIRTUAL (not because we forgot it, but we know what we do.)
-    void updateWorld();
+    virtual void updateWorld() override;
 
     // hide smartpointers from user.
     typedef smart_iterator<std::vector<std::unique_ptr<Object>>::iterator> object_iterator_type;

@@ -113,8 +113,7 @@ void SceneEditorWindow::loadScene()
                                                     tr("Xml files (*.xml)"));
     if (filename.length() > 0)
     {
-        Scene *scene = Scene::loadFromFile(filename).second;
-        m_game->initialize(std::unique_ptr<Scene>(scene));
+        m_game->reset(std::unique_ptr<Scene>(new Scene(filename)));
     }
 
 }
@@ -128,8 +127,11 @@ void SceneEditorWindow::saveScene()
                                                     tr("Xml files (*.xml)"));
     if (filename.length() > 0)
     {
-        Scene::SceneInfo info = std::make_tuple("shinyscene","42","norby");
-        Scene::saveToFile(m_game->getScene(),filename,info);
+        // TODO don't set dummy values!
+        m_game->getScene()->setName("Shiny Scene");
+        m_game->getScene()->setVersion("42");
+        m_game->getScene()->setAuthor("Norby");
+        m_game->getScene()->saveToFile(filename);
     }
 
 }
