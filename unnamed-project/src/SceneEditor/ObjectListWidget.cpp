@@ -1,14 +1,20 @@
 #include "SceneEditor/ObjectListWidget.h"
 #include "SceneEditor/TreeModel.h"
 #include "SceneEditor/SceneEditorGame.h"
+#include "SceneEditor/SceneEditorWindow.h"
 #include "Scene/Object.h"
+#include <QInputDialog>
+#include <QMessageBox>
 
 //DEBUG
 #include <iostream>
 #include <cassert>
 
 //------------------------------------------------------------------------------
-ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
+ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, SceneEditorWindow *parent) :
+    QWidget(parent),
+    m_game(game),
+    m_parent(parent)
 {
     m_currentObject = nullptr; //maybe should be set to root by default
 
@@ -22,8 +28,11 @@ ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, QWidge
     container->layout()->setMargin(0);
     this->layout()->addWidget(container);
 
-    m_add = new QPushButton("Add Object", container);
-    container->layout()->addWidget(m_add);
+    m_addObject = new QPushButton("Add Object", container);
+    container->layout()->addWidget(m_addObject);
+
+    m_addGroup = new QPushButton("Add Object Group", container);
+    container->layout()->addWidget(m_addGroup);
 
     m_remove = new QPushButton("Remove Object", container);
     container->layout()->addWidget(m_remove);
@@ -32,9 +41,8 @@ ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, QWidge
     m_treeModel = nullptr;
     updateModelTree();
 
-    //connect stuff:
-    connect(m_treeView, SIGNAL(clicked(QModelIndex)),
-            this, SLOT(setCurrentObject(QModelIndex)));
+    connectStuff();
+
 }
 
 //------------------------------------------------------------------------------
@@ -74,5 +82,106 @@ void ObjectListWidget::setCurrentObject(const QModelIndex &index)
     std::cout << "Current Object changed to: "
               << m_currentObject->getName().toStdString()
               << std::endl;
+}
+
+//------------------------------------------------------------------------------
+void ObjectListWidget::onAddObjectClick()
+{
+    // get current Model from parent:
+    Model *model = m_parent->getCurrentModel();
+
+    if (!model)
+    {
+        QMessageBox::information(this,
+                                 "error while creating object",
+                                 "please select a model first");
+        return;
+    }
+
+    // get new object name by user:
+    bool ok;
+    QString objectName =
+            QInputDialog::getText(this,
+                                  "Create object",
+                                  "Object name:",
+                                  QLineEdit::Normal,
+                                  QString::fromStdString(model->getName()),
+                                  &ok);
+
+    if (ok)
+    {
+        ObjectGroup *parent = nullptr;
+
+        // check if selected object is an objectGroup.
+        // in this case we create the object as it's child
+        if (m_currentObject)
+        {
+            if (m_currentObject->getObjectType() == ObjectType::ObjectGroup)
+            {
+                // downcasting ObjectBase to ObjectGroup
+                parent = static_cast<ObjectGroup *>(m_currentObject);
+            }
+        }
+        m_game->createObject(model->getName(),parent)->setName(objectName);
+        updateModelTree();
+    }
+}
+
+//------------------------------------------------------------------------------
+void ObjectListWidget::onAddGroupClick()
+{
+
+    // get new object name by user:
+    bool ok;
+    QString groupName =
+            QInputDialog::getText(this,
+                                  "Create object",
+                                  "Object name:",
+                                  QLineEdit::Normal,
+                                  "new Object Group",
+                                  &ok);
+
+    if (ok)
+    {
+        ObjectGroup *parent = nullptr;
+
+        // check if selected object is an objectGroup.
+        // in this case we create the object as it's child
+        if (m_currentObject)
+        {
+            if (m_currentObject->getObjectType() == ObjectType::ObjectGroup)
+            {
+                // downcasting ObjectBase to ObjectGroup
+                parent = static_cast<ObjectGroup *>(m_currentObject);
+            }
+        }
+        m_game->createObjectGroup(groupName.toStdString(),parent);
+        updateModelTree();
+    }
+}
+
+//------------------------------------------------------------------------------
+void ObjectListWidget::onRemoveClick()
+{
+    if (m_currentObject)
+    {
+        m_currentObject->destroy();
+        m_currentObject = nullptr;
+        updateModelTree();
+        emit updateSceneObjectsRequest();
+    }
+}
+
+//------------------------------------------------------------------------------
+void ObjectListWidget::connectStuff()
+{
+    connect(m_treeView, SIGNAL(clicked(QModelIndex)),
+            this, SLOT(setCurrentObject(QModelIndex)));
+    connect(m_addObject, SIGNAL(clicked()),
+            this, SLOT(onAddObjectClick()));
+    connect(m_addGroup, SIGNAL(clicked()),
+            this, SLOT(onAddGroupClick()));
+    connect(m_remove, SIGNAL(clicked()),
+            this, SLOT(onRemoveClick()));
 }
 

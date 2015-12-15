@@ -5,6 +5,8 @@
 #include <QString>
 #include <QMatrix4x4>
 
+class ObjectGroup;
+
 // not sure if this is the smartest solution (Yes)
 enum class ObjectType
 {
@@ -16,7 +18,7 @@ enum class ObjectType
 class ObjectBase
 {
 public:
-    ObjectBase(ObjectBase *parent = nullptr);
+    ObjectBase(ObjectGroup *parent = nullptr);
 
     // void setWorld(const QMatrix4x4 &world);
     virtual void updateWorld();
@@ -32,16 +34,19 @@ public:
 
     const QMatrix4x4 &getWorld();
 
-    void setParent(ObjectBase *parent);
-    ObjectBase *getParent();
+    void setParent(ObjectGroup *parent);
+    ObjectGroup *getParent();
 
     void setName(QString name);
     QString getName();
 
+    // destroys itself
+    void destroy();
+
     virtual ObjectType getObjectType();
 
 protected:
-    ObjectBase *m_parent;
+    ObjectGroup *m_parent;
 
     QVector3D m_position;
     QVector3D m_scaling;

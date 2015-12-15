@@ -174,6 +174,11 @@ void SceneEditorGame::getModels(std::vector<Model *> &models)
     }
 }
 
+Model *SceneEditorGame::getModelByName(const std::string &modelName)
+{
+    m_scene->getModel(modelName);
+}
+
 void SceneEditorGame::addModel(std::unique_ptr<Model> model)
 {
     m_scene->addModel(std::move(model));
@@ -186,9 +191,9 @@ void SceneEditorGame::removeModel(const std::string &modelName)
     emit modelsChanged();
 }
 
-Object *SceneEditorGame::createObject(const std::string &name, ObjectGroup *parent)
+Object *SceneEditorGame::createObject(const std::string &modelName, ObjectGroup *parent)
 {
-    Object *obj = m_scene->createObject(name, parent);
+    Object *obj = m_scene->createObject(modelName, parent);
     emit objectsChanged();
     return obj;
 }

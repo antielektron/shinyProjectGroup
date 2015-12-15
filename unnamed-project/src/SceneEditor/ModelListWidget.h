@@ -27,6 +27,9 @@ public slots:
     void onRemoveClick();
     void onAddClick();
 
+signals:
+    void currentModelChanged(QString currentModel);
+
 private:
     void connectStuff();
 

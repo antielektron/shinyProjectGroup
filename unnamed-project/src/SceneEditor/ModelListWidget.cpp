@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cassert>
 #include <QFileDialog>
+#include <QMessageBox>
 
 ModelListWidget::ModelListWidget(std::shared_ptr<SceneEditorGame> game, SceneEditorWindow *parent) :
     QWidget(parent),
@@ -62,15 +63,30 @@ void ModelListWidget::onListClick(QModelIndex index)
     {
         m_currentModel = m_listView->model()->data(index).toString();
         //DEBUG:
-        std::cout << "selected Model: " << m_currentModel.toStdString()
+        std::cout << "selected Model changed to: " << m_currentModel.toStdString()
                   << std::endl;
+
+        emit currentModelChanged(m_currentModel);
     }
 }
 
 //------------------------------------------------------------------------------
 void ModelListWidget::onRemoveClick()
 {
-    m_game->removeModel(m_currentModel.toStdString());
+    // test if model is used:
+    std::string modelName = m_currentModel.toStdString();
+    for (Object *objects : m_game->getScene()->getObjects())
+    {
+        if (objects->getModel()->getName() == modelName)
+        {
+            QMessageBox::information(this,
+                                     "Error",
+                                     "Model is still used by objects");
+            return;
+        }
+    }
+
+    m_game->removeModel(modelName);
 }
 
 //------------------------------------------------------------------------------

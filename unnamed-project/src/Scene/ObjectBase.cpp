@@ -1,6 +1,8 @@
 #include "Scene/ObjectBase.h"
+#include "Scene/ObjectGroup.h"
+#include "Scene/Object.h"
 
-ObjectBase::ObjectBase(ObjectBase *parent) : m_parent(parent), m_scaling(1., 1., 1.)
+ObjectBase::ObjectBase(ObjectGroup *parent) : m_parent(parent), m_scaling(1., 1., 1.)
 {
     m_name = "unnamedObject";
 }
@@ -58,12 +60,12 @@ QVector3D &ObjectBase::getScaling()
     return m_scaling;
 }
 
-void ObjectBase::setParent(ObjectBase *parent)
+void ObjectBase::setParent(ObjectGroup *parent)
 {
     m_parent = parent;
 }
 
-ObjectBase *ObjectBase::getParent()
+ObjectGroup *ObjectBase::getParent()
 {
     return m_parent;
 }
@@ -76,6 +78,22 @@ void ObjectBase::setName(QString name)
 QString ObjectBase::getName()
 {
     return m_name;
+}
+
+void ObjectBase::destroy()
+{
+    if (!m_parent)
+    {
+        return;
+    }
+    if (getObjectType() == ObjectType::ObjectGroup)
+    {
+        m_parent->removeObjectGroup(static_cast<ObjectGroup *>(this));
+    }
+    else
+    {
+        m_parent->removeObject(static_cast<Object *>(this));
+    }
 }
 
 ObjectType ObjectBase::getObjectType()

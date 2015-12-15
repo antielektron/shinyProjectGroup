@@ -442,6 +442,27 @@ ObjectGroup *Scene::getSceneRoot()
 }
 
 //------------------------------------------------------------------------------
+void Scene::updateObjectList()
+{
+    m_objects.clear();
+    ObjectGroup *root = &m_rootGroup;
+    addToObjectList(root);
+}
+
+//------------------------------------------------------------------------------
+void Scene::addToObjectList(ObjectGroup *root)
+{
+    for (Object *object : root->getObjects())
+    {
+        m_objects.push_back(object);
+    }
+    for (ObjectGroup *group : root->getGroups())
+    {
+        addToObjectList(group);
+    }
+}
+
+//------------------------------------------------------------------------------
 Model *Scene::getModel(const std::string &modelName)
 {
     assert(m_models.find(modelName) != m_models.end());

@@ -18,6 +18,7 @@ class ObjectListWidget;
 class ModelListWidget;
 
 class ObjectBase;
+class Model;
 
 class SceneEditorWindow : public QMainWindow
 {
@@ -27,11 +28,17 @@ public:
     virtual ~SceneEditorWindow();
     void makeGlWidgetCurrent();
     void doneGlWidgetCurrent();
+    Model *getCurrentModel();
 
 protected slots:
     void loadScene();
     void saveScene();
     void newScene();
+    void onCurrentModelChanged(QString);
+
+    // will be called if the scene has to rebuild
+    // it's vector of objects
+    void onUpdateSceneObjectsRequest();
 
 private:
     void connectStuff();
@@ -56,6 +63,8 @@ private:
     ModelListWidget *m_modelList;
 
     std::shared_ptr<SceneEditorGame> m_game;
+
+    Model *m_currentModel;
 
 };
 

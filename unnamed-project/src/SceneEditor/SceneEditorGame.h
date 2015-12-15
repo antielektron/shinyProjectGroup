@@ -32,14 +32,18 @@ public:
 	void reset(std::unique_ptr<Scene> scene);
 
 	ObjectGroup *getRootObject();
+
+    //wrapper stuff
     void getModels(std::vector<Model *> &models);
+
+    Model *getModelByName(const std::string &modelName);
 
     void addModel(std::unique_ptr<Model> model);
     void removeModel(const std::string &modelName);
 
 	void currentObjectModified(ObjectBase* object);
 
-	Object *createObject(const std::string &name, ObjectGroup *parent = nullptr);
+    Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
 Q_SIGNALS:

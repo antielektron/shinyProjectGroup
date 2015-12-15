@@ -51,6 +51,8 @@ public:
 
     ObjectGroup *getSceneRoot();
 
+    void updateObjectList();
+
     typedef std::map<std::string, std::unique_ptr<Model>>::const_iterator ModelIterator;
     range<ModelIterator> getModels();
 
@@ -81,6 +83,8 @@ private:
     void writePosition(const QVector3D &position, QXmlStreamWriter &writer);
     void writeRotation(const QVector3D &rotation, QXmlStreamWriter &writer);
     void writeScaling(const QVector3D &scaling, QXmlStreamWriter &writer);
+
+    void addToObjectList(ObjectGroup *group);
 
     QMatrix4x4 m_proj;
     QMatrix4x4 m_camera;

@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include "Scene/ObjectGroup.h"
 
+class SceneEditorWindow;
 class SceneEditorGame;
 class TreeModel;
 
@@ -16,7 +17,7 @@ class ObjectListWidget : public QWidget
 {
     Q_OBJECT
 public:
-    ObjectListWidget(std::shared_ptr<SceneEditorGame>, QWidget *parent = nullptr);
+    ObjectListWidget(std::shared_ptr<SceneEditorGame>, SceneEditorWindow *parent);
     virtual ~ObjectListWidget();
     ObjectBase *getCurrentObject();
 
@@ -30,15 +31,23 @@ public slots:
      */
     void setCurrentObject(const QModelIndex &index);
 
+    void onAddObjectClick();
+    void onAddGroupClick();
+    void onRemoveClick();
+
 signals:
     void currentObjectChanged(ObjectBase *object);
+    void updateSceneObjectsRequest();
 
 private:
+
+    void connectStuff();
 
     QTreeView *m_treeView;
     TreeModel *m_treeModel;
 
-    QPushButton *m_add;
+    QPushButton *m_addObject;
+    QPushButton *m_addGroup;
     QPushButton *m_remove;
 
     ObjectBase *m_currentObject;
@@ -46,6 +55,8 @@ private:
     // TODO buttons for adding/removing and moving objects!
 
     std::shared_ptr<SceneEditorGame> m_game;
+
+    SceneEditorWindow *m_parent;
 
 };
 

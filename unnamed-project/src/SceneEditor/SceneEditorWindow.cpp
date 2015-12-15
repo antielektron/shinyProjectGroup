@@ -8,6 +8,8 @@
 #include "SceneEditor/ObjectListWidget.h"
 #include "SceneEditor/ModelListWidget.h"
 
+#include "Scene/Model.h"
+
 #include "OpenGLWidget.h"
 
 //DEBUG
@@ -69,6 +71,12 @@ void SceneEditorWindow::doneGlWidgetCurrent()
 }
 
 //------------------------------------------------------------------------------
+Model *SceneEditorWindow::getCurrentModel()
+{
+    return m_currentModel;
+}
+
+//------------------------------------------------------------------------------
 void SceneEditorWindow::createActions()
 {
     QStyle *style = QApplication::style();
@@ -109,6 +117,12 @@ void SceneEditorWindow::connectStuff()
 
     connect(m_game.get(), SIGNAL(objectsChanged()),
             m_objectList, SLOT(updateModelTree()));
+
+    connect(m_modelList, SIGNAL(currentModelChanged(QString)),
+            this, SLOT(onCurrentModelChanged(QString)));
+
+    connect(m_objectList, SIGNAL(updateSceneObjectsRequest()),
+            this, SLOT(onUpdateSceneObjectsRequest()));
 
     //connect Actions:
     connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
@@ -167,4 +181,16 @@ void SceneEditorWindow::newScene()
                        m_glWidget->geometry().height());
 }
 
+//------------------------------------------------------------------------------
+void SceneEditorWindow::onCurrentModelChanged(QString model)
+{
+    //TODO: maybe error handling?
+    m_currentModel = m_game->getModelByName(model.toStdString());
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorWindow::onUpdateSceneObjectsRequest()
+{
+    m_game->getScene()->updateObjectList();
+}
 
