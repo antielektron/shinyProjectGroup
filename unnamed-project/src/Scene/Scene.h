@@ -44,6 +44,7 @@ public:
     QVector3D &getLightColor();
 
     void addModel(std::unique_ptr<Model> model);
+    void removeModel(const std::string &modelName);
 
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);

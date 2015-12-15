@@ -25,6 +25,8 @@ class SceneEditorWindow : public QMainWindow
 public:
     SceneEditorWindow(QWidget *parent = 0);
     virtual ~SceneEditorWindow();
+    void makeGlWidgetCurrent();
+    void doneGlWidgetCurrent();
 
 protected slots:
     void loadScene();

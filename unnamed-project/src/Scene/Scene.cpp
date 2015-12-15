@@ -363,6 +363,13 @@ void Scene::addModel(std::unique_ptr<Model> model)
 }
 
 //------------------------------------------------------------------------------
+void Scene::removeModel(const std::string &modelName)
+{
+    assert(m_models.find(modelName) != m_models.end());
+    m_models.erase(modelName);
+}
+
+//------------------------------------------------------------------------------
 Object *Scene::createObject(const std::string &modelName, ObjectGroup *parent)
 {
     if (!parent)

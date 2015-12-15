@@ -57,6 +57,18 @@ SceneEditorWindow::~SceneEditorWindow()
 }
 
 //------------------------------------------------------------------------------
+void SceneEditorWindow::makeGlWidgetCurrent()
+{
+    m_glWidget->makeCurrent();
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorWindow::doneGlWidgetCurrent()
+{
+    m_glWidget->doneCurrent();
+}
+
+//------------------------------------------------------------------------------
 void SceneEditorWindow::createActions()
 {
     QStyle *style = QApplication::style();
@@ -113,7 +125,14 @@ void SceneEditorWindow::loadScene()
                                                     tr("Xml files (*.xml)"));
     if (filename.length() > 0)
     {
+        makeGlWidgetCurrent();
         m_game->reset(std::unique_ptr<Scene>(new Scene(filename)));
+        doneGlWidgetCurrent();
+
+        // trigger resize event in order to update
+        // the projection matrix
+        m_game->resize(m_glWidget->geometry().width(),
+                           m_glWidget->geometry().height());
     }
 
 }
@@ -139,8 +158,13 @@ void SceneEditorWindow::saveScene()
 //------------------------------------------------------------------------------
 void SceneEditorWindow::newScene()
 {
+    makeGlWidgetCurrent();
     m_game->initialize();
-
+    doneGlWidgetCurrent();
+    // trigger resize event in order to update
+    // the projection matrix
+    m_game->resize(m_glWidget->geometry().width(),
+                       m_glWidget->geometry().height());
 }
 
 

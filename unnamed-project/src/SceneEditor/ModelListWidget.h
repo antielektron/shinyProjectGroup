@@ -12,25 +12,33 @@
 class SceneEditorGame;
 class ObjectBase;
 class TreeModel;
+class SceneEditorWindow;
 
 class ModelListWidget : public QWidget
 {
     Q_OBJECT
 public:
-    ModelListWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent = nullptr);
+    ModelListWidget(std::shared_ptr<SceneEditorGame> game, SceneEditorWindow *parent = nullptr);
     virtual ~ModelListWidget();
 
 public slots:
     void updateModelList();
+    void onListClick(QModelIndex index);
+    void onRemoveClick();
+    void onAddClick();
 
 private:
+    void connectStuff();
+
     QListWidget *m_listView;
 
+    QString m_currentModel;
 
     QPushButton *m_add;
     QPushButton *m_remove;
 
     std::shared_ptr<SceneEditorGame> m_game;
+    SceneEditorWindow *m_parent;
 
 
 

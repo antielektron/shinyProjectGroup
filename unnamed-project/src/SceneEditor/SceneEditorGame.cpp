@@ -13,7 +13,7 @@ SceneEditorGame::SceneEditorGame() :
 void SceneEditorGame::initialize()
 {
     // Load a test level by default or empty scene
-	reset(std::unique_ptr<Scene>(new Scene("level/test.xml")));
+    reset(std::unique_ptr<Scene>(new Scene("level/test.xml")));
 }
 
 void SceneEditorGame::reset(std::unique_ptr<Scene> scene)
@@ -177,6 +177,12 @@ void SceneEditorGame::getModels(std::vector<Model *> &models)
 void SceneEditorGame::addModel(std::unique_ptr<Model> model)
 {
     m_scene->addModel(std::move(model));
+    emit modelsChanged();
+}
+
+void SceneEditorGame::removeModel(const std::string &modelName)
+{
+    m_scene->removeModel(modelName);
     emit modelsChanged();
 }
 

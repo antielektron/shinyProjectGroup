@@ -35,6 +35,7 @@ public:
     void getModels(std::vector<Model *> &models);
 
     void addModel(std::unique_ptr<Model> model);
+    void removeModel(const std::string &modelName);
 
 	void currentObjectModified(ObjectBase* object);
 
