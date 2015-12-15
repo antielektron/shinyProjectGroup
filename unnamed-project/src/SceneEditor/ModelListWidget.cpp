@@ -6,6 +6,7 @@
 #include <cassert>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QDir>
 
 ModelListWidget::ModelListWidget(std::shared_ptr<SceneEditorGame> game, SceneEditorWindow *parent) :
     QWidget(parent),
@@ -97,10 +98,13 @@ void ModelListWidget::onAddClick()
                                                     ".",
                                                     tr("obj Files (*.obj)"));
 
+    // create relative filepath from current working directory
+    QString relativePath = QDir::current().relativeFilePath(filename);
+
     if (filename.length() > 0)
     {
         m_parent->makeGlWidgetCurrent();
-        Model *model = new Model(filename.toStdString());
+        Model *model = new Model(relativePath.toStdString());
         m_game->addModel(std::unique_ptr<Model>(model));
         m_parent->doneGlWidgetCurrent();
     }
