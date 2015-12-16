@@ -4,12 +4,16 @@
 #include "Scene/Object.h"
 #include "Scene/ObjectGroup.h"
 
+#include <limits>
+
 //DEBUG
 #include <iostream>
 
 //------------------------------------------------------------------------------
 ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
 {
+    m_objectPropertiesLocked = false;
+
     m_layout =  new QFormLayout(this);
 
     m_modelSelection = new QComboBox(this);
@@ -23,24 +27,27 @@ ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, 
     m_rotPitch = createNumericField("Pitch");
     m_rotRoll = createNumericField("Roll");
 
-    m_applyButton = new QPushButton("Apply", this);
-    m_layout->addWidget(m_applyButton);
-
-    // Scaling?
+    m_scaleX = createNumericField("scale x");
+    m_scaleY = createNumericField("scale y");
+    m_scaleZ = createNumericField("scale z");
 
     // Material?
 
     this->setLayout(m_layout);
 
-    connect(m_applyButton, SIGNAL(clicked()), this, SLOT(applyClicked()));
-
     m_currentObject = nullptr;
 }
 
 //------------------------------------------------------------------------------
-QLineEdit *ObjectDetailsWidget::createNumericField(const QString &name)
+QDoubleSpinBox *ObjectDetailsWidget::createNumericField(const QString &name)
 {
-    QLineEdit *widget = new QLineEdit(this);
+    QDoubleSpinBox *widget = new QDoubleSpinBox(this);
+    // set limits for widget
+    widget->setMinimum(-std::numeric_limits<float>::max());
+    widget->setMaximum(std::numeric_limits<float>::max());
+
+    // connect with
+    connect(widget, SIGNAL(valueChanged(double)), this, SLOT(applyValues()));
     m_layout->addRow(name, widget);
     return widget;
 }
@@ -79,8 +86,13 @@ void ObjectDetailsWidget::currentObjectChanged(ObjectBase *object)
 }
 
 //------------------------------------------------------------------------------
-void ObjectDetailsWidget::applyClicked()
+void ObjectDetailsWidget::applyValues()
 {
+    if (!m_currentObject)
+    {
+        return;
+    }
+
     switch(m_currentObject->getObjectType())
     {
     case ObjectType::Object:
@@ -125,13 +137,19 @@ void ObjectDetailsWidget::updateCurrentObjectGroup(ObjectGroup *objectGroup)
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::updateCurrentObjectBase(ObjectBase *object)
 {
-    m_posX->setText(QString::number(object->getPosition().x()));
-    m_posY->setText(QString::number(object->getPosition().y()));
-    m_posZ->setText(QString::number(object->getPosition().z()));
+    m_objectPropertiesLocked = true;
+    m_posX->setValue(object->getPosition().x());
+    m_posY->setValue(object->getPosition().y());
+    m_posY->setValue(object->getPosition().z());
 
-    m_rotYaw->setText(QString::number(object->getRotation().y()));
-    m_rotPitch->setText(QString::number(object->getRotation().x()));
-    m_rotRoll->setText(QString::number(object->getRotation().z()));
+    m_rotYaw->setValue(object->getRotation().y());
+    m_rotPitch->setValue(object->getRotation().x());
+    m_rotRoll->setValue(object->getRotation().z());
+
+    m_scaleX->setValue(object->getScaling().x());
+    m_scaleY->setValue(object->getScaling().y());
+    m_scaleZ->setValue(object->getScaling().z());
+    m_objectPropertiesLocked = false;
 }
 
 //------------------------------------------------------------------------------
@@ -151,13 +169,21 @@ void ObjectDetailsWidget::applyCurrentObjectGroup(ObjectGroup *objectGroup)
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::applyCurrentObjectBase(ObjectBase *object)
 {
-    object->getPosition().setX(m_posX->text().toFloat());
-    object->getPosition().setY(m_posY->text().toFloat());
-    object->getPosition().setZ(m_posZ->text().toFloat());
+    if (m_objectPropertiesLocked)
+    {
+        return;
+    }
+    object->getPosition().setX((float)m_posX->value());
+    object->getPosition().setY((float)m_posY->value());
+    object->getPosition().setZ((float)m_posZ->value());
 
-    object->getRotation().setY(m_rotYaw->text().toFloat());
-    object->getRotation().setX(m_rotPitch->text().toFloat());
-    object->getRotation().setZ(m_rotRoll->text().toFloat());
+    object->getRotation().setY((float)m_rotYaw->value());
+    object->getRotation().setX((float)m_rotPitch->value());
+    object->getRotation().setZ((float)m_rotRoll->value());
+
+    object->getScaling().setX((float)m_scaleX->value());
+    object->getScaling().setY((float)m_scaleY->value());
+    object->getScaling().setZ((float)m_scaleZ->value());
 
     object->updateWorld();
 }

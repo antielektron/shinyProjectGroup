@@ -4,7 +4,7 @@
 #include <memory>
 
 #include <QWidget>
-#include <QLineEdit>
+#include <QDoubleSpinBox>
 #include <QComboBox>
 #include <QPushButton>
 
@@ -27,7 +27,7 @@ public:
 public slots:
     void modelsChanged();
     void currentObjectChanged(ObjectBase *object);
-    void applyClicked();
+    void applyValues();
 
 private:
     void updateCurrentObject(Object *object);
@@ -42,23 +42,29 @@ private:
 
     QComboBox *m_modelSelection;
 
-    QLineEdit *m_posX;
-    QLineEdit *m_posY;
-    QLineEdit *m_posZ;
+    QDoubleSpinBox *m_posX;
+    QDoubleSpinBox *m_posY;
+    QDoubleSpinBox *m_posZ;
 
-    QLineEdit *m_rotYaw;
-    QLineEdit *m_rotPitch;
-    QLineEdit *m_rotRoll;
+    QDoubleSpinBox *m_rotYaw;
+    QDoubleSpinBox *m_rotPitch;
+    QDoubleSpinBox *m_rotRoll;
 
-    QPushButton *m_applyButton;
+    QDoubleSpinBox *m_scaleX;
+    QDoubleSpinBox *m_scaleY;
+    QDoubleSpinBox *m_scaleZ;
 
     QFormLayout *m_layout;
 
-    QLineEdit *createNumericField(const QString &name);
+    QDoubleSpinBox *createNumericField(const QString &name);
 
     ObjectBase *m_currentObject;
 
     std::shared_ptr<SceneEditorGame> m_game;
+
+    // necessary for avoiding a feedback loop
+    // when property widgets are updated by the object
+    bool m_objectPropertiesLocked;
 };
 
 #endif // UNNAMED_PROJECT_OBJECT_DETAILS_WIDGET_H
