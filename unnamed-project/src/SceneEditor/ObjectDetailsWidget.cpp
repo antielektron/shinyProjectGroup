@@ -149,7 +149,7 @@ void ObjectDetailsWidget::updateCurrentObjectBase(ObjectBase *object)
 {
     m_posX->setValue(object->getPosition().x());
     m_posY->setValue(object->getPosition().y());
-    m_posY->setValue(object->getPosition().z());
+    m_posZ->setValue(object->getPosition().z());
 
     m_rotYaw->setValue(object->getRotation().y());
     m_rotPitch->setValue(object->getRotation().x());
