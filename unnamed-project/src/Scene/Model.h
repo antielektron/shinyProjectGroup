@@ -36,6 +36,9 @@ private:
     void loadObj(const std::string &fileName);
     void createOpenGLStuff();
 
+    // get the models maximal extend
+    float radius;
+
 };
 
 #endif // UNNAMED_PROJECT_SCENE_MODEL_H

@@ -43,7 +43,7 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     m_modelListDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
     m_modelListDock->setWidget(m_modelList);
 
-    this->addDockWidget(Qt::RightDockWidgetArea, m_objectDetailsDock);
+    this->addDockWidget(Qt::LeftDockWidgetArea, m_objectDetailsDock);
     this->addDockWidget(Qt::RightDockWidgetArea, m_objectListDock);
     this->addDockWidget(Qt::RightDockWidgetArea, m_modelListDock);
 

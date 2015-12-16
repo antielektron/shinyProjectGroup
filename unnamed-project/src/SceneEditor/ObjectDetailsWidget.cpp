@@ -4,8 +4,6 @@
 #include "Scene/Object.h"
 #include "Scene/ObjectGroup.h"
 
-#include <limits>
-
 //DEBUG
 #include <iostream>
 
@@ -31,6 +29,9 @@ ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, 
     m_scaleY = createNumericField("scale y");
     m_scaleZ = createNumericField("scale z");
 
+    connect(m_modelSelection, SIGNAL(currentTextChanged(QString)),
+            this, SLOT(applyValues()));
+
     // Material?
 
     this->setLayout(m_layout);
@@ -43,8 +44,15 @@ QDoubleSpinBox *ObjectDetailsWidget::createNumericField(const QString &name)
 {
     QDoubleSpinBox *widget = new QDoubleSpinBox(this);
     // set limits for widget
-    widget->setMinimum(-std::numeric_limits<float>::max());
-    widget->setMaximum(std::numeric_limits<float>::max());
+    // (using std::numeric_limits is a bad idea here,
+    // because the spin box will be sized so that
+    // every valid value fits (and may fills the whole
+    // parent widget)
+    widget->setMaximum(10e10);
+    widget->setMinimum(-10e10);
+
+    widget->setDecimals(3);
+    widget->setSingleStep(0.1);
 
     // connect with
     connect(widget, SIGNAL(valueChanged(double)), this, SLOT(applyValues()));
@@ -118,6 +126,7 @@ void ObjectDetailsWidget::applyValues()
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::updateCurrentObject(Object *object)
 {
+    m_objectPropertiesLocked = true;
     m_modelSelection->setEnabled(true);
 
     int index = m_modelSelection->findText(
@@ -125,6 +134,7 @@ void ObjectDetailsWidget::updateCurrentObject(Object *object)
     m_modelSelection->setCurrentIndex(index);
 
     updateCurrentObjectBase(object);
+    m_objectPropertiesLocked = false;
 }
 
 //------------------------------------------------------------------------------
@@ -137,7 +147,6 @@ void ObjectDetailsWidget::updateCurrentObjectGroup(ObjectGroup *objectGroup)
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::updateCurrentObjectBase(ObjectBase *object)
 {
-    m_objectPropertiesLocked = true;
     m_posX->setValue(object->getPosition().x());
     m_posY->setValue(object->getPosition().y());
     m_posY->setValue(object->getPosition().z());
@@ -149,7 +158,6 @@ void ObjectDetailsWidget::updateCurrentObjectBase(ObjectBase *object)
     m_scaleX->setValue(object->getScaling().x());
     m_scaleY->setValue(object->getScaling().y());
     m_scaleZ->setValue(object->getScaling().z());
-    m_objectPropertiesLocked = false;
 }
 
 //------------------------------------------------------------------------------
