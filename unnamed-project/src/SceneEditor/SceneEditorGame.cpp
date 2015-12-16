@@ -50,6 +50,8 @@ void SceneEditorGame::tick()
 
 	m_keyManager->tick();
 
+	float speed = 7. / 60;
+
 	if (m_keyManager->shouldCatchMouse())
 	{
 		rotX += m_keyManager->getRelativeY() * .1;
@@ -58,11 +60,11 @@ void SceneEditorGame::tick()
 
 	if (m_keyManager->isKeyPressed(Qt::Key_Right))
 	{
-		rotY -= 0.5;
+		rotY += 0.5;
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_Left))
 	{
-		rotY += 0.5;
+		rotY -= 0.5;
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_Up))
 	{
@@ -74,11 +76,11 @@ void SceneEditorGame::tick()
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_S))
 	{
-		deltaPos += QVector3D(0, 0, 0.5);
+		deltaPos += QVector3D(0, 0, speed);
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_W))
 	{
-		deltaPos += QVector3D(0, 0, -0.5);
+		deltaPos += QVector3D(0, 0, -speed);
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_D))
 	{
@@ -88,18 +90,18 @@ void SceneEditorGame::tick()
 	{
 		deltaPos += QVector3D(-0.5, 0, 0);
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_Q))
+	if (m_keyManager->isKeyPressed(Qt::Key_Space))
 	{
 		deltaPos += QVector3D(0, 0.5, 0);
 	}
-	// !!! Keyboard layout
-	if (m_keyManager->isKeyPressed(Qt::Key_Z))
+	
+	if (m_keyManager->isKeyPressed(Qt::Key_Shift))
 	{
 		deltaPos += QVector3D(0, -0.5, 0);
 	}
 
 	// Reset camera
-	if (m_keyManager->isKeyPressed(Qt::Key_Space))
+	if (m_keyManager->isKeyPressed(Qt::Key_R))
 	{
 		m_position = QVector3D(0, 0, 0);
 		rotX = 0;

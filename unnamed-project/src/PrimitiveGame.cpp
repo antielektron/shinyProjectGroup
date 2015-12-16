@@ -95,18 +95,18 @@ void PrimitiveGame::tick()
     {
         deltaPos += QVector3D(-speed, 0, 0);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Q))
+    if (m_keyManager->isKeyPressed(Qt::Key_Space))
     {
         deltaPos += QVector3D(0, speed, 0);
     }
-    // !!! Keyboard layout
-    if (m_keyManager->isKeyPressed(Qt::Key_E))
+    
+    if (m_keyManager->isKeyPressed(Qt::Key_Shift))
     {
         deltaPos += QVector3D(0, -speed, 0);
     }
 
     // Reset camera
-    if (m_keyManager->isKeyPressed(Qt::Key_Space))
+    if (m_keyManager->isKeyPressed(Qt::Key_R))
     {
         m_position = QVector3D(0, 0, 0);
         rotX = 0;
