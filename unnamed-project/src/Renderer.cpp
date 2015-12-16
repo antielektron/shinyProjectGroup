@@ -10,9 +10,9 @@
 #include "utility.h"
 
 Renderer::Renderer() :
-    m_frameBuffer(0),
+    m_renderFrameBuffer(0),
     m_renderTexture(0),
-    m_depthBuffer(0)
+    m_renderDepthBuffer(0)
 {
 }
 
@@ -21,9 +21,9 @@ Renderer::~Renderer()
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
     // Delete the manually created objects!
-    f->glDeleteFramebuffers(1, &m_frameBuffer);
+    f->glDeleteFramebuffers(1, &m_renderFrameBuffer);
     f->glDeleteTextures(1, &m_renderTexture);
-    f->glDeleteRenderbuffers(1, &m_depthBuffer);
+    f->glDeleteRenderbuffers(1, &m_renderDepthBuffer);
 }
 
 ShaderErrorType Renderer::createShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource)
@@ -79,33 +79,21 @@ std::string &Renderer::getFragmentShader()
     return m_currentFragmentShader;
 }
 
-void Renderer::initialize()
+void Renderer::createComposeProgram()
 {
-    // initializeOpenGLFunctions();
-    glClearColor(0, 0, 0, 1);
-
-    createShaderProgram(
-                loadTextFile("shaders/vertex.glsl"),
-                loadTextFile("shaders/fragment.glsl"));
-
-    // compose shader
-
-    std::string composeVertexShaderSource = loadTextFile("shaders/vertex_copy.glsl");
-    std::string composeFragmentShaderSource = loadTextFile("shaders/fragment_copy.glsl");
-
-    if (!m_composeProgram.addShaderFromSourceCode(QOpenGLShader::Vertex, composeVertexShaderSource.c_str()))
+    if (!m_composeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "shaders/vertex_copy.glsl"))
     {
-        std::cerr << "could not load vertex shader" << std::endl;
+        throw std::runtime_error("could not load vertex shader");
     }
-    if (!m_composeProgram.addShaderFromSourceCode(QOpenGLShader::Fragment, composeFragmentShaderSource.c_str()))
+    if (!m_composeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "shaders/fragment_copy.glsl"))
     {
-        std::cerr << "could not load fragment shader" << std::endl;
+        throw std::runtime_error("could not load fragment shader");
     }
     m_composeProgram.bindAttributeLocation("v_position", 0);
 
     if (!m_composeProgram.link())
     {
-        std::cerr << "could not link shader program" << std::endl;
+        throw std::runtime_error("could not link shader program");
     }
 
     m_composeProgram.bind();
@@ -116,15 +104,15 @@ void Renderer::initialize()
 
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
-    // create quad
+    // Create quad
     m_quadVao.create();
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
 
     float vertices[] = {
-        0, 0,
-        1, 0,
-        1, 1,
-        0, 1
+            0, 0,
+            1, 0,
+            1, 1,
+            0, 1
     };
 
     // Setup our vertex buffer object.
@@ -138,13 +126,103 @@ void Renderer::initialize()
     m_quadVbo.release();
 }
 
+void Renderer::createShadowMapProgram()
+{
+    if (!m_shadowMapProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "shaders/vertex_shadowmap.glsl"))
+    {
+        throw std::runtime_error("could not load vertex shader");
+    }
+    if (!m_shadowMapProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "shaders/fragment_shadowmap.glsl"))
+    {
+        throw std::runtime_error("could not load fragment shader");
+    }
+    m_shadowMapProgram.bindAttributeLocation("v_position", 0);
+
+    if (!m_shadowMapProgram.link())
+    {
+        throw std::runtime_error("could not link shader program");
+    }
+
+    m_shadowMapProgram.bind();
+
+    m_shadowMapModelViewProjectionLoc = m_shadowMapProgram.uniformLocation("modelViewProjection");
+
+    m_shadowMapProgram.release();
+
+    // Create ShadowMap
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+
+    const GLsizei shapdowMapSize = 2048;
+
+    // Create Texture
+    f->glGenTextures(1, &m_shadowMapTexture);
+    f->glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
+    // Give an empty image to OpenGL ( the last "0" )
+    f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, shapdowMapSize, shapdowMapSize, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    f->glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Create DepthBuffer
+    f->glGenRenderbuffers(1, &m_shadowMapDepthBuffer);
+    f->glBindRenderbuffer(GL_RENDERBUFFER, m_shadowMapDepthBuffer);
+    f->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, shapdowMapSize, shapdowMapSize);
+    f->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // Create FrameBuffer
+    f->glGenFramebuffers(1, &m_shadowMapFrameBuffer);
+    f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
+    f->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_shadowMapDepthBuffer);
+    f->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_shadowMapTexture, 0);
+}
+
+void Renderer::initialize()
+{
+    // initializeOpenGLFunctions();
+    glClearColor(0, 0, 0, 1);
+
+    createShaderProgram(
+                loadTextFile("shaders/vertex.glsl"),
+                loadTextFile("shaders/fragment.glsl"));
+
+    createShadowMapProgram();
+    createComposeProgram();
+}
+
 void Renderer::render(GLuint fbo, Scene *scene)
 {
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
-    // render to texture!
-    f->glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
+    // Render to ShadowMap
 
+    f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
+    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    f->glEnable(GL_DEPTH_TEST);
+
+    // TODO compute light viewprojection!
+    QMatrix4x4 lightView;
+    // TODO find any vector orthogonal to light direction
+    lightView.lookAt(scene->getDirectionalLightDirection()*10, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+    QMatrix4x4 lightProjection;
+    lightProjection.ortho(-10, 10, -10, 10, 0.1, 100);
+
+    m_shadowMapProgram.bind();
+
+    for (auto &object : scene->getObjects())
+    {
+        // TODO
+        auto modelViewProjection = lightProjection * lightView * object->getWorld();
+
+        m_shadowMapProgram.setUniformValue(m_shadowMapModelViewProjectionLoc, modelViewProjection);
+
+        object->getModel()->draw();
+    }
+
+    m_shadowMapProgram.release();
+
+
+    // Render to Texture
+    f->glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     f->glEnable(GL_DEPTH_TEST);
     // f->glEnable(GL_CULL_FACE);
@@ -171,17 +249,18 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     m_program->release();
 
-    // render to screen....
+
+    // Render to Screen
     f->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    f->glEnable(GL_DEPTH_TEST);
 
     m_composeProgram.bind();
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
 
     f->glActiveTexture(GL_TEXTURE0);
-    f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+    // f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+    f->glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
     m_composeProgram.setUniformValue(m_samplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
 
     f->glDrawArrays(GL_QUADS, 0, 4);
@@ -199,9 +278,9 @@ void Renderer::resize(int width, int height)
     m_width = width;
     m_height = height;
 
-    f->glDeleteFramebuffers(1, &m_frameBuffer);
+    f->glDeleteFramebuffers(1, &m_renderFrameBuffer);
     f->glDeleteTextures(1, &m_renderTexture);
-    f->glDeleteRenderbuffers(1, &m_depthBuffer);
+    f->glDeleteRenderbuffers(1, &m_renderDepthBuffer);
 
     // hm
     // glViewport(0, 0, width, height);
@@ -217,15 +296,15 @@ void Renderer::resize(int width, int height)
     f->glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create depth buffer!
-    f->glGenRenderbuffers(1, &m_depthBuffer);
-    f->glBindRenderbuffer(GL_RENDERBUFFER, m_depthBuffer);
+    f->glGenRenderbuffers(1, &m_renderDepthBuffer);
+    f->glBindRenderbuffer(GL_RENDERBUFFER, m_renderDepthBuffer);
     f->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
     f->glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-    f->glGenFramebuffers(1, &m_frameBuffer);
-    f->glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
-    f->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthBuffer);
+    f->glGenFramebuffers(1, &m_renderFrameBuffer);
+    f->glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
+    f->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderDepthBuffer);
     // Set "renderTexture" as our colour attachement #0
     f->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_renderTexture, 0);
     // glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_renderTexture, 0);

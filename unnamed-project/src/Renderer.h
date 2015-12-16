@@ -24,6 +24,9 @@ private:
     int m_width;
     int m_height;
 
+    void createComposeProgram();
+    void createShadowMapProgram();
+
     std::string m_currentVertexShader;
     std::string m_currentFragmentShader;
     std::unique_ptr<QOpenGLShaderProgram> m_program;
@@ -35,16 +38,23 @@ private:
     int m_diffuseColorLoc;
     int m_ambientColorLoc;
 
+    // ShadowMap Shader
+    QOpenGLShaderProgram m_shadowMapProgram;
+    int m_shadowMapModelViewProjectionLoc;
+    GLuint m_shadowMapFrameBuffer;
+    GLuint m_shadowMapTexture;
+    GLuint m_shadowMapDepthBuffer;
+
+    // Compose Shader
     QOpenGLShaderProgram m_composeProgram;
     int m_samplerLoc;
-
 
     QOpenGLVertexArrayObject m_quadVao;
     QOpenGLBuffer m_quadVbo;
 
-    GLuint m_frameBuffer;
+    GLuint m_renderFrameBuffer;
     GLuint m_renderTexture;
-    GLuint m_depthBuffer;
+    GLuint m_renderDepthBuffer;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H
