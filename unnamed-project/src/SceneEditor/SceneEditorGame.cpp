@@ -176,7 +176,7 @@ void SceneEditorGame::getModels(std::vector<Model *> &models)
 
 Model *SceneEditorGame::getModelByName(const std::string &modelName)
 {
-    m_scene->getModel(modelName);
+    return m_scene->getModel(modelName);
 }
 
 void SceneEditorGame::addModel(std::unique_ptr<Model> model)
