@@ -99,6 +99,13 @@ void SceneEditorGame::tick()
 	{
 		deltaPos += QVector3D(0, -0.5, 0);
 	}
+	if (m_keyManager->isKeyPressed(Qt::Key_T))
+	{
+		if (m_currentObject)
+		{
+			m_currentObject->getPosition() += QVector3D(0.0,0.1,0.0);
+		}
+	}
 
 	// Reset camera
 	if (m_keyManager->isKeyPressed(Qt::Key_R))
@@ -205,5 +212,10 @@ ObjectGroup *SceneEditorGame::createObjectGroup(const std::string &name, ObjectG
     ObjectGroup *objGrp = m_scene->createObjectGroup(name, parent);
     emit objectsChanged();
     return objGrp;
+}
+
+void SceneEditorGame::onCurrentObjectChanged(ObjectBase * object)
+{
+	m_currentObject = object;
 }
 

@@ -46,6 +46,11 @@ public:
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
+public slots:
+	void onCurrentObjectChanged(ObjectBase * object);
+
+
+
 Q_SIGNALS:
     void currentObjectChanged();
     void modelsChanged();

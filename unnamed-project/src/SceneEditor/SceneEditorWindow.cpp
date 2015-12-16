@@ -124,6 +124,9 @@ void SceneEditorWindow::connectStuff()
     connect(m_objectList, SIGNAL(updateSceneObjectsRequest()),
             this, SLOT(onUpdateSceneObjectsRequest()));
 
+	connect(m_objectDetails, SIGNAL(currentObjectChanged(ObjectBase *)),
+		m_game.get(), SLOT(onCurrentObjectChanged(ObjectBase *)));
+
     //connect Actions:
     connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
     connect(m_saveScene, SIGNAL(triggered()), this, SLOT(saveScene()));
