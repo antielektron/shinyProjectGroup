@@ -72,6 +72,8 @@ void ObjectDetailsWidget::currentObjectChanged(ObjectBase *object)
     // New current object from game
     m_currentObject = object;
 
+    m_objectPropertiesLocked = true;
+
     // Update widgets:
     switch (object->getObjectType())
     {
@@ -91,6 +93,8 @@ void ObjectDetailsWidget::currentObjectChanged(ObjectBase *object)
         updateCurrentObjectBase(object);
     }
     }
+
+    m_objectPropertiesLocked = false;
 }
 
 //------------------------------------------------------------------------------
@@ -126,7 +130,6 @@ void ObjectDetailsWidget::applyValues()
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::updateCurrentObject(Object *object)
 {
-    m_objectPropertiesLocked = true;
     m_modelSelection->setEnabled(true);
 
     int index = m_modelSelection->findText(
@@ -134,7 +137,6 @@ void ObjectDetailsWidget::updateCurrentObject(Object *object)
     m_modelSelection->setCurrentIndex(index);
 
     updateCurrentObjectBase(object);
-    m_objectPropertiesLocked = false;
 }
 
 //------------------------------------------------------------------------------
