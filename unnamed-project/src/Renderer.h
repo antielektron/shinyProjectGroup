@@ -21,8 +21,10 @@ public:
     virtual std::string &getFragmentShader() override;
 
 private:
-    int m_width;
-    int m_height;
+    GLsizei m_width;
+    GLsizei m_height;
+
+    GLsizei m_shadowMapSize;
 
     void createComposeProgram();
     void createShadowMapProgram();
@@ -30,24 +32,27 @@ private:
     std::string m_currentVertexShader;
     std::string m_currentFragmentShader;
     std::unique_ptr<QOpenGLShaderProgram> m_program;
-    int m_modelViewLoc;
-    int m_projectionLoc;
+    int m_modelViewMatrixLoc;
+    int m_projectionMatrixLoc;
+    int m_lightViewMatrixLoc;
     int m_lightDirectionLoc;
     int m_lightColorLoc;
     int m_specularColorLoc;
     int m_diffuseColorLoc;
     int m_ambientColorLoc;
+    int m_shadowMapSamplerLoc;
 
     // ShadowMap Shader
     QOpenGLShaderProgram m_shadowMapProgram;
-    int m_shadowMapModelViewProjectionLoc;
+    int m_shadowMapLightViewMatrixLoc;
+
     GLuint m_shadowMapFrameBuffer;
     GLuint m_shadowMapTexture;
     GLuint m_shadowMapDepthBuffer;
 
     // Compose Shader
     QOpenGLShaderProgram m_composeProgram;
-    int m_samplerLoc;
+    int m_composeSamplerLoc;
 
     QOpenGLVertexArrayObject m_quadVao;
     QOpenGLBuffer m_quadVbo;

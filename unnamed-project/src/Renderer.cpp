@@ -54,8 +54,9 @@ ShaderErrorType Renderer::createShaderProgram(const std::string &vertexShaderSou
     m_currentFragmentShader = fragmentShaderSource;
 
     m_program->bind();
-    m_modelViewLoc = m_program->uniformLocation("modelView");
-    m_projectionLoc = m_program->uniformLocation("projection");
+    m_modelViewMatrixLoc = m_program->uniformLocation("modelViewMatrix");
+    m_projectionMatrixLoc = m_program->uniformLocation("projectionMatrix");
+    m_lightViewMatrixLoc = m_program->uniformLocation("lightViewMatrix");
 
     m_lightDirectionLoc = m_program->uniformLocation("lightDirection");
     m_lightColorLoc = m_program->uniformLocation("lightColor");
@@ -63,6 +64,8 @@ ShaderErrorType Renderer::createShaderProgram(const std::string &vertexShaderSou
     m_specularColorLoc = m_program->uniformLocation("specularColor");
     m_diffuseColorLoc = m_program->uniformLocation("diffuseColor");
     m_ambientColorLoc = m_program->uniformLocation("ambientColor");
+
+    m_shadowMapSamplerLoc = m_program->uniformLocation("shadowMapSampler");
 
     m_program->release();
 
@@ -98,7 +101,7 @@ void Renderer::createComposeProgram()
 
     m_composeProgram.bind();
 
-    m_samplerLoc = m_composeProgram.uniformLocation("sampler");
+    m_composeSamplerLoc = m_composeProgram.uniformLocation("sampler");
 
     m_composeProgram.release();
 
@@ -145,20 +148,20 @@ void Renderer::createShadowMapProgram()
 
     m_shadowMapProgram.bind();
 
-    m_shadowMapModelViewProjectionLoc = m_shadowMapProgram.uniformLocation("modelViewProjection");
+    m_shadowMapLightViewMatrixLoc = m_shadowMapProgram.uniformLocation("lightViewMatrix");
 
     m_shadowMapProgram.release();
 
     // Create ShadowMap
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
-    const GLsizei shapdowMapSize = 2048;
+    m_shadowMapSize = 2048;
 
     // Create Texture
     f->glGenTextures(1, &m_shadowMapTexture);
     f->glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, shapdowMapSize, shapdowMapSize, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+    f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_shadowMapSize, m_shadowMapSize, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
     f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     f->glBindTexture(GL_TEXTURE_2D, 0);
@@ -166,7 +169,7 @@ void Renderer::createShadowMapProgram()
     // Create DepthBuffer
     f->glGenRenderbuffers(1, &m_shadowMapDepthBuffer);
     f->glBindRenderbuffer(GL_RENDERBUFFER, m_shadowMapDepthBuffer);
-    f->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, shapdowMapSize, shapdowMapSize);
+    f->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize);
     f->glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // Create FrameBuffer
@@ -195,25 +198,28 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     // Render to ShadowMap
 
+    // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
+    glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
+
     f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
+    f->glClearColor(0, 0, 0, 1);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     f->glEnable(GL_DEPTH_TEST);
 
     // TODO compute light viewprojection!
-    QMatrix4x4 lightView;
     // TODO find any vector orthogonal to light direction
+    QMatrix4x4 lightView;
+    lightView.ortho(-10, 10, -10, 10, 5, 20);
     lightView.lookAt(scene->getDirectionalLightDirection()*10, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
-    QMatrix4x4 lightProjection;
-    lightProjection.ortho(-10, 10, -10, 10, 0.1, 100);
 
     m_shadowMapProgram.bind();
 
     for (auto &object : scene->getObjects())
     {
         // TODO
-        auto modelViewProjection = lightProjection * lightView * object->getWorld();
+        auto lightModelView = lightView * object->getWorld();
 
-        m_shadowMapProgram.setUniformValue(m_shadowMapModelViewProjectionLoc, modelViewProjection);
+        m_shadowMapProgram.setUniformValue(m_shadowMapLightViewMatrixLoc, lightModelView);
 
         object->getModel()->draw();
     }
@@ -221,37 +227,53 @@ void Renderer::render(GLuint fbo, Scene *scene)
     m_shadowMapProgram.release();
 
 
+    // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
+    glViewport(0, 0, m_width, m_height);
+
+
     // Render to Texture
     f->glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
+    f->glClearColor(0, 0, 0, 1);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     f->glEnable(GL_DEPTH_TEST);
     // f->glEnable(GL_CULL_FACE);
 
     m_program->bind();
 
-    m_program->setUniformValue(m_projectionLoc, scene->getProjection());
+    auto lightDir = scene->getCamera() * QVector4D(scene->getDirectionalLightDirection(), 0.);
+    lightDir.setW(1.);
+
+    m_program->setUniformValue(m_projectionMatrixLoc, scene->getProjection());
+    m_program->setUniformValue(m_lightDirectionLoc, QVector3D(lightDir));
+    m_program->setUniformValue(m_lightColorLoc, scene->getLightColor());
+
+    // Bind shadow map
+    f->glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
+    m_program->setUniformValue(m_shadowMapSamplerLoc, 0);
 
     for (auto &object : scene->getObjects())
     {
-        auto modelView = scene->getCamera() * object->getWorld();
+        auto cameraModelView = scene->getCamera() * object->getWorld();
+        auto lightModelView = lightView * object->getWorld();
 
-        auto lightDir = scene->getCamera() * QVector4D(scene->getDirectionalLightDirection(), 0.);
-        lightDir.setW(1.);
-
-        m_program->setUniformValue(m_modelViewLoc, modelView);
-        m_program->setUniformValue(m_lightDirectionLoc, QVector3D(lightDir));
-        m_program->setUniformValue(m_lightColorLoc, scene->getLightColor());
+        m_program->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+        m_program->setUniformValue(m_lightViewMatrixLoc, lightModelView);
         m_program->setUniformValue(m_specularColorLoc, object->getSpecularAmount() * QVector3D(1., 1., 1.));
         m_program->setUniformValue(m_diffuseColorLoc, object->getDiffuseAmount() * QVector3D(1., 1., 1.));
         m_program->setUniformValue(m_ambientColorLoc, object->getAmbientAmount() * QVector3D(1., 1., 1.));
+
         object->getModel()->draw();
     }
+
+    // Unbind shadow map texture
+    f->glBindTexture(GL_TEXTURE_2D, 0);
 
     m_program->release();
 
 
     // Render to Screen
     f->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    f->glClearColor(0, 0, 0, 1);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_composeProgram.bind();
@@ -259,9 +281,9 @@ void Renderer::render(GLuint fbo, Scene *scene)
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
 
     f->glActiveTexture(GL_TEXTURE0);
-    // f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
-    f->glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
-    m_composeProgram.setUniformValue(m_samplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
+    f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+    // f->glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
+    m_composeProgram.setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
 
     f->glDrawArrays(GL_QUADS, 0, 4);
 
