@@ -85,13 +85,14 @@ float cooktorranceTerm(vec3 v, vec3 n, vec3 l)
     return D * F * G / (4.0 * dotVN * dotNL);
 }
 
-float simpleShadowTerm(vec2 lv, float depth)
+float simpleShadowTerm(vec2 lv, float d)
 {
     vec2 uv = vec2(lightViewPosition.xy * 0.5 + 0.5);
     float shadowMapDepth = texture2D(shadowMapSampler, uv).x;
+    float depth = d*0.5 + 0.5;
 
     // Add some epsilon
-    if (shadowMapDepth - depth <= 0.01)
+    if (depth - shadowMapDepth <= 0.01)
         return 1.;
     else
         return 0.;
@@ -107,7 +108,7 @@ void main()
     float specularTerm = cooktorranceTerm(v, n, l);
 
     vec2 lv = lightViewPosition.xy;
-    float d = -lightViewPosition.z;
+    float d = lightViewPosition.z;
     float shadowTerm = simpleShadowTerm(lv, d);
 
     fragColor = vec4(clamp(shadowTerm * (specularTerm * specularColor + diffuseTerm * diffuseColor) + ambientColor, 0., 1.), 1.);

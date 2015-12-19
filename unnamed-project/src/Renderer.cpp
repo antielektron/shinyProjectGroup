@@ -202,15 +202,16 @@ void Renderer::render(GLuint fbo, Scene *scene)
     glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
 
     f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
-    f->glClearColor(0, 0, 0, 1);
+    // Initialize with max depth.
+    f->glClearColor(1, 0, 0, 1);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     f->glEnable(GL_DEPTH_TEST);
 
     // TODO compute light viewprojection!
     // TODO find any vector orthogonal to light direction
     QMatrix4x4 lightView;
-    lightView.ortho(-10, 10, -10, 10, 5, 20);
-    lightView.lookAt(scene->getDirectionalLightDirection()*10, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+    lightView.ortho(-10, 10, -10, 10, -5, 5);
+    lightView.lookAt(scene->getDirectionalLightDirection().normalized(), QVector3D(0, 0, 0), QVector3D(1, 1, 0));
 
     m_shadowMapProgram.bind();
 
