@@ -50,7 +50,7 @@ void SceneEditorGame::tick()
 
 	m_keyManager->tick();
 
-	float speed = 7. / 60;
+	float speed = 10. / 60;
 
 	if (m_keyManager->shouldCatchMouse())
 	{
@@ -84,20 +84,20 @@ void SceneEditorGame::tick()
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_D))
 	{
-		deltaPos += QVector3D(0.5, 0, 0);
+		deltaPos += QVector3D(speed, 0, 0);
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_A))
 	{
-		deltaPos += QVector3D(-0.5, 0, 0);
+		deltaPos += QVector3D(-speed, 0, 0);
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_Space))
+	if (m_keyManager->isKeyPressed(Qt::Key_Space) || m_keyManager->isKeyPressed(Qt::Key_Q))
 	{
-		deltaPos += QVector3D(0, 0.5, 0);
+		deltaPos += QVector3D(0, speed, 0);
 	}
 	
-	if (m_keyManager->isKeyPressed(Qt::Key_Shift))
+	if (m_keyManager->isKeyPressed(Qt::Key_Shift) || m_keyManager->isKeyPressed(Qt::Key_Z) || m_keyManager->isKeyPressed(Qt::Key_Y))
 	{
-		deltaPos += QVector3D(0, -0.5, 0);
+		deltaPos += QVector3D(0, -speed, 0);
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_T))
 	{
