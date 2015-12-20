@@ -1,7 +1,8 @@
 #version 130
 
 in vec3 normal;
-in vec3 world;
+in vec3 worldPosition;
+in vec4 lightViewPosition;
 
 uniform vec3 lightDirection;
 uniform vec3 lightColor;
@@ -9,6 +10,8 @@ uniform vec3 lightColor;
 uniform vec3 specularColor;
 uniform vec3 diffuseColor;
 uniform vec3 ambientColor;
+
+uniform sampler2D shadowMapSampler;
 
 const float roughness = 0.1;
 const float fresnelFactor = 1.;
@@ -82,15 +85,31 @@ float cooktorranceTerm(vec3 v, vec3 n, vec3 l)
     return D * F * G / (4.0 * dotVN * dotNL);
 }
 
+float simpleShadowTerm(vec2 lv, float d)
+{
+    vec2 uv = vec2(lightViewPosition.xy * 0.5 + 0.5);
+    float shadowMapDepth = texture2D(shadowMapSampler, uv).x;
+    float depth = d*0.5 + 0.5;
+
+    // Add some epsilon
+    if (depth - shadowMapDepth <= 0.01)
+        return 1.;
+    else
+        return 0.;
+}
+
 void main()
 {
     vec3 n = normalize(normal);
     vec3 l = normalize(lightDirection);
-    vec3 v = normalize(-world); // eye is in the origin.
+    vec3 v = normalize(-worldPosition); // eye is in the origin.
     float diffuseTerm = cdot(n, l);
 
     float specularTerm = cooktorranceTerm(v, n, l);
 
-    fragColor = vec4(clamp(specularTerm * specularColor + diffuseTerm * diffuseColor + ambientColor, 0., 1.), 1.);
-    // fragColor = vec4(l, 1.);
+    vec2 lv = lightViewPosition.xy;
+    float d = lightViewPosition.z;
+    float shadowTerm = simpleShadowTerm(lv, d);
+
+    fragColor = vec4(clamp(shadowTerm * (specularTerm * specularColor + diffuseTerm * diffuseColor) + ambientColor, 0., 1.), 1.);
 }

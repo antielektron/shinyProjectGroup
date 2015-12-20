@@ -50,6 +50,8 @@ void SceneEditorGame::tick()
 
 	m_keyManager->tick();
 
+	float speed = 10. / 60;
+
 	if (m_keyManager->shouldCatchMouse())
 	{
 		rotX += m_keyManager->getRelativeY() * .1;
@@ -58,11 +60,11 @@ void SceneEditorGame::tick()
 
 	if (m_keyManager->isKeyPressed(Qt::Key_Right))
 	{
-		rotY -= 0.5;
+		rotY += 0.5;
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_Left))
 	{
-		rotY += 0.5;
+		rotY -= 0.5;
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_Up))
 	{
@@ -74,32 +76,39 @@ void SceneEditorGame::tick()
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_S))
 	{
-		deltaPos += QVector3D(0, 0, 0.5);
+		deltaPos += QVector3D(0, 0, speed);
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_W))
 	{
-		deltaPos += QVector3D(0, 0, -0.5);
+		deltaPos += QVector3D(0, 0, -speed);
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_D))
 	{
-		deltaPos += QVector3D(0.5, 0, 0);
+		deltaPos += QVector3D(speed, 0, 0);
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_A))
 	{
-		deltaPos += QVector3D(-0.5, 0, 0);
+		deltaPos += QVector3D(-speed, 0, 0);
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_Q))
+	if (m_keyManager->isKeyPressed(Qt::Key_Space) || m_keyManager->isKeyPressed(Qt::Key_Q))
 	{
-		deltaPos += QVector3D(0, 0.5, 0);
+		deltaPos += QVector3D(0, speed, 0);
 	}
-	// !!! Keyboard layout
-	if (m_keyManager->isKeyPressed(Qt::Key_Z))
+	
+	if (m_keyManager->isKeyPressed(Qt::Key_Shift) || m_keyManager->isKeyPressed(Qt::Key_Z) || m_keyManager->isKeyPressed(Qt::Key_Y))
 	{
-		deltaPos += QVector3D(0, -0.5, 0);
+		deltaPos += QVector3D(0, -speed, 0);
+	}
+	if (m_keyManager->isKeyPressed(Qt::Key_T))
+	{
+		if (m_currentObject)
+		{
+			m_currentObject->getPosition() += QVector3D(0.0,0.1,0.0);
+		}
 	}
 
 	// Reset camera
-	if (m_keyManager->isKeyPressed(Qt::Key_Space))
+	if (m_keyManager->isKeyPressed(Qt::Key_R))
 	{
 		m_position = QVector3D(0, 0, 0);
 		rotX = 0;
@@ -210,5 +219,10 @@ void SceneEditorGame::createIndicatorObject()
 {
     m_indicatorModel.reset(new Model("models/editorIndicator"));
     m_indicatorObject.reset(new Object(m_indicatorModel.get()));
+}
+
+void SceneEditorGame::onCurrentObjectChanged(ObjectBase * object)
+{
+	m_currentObject = object;
 }
 

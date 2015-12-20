@@ -273,7 +273,7 @@ void Model::updateExtent()
 
         m_center += vertex;
     }
-    m_center /= (float)m_vertices.size();
+    m_center /= static_cast<float>(m_vertices.size());
 
     float maxSqrdRad = 0.0f;
     for (auto &vertex : m_vertices)
