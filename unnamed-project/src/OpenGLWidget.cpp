@@ -128,8 +128,12 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
         if (event->globalPos() == mapToGlobal(rect().center()))
             return;
 
-        // "Relative" mouse position
-        m_keyManager->mouseMoveRelative(event->pos().x() - this->width() / 2, event->pos().y() - this->height() / 2);
+        // TODO check if this is fiirst should catch mouse event..
+        if (m_prevShouldCatchMouse)
+        {
+            // "Relative" mouse position
+            m_keyManager->mouseMoveRelative(event->pos().x() - this->width() / 2, event->pos().y() - this->height() / 2);
+        }
 
         // Reset mouse position
         QCursor::setPos(mapToGlobal(rect().center()));
@@ -138,6 +142,8 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
     {
         m_keyManager->mouseMoveAbsolute(event->pos().x(), event->pos().y());
     }
+
+    m_prevShouldCatchMouse = m_keyManager->shouldCatchMouse();
 }
 
 void OpenGLWidget::keyPressEvent(QKeyEvent * event)

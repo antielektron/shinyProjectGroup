@@ -51,6 +51,8 @@ private:
     std::unique_ptr<IRenderer> m_renderer;
 	std::unique_ptr<KeyManager> m_keyManager;
 
+	bool m_prevShouldCatchMouse;
+
     QTimer m_timer;
     std::chrono::system_clock::time_point start;
     size_t frame_count;
