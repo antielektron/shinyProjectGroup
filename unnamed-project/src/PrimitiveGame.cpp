@@ -46,7 +46,7 @@ void PrimitiveGame::resize(int width, int height)
     proj.perspective(45.0f, (float)width / height, 0.01f, 100.0f);
 }
 
-void PrimitiveGame::tick()
+void PrimitiveGame::tick(float dt)
 {
     QVector3D deltaPos(0, 0, 0);
 
@@ -55,7 +55,7 @@ void PrimitiveGame::tick()
 
     m_keyManager->tick();
 
-    float speed = 7./60;
+    float speed = 7.0f * dt;
 
     if (m_keyManager->shouldCatchMouse())
     {

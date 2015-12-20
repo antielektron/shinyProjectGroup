@@ -13,7 +13,7 @@ public:
 	PrimitiveGame();
     virtual void initialize() override;
     virtual void resize(int width, int height) override;
-    virtual void tick() override;
+    virtual void tick(float dt = 1.0f/60.0f) override;
 
     virtual Scene *getScene() override;
 

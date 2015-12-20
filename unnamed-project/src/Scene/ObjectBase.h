@@ -45,6 +45,8 @@ public:
     void setName(QString name);
     QString getName();
 
+    QVector3D getAbsolutePosition();
+
     // destroys itself
     void destroy();
 

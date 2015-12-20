@@ -21,6 +21,8 @@
 #include "Scene/ObjectGroup.h"
 #include "smartiterator.h"
 
+#include "SceneEditor/EditorObject.h"
+
 class Scene
 {
 public:
@@ -49,6 +51,8 @@ public:
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
+    EditorObject *createEditorObject(const std::string &modelName);
+
     ObjectGroup *getSceneRoot();
 
     void updateObjectList();
@@ -58,6 +62,8 @@ public:
 
     typedef std::vector<Object *>::const_iterator ObjectIterator;
     range<ObjectIterator> getObjects();
+
+    range<ObjectGroup::object_iterator_type> getEditorObjects();
 
     Model *getModel(const std::string &modelName);
 
@@ -95,6 +101,11 @@ private:
 
     // No pointer: force to exist.
     ObjectGroup m_rootGroup;
+
+    // Root for Editor- (aka Debug-) objects.
+    // Scene only allows to add objects to that root,
+    // groups are not allowed as child
+    ObjectGroup m_editorObjectRootGroup;
 
     //TODO: get names directly from objects
     //(is more efficient than ask the scene

@@ -373,6 +373,24 @@ void Renderer::render(GLuint fbo, Scene *scene)
         object->getModel()->draw();
     }
 
+    for (auto editorObject : scene->getEditorObjects())
+    {
+        if (!(static_cast<EditorObject *>(editorObject)->isVisible()))
+        {
+            continue;
+        }
+        auto cameraModelView = scene->getCamera() * editorObject->getWorld();
+        auto lightModelView  = lightView * editorObject->getWorld();
+
+        m_program->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+        m_program->setUniformValue(m_lightViewMatrixLoc, lightModelView);
+        m_program->setUniformValue(m_specularColorLoc, editorObject->getSpecularAmount() * QVector3D(1., 1., 1.));
+        m_program->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseAmount() * QVector3D(1., 1., 1.));
+        m_program->setUniformValue(m_ambientColorLoc, editorObject->getAmbientAmount() * QVector3D(1., 1., 1.));
+
+        editorObject->getModel()->draw();
+    }
+
     // Unbind shadow map texture
     f->glBindTexture(GL_TEXTURE_2D, 0);
 

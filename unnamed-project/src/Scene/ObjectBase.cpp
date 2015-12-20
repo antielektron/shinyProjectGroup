@@ -40,6 +40,12 @@ QVector3D &ObjectBase::getPosition()
     return m_position;
 }
 
+QVector3D ObjectBase::getAbsolutePosition()
+{
+    QVector3D result = (m_world * QVector4D(0,0,0,1)).toVector3D();
+    return result;
+}
+
 void ObjectBase::setRotation(const QVector3D &rotation)
 {
     m_rotation = rotation;

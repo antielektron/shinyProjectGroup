@@ -11,6 +11,7 @@
 class ObjectBase;
 class ObjectGroup;
 class Object;
+class EditorObject;
 
 class SceneEditorGame : public QObject, public IGame
 {
@@ -22,13 +23,13 @@ public:
     // OpenGL might not be ready, while the constructor was called!
     virtual void initialize() override;
     virtual void resize(int width, int height) override;
-    virtual void tick() override;
+    virtual void tick(float dt = 1.0f/60.0f) override;
 
     virtual Scene *getScene() override;
 
     virtual void setKeyManager(KeyManager *keyManager) override;
 
-    virtual bool isInitialized();
+    virtual bool isInitialized() override;
 
 	void reset(std::unique_ptr<Scene> scene);
 
@@ -64,6 +65,12 @@ private:
 
     std::unique_ptr<Scene> m_scene;
 
+    float m_time;
+
+    // if we have non constant framerates, this should
+    // be set to the difference of the last 2 render times.
+    float m_deltaTime;
+
     ObjectBase *m_currentObject;
 
 	float rotY = 0;
@@ -81,8 +88,14 @@ private:
 
 	void updatePosMatrix(QVector3D deltaPos);
 
-    std::unique_ptr<Model> m_indicatorModel;
-    std::unique_ptr<Object> m_indicatorObject;
+    //indicator stuff
+    EditorObject *m_indicatorObject;
+
+    float m_indicatorH;
+    float m_extraIndicatorH;
+    float m_indicatorRotation;
+    float m_indicatorScale;
+
 
 };
 

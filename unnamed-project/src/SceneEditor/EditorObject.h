@@ -11,9 +11,12 @@ public:
 
     virtual ObjectType getObjectType() override;
 
-signals:
+    void makeVisible();
+    void makeInvisible();
+    bool isVisible();
 
-public slots:
+protected:
+    bool m_visible;
 };
 
 #endif // EDITOROBJECT_H
