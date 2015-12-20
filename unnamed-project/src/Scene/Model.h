@@ -20,6 +20,11 @@ public:
     std::string &getName();
     std::string &getFilename();
 
+    float getRadius();
+    const QVector3D &getCenter();
+    const QVector3D &getMinExtent();
+    const QVector3D &getMaxExtent();
+
 private:
     std::vector<QVector3D> m_vertices;
     std::vector<QVector3D> m_normals;
@@ -36,8 +41,20 @@ private:
     void loadObj(const std::string &fileName);
     void createOpenGLStuff();
 
-    // get the models maximal extend
-    float radius;
+    /**
+     * update max sphere radius and bounding box
+     */
+    void updateExtent();
+
+    // the models maximal radius
+    float m_radius;
+
+    // main emphasis
+    QVector3D m_center;
+
+    // rectiliniar extent:
+    QVector3D m_minExtent;
+    QVector3D m_maxExtent;
 
 };
 

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <sstream>
 #include <cassert>
+#include <cmath>
+#include <climits>
 
 #include "Scene/Model.h"
 
@@ -157,6 +159,7 @@ void Model::loadObj(const std::string &fileName)
         }
     }
     std::cout << m_vertices.size() << std::endl;
+    updateExtent();
 }
 
 //------------------------------------------------------------------------------
@@ -214,4 +217,75 @@ std::string &Model::getName()
 std::string &Model::getFilename()
 {
     return m_filename;
+}
+
+//------------------------------------------------------------------------------
+float Model::getRadius()
+{
+    return m_radius;
+}
+
+//------------------------------------------------------------------------------
+const QVector3D &Model::getCenter()
+{
+    return m_center;
+}
+
+//------------------------------------------------------------------------------
+const QVector3D &Model::getMinExtent()
+{
+    return m_minExtent;
+}
+
+//------------------------------------------------------------------------------
+
+const QVector3D &Model::getMaxExtent()
+{
+    return m_maxExtent;
+}
+
+//------------------------------------------------------------------------------
+
+void Model::updateExtent()
+{
+    m_minExtent[0] = std::numeric_limits<float>::max();
+    m_minExtent[1] = std::numeric_limits<float>::max();
+    m_minExtent[2] = std::numeric_limits<float>::max();
+    m_maxExtent[0] = -std::numeric_limits<float>::max();
+    m_maxExtent[1] = -std::numeric_limits<float>::max();
+    m_maxExtent[2] = -std::numeric_limits<float>::max();
+    m_center[0] = 0.0;
+    m_center[1] = 0.0;
+    m_center[2] = 0.0;
+    for (auto &vertex : m_vertices)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if (vertex[i] > m_maxExtent[i])
+            {
+                m_maxExtent[i] = vertex[i];
+            }
+            if (vertex[i] < m_minExtent[i])
+            {
+                m_minExtent[i] = vertex[i];
+            }
+        }
+
+        m_center += vertex;
+    }
+    m_center /= (float)m_vertices.size();
+
+    float maxSqrdRad = 0.0f;
+    for (auto &vertex : m_vertices)
+    {
+        QVector3D vec = vertex - m_center;
+        float sqrdVec = vec[0] * vec[0]
+                      + vec[1] * vec[1]
+                      + vec[2] * vec[2];
+        if (sqrdVec > maxSqrdRad)
+        {
+            maxSqrdRad = sqrdVec;
+        }
+    }
+    m_radius = std::sqrt(maxSqrdRad);
 }

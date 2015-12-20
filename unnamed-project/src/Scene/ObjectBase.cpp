@@ -100,3 +100,21 @@ ObjectType ObjectBase::getObjectType()
 {
     return ObjectType::Undefined;
 }
+
+//------------------------------------------------------------------------------
+void ObjectBase::addProperty(const std::string &key, QVariant value)
+{
+    m_properties[key] = value;
+}
+
+//------------------------------------------------------------------------------
+const QVariant &ObjectBase::getProperty(const std::string &key)
+{
+    return m_properties[key];
+}
+
+//------------------------------------------------------------------------------
+range<ObjectBase::PropertiesIteratorType> ObjectBase::getProperties()
+{
+    return range<PropertiesIteratorType>(m_properties.begin(), m_properties.end());
+}
