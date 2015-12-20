@@ -2,6 +2,7 @@
 #include "Scene/Object.h"
 #include "Scene/ObjectGroup.h"
 #include <cmath>
+#include <iostream>
 
 SceneEditorGame::SceneEditorGame() : 
 		QObject(nullptr), 
@@ -53,9 +54,11 @@ void SceneEditorGame::tick(float dt)
     m_deltaTime = dt;
     m_time += m_deltaTime;
 
+    std::cout << "time: " << m_time << std::endl;
+
     // update indicator stuff
     m_extraIndicatorH = (std::sin(3.0f * m_time) + 1.0f) * 0.2f * m_indicatorScale;
-    m_indicatorRotation += 90.0f * m_deltaTime;
+    m_indicatorRotation += 90.f * m_deltaTime;
     if (m_indicatorRotation > 360.0f)
     {
         m_indicatorRotation -= 360.0f;
