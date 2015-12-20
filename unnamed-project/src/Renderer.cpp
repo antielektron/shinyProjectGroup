@@ -207,11 +207,118 @@ void Renderer::render(GLuint fbo, Scene *scene)
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     f->glEnable(GL_DEPTH_TEST);
 
+    auto viewProjection = scene->getProjection() * scene->getCamera();
+    auto inverseViewProjection = viewProjection.inverted();
+
+    QVector4D frustumCorners[8] = {
+            {-1., -1., -1., 1.},
+            { 1., -1., -1., 1.},
+            {-1.,  1., -1., 1.},
+            { 1.,  1., -1., 1.},
+            {-1., -1.,  1., 1.},
+            { 1., -1.,  1., 1.},
+            {-1.,  1.,  1., 1.},
+            { 1.,  1.,  1., 1.}
+    };
+
+    for (int i = 0; i < 8; i++)
+    {
+        QVector4D res = inverseViewProjection * frustumCorners[i];
+        frustumCorners[i] = res / res.w();
+    }
+
+    /*
+    // normals after projection
+    QVector4D normals[4] = {
+            {-1., 0., 0., -1.},
+            { 1., 0., 0., -1.},
+            { 0., 1., 0., -1.},
+            { 0.,-1., 0., -1.},
+    };
+    // n*x <= 0 iff x in view frustum
+
+    QVector4D normalsWorld[4];
+    for (int i = 0; i < 4; i++)
+        normalsWorld[i] = viewProjection.transposed() * normals[i];
+
+    float nearZ = 1000., farZ = 0.;
+
+    // TODO compute view frustum (in world coordinates) nonononono (pseudo infinite far plane is not such a good idea..)
+    for (auto &object : scene->getObjects())
+    {
+        auto minCorner = object->getModel()->getMinCorner();
+        auto maxCorner = object->getModel()->getMaxCorner();
+
+        // TODO consider hyperplanes
+        QMatrix4x4 transformation = viewProjection * object->getWorld();
+        QVector4D corners[8];
+        QVector4D cornersWorld[8];
+        for (int i = 0; i < 8; i++)
+        {
+            auto inputCorner = QVector4D(i & 1 ? minCorner[0] : maxCorner[0],
+                                         i & 2 ? minCorner[1] : maxCorner[1],
+                                         i & 4 ? minCorner[2] : maxCorner[2], 1.);
+            corners[i] = transformation * inputCorner;
+            cornersWorld[i] = object->getWorld() * inputCorner;
+        }
+
+        bool visible = true;
+        // see out-codes
+        for (int i = 0; i < 4; i++)
+        {
+            bool violated = true;
+            for (int j = 0; j < 8; j++)
+            {
+                float f1 = QVector4D::dotProduct(normals[i], corners[j]);
+                float f2 = QVector4D::dotProduct(normalsWorld[i], cornersWorld[j]);
+
+                if (f1 <= 0.) // not violated
+                {
+                    violated = false;
+                    break;
+                }
+            }
+
+            if (violated)
+            {
+                visible = false;
+                break;
+            }
+        }
+
+        if (visible)
+        {
+            // TODO extend view frustum Z
+            for (int i = 0; i < 8; i++)
+            {
+                if (corners[i].z() < nearZ)
+                    nearZ = corners[i].z();
+                if (corners[i].z() > farZ);
+                    farZ = corners[i].z();
+            }
+        }
+    }
+    */
+
     // TODO compute light viewprojection!
-    // TODO find any vector orthogonal to light direction
-    QMatrix4x4 lightView;
-    lightView.ortho(-10, 10, -10, 10, -5, 5);
-    lightView.lookAt(scene->getDirectionalLightDirection().normalized(), QVector3D(0, 0, 0), QVector3D(1, 1, 0));
+    QMatrix4x4 lightViewProjection;
+    lightViewProjection.ortho(-10, 10, -10, 10, -5, 5);
+
+    // TODO rotate light direction to -z
+
+    // 1. cross product -> rotation axis
+    // 2. scalar product -> angle
+
+    QVector3D sourceDir = scene->getDirectionalLightDirection().normalized();
+    QVector3D targetDir = QVector3D(0., 0., 1.);
+
+    QVector3D lightRotationAxis = QVector3D::crossProduct(sourceDir, targetDir);
+    float lightRotationAngle = std::acos(QVector3D::dotProduct(sourceDir, targetDir))*180./M_PI;
+
+    QMatrix4x4 lightViewRotation;
+    lightViewRotation.rotate(lightRotationAngle, lightRotationAxis);
+
+    auto lightView = lightViewProjection * lightViewRotation;
 
     m_shadowMapProgram.bind();
 
@@ -304,9 +411,6 @@ void Renderer::resize(int width, int height)
     f->glDeleteFramebuffers(1, &m_renderFrameBuffer);
     f->glDeleteTextures(1, &m_renderTexture);
     f->glDeleteRenderbuffers(1, &m_renderDepthBuffer);
-
-    // hm
-    // glViewport(0, 0, width, height);
 
     // Create texture
     f->glGenTextures(1, &m_renderTexture);
