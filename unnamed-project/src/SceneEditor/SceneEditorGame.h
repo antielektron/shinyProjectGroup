@@ -6,6 +6,7 @@
 #include "IGame.h"
 #include "Scene/Scene.h"
 #include "KeyManager.h"
+#include "Scene/Model.h"
 
 class ObjectBase;
 class ObjectGroup;
@@ -59,6 +60,8 @@ Q_SIGNALS:
     void sceneReloaded();
 
 private:
+    void createIndicatorObject();
+
     std::unique_ptr<Scene> m_scene;
 
     ObjectBase *m_currentObject;
@@ -77,6 +80,9 @@ private:
     bool m_initialized;
 
 	void updatePosMatrix(QVector3D deltaPos);
+
+    std::unique_ptr<Model> m_indicatorModel;
+    std::unique_ptr<Object> m_indicatorObject;
 
 };
 

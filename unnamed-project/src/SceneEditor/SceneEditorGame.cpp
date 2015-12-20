@@ -215,6 +215,13 @@ ObjectGroup *SceneEditorGame::createObjectGroup(const std::string &name, ObjectG
     return objGrp;
 }
 
+//------------------------------------------------------------------------------
+void SceneEditorGame::createIndicatorObject()
+{
+    m_indicatorModel.reset(new Model("models/editorIndicator"));
+    m_indicatorObject.reset(new Object(m_indicatorModel.get()));
+}
+
 void SceneEditorGame::onCurrentObjectChanged(ObjectBase * object)
 {
 	m_currentObject = object;

@@ -3,7 +3,11 @@
 
 #include <QVector3D>
 #include <QString>
+#include <string>
 #include <QMatrix4x4>
+#include <map>
+#include <QVariant>
+#include "smartiterator.h"
 
 class ObjectGroup;
 
@@ -12,7 +16,8 @@ enum class ObjectType
 {
     Undefined,
     ObjectGroup,
-    Object
+    Object,
+    EditorObject
 };
 
 class ObjectBase
@@ -43,9 +48,14 @@ public:
     // destroys itself
     void destroy();
 
+    void addProperty(const std::string &key, QVariant value);
+    const QVariant &getProperty(const std::string &key);
+    typedef std::map<std::string, QVariant>::iterator PropertiesIteratorType;
+    range<PropertiesIteratorType> getProperties();
     virtual ObjectType getObjectType();
 
 protected:
+
     ObjectGroup *m_parent;
 
     QVector3D m_position;
@@ -55,6 +65,9 @@ protected:
     QMatrix4x4 m_world;
 
     QString m_name;
+
+    std::map<std::string, QVariant> m_properties;
+
 };
 
 #endif // UNNAMED_PROJECT_SCENE_OBJECT_BASE_H
