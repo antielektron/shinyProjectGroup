@@ -400,9 +400,30 @@ ObjectGroup *Scene::createObjectGroup(const std::string &name, ObjectGroup *pare
 }
 
 //------------------------------------------------------------------------------
+EditorObject *Scene::createEditorObject(const std::string &modelName)
+{
+    assert(m_models.find(modelName) != m_models.end());
+    Model *model = m_models[modelName].get();
+
+    EditorObject *object = new EditorObject(model);
+    object->setName(QString::fromStdString(modelName));
+
+    m_editorObjectRootGroup.addObject(
+                std::unique_ptr<Object>(object));
+
+    return object;
+}
+
+//------------------------------------------------------------------------------
 range<Scene::ObjectIterator> Scene::getObjects()
 {
     return range<ObjectIterator>(m_objects.cbegin(),m_objects.cend());
+}
+
+//------------------------------------------------------------------------------
+range<ObjectGroup::object_iterator_type> Scene::getEditorObjects()
+{
+    return m_editorObjectRootGroup.getObjects();
 }
 
 //------------------------------------------------------------------------------

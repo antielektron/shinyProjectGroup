@@ -1,6 +1,7 @@
 #include "SceneEditor/SceneEditorGame.h"
 #include "Scene/Object.h"
 #include "Scene/ObjectGroup.h"
+#include <cmath>
 
 SceneEditorGame::SceneEditorGame() : 
 		QObject(nullptr), 
@@ -24,9 +25,14 @@ void SceneEditorGame::reset(std::unique_ptr<Scene> scene)
 
     m_currentObject = nullptr;
 
+    m_time = 0;
+
     m_scene->getCamera().translate(0., 0., -10);
 
     m_scene->getSceneRoot()->updateWorld();
+
+    createIndicatorObject();
+    m_indicatorObject->makeInvisible();
 
     emit currentObjectChanged();
     emit modelsChanged();
@@ -41,8 +47,23 @@ void SceneEditorGame::resize(int width, int height)
     proj.perspective(45.0f, (float)width / height, 0.01f, 100.0f);
 }
 
-void SceneEditorGame::tick()
+void SceneEditorGame::tick(float dt)
 {
+    m_deltaTime = dt;
+    m_time += m_deltaTime;
+
+    // update indicator stuff
+    m_extraIndicatorH = (std::sin(3.0f * m_time) + 1.0f) * 0.2f * m_indicatorScale;
+    m_indicatorRotation += 90.0f * m_deltaTime;
+    if (m_indicatorRotation > 360.0f)
+    {
+        m_indicatorRotation -= 360.0f;
+    }
+
+    m_indicatorObject->getPosition()[1] = m_extraIndicatorH + m_indicatorH;
+    m_indicatorObject->getRotation()[1] = m_indicatorRotation;
+    m_indicatorObject->updateWorld();
+
 	QVector3D deltaPos(0, 0, 0);
 
 	if (!m_keyManager)
@@ -50,7 +71,7 @@ void SceneEditorGame::tick()
 
 	m_keyManager->tick();
 
-	float speed = 10. / 60;
+    float speed = 10.0f * m_deltaTime;
 
 	if (m_keyManager->shouldCatchMouse())
 	{
@@ -172,6 +193,26 @@ void SceneEditorGame::currentObjectModified(ObjectBase* object)
 {
 	// Called when a new object was selected or the current object has changed.
     m_currentObject = object;
+
+    if (object->getObjectType() != ObjectType::ObjectGroup)
+    {
+        m_indicatorObject->makeVisible();
+        QVector3D indicatorPosition = object->getAbsolutePosition();
+        Model *objModel = static_cast<Object *>(object)->getModel();
+        m_indicatorH = objModel->getCenter().y() + objModel->getRadius();
+        indicatorPosition += QVector3D(0,m_indicatorH,0);
+        m_indicatorObject->setPosition(indicatorPosition);
+        m_indicatorScale = objModel->getRadius() * 0.5f;
+        m_indicatorObject->setScaling(
+                    QVector3D(m_indicatorScale, m_indicatorScale, m_indicatorScale));
+        m_indicatorObject->updateWorld();
+        m_indicatorScale = objModel->getRadius();
+    }
+    else
+    {
+        m_indicatorObject->makeInvisible();
+    }
+
     emit currentObjectChanged();
 }
 
@@ -217,10 +258,12 @@ ObjectGroup *SceneEditorGame::createObjectGroup(const std::string &name, ObjectG
 //------------------------------------------------------------------------------
 void SceneEditorGame::createIndicatorObject()
 {
-    m_indicatorModel.reset(new Model("models/editorIndicator"));
-    m_indicatorObject.reset(new Object(m_indicatorModel.get()));
+    Model *model = new Model("models/editorIndicator.obj");
+    m_scene->addModel(std::unique_ptr<Model>(model));
+    m_indicatorObject = m_scene->createEditorObject(model->getName());
 }
 
+//------------------------------------------------------------------------------
 void SceneEditorGame::onCurrentObjectChanged(ObjectBase * object)
 {
 	m_currentObject = object;
