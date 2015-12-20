@@ -1,13 +1,16 @@
 // for glDrawBuffers
 #define GL_GLEXT_PROTOTYPES 1
+#define _USE_MATH_DEFINES
 
 #include <iostream>
+#include <cmath>
 #include <QtGui/qopenglframebufferobject.h>
 
 #include "Renderer.h"
 #include "Scene/Scene.h"
 
 #include "utility.h"
+
 
 Renderer::Renderer() :
     m_renderFrameBuffer(0),
