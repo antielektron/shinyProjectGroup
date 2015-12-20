@@ -61,6 +61,15 @@ void SceneEditorGame::tick(float dt)
         m_indicatorRotation -= 360.0f;
     }
 
+    // TODO call the following only when needed!
+    if (m_currentObject)
+    {
+        m_indicatorH = m_currentObject->getPosition()[1];
+        if (m_currentObject->getObjectType() != ObjectType::ObjectGroup)
+        {
+            m_indicatorH += static_cast<Object *>(m_currentObject)->getModel()->getRadius();
+        }
+    }
     m_indicatorObject->getPosition()[1] = m_extraIndicatorH + m_indicatorH;
     m_indicatorObject->getRotation()[1] = m_indicatorRotation;
     m_indicatorObject->updateWorld();
