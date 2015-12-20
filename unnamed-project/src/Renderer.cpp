@@ -196,37 +196,6 @@ void Renderer::render(GLuint fbo, Scene *scene)
 {
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
-    // Render to ShadowMap
-
-    // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
-    glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
-
-    f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
-    // Initialize with max depth.
-    f->glClearColor(1, 0, 0, 1);
-    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    f->glEnable(GL_DEPTH_TEST);
-
-    auto viewProjection = scene->getProjection() * scene->getCamera();
-    auto inverseViewProjection = viewProjection.inverted();
-
-    QVector4D frustumCorners[8] = {
-            {-1., -1., -1., 1.},
-            { 1., -1., -1., 1.},
-            {-1.,  1., -1., 1.},
-            { 1.,  1., -1., 1.},
-            {-1., -1.,  1., 1.},
-            { 1., -1.,  1., 1.},
-            {-1.,  1.,  1., 1.},
-            { 1.,  1.,  1., 1.}
-    };
-
-    for (int i = 0; i < 8; i++)
-    {
-        QVector4D res = inverseViewProjection * frustumCorners[i];
-        frustumCorners[i] = res / res.w();
-    }
-
     /*
     // normals after projection
     QVector4D normals[4] = {
@@ -300,14 +269,18 @@ void Renderer::render(GLuint fbo, Scene *scene)
     }
     */
 
-    // TODO compute light viewprojection!
-    QMatrix4x4 lightViewProjection;
-    lightViewProjection.ortho(-10, 10, -10, 10, -5, 5);
+    // Render to ShadowMap
+
+    // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
+    glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
+
+    f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
+    // Initialize with max depth.
+    f->glClearColor(1, 0, 0, 1);
+    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    f->glEnable(GL_DEPTH_TEST);
 
     // TODO rotate light direction to -z
-
-    // 1. cross product -> rotation axis
-    // 2. scalar product -> angle
 
     QVector3D sourceDir = scene->getDirectionalLightDirection().normalized();
     QVector3D targetDir = QVector3D(0., 0., 1.);
@@ -317,6 +290,50 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     QMatrix4x4 lightViewRotation;
     lightViewRotation.rotate(lightRotationAngle, lightRotationAxis);
+
+    // Compute viewFrustum of camera in light view
+    auto inverseViewProjection = (scene->getProjection() * scene->getCamera()).inverted();
+    auto screenToLightTransformation = lightViewRotation * inverseViewProjection;
+
+    QVector3D frustumCorners[8] = {
+            {-1., -1., -1.},
+            { 1., -1., -1.},
+            {-1.,  1., -1.},
+            { 1.,  1., -1.},
+            {-1., -1.,  1.},
+            { 1., -1.,  1.},
+            {-1.,  1.,  1.},
+            { 1.,  1.,  1.}
+    };
+
+    // TODO compute MINIMAL bounding box of frustumCorners
+    QVector3D minCorner;
+    QVector3D maxCorner;
+
+    for (int i = 0; i < 8; i++)
+    {
+        QVector4D res = screenToLightTransformation * QVector4D(frustumCorners[i], 1.);
+        frustumCorners[i] = QVector3D(res / res.w());
+
+        if (i == 0)
+        {
+            minCorner = maxCorner = frustumCorners[i];
+        }
+        else
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                if (minCorner[j] > frustumCorners[i][j])
+                    minCorner[j] = frustumCorners[i][j];
+                if (maxCorner[j] < frustumCorners[i][j])
+                    maxCorner[j] = frustumCorners[i][j];
+            }
+        }
+    }
+
+    // compute light viewprojection
+    QMatrix4x4 lightViewProjection;
+    lightViewProjection.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), minCorner.z(), maxCorner.z());
 
     auto lightView = lightViewProjection * lightViewRotation;
 
