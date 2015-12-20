@@ -7,6 +7,7 @@
 #include "SceneEditor/ObjectDetailsWidget.h"
 #include "SceneEditor/ObjectListWidget.h"
 #include "SceneEditor/ModelListWidget.h"
+#include "SceneEditor/GlobalDetailsWidget.h"
 
 #include "Scene/Model.h"
 
@@ -30,6 +31,7 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     m_objectDetails = new ObjectDetailsWidget(m_game, this);
     m_objectList = new ObjectListWidget(m_game, this);
     m_modelList = new ModelListWidget(m_game, this);
+    m_globalDetails = new GlobalDetailsWidget(m_game, this);
 
     m_objectDetailsDock = new QDockWidget("Object Details", this);
     m_objectDetailsDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
@@ -43,9 +45,15 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     m_modelListDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
     m_modelListDock->setWidget(m_modelList);
 
+    m_globalDetailsDock = new QDockWidget("Global Details", this);
+    m_globalDetailsDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+    m_globalDetailsDock->setWidget(m_globalDetails);
+
+
     this->addDockWidget(Qt::LeftDockWidgetArea, m_objectDetailsDock);
     this->addDockWidget(Qt::RightDockWidgetArea, m_objectListDock);
     this->addDockWidget(Qt::RightDockWidgetArea, m_modelListDock);
+    this->addDockWidget(Qt::LeftDockWidgetArea, m_globalDetailsDock);
 
     createActions();
     createToolbar();

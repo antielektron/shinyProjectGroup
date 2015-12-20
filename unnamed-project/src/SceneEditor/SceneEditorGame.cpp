@@ -31,6 +31,7 @@ void SceneEditorGame::reset(std::unique_ptr<Scene> scene)
     emit currentObjectChanged();
     emit modelsChanged();
     emit objectsChanged();
+	emit sceneChanged();
     emit sceneReloaded();
 }
 
@@ -218,4 +219,3 @@ void SceneEditorGame::onCurrentObjectChanged(ObjectBase * object)
 {
 	m_currentObject = object;
 }
-

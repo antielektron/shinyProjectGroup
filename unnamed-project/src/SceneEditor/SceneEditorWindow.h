@@ -16,6 +16,7 @@ class SceneEditorGame;
 class ObjectDetailsWidget;
 class ObjectListWidget;
 class ModelListWidget;
+class GlobalDetailsWidget;
 
 class ObjectBase;
 class Model;
@@ -61,6 +62,9 @@ private:
 
     QDockWidget *m_modelListDock;
     ModelListWidget *m_modelList;
+
+    QDockWidget *m_globalDetailsDock;
+    GlobalDetailsWidget *m_globalDetails;
 
     std::shared_ptr<SceneEditorGame> m_game;
 

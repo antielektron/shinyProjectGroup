@@ -52,9 +52,10 @@ public slots:
 
 
 Q_SIGNALS:
-    void currentObjectChanged();
+    void currentObjectChanged(); // TODO with argument!
     void modelsChanged();
     void objectsChanged();
+	void sceneChanged(); // emited when "global information" has changed
     void sceneReloaded();
 
 private:
