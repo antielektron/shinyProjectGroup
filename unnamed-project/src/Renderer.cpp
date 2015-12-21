@@ -283,8 +283,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     f->glEnable(GL_DEPTH_TEST);
 
-    // TODO rotate light direction to -z
-
+    // Rotate light direction to z
     QVector3D sourceDir = scene->getDirectionalLightDirection().normalized();
     QVector3D targetDir = QVector3D(0., 0., 1.);
 
@@ -334,9 +333,9 @@ void Renderer::render(GLuint fbo, Scene *scene)
         }
     }
 
-    // compute light viewprojection
+    // Compute light viewprojection
     QMatrix4x4 lightViewProjection;
-    lightViewProjection.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), minCorner.z(), maxCorner.z());
+    lightViewProjection.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z()); // TODO find out why near/far plane are so?
 
     auto lightView = lightViewProjection * lightViewRotation;
 
@@ -344,7 +343,6 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     for (auto &object : scene->getObjects())
     {
-        // TODO
         auto lightModelView = lightView * object->getWorld();
 
         m_shadowMapProgram.setUniformValue(m_shadowMapLightViewMatrixLoc, lightModelView);
