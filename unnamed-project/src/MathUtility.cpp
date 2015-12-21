@@ -22,8 +22,8 @@ void mathUtility::getMinimalBoundingBox(
 
     for (size_t i = 0; i < points.size(); i++)
     {
-        QVector2D dP = points[i +1 >= points.size() ? 0 : i] - points[i];
-        alphas.push_back(getAngle(QVector2D(0.f,0.f), dP));
+        QVector2D dP = points[i +1 >= points.size() ? 0 : i + 1] - points[i];
+        alphas.push_back(getAngle(QVector2D(0.f,1.f), dP));
     }
 
     for (float alpha : alphas)
