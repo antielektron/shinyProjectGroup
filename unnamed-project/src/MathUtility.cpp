@@ -81,7 +81,7 @@ void mathUtility::getMinimalBoundingBox(
 
     }
 
-    rotation = -bestAlpha;
+    rotation = bestAlpha;
     lowerPoint = bestLowerPoint;
     upperPoint = bestUpperPoint;
 
