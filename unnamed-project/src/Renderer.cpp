@@ -272,16 +272,6 @@ void Renderer::render(GLuint fbo, Scene *scene)
     }
     */
 
-    // Render to ShadowMap
-
-    // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
-    glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
-
-    f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
-    // Initialize with max depth.
-    f->glClearColor(1, 0, 0, 1);
-    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    f->glEnable(GL_DEPTH_TEST);
 
     // Rotate light direction to z
     QVector3D sourceDir = scene->getDirectionalLightDirection().normalized();
@@ -333,11 +323,29 @@ void Renderer::render(GLuint fbo, Scene *scene)
         }
     }
 
-    // Compute light viewprojection
+    // Compute light view projection
     QMatrix4x4 lightViewProjection;
     lightViewProjection.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z()); // TODO find out why near/far plane are so?
 
-    auto lightView = lightViewProjection * lightViewRotation;
+    QMatrix4x4 lightView = lightViewProjection * lightViewRotation;
+
+
+    // Light direction from camera's perspective
+    auto lightDirection = scene->getCamera() * QVector4D(scene->getDirectionalLightDirection(), 0.);
+    lightDirection.setW(1.);
+
+
+
+    // Render to ShadowMap
+
+    // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
+    glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
+
+    f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
+    // Initialize with max depth.
+    f->glClearColor(1, 0, 0, 1);
+    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    f->glEnable(GL_DEPTH_TEST);
 
     m_shadowMapProgram.bind();
 
@@ -353,11 +361,12 @@ void Renderer::render(GLuint fbo, Scene *scene)
     m_shadowMapProgram.release();
 
 
+
+    // Render to Texture
+
     // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
     glViewport(0, 0, m_width, m_height);
 
-
-    // Render to Texture
     f->glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
     f->glClearColor(0, 0, 0, 1);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -366,17 +375,15 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     m_program->bind();
 
-    auto lightDir = scene->getCamera() * QVector4D(scene->getDirectionalLightDirection(), 0.);
-    lightDir.setW(1.);
-
     m_program->setUniformValue(m_projectionMatrixLoc, scene->getProjection());
-    m_program->setUniformValue(m_lightDirectionLoc, QVector3D(lightDir));
+    m_program->setUniformValue(m_lightDirectionLoc, QVector3D(lightDirection));
     m_program->setUniformValue(m_lightColorLoc, scene->getLightColor());
 
     // Bind shadow map
     f->glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
     m_program->setUniformValue(m_shadowMapSamplerLoc, 0);
 
+    // Render regular objects
     for (auto &object : scene->getObjects())
     {
         auto cameraModelView = scene->getCamera() * object->getWorld();
@@ -391,6 +398,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
         object->getModel()->draw();
     }
 
+    // Render debug objects
     for (auto editorObject : scene->getEditorObjects())
     {
         if (!(static_cast<EditorObject *>(editorObject)->isVisible()))
@@ -415,7 +423,9 @@ void Renderer::render(GLuint fbo, Scene *scene)
     m_program->release();
 
 
+
     // Render to Screen
+
     f->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     f->glClearColor(0, 0, 0, 1);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
