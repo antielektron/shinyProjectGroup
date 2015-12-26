@@ -1,6 +1,19 @@
 #include "MathUtility.h"
 #include <climits>
+#include <cmath>
+#include <cassert>
 #include <QMatrix2x2>
+
+//DEBUG
+#include <iostream>
+
+struct AngleComparator{
+    inline bool operator()(const std::pair<QVector2D, float> &a,
+              const std::pair<QVector2D, float> &b)
+    {
+        return a.second < b.second;
+    }
+};
 
 void mathUtility::getMinimalBoundingBox(
         const std::vector<QVector2D> &points,
@@ -23,7 +36,7 @@ void mathUtility::getMinimalBoundingBox(
     for (size_t i = 0; i < points.size(); i++)
     {
         QVector2D dP = points[i +1 >= points.size() ? 0 : i + 1] - points[i];
-        alphas.push_back(getAngle(QVector2D(0.f,1.f), dP));
+        alphas.push_back(std::atan2(dP[1], dP[0]));
     }
 
     for (float alpha : alphas)
@@ -88,10 +101,109 @@ void mathUtility::getMinimalBoundingBox(
 }
 
 //------------------------------------------------------------------------------
-float mathUtility::getAngle(const QVector2D &a, const QVector2D &b)
+// helper Funktion:
+inline float T(const QVector2D &a, const QVector2D &b, const QVector2D &c)
 {
-    float sinTheta = std::fabs(a[0] * b[1] - a[1] * b[0])/(a.length() * b.length());
-    return std::asin(sinTheta);
+    return (b[0] - a[0])*(c[1] - a[1]) - (c[0] - a[0])*(b[1] - a[1]);
+}
+
+void mathUtility::getConvexHull(const std::vector<QVector2D> &points,
+                                std::vector<QVector2D> &hull)
+{
+    assert(points.size() > 2);
+
+    // Graham scan implementation
+    hull.clear();
+
+    float yMin = std::numeric_limits<float>::max();
+    float y2ndMin = yMin;
+
+    QVector2D minPoint;
+    std::vector<std::pair<QVector2D, float>> listWithAngles;
+
+    // get lowest point on y-axis.
+    // if there are more than one,
+    // take the one with minimal x-coordinate
+
+    for (auto &p : points)
+    {
+        if (p[1] < yMin)
+        {
+            y2ndMin = yMin;
+            yMin = p[1];
+            minPoint = p;
+        }
+    }
+
+    if (y2ndMin < yMin + EPSILON)
+    {
+        float xMin = minPoint[0];
+        for (auto &p : points)
+        {
+            if (p[1] < yMin + EPSILON && p[0] < xMin)
+            {
+                xMin = p[0];
+                minPoint = p;
+            }
+        }
+    }
+
+    // calculate angles for comparators
+    for (auto &p : points)
+    {
+        if (!isInEps(p,minPoint))
+        {
+            float alpha = std::atan2(p[1] - minPoint[1],
+                                     p[0] - minPoint[0]);
+            listWithAngles.push_back(std::make_pair(p, alpha));
+        }
+    }
+
+    typedef std::vector<std::pair<QVector2D, float>>::iterator
+            angleListIterator;
+
+    // sort listWithAngles
+    std::sort<angleListIterator, AngleComparator>(listWithAngles.begin(),
+                                                  listWithAngles.end(),
+                                                  AngleComparator());
+
+    if (listWithAngles.size() == 0)
+    {
+        // all points are in the same epsilon environment
+        hull.push_back(minPoint);
+        return;
+    }
+
+    // graham-scan:
+    hull.push_back(minPoint);
+    for (auto &pair : listWithAngles)
+    {
+        auto &pk = pair.first;
+        std::cout << "Processing point "
+                  << pk[0] << " -- " << pk[1]
+                  << std::endl;
+        while (hull.size() > 1)
+        {
+            size_t hSize = hull.size();
+            float t = T(hull[hSize - 2], hull[hSize - 1], pk);
+
+            if (t > 0) // pk is on the left side of p[hSize-2] → p[hSize-1]
+            {
+                break;
+            }
+            else
+            {
+                std::cout << "\tremove point : "
+                          << hull[hSize-1][0]
+                          << " -- "
+                          << hull[hSize-1][1]
+                          << std::endl;
+                hull.pop_back();
+            }
+        }
+        hull.push_back(pk);
+    }
+
 }
 
 //------------------------------------------------------------------------------
