@@ -4,9 +4,6 @@
 #include <cassert>
 #include <QMatrix2x2>
 
-//DEBUG
-#include <iostream>
-
 struct AngleComparator{
     inline bool operator()(const std::pair<QVector2D, float> &a,
               const std::pair<QVector2D, float> &b)
@@ -179,9 +176,6 @@ void mathUtility::getConvexHull(const std::vector<QVector2D> &points,
     for (auto &pair : listWithAngles)
     {
         auto &pk = pair.first;
-        std::cout << "Processing point "
-                  << pk[0] << " -- " << pk[1]
-                  << std::endl;
         while (hull.size() > 1)
         {
             size_t hSize = hull.size();
@@ -193,11 +187,6 @@ void mathUtility::getConvexHull(const std::vector<QVector2D> &points,
             }
             else
             {
-                std::cout << "\tremove point : "
-                          << hull[hSize-1][0]
-                          << " -- "
-                          << hull[hSize-1][1]
-                          << std::endl;
                 hull.pop_back();
             }
         }
