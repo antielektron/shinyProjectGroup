@@ -84,25 +84,25 @@ void SceneEditorGame::tick(float dt)
 
 	if (m_keyManager->shouldCatchMouse())
 	{
-		rotX += m_keyManager->getRelativeY() * .1;
-		rotY += m_keyManager->getRelativeX() * .1;
+		m_rotX += m_keyManager->getRelativeY() * .1;
+		m_rotY += m_keyManager->getRelativeX() * .1;
 	}
 
 	if (m_keyManager->isKeyPressed(Qt::Key_Right))
 	{
-		rotY += 0.5;
+		m_rotY += 0.5;
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_Left))
 	{
-		rotY -= 0.5;
+		m_rotY -= 0.5;
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_Up))
 	{
-		rotX += 0.5;
+		m_rotX += 0.5;
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_Down))
 	{
-		rotX -= 0.5;
+		m_rotX -= 0.5;
 	}
 	if (m_keyManager->isKeyPressed(Qt::Key_S))
 	{
@@ -124,11 +124,11 @@ void SceneEditorGame::tick(float dt)
 	{
 		deltaPos += QVector3D(0, speed, 0);
 	}
-	
 	if (m_keyManager->isKeyPressed(Qt::Key_Shift) || m_keyManager->isKeyPressed(Qt::Key_Z) || m_keyManager->isKeyPressed(Qt::Key_Y))
 	{
 		deltaPos += QVector3D(0, -speed, 0);
 	}
+
 	if (m_keyManager->isKeyPressed(Qt::Key_T))
 	{
 		if (m_currentObject)
@@ -141,14 +141,14 @@ void SceneEditorGame::tick(float dt)
 	if (m_keyManager->isKeyPressed(Qt::Key_R))
 	{
 		m_position = QVector3D(0, 0, 0);
-		rotX = 0;
-		rotY = 0;
+		m_rotX = 0;
+		m_rotY = 0;
 	}
 
-	if (rotX > 90.f)
-		rotX = 90.f;
-	if (rotX < -90.f)
-		rotX = -90.f;
+	if (m_rotX > 90.f)
+		m_rotX = 90.f;
+	if (m_rotX < -90.f)
+		m_rotX = -90.f;
 
 	updatePosMatrix(deltaPos);
 
@@ -177,8 +177,8 @@ void SceneEditorGame::updatePosMatrix(QVector3D deltaPos)
 	QMatrix4x4 xRotation;
 	QMatrix4x4 yRotation;
 
-	xRotation.rotate(rotX, 1, 0, 0);
-	yRotation.rotate(rotY, 0, 1, 0);
+	xRotation.rotate(m_rotX, 1, 0, 0);
+	yRotation.rotate(m_rotY, 0, 1, 0);
 	translation.translate(-1 * m_position);
 
 	QMatrix4x4 rotation = xRotation * yRotation;

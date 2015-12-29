@@ -64,14 +64,10 @@ private:
 
     ObjectBase *m_currentObject;
 
-	float rotY = 0;
-	float rotX = 0;
-	float pos_height = 0;
-
-
 	QVector3D m_position;
-	QVector3D m_centre;
-	QMatrix4x4 posMatrix;
+
+	float m_rotY = 0;
+	float m_rotX = 0;
 
 	bool m_wasEscDown;
 
