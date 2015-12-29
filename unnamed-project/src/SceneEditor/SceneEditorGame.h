@@ -27,10 +27,6 @@ public:
 
     virtual Scene *getScene() override;
 
-    virtual void setKeyManager(KeyManager *keyManager) override;
-
-    virtual bool isInitialized() override;
-
 	void reset(std::unique_ptr<Scene> scene);
 
 	ObjectGroup *getRootObject();
@@ -77,9 +73,7 @@ private:
 	QVector3D m_centre;
 	QMatrix4x4 posMatrix;
 
-	KeyManager *m_keyManager;
 	bool m_wasEscDown;
-    bool m_initialized;
 
 	void updatePosMatrix(QVector3D deltaPos);
 
@@ -90,8 +84,6 @@ private:
     float m_extraIndicatorH;
     float m_indicatorRotation;
     float m_indicatorScale;
-
-
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_GAME_H

@@ -6,7 +6,8 @@
 
 OpenGLWidget::OpenGLWidget(QWidget *parent) :
     QOpenGLWidget(parent),
-    m_renderer(new Renderer())
+    m_renderer(new Renderer()),
+    m_initialized(false)
 {
     // enformce opengl version
     // QSurfaceFormat format;
@@ -29,7 +30,8 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) :
 OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
     QOpenGLWidget(parent),
     m_renderer(new Renderer()),
-    m_game(std::move(game))
+    m_game(std::move(game)),
+    m_initialized(false)
 {
     // render as fast as possible!
     m_timer.setInterval(16); // ~60fps
@@ -48,8 +50,15 @@ OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
 void OpenGLWidget::setGame(std::shared_ptr<IGame> game)
 {
     m_game = std::move(game);
+
 	m_keyManager = std::unique_ptr<KeyManager>(new KeyManager());
 	m_game->setKeyManager(m_keyManager.get());
+
+    if (m_initialized)
+    {
+        // TODO makeCurrent!
+        m_game->initialize();
+    }
 }
 
 void OpenGLWidget::setRenderer(std::unique_ptr<IRenderer> renderer)
@@ -66,13 +75,13 @@ void OpenGLWidget::initializeGL()
 {
     connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &OpenGLWidget::cleanup);
 
+    m_initialized = true;
+
     m_renderer->initialize();
     m_game->initialize();
 
     auto version = context()->format().version();
     std::cout << "Using OpenGL Version " << version.first << "." << version.second << std::endl;
-
-    emit glInitEvent();
 }
 
 void OpenGLWidget::paintGL()

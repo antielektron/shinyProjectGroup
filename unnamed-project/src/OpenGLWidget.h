@@ -31,9 +31,6 @@ public:
 public slots:
     void cleanup();
 
-signals:
-    void glInitEvent();
-
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
@@ -47,6 +44,8 @@ protected:
 	virtual void keyReleaseEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 	 
 private:
+	bool m_initialized;
+
     std::shared_ptr<IGame> m_game;
     std::unique_ptr<IRenderer> m_renderer;
 	std::unique_ptr<KeyManager> m_keyManager;

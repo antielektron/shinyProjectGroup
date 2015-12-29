@@ -11,16 +11,12 @@ class PrimitiveGame : public IGame
 {
 public:
 	PrimitiveGame();
+
     virtual void initialize() override;
     virtual void resize(int width, int height) override;
     virtual void tick(float dt = 1.0f/60.0f) override;
 
     virtual Scene *getScene() override;
-
-	virtual void setKeyManager(KeyManager *keymanager) override;
-
-    virtual bool isInitialized();
-	
 
 private:
     std::unique_ptr<Scene> m_scene;
@@ -38,11 +34,6 @@ private:
 	bool m_wasEscDown;
 
 	void updatePosMatrix(QVector3D deltaPos);
-
-    bool m_initialized;
-
-	
-
 };
 
 #endif // UNNAMED_PROJECT_PRIMITIVE_GAME_H

@@ -6,21 +6,26 @@
 class Scene;
 class KeyManager;
 
+// not only a plain interface anymore
 class IGame
 {
 public:
+    IGame();
     virtual ~IGame() {}
 
     // OpenGL might not be ready, while the constructor was called!
-    virtual void initialize() = 0;
+    virtual void initialize();
     virtual void resize(int width, int height) = 0;
     virtual void tick(float dt = 1.0f/60.0f) = 0;
 
     virtual Scene *getScene() = 0;
 
-	virtual void setKeyManager(KeyManager *keyManager) {}
+	void setKeyManager(KeyManager *keyManager);
+    bool isInitialized();
 
-    virtual bool isInitialized() = 0;
+protected:
+    bool m_initialized;
+    KeyManager *m_keyManager;
 };
 
 #endif // UNNAMED_PROJECT_IGAME_H

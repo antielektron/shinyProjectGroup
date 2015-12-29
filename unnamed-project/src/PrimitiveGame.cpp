@@ -3,22 +3,20 @@
 #include <iostream>
 
 PrimitiveGame::PrimitiveGame() :
-        m_keyManager(nullptr),
-        m_wasEscDown(false),
-        m_initialized(false)
+        m_wasEscDown(false)
 {
 }
 
 void PrimitiveGame::initialize()
 {
+    // call parent
+    IGame::initialize();
+
     m_scene = std::unique_ptr<Scene>(new Scene());
 
     // static camera
     m_position = QVector3D(0, 0, 5);
     updatePosMatrix(QVector3D(0,0,0));
-
-    m_initialized = true;
-
 
 
     m_scene->addModel(std::unique_ptr<Model>(new Model("models/octonorm.obj")));
@@ -131,16 +129,6 @@ void PrimitiveGame::tick(float dt)
 Scene *PrimitiveGame::getScene()
 {
     return m_scene.get();
-}
-
-void PrimitiveGame::setKeyManager(KeyManager *keyManager)
-{
-    this->m_keyManager = keyManager;
-}
-
-bool PrimitiveGame::isInitialized()
-{
-    return m_initialized;
 }
 
 void PrimitiveGame::updatePosMatrix(QVector3D deltaPos) 

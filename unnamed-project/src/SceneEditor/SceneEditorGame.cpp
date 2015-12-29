@@ -6,14 +6,15 @@
 
 SceneEditorGame::SceneEditorGame() : 
 		QObject(nullptr), 
-		m_currentObject(nullptr),
-        m_keyManager(nullptr),
-        m_initialized(false)
+		m_currentObject(nullptr)
 {
 }
 
 void SceneEditorGame::initialize()
 {
+	// call parent
+	IGame::initialize();
+
     // Load a test level by default or empty scene
     reset(std::unique_ptr<Scene>(new Scene("level/test.xml")));
 }
@@ -21,8 +22,6 @@ void SceneEditorGame::initialize()
 void SceneEditorGame::reset(std::unique_ptr<Scene> scene)
 {
     m_scene = std::move(scene);
-
-    m_initialized = true;
 
     m_currentObject = nullptr;
 
@@ -164,16 +163,6 @@ void SceneEditorGame::tick(float dt)
 Scene *SceneEditorGame::getScene()
 {
     return m_scene.get();
-}
-
-void SceneEditorGame::setKeyManager(KeyManager *keyManager)
-{
-	this->m_keyManager = keyManager;
-}
-
-bool SceneEditorGame::isInitialized()
-{
-    return m_initialized;
 }
 
 ObjectGroup *SceneEditorGame::getRootObject()
