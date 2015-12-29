@@ -180,8 +180,6 @@ void BulletGame::handleInput(float deltaTime)
     // auto worldVelocity = QVector3D(m_scene->getCamera().transposed() * QVector4D(velocity, 0.));
     // m_position += worldVelocity * deltaTime;
 
-    m_playerBody->set
-
     m_playerBody->setLinearVelocity(toBulletVector3(worldVelocity));
     m_playerBody->activate(true);
 
