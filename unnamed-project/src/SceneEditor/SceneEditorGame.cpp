@@ -39,7 +39,6 @@ void SceneEditorGame::reset(std::unique_ptr<Scene> scene)
     emit modelsChanged();
     emit objectsChanged();
 	emit sceneChanged();
-    emit sceneReloaded();
 }
 
 void SceneEditorGame::resize(int width, int height)
@@ -200,7 +199,7 @@ void SceneEditorGame::updatePosMatrix(QVector3D deltaPos)
 	camera = rotation * translation;
 }
 
-void SceneEditorGame::currentObjectModified(ObjectBase* object)
+void SceneEditorGame::notifyCurrentObjectChanged(ObjectBase *object)
 {
 	// Called when a new object was selected or the current object has changed.
     m_currentObject = object;
@@ -225,6 +224,11 @@ void SceneEditorGame::currentObjectModified(ObjectBase* object)
     }
 
     emit currentObjectChanged();
+}
+
+ObjectBase *SceneEditorGame::getCurrentObject()
+{
+	return m_currentObject;
 }
 
 void SceneEditorGame::getModels(std::vector<Model *> &models)
@@ -254,7 +258,7 @@ void SceneEditorGame::removeModel(const std::string &modelName)
 
 Object *SceneEditorGame::createObject(const std::string &modelName, ObjectGroup *parent)
 {
-    Object *obj = m_scene->createObject(modelName, parent);
+	Object *obj = m_scene->createObject(modelName, parent);
     emit objectsChanged();
     return obj;
 }
@@ -272,10 +276,4 @@ void SceneEditorGame::createIndicatorObject()
     Model *model = new Model("models/editorIndicator.obj");
     m_scene->addModel(std::unique_ptr<Model>(model));
     m_indicatorObject = m_scene->createEditorObject(model->getName());
-}
-
-//------------------------------------------------------------------------------
-void SceneEditorGame::onCurrentObjectChanged(ObjectBase * object)
-{
-	m_currentObject = object;
 }

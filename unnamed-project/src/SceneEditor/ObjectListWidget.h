@@ -19,7 +19,6 @@ class ObjectListWidget : public QWidget
 public:
     ObjectListWidget(std::shared_ptr<SceneEditorGame>, SceneEditorWindow *parent);
     virtual ~ObjectListWidget();
-    ObjectBase *getCurrentObject();
 
 public slots:
 
@@ -36,7 +35,6 @@ public slots:
     void onRemoveClick();
 
 signals:
-    void currentObjectChanged(ObjectBase *object);
     void updateSceneObjectsRequest();
 
 private:

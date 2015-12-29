@@ -16,8 +16,6 @@ ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, SceneE
     m_game(game),
     m_parent(parent)
 {
-    m_currentObject = nullptr; //maybe should be set to root by default
-
     this->setLayout(new QVBoxLayout(this));
 
     m_treeView = new QTreeView(this);
@@ -51,23 +49,17 @@ ObjectListWidget::~ObjectListWidget()
 }
 
 //------------------------------------------------------------------------------
-ObjectBase *ObjectListWidget::getCurrentObject()
-{
-    return m_currentObject;
-}
-
-//------------------------------------------------------------------------------
 void ObjectListWidget::updateModelTree()
 {
     if (m_game->isInitialized())
     {
-
         ObjectGroup *root = m_game->getRootObject();
         assert(root);
         m_treeModel = new TreeModel(root, this);
         m_treeView->setModel(m_treeModel);
     }
-    else{
+    else
+    {
         //TODO: maybe a default root?
     }
 }
@@ -76,7 +68,7 @@ void ObjectListWidget::updateModelTree()
 void ObjectListWidget::setCurrentObject(const QModelIndex &index)
 {
     m_currentObject = m_treeModel->getGameObject(index);
-    emit currentObjectChanged(m_currentObject);
+    m_game->notifyCurrentObjectChanged(m_currentObject);
 
     //debug output
     std::cout << "Current Object changed to: "
@@ -114,15 +106,12 @@ void ObjectListWidget::onAddObjectClick()
 
         // check if selected object is an objectGroup.
         // in this case we create the object as it's child
-        if (m_currentObject)
+        if (m_currentObject && m_currentObject->getObjectType() == ObjectType::ObjectGroup)
         {
-            if (m_currentObject->getObjectType() == ObjectType::ObjectGroup)
-            {
-                // downcasting ObjectBase to ObjectGroup
-                parent = static_cast<ObjectGroup *>(m_currentObject);
-            }
+            parent = static_cast<ObjectGroup *>(m_currentObject);
         }
-        m_game->createObject(model->getName(),parent)->setName(objectName);
+
+        m_game->createObject(model->getName(), parent)->setName(objectName);
         updateModelTree();
     }
 }

@@ -19,9 +19,8 @@ GlobalDetailsWidget::GlobalDetailsWidget(std::shared_ptr<SceneEditorGame> game, 
 
     this->setLayout(m_layout);
 
-    // register at game
-    connect(m_game.get(), SIGNAL(sceneChanged()),
-            this, SLOT(sceneChanged()));
+    // register at game (done in Window)
+    // connect(m_game.get(), SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
 }
 
 //------------------------------------------------------------------------------

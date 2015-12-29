@@ -34,8 +34,9 @@ public:
 	void reset(std::unique_ptr<Scene> scene);
 
 	ObjectGroup *getRootObject();
+    ObjectBase *getCurrentObject();
 
-    //wrapper stuff
+    // wrapper stuff
     void getModels(std::vector<Model *> &models);
 
     Model *getModelByName(const std::string &modelName);
@@ -43,22 +44,16 @@ public:
     void addModel(std::unique_ptr<Model> model);
     void removeModel(const std::string &modelName);
 
-	void currentObjectModified(ObjectBase* object);
+	void notifyCurrentObjectChanged(ObjectBase *object);
 
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
-public slots:
-	void onCurrentObjectChanged(ObjectBase * object);
-
-
-
 Q_SIGNALS:
-    void currentObjectChanged(); // TODO with argument!
+    void currentObjectChanged();
     void modelsChanged();
     void objectsChanged();
 	void sceneChanged(); // emited when "global information" has changed
-    void sceneReloaded();
 
 private:
     void createIndicatorObject();

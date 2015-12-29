@@ -117,11 +117,11 @@ void SceneEditorWindow::createToolbar()
 //------------------------------------------------------------------------------
 void SceneEditorWindow::connectStuff()
 {
-    connect(m_objectList, SIGNAL(currentObjectChanged(ObjectBase*)),
-            m_objectDetails, SLOT(currentObjectChanged(ObjectBase*)));
-
     connect(m_game.get(), SIGNAL(modelsChanged()),
             m_objectDetails, SLOT(modelsChanged()));
+
+    connect(m_game.get(), SIGNAL(currentObjectChanged()),
+            m_objectDetails, SLOT(currentObjectChanged()));
 
     connect(m_game.get(), SIGNAL(objectsChanged()),
             m_objectList, SLOT(updateModelTree()));
@@ -131,9 +131,6 @@ void SceneEditorWindow::connectStuff()
 
     connect(m_objectList, SIGNAL(updateSceneObjectsRequest()),
             this, SLOT(onUpdateSceneObjectsRequest()));
-
-	connect(m_objectDetails, SIGNAL(currentObjectChanged(ObjectBase *)),
-		m_game.get(), SLOT(onCurrentObjectChanged(ObjectBase *)));
 
     //connect Actions:
     connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
@@ -145,7 +142,7 @@ void SceneEditorWindow::connectStuff()
 void SceneEditorWindow::loadScene()
 {
     QString filename = QFileDialog::getOpenFileName(this,
-                                                    tr("open Level"),
+                                                    tr("Open Level"),
                                                     ".",
                                                     tr("Xml files (*.xml)"));
     if (filename.length() > 0)

@@ -26,7 +26,8 @@ public:
 
 public slots:
     void modelsChanged();
-    void currentObjectChanged(ObjectBase *object);
+    void currentObjectChanged();
+
     void applyValues();
 
 private:

@@ -29,8 +29,7 @@ ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, 
     m_scaleY = createNumericField("scale y");
     m_scaleZ = createNumericField("scale z");
 
-    connect(m_modelSelection, SIGNAL(currentTextChanged(QString)),
-            this, SLOT(applyValues()));
+    connect(m_modelSelection, SIGNAL(currentTextChanged(QString)), this, SLOT(applyValues()));
 
     // Material?
 
@@ -67,30 +66,36 @@ void ObjectDetailsWidget::modelsChanged()
 }
 
 //------------------------------------------------------------------------------
-void ObjectDetailsWidget::currentObjectChanged(ObjectBase *object)
+void ObjectDetailsWidget::currentObjectChanged()
 {
     // New current object from game
-    m_currentObject = object;
+    m_currentObject = m_game->getCurrentObject();
 
     m_objectPropertiesLocked = true;
 
+    if (m_currentObject == nullptr)
+    {
+        // TODO disable UI
+        return;
+    }
+
     // Update widgets:
-    switch (object->getObjectType())
+    switch (m_currentObject->getObjectType())
     {
     case ObjectType::Object:
     {
-        updateCurrentObject(static_cast<Object *>(object));
+        updateCurrentObject(static_cast<Object *>(m_currentObject));
         break;
     }
     case ObjectType::ObjectGroup:
     {
-        updateCurrentObjectGroup(static_cast<ObjectGroup *>(object));
+        updateCurrentObjectGroup(static_cast<ObjectGroup *>(m_currentObject));
         break;
     }
     default:
     {
         // Should not happen, just in case..
-        updateCurrentObjectBase(object);
+        updateCurrentObjectBase(m_currentObject);
     }
     }
 
@@ -124,7 +129,7 @@ void ObjectDetailsWidget::applyValues()
     }
     }
 
-    m_game->currentObjectModified(m_currentObject);
+    m_game->notifyCurrentObjectChanged(m_currentObject);
 }
 
 //------------------------------------------------------------------------------
