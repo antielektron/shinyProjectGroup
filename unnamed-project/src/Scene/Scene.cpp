@@ -113,8 +113,6 @@ void Scene::readObjectTreeFromDom(ObjectGroup *root, const QDomElement &domEleme
             QString name = child.attribute("name", "unnamedObject");
             QString modelName = child.attribute("model","");
 
-            std::cout << name.toStdString() << " " << modelName.toStdString() << std::endl;
-
             auto object = createObject(modelName.toStdString(), root);
             object->setName(name);
             object->setPosition(getPositionFromDom(child));
