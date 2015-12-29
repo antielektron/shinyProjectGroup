@@ -95,6 +95,9 @@ void Scene::loadFromFile(const QString &filename)
                       << std::endl;
         }
     }
+
+    // Apply transformations to objects
+    m_rootGroup.updateWorld();
 }
 
 //------------------------------------------------------------------------------
@@ -109,6 +112,8 @@ void Scene::readObjectTreeFromDom(ObjectGroup *root, const QDomElement &domEleme
         {
             QString name = child.attribute("name", "unnamedObject");
             QString modelName = child.attribute("model","");
+
+            std::cout << name.toStdString() << " " << modelName.toStdString() << std::endl;
 
             auto object = createObject(modelName.toStdString(), root);
             object->setName(name);
