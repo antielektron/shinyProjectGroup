@@ -30,3 +30,12 @@ include_directories(${OPENGL_INCLUDE_DIRS})
 
 # Link against OpenGL
 target_link_libraries(unnamed-project ${OPENGL_LIBRARIES})
+
+
+# Try to use Bullet3
+find_package(Bullet)
+
+if (BULLET_FOUND)
+    include_directories(${BULLET_INCLUDE_DIRS})
+    target_link_libraries(unnamed-project ${BULLET_LIBRARIES})
+endif()

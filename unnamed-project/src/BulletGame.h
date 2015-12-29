@@ -1,7 +1,11 @@
 #ifndef UNNAMED_PROJECT_BULLET_GAME_H
 #define UNNAMED_PROJECT_BULLET_GAME_H
 
+#include <btBulletDynamicsCommon.h>
+#include <btBulletCollisionCommon.h>
+
 #include <QString>
+#include <QMatrix4x4>
 
 #include "IGame.h"
 
@@ -18,11 +22,29 @@ public:
 
     virtual Scene *getScene() override;
 
+private:
+    // TODO maybe public..
     void loadScene(const QString &filename);
 
-private:
+    void handleInput(float deltaTime);
+    void updateCamera();
+
     QString m_scenefile;
     std::unique_ptr<Scene> m_scene;
+
+    std::vector<btRigidBody *> m_bodies;
+    std::unique_ptr<btRigidBody> m_playerBody;
+    QVector3D m_position;
+    float m_rotX;
+    float m_rotY;
+
+    bool m_wasEscDown;
+
+    std::unique_ptr<btDefaultCollisionConfiguration> m_collisionConfiguration;
+    std::unique_ptr<btCollisionDispatcher> m_dispatcher;
+    std::unique_ptr<btBroadphaseInterface> m_broadphase; // TODO what's this
+    std::unique_ptr<btSequentialImpulseConstraintSolver> m_solver;
+    std::unique_ptr<btDiscreteDynamicsWorld> m_bulletWorld;
 };
 
 #endif // UNNAMED_PROJECT_BULLET_GAME_H

@@ -5,6 +5,7 @@
 
 #include "OpenGLWidget.h"
 #include "PrimitiveGame.h"
+#include "BulletGame.h"
 #include "ShaderEditor/EditorWindow.h"
 #include "SceneEditor/SceneEditorWindow.h"
 
@@ -32,6 +33,9 @@ int main(int argc, char **argv)
     QCommandLineOption sceneEditorOption("scene", "Start the scene editor");
     parser.addOption(sceneEditorOption);
 
+    QCommandLineOption bulletGameOption("bullet", "Start the game!");
+    parser.addOption(bulletGameOption);
+
     parser.addHelpOption();
     parser.process(app);
 
@@ -46,6 +50,15 @@ int main(int argc, char **argv)
     {
         SceneEditorWindow sceneEditor;
         sceneEditor.show();
+
+        return app.exec();
+    }
+    else if (parser.isSet(bulletGameOption))
+    {
+        // TODO have window (with debug ui)
+        // TODO add command line argument for level file to use!
+        OpenGLWidget widget(std::make_shared<BulletGame>("level/test.xml"));
+        widget.show();
 
         return app.exec();
     }
