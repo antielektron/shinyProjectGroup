@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#ifdef HAVE_BULLET
+
 BulletGame::BulletGame(const QString &scenefile) :
         m_scenefile(scenefile),
         m_wasEscDown(false)
@@ -219,3 +221,5 @@ void BulletGame::loadScene(const QString &filename)
     m_scene.reset(new Scene(filename));
     // TODO find out player position!
 }
+
+#endif // HAVE_BULLET

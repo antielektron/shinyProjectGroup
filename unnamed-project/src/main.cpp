@@ -33,8 +33,10 @@ int main(int argc, char **argv)
     QCommandLineOption sceneEditorOption("scene", "Start the scene editor");
     parser.addOption(sceneEditorOption);
 
+#ifdef HAVE_BULLET
     QCommandLineOption bulletGameOption("bullet", "Start the game!");
     parser.addOption(bulletGameOption);
+#endif // HAVE_BULLET
 
     parser.addHelpOption();
     parser.process(app);
@@ -53,6 +55,7 @@ int main(int argc, char **argv)
 
         return app.exec();
     }
+#ifdef HAVE_BULLET
     else if (parser.isSet(bulletGameOption))
     {
         // TODO have window (with debug ui)
@@ -62,6 +65,7 @@ int main(int argc, char **argv)
 
         return app.exec();
     }
+#endif // HAVE_BULLET
     else
     {
         // Start the regular primitive game ..

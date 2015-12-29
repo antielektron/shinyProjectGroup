@@ -1,6 +1,8 @@
 #ifndef UNNAMED_PROJECT_BULLET_GAME_H
 #define UNNAMED_PROJECT_BULLET_GAME_H
 
+#ifdef HAVE_BULLET
+
 #include <btBulletDynamicsCommon.h>
 #include <btBulletCollisionCommon.h>
 
@@ -46,5 +48,7 @@ private:
     std::unique_ptr<btSequentialImpulseConstraintSolver> m_solver;
     std::unique_ptr<btDiscreteDynamicsWorld> m_bulletWorld;
 };
+
+#endif // HAVE_BULLET
 
 #endif // UNNAMED_PROJECT_BULLET_GAME_H
