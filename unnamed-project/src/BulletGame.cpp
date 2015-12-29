@@ -30,7 +30,7 @@ void BulletGame::initialize()
     m_bulletWorld.reset(new btDiscreteDynamicsWorld(m_dispatcher.get(), m_broadphase.get(), m_solver.get(), m_collisionConfiguration.get()));
 
 //     m_bulletWorld->setGravity(btVector3(0., 0., 0.));
-    m_bulletWorld->setGravity(btVector3(0, -100, 0));
+    m_bulletWorld->setGravity(btVector3(0, -200, 0));
 
     loadScene(m_scenefile);
 
@@ -57,7 +57,7 @@ void BulletGame::initialize()
     }
 
     // add player to bullet world
-    float mass = 80.;
+    float mass = 1.;
     btVector3 inertia;
     btTransform transform;
     transform.setIdentity();
@@ -170,18 +170,22 @@ void BulletGame::handleInput(float deltaTime)
     if (m_rotX < -90.f)
         m_rotX = -90.f;
 
-    auto worldVelocity = QVector3D(m_scene->getCamera().transposed() * QVector4D(velocity, 0.));
+    // Player up will be "world" up.
+    // Player forward/sideward will be in xz plane.
+    QMatrix4x4 halfCameraTransformation;
+    halfCameraTransformation.rotate(m_rotY, 0., 1., 0.);
+    auto worldVelocity = QVector3D(halfCameraTransformation.transposed() * QVector4D(velocity, 0.));
+    // auto worldVelocity = QVector3D(m_scene->getCamera().transposed() * QVector4D(velocity, 0.));
     // m_position += worldVelocity * deltaTime;
-    m_position = toQVector3D(m_playerBody->getWorldTransform() * btVector3(0., 0., 0.));
+
+    m_playerBody->set
 
     m_playerBody->setLinearVelocity(toBulletVector3(worldVelocity));
     m_playerBody->activate(true);
 
     // TODO modify camera!
+    m_position = toQVector3D(m_playerBody->getWorldTransform() * btVector3(0., 0., 0.));
     updateCamera();
-
-    // btRigidBody *body;
-    // body->setLinearVelocity()
 
     // Start/Stop catching mouse
     if (m_keyManager->isKeyPressed(Qt::Key_Escape) && !m_wasEscDown)
