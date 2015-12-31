@@ -17,8 +17,7 @@
 #ifdef HAVE_BULLET
 
 BulletGame::BulletGame(const QString &scenefile) :
-        m_scenefile(scenefile),
-        m_wasEscDown(false)
+        m_scenefile(scenefile)
 {
 }
 
@@ -55,9 +54,9 @@ void BulletGame::tick(float dt)
     // auto player = m_playerBody->getWorldTransform() * btVector3(0., 0., 0.);
     //std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
     auto player = m_playerBody->getLinearVelocity();
-    std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
+    // std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
 
-    std::cout << std::endl;
+    // std::cout << std::endl;
 
     // TODO physics & camera
 
@@ -78,51 +77,50 @@ void BulletGame::handleInput(float deltaTime)
         m_rotY += m_keyManager->getRelativeX() * .1;
     }
 
-    if (m_keyManager->isKeyPressed(Qt::Key_Right))
+    if (m_keyManager->isKeyDown(Qt::Key_Right))
     {
         m_rotY += 0.5;
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Left))
+    if (m_keyManager->isKeyDown(Qt::Key_Left))
     {
         m_rotY -= 0.5;
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Up))
+    if (m_keyManager->isKeyDown(Qt::Key_Up))
     {
         m_rotX += 0.5;
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Down))
+    if (m_keyManager->isKeyDown(Qt::Key_Down))
     {
         m_rotX -= 0.5;
     }
 
-    if (m_keyManager->isKeyPressed(Qt::Key_S))
+    if (m_keyManager->isKeyDown(Qt::Key_S))
     {
         velocity += QVector3D(0, 0, speed);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_W))
+    if (m_keyManager->isKeyDown(Qt::Key_W))
     {
         velocity += QVector3D(0, 0, -speed);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_D))
+    if (m_keyManager->isKeyDown(Qt::Key_D))
     {
         velocity += QVector3D(speed, 0, 0);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_A))
+    if (m_keyManager->isKeyDown(Qt::Key_A))
     {
         velocity += QVector3D(-speed, 0, 0);
     }
 
-    if (m_keyManager->isKeyPressed(Qt::Key_Space) && !m_wasSpaceDown)
+    if (m_keyManager->isKeyPressed(Qt::Key_Space))
     {
         // TODO initiate jump
         // velocity += QVector3D(0, speed*2, 0);
         // m_playerBody->applyCentralForce(btVector3(0, 40, 0));
         m_playerBody->applyCentralImpulse(btVector3(0, 10, 0));
     }
-    m_wasSpaceDown = m_keyManager->isKeyPressed(Qt::Key_Space);
 
     // Reset camera
-    if (m_keyManager->isKeyPressed(Qt::Key_R))
+    if (m_keyManager->isKeyDown(Qt::Key_R))
     {
         m_position = QVector3D(0, 0, 0);
         m_rotX = 0;
@@ -149,11 +147,10 @@ void BulletGame::handleInput(float deltaTime)
     updateCamera();
 
     // Start/Stop catching mouse
-    if (m_keyManager->isKeyPressed(Qt::Key_Escape) && !m_wasEscDown)
+    if (m_keyManager->isKeyPressed(Qt::Key_Escape))
     {
         m_keyManager->setCatchMouse(!m_keyManager->shouldCatchMouse());
     }
-    m_wasEscDown = m_keyManager->isKeyPressed(Qt::Key_Escape);
 }
 
 void BulletGame::updateCamera()

@@ -69,8 +69,6 @@ private:
 	float m_rotY = 0;
 	float m_rotX = 0;
 
-	bool m_wasEscDown;
-
 	void updatePosMatrix(QVector3D deltaPos);
 
     //indicator stuff

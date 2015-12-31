@@ -61,50 +61,50 @@ void PrimitiveGame::tick(float dt)
         rotY += m_keyManager->getRelativeX() * .1;
     }
 
-    if (m_keyManager->isKeyPressed(Qt::Key_Right))
+    if (m_keyManager->isKeyDown(Qt::Key_Right))
     {
         rotY += 0.5;
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Left))
+    if (m_keyManager->isKeyDown(Qt::Key_Left))
     {
         rotY -= 0.5;
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Up))
+    if (m_keyManager->isKeyDown(Qt::Key_Up))
     {
         rotX += 0.5;
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Down))
+    if (m_keyManager->isKeyDown(Qt::Key_Down))
     {
         rotX -= 0.5;
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_S))
+    if (m_keyManager->isKeyDown(Qt::Key_S))
     {
         deltaPos += QVector3D(0, 0, speed);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_W))
+    if (m_keyManager->isKeyDown(Qt::Key_W))
     {
         deltaPos += QVector3D(0, 0, -speed);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_D))
+    if (m_keyManager->isKeyDown(Qt::Key_D))
     {
         deltaPos += QVector3D(speed, 0, 0);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_A))
+    if (m_keyManager->isKeyDown(Qt::Key_A))
     {
         deltaPos += QVector3D(-speed, 0, 0);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Space))
+    if (m_keyManager->isKeyDown(Qt::Key_Space))
     {
         deltaPos += QVector3D(0, speed, 0);
     }
     
-    if (m_keyManager->isKeyPressed(Qt::Key_Shift))
+    if (m_keyManager->isKeyDown(Qt::Key_Shift))
     {
         deltaPos += QVector3D(0, -speed, 0);
     }
 
     // Reset camera
-    if (m_keyManager->isKeyPressed(Qt::Key_R))
+    if (m_keyManager->isKeyDown(Qt::Key_R))
     {
         m_position = QVector3D(0, 0, 0);
         rotX = 0;
@@ -119,11 +119,11 @@ void PrimitiveGame::tick(float dt)
     updatePosMatrix(deltaPos);
 
     // Start/Stop catching mouse
-    if (m_keyManager->isKeyPressed(Qt::Key_Escape) && !m_wasEscDown)
+    if (m_keyManager->isKeyDown(Qt::Key_Escape) && !m_wasEscDown)
     {
         m_keyManager->setCatchMouse(!m_keyManager->shouldCatchMouse());
     }
-    m_wasEscDown = m_keyManager->isKeyPressed(Qt::Key_Escape);
+    m_wasEscDown = m_keyManager->isKeyDown(Qt::Key_Escape);
 }
 
 Scene *PrimitiveGame::getScene()
