@@ -232,27 +232,22 @@ void BulletGame::loadScene(const QString &filename)
     tr.setIdentity();
     auto *springConstraint = new btGeneric6DofSpringConstraint(*m_playerBody, tr, false);
 
-    btScalar springRestLen(10.f);
     btScalar springRange(7.f);
 
-    springConstraint->setLinearUpperLimit(btVector3(springRestLen + springRange, 0., 0.));
-    springConstraint->setLinearLowerLimit(btVector3(springRestLen - springRange, 0., 0.));
+    springConstraint->setLinearUpperLimit(springRange * btVector3(1., 1., 1.));
+    springConstraint->setLinearLowerLimit(-springRange * btVector3(1., 1., 1.));
 
     springConstraint->setAngularLowerLimit(btVector3(0.f, 0.f, 0.f));
     springConstraint->setAngularUpperLimit(btVector3(0.f, 0.f, 0.f));
 
     // Enable spring
-    springConstraint->enableSpring(0, true);
-    springConstraint->enableSpring(1, true);
-    springConstraint->enableSpring(2, true);
-    springConstraint->enableSpring(3, false);
-    springConstraint->enableSpring(4, false);
-    springConstraint->enableSpring(5, false);
-    springConstraint->setStiffness(1, 40); // period 1 sec for !kG body
-    springConstraint->setDamping(1, 0.01f); // add some damping
+    for (int i = 0; i < 3; i++)
+    {
+        springConstraint->enableSpring(i, true);
+        springConstraint->setStiffness(i, 4); // period 1 sec for !kG body
+        springConstraint->setDamping(i, 1.00f); // add some damping
+    }
 
-    new btGhostObject();
-    
     // m_bulletWorld->addConstraint(springConstraint, false);
 }
 
