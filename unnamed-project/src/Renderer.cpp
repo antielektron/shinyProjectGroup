@@ -5,9 +5,12 @@
 #include <iostream>
 #include <cmath>
 #include <QtGui/qopenglframebufferobject.h>
+#include <vector>
 
 #include "Renderer.h"
 #include "Scene/Scene.h"
+
+#include "MathUtility.h"
 
 #include "utility.h"
 
@@ -302,10 +305,13 @@ void Renderer::render(GLuint fbo, Scene *scene)
     QVector3D minCorner;
     QVector3D maxCorner;
 
+    std::vector<QVector2D> frustum2DPoints;
+
     for (int i = 0; i < 8; i++)
     {
         QVector4D res = screenToLightTransformation * QVector4D(frustumCorners[i], 1.);
         frustumCorners[i] = QVector3D(res / res.w());
+        frustum2DPoints.push_back(frustumCorners[i].toVector2D());
 
         if (i == 0)
         {
@@ -323,11 +329,26 @@ void Renderer::render(GLuint fbo, Scene *scene)
         }
     }
 
+    // compute on x-y-plane the minimal bounding rectangle
+    std::vector<QVector2D> frustumHull;
+    QVector2D upperPoint;
+    QVector2D lowerPoint;
+    float frustumRot;
+
+    mathUtility::getConvexHull(frustum2DPoints, frustumHull);
+    mathUtility::getMinimalBoundingBox(frustumHull,
+                                       lowerPoint,
+                                       upperPoint,
+                                       frustumRot);
+
     // Compute light view projection
     QMatrix4x4 lightViewProjection;
+    QMatrix4x4 lightViewRotationZ;
+
+    lightViewRotationZ.rotate(frustumRot * 180.f / static_cast<float>(M_PI), QVector3D(0,0,-1));
     lightViewProjection.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z()); // TODO find out why near/far plane are so?
 
-    QMatrix4x4 lightView = lightViewProjection * lightViewRotation;
+    QMatrix4x4 lightView = lightViewProjection * lightViewRotationZ * lightViewRotation;
 
 
     // Light direction from camera's perspective
