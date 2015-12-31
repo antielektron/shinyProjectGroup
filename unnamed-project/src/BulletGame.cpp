@@ -18,7 +18,9 @@
 
 BulletGame::BulletGame(const QString &scenefile) :
         m_scenefile(scenefile),
-        m_wasEscDown(false)
+        m_wasEscDown(false),
+        m_rotX(0.f),
+        m_rotY(0.f)
 {
 }
 
@@ -124,7 +126,7 @@ void BulletGame::handleInput(float deltaTime)
     // Reset camera
     if (m_keyManager->isKeyPressed(Qt::Key_R))
     {
-        m_position = QVector3D(0, 0, 0);
+        m_playerBody->getWorldTransform().setOrigin(btVector3(0, 0, 0));
         m_rotX = 0;
         m_rotY = 0;
     }
@@ -255,7 +257,7 @@ void BulletGame::loadScene(const QString &filename)
         springConstraint->setDamping(i, 1.00f); // add some damping
     }
 
-    // m_bulletWorld->addConstraint(springConstraint, false);
+    //m_bulletWorld->addConstraint(springConstraint, false);
 }
 
 #endif // HAVE_BULLET
