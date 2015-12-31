@@ -7,6 +7,13 @@
 
 #include <iostream>
 
+/*
+ * References:
+ *
+ * Character with spring
+ * http://stackoverflow.com/questions/25605659/avoid-ground-collision-with-bullet
+ */
+
 #ifdef HAVE_BULLET
 
 BulletGame::BulletGame(const QString &scenefile) :
