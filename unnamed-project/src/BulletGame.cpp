@@ -199,19 +199,29 @@ void BulletGame::loadScene(const QString &filename)
     // Add objects
     for (auto *object : m_scene->getObjects())
     {
-        auto minCorner = object->getModel()->getMinExtent();
-        auto maxCorner = object->getModel()->getMaxExtent();
+        auto *mesh = new btTriangleMesh();
 
-        btBoxShape *box = new btBoxShape(btVector3( std::max(-minCorner.x(), maxCorner.x()) + 0.02,
-                                                    std::max(-minCorner.y(), maxCorner.y()) + 0.02,
-                                                    std::max(-minCorner.z(), maxCorner.z()) + 0.02 ));
+        auto vertices = object->getModel()->getVertices();
+        auto indices = object->getModel()->getIndices();
+
+        auto iThVector = [&](unsigned int i)->btVector3
+        {
+            return toBulletVector3(vertices[indices[i]]);
+        };
+
+        for (int i = 0; i < indices.size(); i += 3)
+        {
+            mesh->addTriangle(iThVector(i), iThVector(i+1), iThVector(i+2));
+        }
+
+        auto *shape = new btBvhTriangleMeshShape(mesh, true);
 
         // TODO: remove scaling from transformation!
         btTransform transformation;
         transformation.setFromOpenGLMatrix(object->getWorld().constData());
 
         // TODO save body - object pair
-        btRigidBody *body = new btRigidBody(0, nullptr, box, btVector3(0, 0, 0)); // No inertia
+        btRigidBody *body = new btRigidBody(0, nullptr, shape, btVector3(0, 0, 0)); // No inertia
         body->setWorldTransform(transformation);
 
         m_bodies.push_back(body);

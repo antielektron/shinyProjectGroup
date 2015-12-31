@@ -5,6 +5,7 @@
         <Model name="sphere" path="models/sphere.obj"/>
         <Model name="suzanne" path="models/suzanne.obj"/>
         <Model name="floor" path="models/floor.obj"/>
+        <Model name="sink" path="models/sink.obj"/>
     </Models>
     <Objects>
         <ObjectGroup name="group" x="0" y="0" z="0">
@@ -13,6 +14,7 @@
         <Object name="suzanne" model="suzanne" x="-3" y="0" z="0"/>
         <Object name="sphere" model="sphere" x="0" y="0" z="0"/>
         <Object name="floor" model="floor" x="0" y="-3" z="0" sx="1" sz="1"/>
+        <Object name="sink" model="sink" x="-7" y="-3" z="-7" sx="1" sz="1"/>
     </Objects>
     <DirectionalLight x=".3" y="1" z=".3" r="1" g="1" b="1"/>
     <Player x="0" y="0" z="0"/>

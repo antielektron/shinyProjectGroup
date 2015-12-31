@@ -240,14 +240,24 @@ const QVector3D &Model::getMinExtent()
 }
 
 //------------------------------------------------------------------------------
-
 const QVector3D &Model::getMaxExtent()
 {
     return m_maxExtent;
 }
 
 //------------------------------------------------------------------------------
+const std::vector<QVector3D> &Model::getVertices()
+{
+    return m_vertices;
+}
 
+//------------------------------------------------------------------------------
+const std::vector<unsigned int> &Model::getIndices()
+{
+    return m_indices;
+}
+
+//------------------------------------------------------------------------------
 void Model::updateExtent()
 {
     m_minExtent[0] = std::numeric_limits<float>::max();
@@ -256,9 +266,11 @@ void Model::updateExtent()
     m_maxExtent[0] = -std::numeric_limits<float>::max();
     m_maxExtent[1] = -std::numeric_limits<float>::max();
     m_maxExtent[2] = -std::numeric_limits<float>::max();
+
     m_center[0] = 0.0;
     m_center[1] = 0.0;
     m_center[2] = 0.0;
+
     for (auto &vertex : m_vertices)
     {
         for (int i = 0; i < 3; i++)
