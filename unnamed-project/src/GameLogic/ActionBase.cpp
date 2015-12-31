@@ -1,20 +1,16 @@
-#include "GlobalState.h"
+#include "ActionBase.h"
 
 //------------------------------------------------------------------------------
-GlobalState::GlobalState()
+ActionBase::ActionBase(GlobalState *globalState)
 {
-
+    m_globalState = globalState;
 }
 
 //------------------------------------------------------------------------------
-GlobalState::~GlobalState()
+ActionBase::~ActionBase()
 {
-    // nothing to do here...
+    //nothing to do here
 }
 
 //------------------------------------------------------------------------------
-const QVariant &GlobalState::getValue(const QString &key)
-{
-    // TODO: maybe check if is Valid?
-    return m_attributes[key];
-}
+
