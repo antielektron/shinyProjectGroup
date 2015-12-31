@@ -6,7 +6,7 @@
 #include <QObject>
 #include "smartiterator.h"
 
-class State
+class State : public QObject
 {
     Q_OBJECT
 public:

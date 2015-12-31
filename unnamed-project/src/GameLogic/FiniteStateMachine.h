@@ -6,7 +6,7 @@
 #include <map>
 #include "GameLogic/State.h"
 
-class FiniteStateMachine
+class FiniteStateMachine : public QObject
 {
     Q_OBJECT
 public:

@@ -70,6 +70,12 @@ const std::string &State::getName()
 }
 
 //------------------------------------------------------------------------------
+void State::performAction()
+{
+    // nothing to do here so far...
+}
+
+//------------------------------------------------------------------------------
 void State::action()
 {
     performAction();
