@@ -9,7 +9,6 @@
 #include "ShaderEditor/EditorWindow.h"
 #include "SceneEditor/SceneEditorWindow.h"
 
-
 // http://www.ics.com/blog/qt-and-opengl-part-2-rendering-3d-model
 // http://doc.qt.io/qt-5/qtopengl-hellogl2-example.html
 // http://doc.qt.io/qt-5/cmake-manual.html
