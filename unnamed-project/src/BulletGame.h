@@ -40,9 +40,6 @@ private:
     float m_rotX;
     float m_rotY;
 
-    bool m_wasEscDown;
-    bool m_wasSpaceDown;
-
     std::unique_ptr<btDefaultCollisionConfiguration> m_collisionConfiguration;
     std::unique_ptr<btCollisionDispatcher> m_dispatcher;
     std::unique_ptr<btBroadphaseInterface> m_broadphase; // TODO what's this

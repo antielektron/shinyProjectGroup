@@ -18,7 +18,6 @@
 
 BulletGame::BulletGame(const QString &scenefile) :
         m_scenefile(scenefile),
-        m_wasEscDown(false),
         m_rotX(0.f),
         m_rotY(0.f)
 {
@@ -57,9 +56,9 @@ void BulletGame::tick(float dt)
     // auto player = m_playerBody->getWorldTransform() * btVector3(0., 0., 0.);
     //std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
     auto player = m_playerBody->getLinearVelocity();
-    std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
+    // std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
 
-    std::cout << std::endl;
+    // std::cout << std::endl;
 
     // TODO physics & camera
 
@@ -80,51 +79,50 @@ void BulletGame::handleInput(float deltaTime)
         m_rotY += m_keyManager->getRelativeX() * .1;
     }
 
-    if (m_keyManager->isKeyPressed(Qt::Key_Right))
+    if (m_keyManager->isKeyDown(Qt::Key_Right))
     {
         m_rotY += 0.5;
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Left))
+    if (m_keyManager->isKeyDown(Qt::Key_Left))
     {
         m_rotY -= 0.5;
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Up))
+    if (m_keyManager->isKeyDown(Qt::Key_Up))
     {
         m_rotX += 0.5;
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Down))
+    if (m_keyManager->isKeyDown(Qt::Key_Down))
     {
         m_rotX -= 0.5;
     }
 
-    if (m_keyManager->isKeyPressed(Qt::Key_S))
+    if (m_keyManager->isKeyDown(Qt::Key_S))
     {
         velocity += QVector3D(0, 0, speed);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_W))
+    if (m_keyManager->isKeyDown(Qt::Key_W))
     {
         velocity += QVector3D(0, 0, -speed);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_D))
+    if (m_keyManager->isKeyDown(Qt::Key_D))
     {
         velocity += QVector3D(speed, 0, 0);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_A))
+    if (m_keyManager->isKeyDown(Qt::Key_A))
     {
         velocity += QVector3D(-speed, 0, 0);
     }
 
-    if (m_keyManager->isKeyPressed(Qt::Key_Space) && !m_wasSpaceDown)
+    if (m_keyManager->isKeyPressed(Qt::Key_Space))
     {
         // TODO initiate jump
         // velocity += QVector3D(0, speed*2, 0);
         // m_playerBody->applyCentralForce(btVector3(0, 40, 0));
         m_playerBody->applyCentralImpulse(btVector3(0, 10, 0));
     }
-    m_wasSpaceDown = m_keyManager->isKeyPressed(Qt::Key_Space);
 
     // Reset camera
-    if (m_keyManager->isKeyPressed(Qt::Key_R))
+    if (m_keyManager->isKeyDown(Qt::Key_R))
     {
         m_playerBody->getWorldTransform().setOrigin(btVector3(0, 0, 0));
         m_rotX = 0;
@@ -151,11 +149,10 @@ void BulletGame::handleInput(float deltaTime)
     updateCamera();
 
     // Start/Stop catching mouse
-    if (m_keyManager->isKeyPressed(Qt::Key_Escape) && !m_wasEscDown)
+    if (m_keyManager->isKeyPressed(Qt::Key_Escape))
     {
         m_keyManager->setCatchMouse(!m_keyManager->shouldCatchMouse());
     }
-    m_wasEscDown = m_keyManager->isKeyPressed(Qt::Key_Escape);
 }
 
 void BulletGame::updateCamera()
@@ -202,19 +199,29 @@ void BulletGame::loadScene(const QString &filename)
     // Add objects
     for (auto *object : m_scene->getObjects())
     {
-        auto minCorner = object->getModel()->getMinExtent();
-        auto maxCorner = object->getModel()->getMaxExtent();
+        auto *mesh = new btTriangleMesh();
 
-        btBoxShape *box = new btBoxShape(btVector3( std::max(-minCorner.x(), maxCorner.x()) + 0.02,
-                                                    std::max(-minCorner.y(), maxCorner.y()) + 0.02,
-                                                    std::max(-minCorner.z(), maxCorner.z()) + 0.02 ));
+        auto vertices = object->getModel()->getVertices();
+        auto indices = object->getModel()->getIndices();
+
+        auto iThVector = [&](unsigned int i)->btVector3
+        {
+            return toBulletVector3(vertices[indices[i]]);
+        };
+
+        for (int i = 0; i < indices.size(); i += 3)
+        {
+            mesh->addTriangle(iThVector(i), iThVector(i+1), iThVector(i+2));
+        }
+
+        auto *shape = new btBvhTriangleMeshShape(mesh, true);
 
         // TODO: remove scaling from transformation!
         btTransform transformation;
         transformation.setFromOpenGLMatrix(object->getWorld().constData());
 
         // TODO save body - object pair
-        btRigidBody *body = new btRigidBody(0, nullptr, box, btVector3(0, 0, 0)); // No inertia
+        btRigidBody *body = new btRigidBody(0, nullptr, shape, btVector3(0, 0, 0)); // No inertia
         body->setWorldTransform(transformation);
 
         m_bodies.push_back(body);

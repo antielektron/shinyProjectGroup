@@ -333,27 +333,26 @@ void Renderer::render(GLuint fbo, Scene *scene)
     std::vector<QVector2D> frustumHull;
     QVector2D upperPoint;
     QVector2D lowerPoint;
-    float frustumRot;
+    float frustumRotationAngle;
 
     mathUtility::getConvexHull(frustum2DPoints, frustumHull);
     mathUtility::getMinimalBoundingBox(frustumHull,
                                        lowerPoint,
                                        upperPoint,
-                                       frustumRot);
+                                       frustumRotationAngle);
 
     // Compute light view projection
     QMatrix4x4 lightViewProjection;
     QMatrix4x4 lightViewRotationZ;
 
-    lightViewRotationZ.rotate(frustumRot * 180.f / static_cast<float>(M_PI), QVector3D(0,0,-1));
-    lightViewProjection.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z()); // TODO find out why near/far plane are so?
+    lightViewRotationZ.rotate(frustumRotationAngle * 180.f / static_cast<float>(M_PI), QVector3D(0, 0, -1));
+    lightViewProjection.ortho(lowerPoint.x(), upperPoint.x(), lowerPoint.y(), upperPoint.y(), -maxCorner.z(), -minCorner.z()); // TODO find out why near/far plane are so?
 
     QMatrix4x4 lightView = lightViewProjection * lightViewRotationZ * lightViewRotation;
 
 
     // Light direction from camera's perspective
     auto lightDirection = scene->getCamera() * QVector4D(scene->getDirectionalLightDirection(), 0.);
-    lightDirection.setW(1.);
 
 
 

@@ -25,6 +25,9 @@ public:
     const QVector3D &getMinExtent();
     const QVector3D &getMaxExtent();
 
+    const std::vector<QVector3D> &getVertices();
+    const std::vector<unsigned int> &getIndices();
+
 private:
     std::vector<QVector3D> m_vertices;
     std::vector<QVector3D> m_normals;
