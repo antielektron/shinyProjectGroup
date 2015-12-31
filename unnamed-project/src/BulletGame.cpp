@@ -7,6 +7,13 @@
 
 #include <iostream>
 
+/*
+ * References:
+ *
+ * Character with spring
+ * http://stackoverflow.com/questions/25605659/avoid-ground-collision-with-bullet
+ */
+
 #ifdef HAVE_BULLET
 
 BulletGame::BulletGame(const QString &scenefile) :
@@ -20,56 +27,7 @@ void BulletGame::initialize()
     // call parent
     IGame::initialize();
 
-    // Create the bullet world!
-    m_collisionConfiguration.reset(new btDefaultCollisionConfiguration());
-
-    m_dispatcher.reset(new btCollisionDispatcher(m_collisionConfiguration.get()));
-
-    m_broadphase.reset(new btDbvtBroadphase());
-
-    m_solver.reset(new btSequentialImpulseConstraintSolver());
-
-    m_bulletWorld.reset(new btDiscreteDynamicsWorld(m_dispatcher.get(), m_broadphase.get(), m_solver.get(), m_collisionConfiguration.get()));
-
-//     m_bulletWorld->setGravity(btVector3(0., 0., 0.));
-    m_bulletWorld->setGravity(btVector3(0, -200, 0));
-
     loadScene(m_scenefile);
-
-    for (auto *object : m_scene->getObjects())
-    {
-        auto minCorner = object->getModel()->getMinExtent();
-        auto maxCorner = object->getModel()->getMaxExtent();
-
-        btBoxShape *box = new btBoxShape(btVector3( std::max(-minCorner.x(), maxCorner.x()) + 0.02,
-                                                    std::max(-minCorner.y(), maxCorner.y()) + 0.02,
-                                                    std::max(-minCorner.z(), maxCorner.z()) + 0.02 ));
-
-        // TODO: remove scaling from transformation!
-        btTransform transformation;
-        transformation.setFromOpenGLMatrix(object->getWorld().constData());
-
-        // TODO save body - object pair
-        btRigidBody *body = new btRigidBody(0., nullptr, box, btVector3(0., 0., 0.)); // No inertia
-		body->setWorldTransform(transformation);
-
-        m_bodies.push_back(body);
-
-        m_bulletWorld->addRigidBody(body);
-    }
-
-    // add player to bullet world
-    float mass = 1.;
-    btVector3 inertia;
-    btTransform transform;
-    transform.setIdentity();
-
-    btSphereShape *sphere = new btSphereShape(1.);
-    sphere->calculateLocalInertia(mass, inertia);
-
-    btDefaultMotionState *motionState = new btDefaultMotionState(transform);
-    m_playerBody.reset(new btRigidBody(mass, motionState, sphere, inertia));
-    m_bulletWorld->addRigidBody(m_playerBody.get());
 }
 
 void BulletGame::resize(int width, int height)
@@ -87,13 +45,16 @@ void BulletGame::tick(float dt)
 
     m_bulletWorld->stepSimulation(dt);
 
+    m_bulletWorld->debugDrawWorld();
 
     for (auto *body : m_bodies)
     {
         auto player = body->getWorldTransform() * btVector3(0., 0., 0.);
-        std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
+        //std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
     }
-    auto player = m_playerBody->getWorldTransform() * btVector3(0., 0., 0.);
+    // auto player = m_playerBody->getWorldTransform() * btVector3(0., 0., 0.);
+    //std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
+    auto player = m_playerBody->getLinearVelocity();
     std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
 
     std::cout << std::endl;
@@ -150,14 +111,15 @@ void BulletGame::handleInput(float deltaTime)
     {
         velocity += QVector3D(-speed, 0, 0);
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Space) || m_keyManager->isKeyPressed(Qt::Key_Q))
+
+    if (m_keyManager->isKeyPressed(Qt::Key_Space) && !m_wasSpaceDown)
     {
-        velocity += QVector3D(0, speed, 0);
+        // TODO initiate jump
+        // velocity += QVector3D(0, speed*2, 0);
+        // m_playerBody->applyCentralForce(btVector3(0, 40, 0));
+        m_playerBody->applyCentralImpulse(btVector3(0, 10, 0));
     }
-    if (m_keyManager->isKeyPressed(Qt::Key_Shift) || m_keyManager->isKeyPressed(Qt::Key_Z) || m_keyManager->isKeyPressed(Qt::Key_Y) || m_keyManager->isKeyPressed(Qt::Key_C))
-    {
-        velocity += QVector3D(0, -speed, 0);
-    }
+    m_wasSpaceDown = m_keyManager->isKeyPressed(Qt::Key_Space);
 
     // Reset camera
     if (m_keyManager->isKeyPressed(Qt::Key_R))
@@ -180,8 +142,7 @@ void BulletGame::handleInput(float deltaTime)
     // auto worldVelocity = QVector3D(m_scene->getCamera().transposed() * QVector4D(velocity, 0.));
     // m_position += worldVelocity * deltaTime;
 
-    m_playerBody->setLinearVelocity(toBulletVector3(worldVelocity));
-    m_playerBody->activate(true);
+    m_playerBody->applyCentralForce(toBulletVector3(worldVelocity));
 
     // TODO modify camera!
     m_position = toQVector3D(m_playerBody->getWorldTransform() * btVector3(0., 0., 0.));
@@ -222,6 +183,79 @@ void BulletGame::loadScene(const QString &filename)
 {
     m_scene.reset(new Scene(filename));
     // TODO find out player position!
+
+    // Create the bullet world!
+    m_collisionConfiguration.reset(new btDefaultCollisionConfiguration());
+
+    m_dispatcher.reset(new btCollisionDispatcher(m_collisionConfiguration.get()));
+
+    m_broadphase.reset(new btDbvtBroadphase());
+
+    m_solver.reset(new btSequentialImpulseConstraintSolver());
+
+    m_bulletWorld.reset(new btDiscreteDynamicsWorld(m_dispatcher.get(), m_broadphase.get(), m_solver.get(), m_collisionConfiguration.get()));
+
+    m_bulletWorld->setGravity(btVector3(0, -10, 0));
+
+    // Add objects
+    for (auto *object : m_scene->getObjects())
+    {
+        auto minCorner = object->getModel()->getMinExtent();
+        auto maxCorner = object->getModel()->getMaxExtent();
+
+        btBoxShape *box = new btBoxShape(btVector3( std::max(-minCorner.x(), maxCorner.x()) + 0.02,
+                                                    std::max(-minCorner.y(), maxCorner.y()) + 0.02,
+                                                    std::max(-minCorner.z(), maxCorner.z()) + 0.02 ));
+
+        // TODO: remove scaling from transformation!
+        btTransform transformation;
+        transformation.setFromOpenGLMatrix(object->getWorld().constData());
+
+        // TODO save body - object pair
+        btRigidBody *body = new btRigidBody(0, nullptr, box, btVector3(0, 0, 0)); // No inertia
+        body->setWorldTransform(transformation);
+
+        m_bodies.push_back(body);
+
+        m_bulletWorld->addRigidBody(body);
+    }
+
+    // Add player to bullet world
+    float mass = 1;
+    btVector3 inertia;
+    btTransform transform;
+    transform.setIdentity();
+    transform.setOrigin(btVector3(0, 5, 2));
+
+    btSphereShape *sphere = new btSphereShape(1);
+    sphere->calculateLocalInertia(mass, inertia);
+
+    btDefaultMotionState *motionState = new btDefaultMotionState(transform);
+    m_playerBody.reset(new btRigidBody(mass, motionState, sphere, inertia));
+    m_playerBody->setActivationState(DISABLE_DEACTIVATION);
+    m_bulletWorld->addRigidBody(m_playerBody.get());
+
+    btTransform tr;
+    tr.setIdentity();
+    auto *springConstraint = new btGeneric6DofSpringConstraint(*m_playerBody, tr, false);
+
+    btScalar springRange(7.f);
+
+    springConstraint->setLinearUpperLimit(springRange * btVector3(1., 1., 1.));
+    springConstraint->setLinearLowerLimit(-springRange * btVector3(1., 1., 1.));
+
+    springConstraint->setAngularLowerLimit(btVector3(0.f, 0.f, 0.f));
+    springConstraint->setAngularUpperLimit(btVector3(0.f, 0.f, 0.f));
+
+    // Enable spring
+    for (int i = 0; i < 3; i++)
+    {
+        springConstraint->enableSpring(i, true);
+        springConstraint->setStiffness(i, 4); // period 1 sec for !kG body
+        springConstraint->setDamping(i, 1.00f); // add some damping
+    }
+
+    // m_bulletWorld->addConstraint(springConstraint, false);
 }
 
 #endif // HAVE_BULLET

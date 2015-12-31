@@ -41,6 +41,7 @@ private:
     float m_rotY;
 
     bool m_wasEscDown;
+    bool m_wasSpaceDown;
 
     std::unique_ptr<btDefaultCollisionConfiguration> m_collisionConfiguration;
     std::unique_ptr<btCollisionDispatcher> m_dispatcher;
