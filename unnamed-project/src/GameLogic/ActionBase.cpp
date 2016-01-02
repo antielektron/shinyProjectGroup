@@ -1,4 +1,5 @@
-#include "ActionBase.h"
+#include "GameLogic/ActionBase.h"
+#include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
 ActionBase::ActionBase(GlobalState *globalState)

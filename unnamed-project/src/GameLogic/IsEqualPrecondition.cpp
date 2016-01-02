@@ -1,4 +1,5 @@
-#include "IsEqualPrecondition.h"
+#include "GameLogic/IsEqualPrecondition.h"
+#include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
 template<class T>

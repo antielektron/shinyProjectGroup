@@ -1,6 +1,6 @@
 
 #include "GameLogic/FlipBooleanAction.h"
-
+#include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
 FlipBooleanAction::FlipBooleanAction(GlobalState *state,

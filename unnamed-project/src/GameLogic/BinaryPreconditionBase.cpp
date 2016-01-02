@@ -1,4 +1,5 @@
 #include "BinaryPreconditionBase.h"
+#include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
 BinaryPreconditionBase::BinaryPreconditionBase(GlobalState *globalState,

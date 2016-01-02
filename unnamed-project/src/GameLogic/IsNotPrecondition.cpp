@@ -1,4 +1,5 @@
 #include "GameLogic/IsNotPrecondition.h"
+#include "GameLogic/GlobalState.h"
 
 IsNotPrecondition::IsNotPrecondition(GlobalState *state,
                                      PreconditionBase *condition) :

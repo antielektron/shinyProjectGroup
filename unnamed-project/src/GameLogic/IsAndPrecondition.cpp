@@ -1,4 +1,5 @@
 #include "GameLogic/IsAndPrecondition.h"
+#include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
 IsAndPrecondition::IsAndPrecondition(GlobalState *state,

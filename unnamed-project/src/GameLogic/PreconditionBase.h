@@ -1,7 +1,7 @@
 #ifndef UNNAMED_PROJECT_PRECONDITIONBASE_H
 #define UNNAMED_PROJECT_PRECONDITIONBASE_H
 
-#include "GameLogic/GlobalState.h"
+class GlobalState;
 
 class PreconditionBase
 {

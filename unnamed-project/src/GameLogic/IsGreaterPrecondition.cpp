@@ -1,4 +1,5 @@
 #include "GameLogic/IsGreaterPrecondition.h"
+#include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
 template<class T>

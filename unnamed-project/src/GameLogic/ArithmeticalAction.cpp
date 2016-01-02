@@ -1,4 +1,5 @@
 #include "GameLogic/ArithmeticalAction.h"
+#include "GameLogic/GlobalState.h"
 
 template<class T>
 ArithmeticalAction<T>::ArithmeticalAction(GlobalState *state,

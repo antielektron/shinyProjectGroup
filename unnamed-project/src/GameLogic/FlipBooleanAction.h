@@ -1,6 +1,7 @@
 #ifndef UNNAMED_PROJECT_FLIPBOOLEANACTION_H
 #define UNNAMED_PROJECT_FLIPBOOLEANACTION_H
 
+#include <QString>
 #include "GameLogic/ActionBase.h"
 
 class FlipBooleanAction : public ActionBase

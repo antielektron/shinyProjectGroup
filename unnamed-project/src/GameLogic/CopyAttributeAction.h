@@ -1,6 +1,7 @@
 #ifndef UNNAMED_PROJECT_SETATTRIBUTEACTION_H
 #define UNNAMED_PROJECT_SETATTRIBUTEACTION_H
 
+#include <QString>
 #include "GameLogic/ActionBase.h"
 
 class CopyAttributeAction : public ActionBase

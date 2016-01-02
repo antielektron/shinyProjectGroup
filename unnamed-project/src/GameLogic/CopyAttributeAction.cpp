@@ -1,4 +1,5 @@
 #include "GameLogic/CopyAttributeAction.h"
+#include "GameLogic/GlobalState.h"
 
 CopyAttributeAction::CopyAttributeAction(GlobalState *state,
                                          const QString &src,
