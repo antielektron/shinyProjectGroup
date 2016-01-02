@@ -1,4 +1,4 @@
-#include "IsGreaterPrecondition.h"
+#include "GameLogic/IsGreaterPrecondition.h"
 
 //------------------------------------------------------------------------------
 template<class T>

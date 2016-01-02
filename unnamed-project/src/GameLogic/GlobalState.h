@@ -11,6 +11,8 @@ public:
     GlobalState();
     virtual ~GlobalState();
     const QVariant &getValue(const QString &key);
+    void setValue(const QString &key,
+                  QVariant value);
 
 protected:
     std::map<QString, QVariant> m_attributes;

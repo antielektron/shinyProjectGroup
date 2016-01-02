@@ -1,7 +1,7 @@
 #ifndef UNNAMED_PROJECT_ISNOTPRECONDITION_H
 #define UNNAMED_PROJECT_ISNOTPRECONDITION_H
 
-#include "PreconditionBase.h"
+#include "GameLogic/PreconditionBase.h"
 
 class IsNotPrecondition : public PreconditionBase
 {

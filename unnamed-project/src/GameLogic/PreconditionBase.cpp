@@ -1,4 +1,4 @@
-#include "PreconditionBase.h"
+#include "GameLogic/PreconditionBase.h"
 
 //------------------------------------------------------------------------------
 PreconditionBase::PreconditionBase(GlobalState *globalState)
