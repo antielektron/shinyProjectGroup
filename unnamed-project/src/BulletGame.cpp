@@ -196,32 +196,40 @@ void BulletGame::loadScene(const QString &filename)
 
     m_bulletWorld->setGravity(btVector3(0, -10, 0));
 
+    typedef std::map<Model *, btBvhTriangleMeshShape *> ShapesMapType;
+    ShapesMapType availableShapes;
     // Add objects
     for (auto *object : m_scene->getObjects())
     {
-        auto *mesh = new btTriangleMesh();
-
-        auto vertices = object->getModel()->getVertices();
-        auto indices = object->getModel()->getIndices();
-
-        auto iThVector = [&](unsigned int i)->btVector3
+        auto it = availableShapes.find(object->getModel());
+        if (it == availableShapes.end() || it->first != object->getModel())
         {
-            return toBulletVector3(vertices[indices[i]]);
-        };
+            auto *mesh = new btTriangleMesh();
 
-        for (int i = 0; i < indices.size(); i += 3)
-        {
-            mesh->addTriangle(iThVector(i), iThVector(i+1), iThVector(i+2));
+            auto vertices = object->getModel()->getVertices();
+            auto indices = object->getModel()->getIndices();
+
+            auto iThVector = [&](unsigned int i)->btVector3
+            {
+                return toBulletVector3(vertices[indices[i]]);
+            };
+
+            for (int i = 0; i < indices.size(); i += 3)
+            {
+                mesh->addTriangle(iThVector(i), iThVector(i+1), iThVector(i+2));
+            }
+
+            auto *shape = new btBvhTriangleMeshShape(mesh, true);
+            // Insert with hint!
+            it = availableShapes.insert(it, ShapesMapType::value_type(object->getModel(), shape));
         }
-
-        auto *shape = new btBvhTriangleMeshShape(mesh, true);
 
         // TODO: remove scaling from transformation!
         btTransform transformation;
         transformation.setFromOpenGLMatrix(object->getWorld().constData());
 
         // TODO save body - object pair
-        btRigidBody *body = new btRigidBody(0, nullptr, shape, btVector3(0, 0, 0)); // No inertia
+        btRigidBody *body = new btRigidBody(0, nullptr, it->second, btVector3(0, 0, 0)); // No inertia
         body->setWorldTransform(transformation);
 
         m_bodies.push_back(body);
