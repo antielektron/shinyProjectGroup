@@ -335,25 +335,25 @@ void Scene::writeScaling(const QVector3D &pos, QXmlStreamWriter &writer)
 }
 
 //------------------------------------------------------------------------------
-void Scene::setCamera(const QMatrix4x4 &camera)
+void Scene::setCameraView(const QMatrix4x4 &camera)
 {
     m_camera = camera;
 }
 
 //------------------------------------------------------------------------------
-void Scene::setProjection(const QMatrix4x4 &proj)
+void Scene::setCameraProjection(const QMatrix4x4 &proj)
 {
     m_proj = proj;
 }
 
 //------------------------------------------------------------------------------
-QMatrix4x4 &Scene::getCamera()
+QMatrix4x4 &Scene::getCameraView()
 {
     return m_camera;
 }
 
 //------------------------------------------------------------------------------
-QMatrix4x4 &Scene::getProjection()
+QMatrix4x4 &Scene::getCameraProjection()
 {
     return m_proj;
 }

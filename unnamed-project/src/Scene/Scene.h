@@ -33,14 +33,14 @@ public:
     void loadFromFile(const QString &filename);
     void saveToFile(const QString &filename);
 
-    void setCamera(const QMatrix4x4 &camera);
-    void setProjection(const QMatrix4x4 &proj);
+    void setCameraView(const QMatrix4x4 &camera);
+    void setCameraProjection(const QMatrix4x4 &proj);
 
     void setLightColor(const QVector3D &color);
     void setDirectionalLightDirection(const QVector3D &direction);
 
-    QMatrix4x4 &getCamera();
-    QMatrix4x4 &getProjection();
+    QMatrix4x4 &getCameraView();
+    QMatrix4x4 &getCameraProjection();
 
     QVector3D &getDirectionalLightDirection();
     QVector3D &getLightColor();

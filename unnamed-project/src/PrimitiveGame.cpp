@@ -39,7 +39,7 @@ void PrimitiveGame::initialize()
 
 void PrimitiveGame::resize(int width, int height)
 {
-    auto &proj = m_scene->getProjection();
+    auto &proj = m_scene->getCameraProjection();
     proj.setToIdentity();
     proj.perspective(45.0f, (float)width / height, 0.01f, 100.0f);
 }
@@ -133,7 +133,7 @@ Scene *PrimitiveGame::getScene()
 
 void PrimitiveGame::updatePosMatrix(QVector3D deltaPos) 
 {
-    QMatrix4x4 &camera = m_scene->getCamera();
+    QMatrix4x4 &camera = m_scene->getCameraView();
     QMatrix4x4 translation;
     QMatrix4x4 xRotation;
     QMatrix4x4 yRotation;

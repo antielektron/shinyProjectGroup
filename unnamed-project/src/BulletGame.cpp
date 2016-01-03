@@ -33,7 +33,7 @@ void BulletGame::initialize()
 
 void BulletGame::resize(int width, int height)
 {
-    auto &proj = m_scene->getProjection();
+    auto &proj = m_scene->getCameraProjection();
     proj.setToIdentity();
     proj.perspective(45.0f, (float)width / height, 0.01f, 100.0f);
 }
@@ -139,7 +139,7 @@ void BulletGame::handleInput(float deltaTime)
     QMatrix4x4 halfCameraTransformation;
     halfCameraTransformation.rotate(m_rotY, 0., 1., 0.);
     auto worldVelocity = QVector3D(halfCameraTransformation.transposed() * QVector4D(velocity, 0.));
-    // auto worldVelocity = QVector3D(m_scene->getCamera().transposed() * QVector4D(velocity, 0.));
+    // auto worldVelocity = QVector3D(m_scene->getCameraView().transposed() * QVector4D(velocity, 0.));
     // m_position += worldVelocity * deltaTime;
 
     m_playerBody->applyCentralForce(toBulletVector3(worldVelocity));
@@ -157,7 +157,7 @@ void BulletGame::handleInput(float deltaTime)
 
 void BulletGame::updateCamera()
 {
-    QMatrix4x4 &camera = m_scene->getCamera();
+    QMatrix4x4 &camera = m_scene->getCameraView();
 
     QMatrix4x4 xRotation;
     xRotation.rotate(m_rotX, 1, 0, 0);

@@ -18,6 +18,7 @@
 Renderer::Renderer() :
     m_renderFrameBuffer(0),
     m_renderTexture(0),
+    m_normalTexture(0),
     m_renderDepthBuffer(0)
 {
 }
@@ -29,6 +30,7 @@ Renderer::~Renderer()
     // Delete the manually created objects!
     f->glDeleteFramebuffers(1, &m_renderFrameBuffer);
     f->glDeleteTextures(1, &m_renderTexture);
+    f->glDeleteTextures(1, &m_normalTexture);
     f->glDeleteRenderbuffers(1, &m_renderDepthBuffer);
 }
 
@@ -203,6 +205,9 @@ void Renderer::render(GLuint fbo, Scene *scene)
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
     /*
+
+    CULLING snipet
+
     // normals after projection
     QVector4D normals[4] = {
             {-1., 0., 0., -1.},
@@ -273,21 +278,25 @@ void Renderer::render(GLuint fbo, Scene *scene)
             }
         }
     }
+
     */
 
+
+    // Input: lightDirection, cameraProjection, cameraView, frustum
+    // Output: lightProjection
 
     // Rotate light direction to z
     QVector3D sourceDir = scene->getDirectionalLightDirection().normalized();
     QVector3D targetDir = QVector3D(0., 0., 1.);
 
     QVector3D lightRotationAxis = QVector3D::crossProduct(sourceDir, targetDir);
-    float lightRotationAngle = std::acos(QVector3D::dotProduct(sourceDir, targetDir))*180./M_PI;
+    float lightRotationAngle = std::acos(QVector3D::dotProduct(sourceDir, targetDir))*180.f/M_PI;
 
     QMatrix4x4 lightViewRotation;
     lightViewRotation.rotate(lightRotationAngle, lightRotationAxis);
 
     // Compute viewFrustum of camera in light view
-    auto inverseViewProjection = (scene->getProjection() * scene->getCamera()).inverted();
+    auto inverseViewProjection = (scene->getCameraProjection() * scene->getCameraView()).inverted();
     auto screenToLightTransformation = lightViewRotation * inverseViewProjection;
 
     QVector3D frustumCorners[8] = {
@@ -302,69 +311,72 @@ void Renderer::render(GLuint fbo, Scene *scene)
     };
 
     // TODO compute MINIMAL bounding box of frustumCorners
-    QVector3D minCorner;
-    QVector3D maxCorner;
+    float minZ;
+    float maxZ;
 
-    std::vector<QVector2D> frustum2DPoints;
+    std::vector<QVector2D> frustumPoints2D;
 
     for (int i = 0; i < 8; i++)
     {
         QVector4D res = screenToLightTransformation * QVector4D(frustumCorners[i], 1.);
-        frustumCorners[i] = QVector3D(res / res.w());
-        frustum2DPoints.push_back(frustumCorners[i].toVector2D());
+        auto corner = QVector3D(res / res.w());
+        frustumPoints2D.push_back(corner.toVector2D());
 
         if (i == 0)
         {
-            minCorner = maxCorner = frustumCorners[i];
+            minZ = maxZ = corner.z();
         }
         else
         {
             for (int j = 0; j < 3; j++)
             {
-                if (minCorner[j] > frustumCorners[i][j])
-                    minCorner[j] = frustumCorners[i][j];
-                if (maxCorner[j] < frustumCorners[i][j])
-                    maxCorner[j] = frustumCorners[i][j];
+                if (minZ > corner.z())
+                    minZ = corner.z();
+                if (maxZ < corner.z())
+                    maxZ = corner.z();
             }
         }
     }
 
     // compute on x-y-plane the minimal bounding rectangle
-    std::vector<QVector2D> frustumHull;
-    QVector2D upperPoint;
-    QVector2D lowerPoint;
+    std::vector<QVector2D> frustumHull2D;
+    QVector2D maxCorner2D;
+    QVector2D minCorner2D;
     float frustumRotationAngle;
 
-    mathUtility::getConvexHull(frustum2DPoints, frustumHull);
-    mathUtility::getMinimalBoundingBox(frustumHull,
-                                       lowerPoint,
-                                       upperPoint,
+    mathUtility::getConvexHull(frustumPoints2D, frustumHull2D);
+    mathUtility::getMinimalBoundingBox(frustumHull2D,
+                                       minCorner2D,
+                                       maxCorner2D,
                                        frustumRotationAngle);
 
-    // Compute light view projection
-    QMatrix4x4 lightViewProjection;
+    // rotate such that minimal bounding box is aabb
     QMatrix4x4 lightViewRotationZ;
-
     lightViewRotationZ.rotate(frustumRotationAngle * 180.f / static_cast<float>(M_PI), QVector3D(0, 0, -1));
-    lightViewProjection.ortho(lowerPoint.x(), upperPoint.x(), lowerPoint.y(), upperPoint.y(), -maxCorner.z(), -minCorner.z()); // TODO find out why near/far plane are so?
+
+    // compute light view projection
+    QMatrix4x4 lightViewProjection;
+    lightViewProjection.ortho(minCorner2D.x(), maxCorner2D.x(), minCorner2D.y(), maxCorner2D.y(), -maxZ, -minZ); // TODO find out why near/far plane are so?
 
     QMatrix4x4 lightView = lightViewProjection * lightViewRotationZ * lightViewRotation;
 
 
-    // Light direction from camera's perspective
-    auto lightDirection = scene->getCamera() * QVector4D(scene->getDirectionalLightDirection(), 0.);
+    // light direction from camera's perspective
+    auto lightDirection = scene->getCameraView() * QVector4D(scene->getDirectionalLightDirection(), 0.);
 
 
 
     // Render to ShadowMap
 
+    f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
+
     // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
     glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
 
-    f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
     // Initialize with max depth.
     f->glClearColor(1, 0, 0, 1);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     f->glEnable(GL_DEPTH_TEST);
 
     m_shadowMapProgram.bind();
@@ -378,24 +390,28 @@ void Renderer::render(GLuint fbo, Scene *scene)
         object->getModel()->draw();
     }
 
+    f->glDisable(GL_DEPTH_TEST);
+
     m_shadowMapProgram.release();
 
 
 
     // Render to Texture
 
+    f->glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
+
     // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
     glViewport(0, 0, m_width, m_height);
 
-    f->glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
-    f->glClearColor(0, 0, 0, 1);
+    f->glClearColor(0, 0, 0, 0);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     f->glEnable(GL_DEPTH_TEST);
-    // f->glEnable(GL_CULL_FACE);
+    f->glEnable(GL_CULL_FACE);
 
     m_program->bind();
 
-    m_program->setUniformValue(m_projectionMatrixLoc, scene->getProjection());
+    m_program->setUniformValue(m_projectionMatrixLoc, scene->getCameraProjection());
     m_program->setUniformValue(m_lightDirectionLoc, QVector3D(lightDirection));
     m_program->setUniformValue(m_lightColorLoc, scene->getLightColor());
 
@@ -406,7 +422,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     // Render regular objects
     for (auto &object : scene->getObjects())
     {
-        auto cameraModelView = scene->getCamera() * object->getWorld();
+        auto cameraModelView = scene->getCameraView() * object->getWorld();
         auto lightModelView = lightView * object->getWorld();
 
         m_program->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
@@ -425,7 +441,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
         {
             continue;
         }
-        auto cameraModelView = scene->getCamera() * editorObject->getWorld();
+        auto cameraModelView = scene->getCameraView() * editorObject->getWorld();
         auto lightModelView  = lightView * editorObject->getWorld();
 
         m_program->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
@@ -440,6 +456,9 @@ void Renderer::render(GLuint fbo, Scene *scene)
     // Unbind shadow map texture
     f->glBindTexture(GL_TEXTURE_2D, 0);
 
+    f->glDisable(GL_CULL_FACE);
+    f->glDisable(GL_DEPTH_TEST);
+
     m_program->release();
 
 
@@ -447,21 +466,30 @@ void Renderer::render(GLuint fbo, Scene *scene)
     // Render to Screen
 
     f->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
     f->glClearColor(0, 0, 0, 1);
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    f->glEnable(GL_BLEND);
+    f->glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_composeProgram.bind();
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
 
     f->glActiveTexture(GL_TEXTURE0);
-    f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
-    // f->glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
     m_composeProgram.setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
 
+    f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+    f->glDrawArrays(GL_QUADS, 0, 4);
+
+    f->glViewport(0, 0, m_width/4, m_height/4);
+    f->glBindTexture(GL_TEXTURE_2D, m_normalTexture);
     f->glDrawArrays(GL_QUADS, 0, 4);
 
     f->glBindTexture(GL_TEXTURE_2D, 0);
+
+    f->glDisable(GL_BLEND);
 
     m_composeProgram.release();
 
@@ -476,9 +504,10 @@ void Renderer::resize(int width, int height)
 
     f->glDeleteFramebuffers(1, &m_renderFrameBuffer);
     f->glDeleteTextures(1, &m_renderTexture);
+    f->glDeleteTextures(1, &m_normalTexture);
     f->glDeleteRenderbuffers(1, &m_renderDepthBuffer);
 
-    // Create texture
+    // Create render texture
     f->glGenTextures(1, &m_renderTexture);
     f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
     // Give an empty image to OpenGL ( the last "0" )
@@ -487,6 +516,18 @@ void Renderer::resize(int width, int height)
     f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     f->glBindTexture(GL_TEXTURE_2D, 0);
+
+
+    // Create normal texture
+    f->glGenTextures(1, &m_normalTexture);
+    f->glBindTexture(GL_TEXTURE_2D, m_normalTexture);
+    // Give an empty image to OpenGL ( the last "0" )
+    f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    // Poor filtering. Needed!
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    f->glBindTexture(GL_TEXTURE_2D, 0);
+
 
     // Create depth buffer!
     f->glGenRenderbuffers(1, &m_renderDepthBuffer);
@@ -500,9 +541,10 @@ void Renderer::resize(int width, int height)
     f->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderDepthBuffer);
     // Set "renderTexture" as our colour attachement #0
     f->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_renderTexture, 0);
+    f->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_normalTexture, 0);
     // glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_renderTexture, 0);
 
     // Set the list of draw buffers.
-    // GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    // glDrawBuffers(1, drawBuffers); // "1" is the size of DrawBuffers
+    GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(2, attachments);
 }

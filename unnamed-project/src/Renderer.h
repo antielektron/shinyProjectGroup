@@ -59,6 +59,7 @@ private:
 
     GLuint m_renderFrameBuffer;
     GLuint m_renderTexture;
+    GLuint m_normalTexture;
     GLuint m_renderDepthBuffer;
 };
 

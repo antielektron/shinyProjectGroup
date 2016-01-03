@@ -1,4 +1,4 @@
-#version 130
+#version 150
 
 in vec3 normal;
 in vec3 worldPosition;
@@ -17,6 +17,7 @@ const float roughness = 0.1;
 const float fresnelFactor = 1.;
 
 out vec4 fragColor;
+out vec4 fragNormal;
 
 const float PI = 3.14159265359;
 
@@ -87,7 +88,7 @@ float cooktorranceTerm(vec3 v, vec3 n, vec3 l)
 
 float simpleShadowTerm(vec2 lv, float d)
 {
-    vec2 uv = vec2(lightViewPosition.xy * 0.5 + 0.5);
+    vec2 uv = vec2(lv * 0.5 + 0.5);
     float shadowMapDepth = texture2D(shadowMapSampler, uv).x;
     float depth = d*0.5 + 0.5;
 
@@ -112,4 +113,6 @@ void main()
     float shadowTerm = simpleShadowTerm(lv, d);
 
     fragColor = vec4(clamp(shadowTerm * (specularTerm * specularColor + diffuseTerm * diffuseColor) + ambientColor, 0., 1.), 1.);
+
+    fragNormal = vec4(normal*normal, 1.);
 }
