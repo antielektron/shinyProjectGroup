@@ -30,7 +30,6 @@ private:
 	QVector3D m_centre;
 	QMatrix4x4 posMatrix;
 
-	KeyManager *m_keyManager;
 	bool m_wasEscDown;
 
 	void updatePosMatrix(QVector3D deltaPos);
