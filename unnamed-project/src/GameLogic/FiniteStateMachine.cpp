@@ -24,6 +24,7 @@ FiniteStateMachine::~FiniteStateMachine()
 State *FiniteStateMachine::addState(std::unique_ptr<State> state)
 {
     m_stateMap[state->getName()] = std::move(state);
+    return 0;
 }
 
 //------------------------------------------------------------------------------
