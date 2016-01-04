@@ -2,6 +2,8 @@
 #define GL_GLEXT_PROTOTYPES 1
 #define _USE_MATH_DEFINES
 
+#include <GL/glew.h>
+
 #include <iostream>
 #include <cmath>
 #include <QtGui/qopenglframebufferobject.h>
