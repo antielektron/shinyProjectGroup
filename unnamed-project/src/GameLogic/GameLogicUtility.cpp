@@ -48,7 +48,7 @@ std::string gameLogicUtility::getSubstringByDelimiters(const std::string &src,
 
     if (findFirstBracket && findLastBracket)
     {
-        return src.substr(indexRightBracket + 1,
+        return src.substr(indexLeftBracket + 1,
                           indexRightBracket - indexLeftBracket - 1);
     }
 
@@ -121,6 +121,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
     if (opIndex == std::string::npos)
     {
         // this is a problem
+        return std::unique_ptr<PreconditionBase>(nullptr);
     }
 
     std::string leftSubstring = input.substr(0, opIndex);
@@ -203,13 +204,24 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
 
     else if (op == OP_AND)
     {
+        // remove brackets around term:
+        std::string leftTerm = getSubstringByDelimiters(leftSubstring,
+                                                        BRACKET_LEFT,
+                                                        BRACKET_RIGHT);
+
+        std::string rightTerm = getSubstringByDelimiters(rightSubstring,
+                                                         BRACKET_LEFT,
+                                                         BRACKET_RIGHT);
+
+        // and generate conditions from terms:
         std::unique_ptr<PreconditionBase> leftCondition =
-                stringToPrecondition(state,leftSubstring);
+                stringToPrecondition(state,leftTerm);
         std::unique_ptr<PreconditionBase> rightCondition =
-                stringToPrecondition(state, rightSubstring);
+                stringToPrecondition(state, rightTerm);
 
         assert(leftCondition && rightCondition);
 
+        // finally generate andCondition
         return std::unique_ptr<PreconditionBase>(
                     new IsAndPrecondition(state,
                                           std::move(leftCondition),
@@ -217,11 +229,18 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
     }
     else if (op == OP_NOT)
     {
+        // remove brackets:
+        std::string term = getSubstringByDelimiters(rightSubstring,
+                                                    BRACKET_LEFT,
+                                                    BRACKET_RIGHT);
+
+        // generate condition from term
         std::unique_ptr<PreconditionBase> rightCondition =
-                stringToPrecondition(state, rightSubstring);
+                stringToPrecondition(state, term);
 
         assert(rightCondition);
 
+        // make the notCondition
         return std::unique_ptr<PreconditionBase>(
                     new IsNotPrecondition(state,
                                           std::move(rightCondition)));

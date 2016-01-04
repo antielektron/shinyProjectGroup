@@ -11,9 +11,11 @@ public:
     IsEqualPrecondition(GlobalState *state,const QString &objA, const QString &objB);
     virtual ~IsEqualPrecondition();
 
-    virtual bool evaluateCondition();
+    virtual bool evaluateCondition() override;
 
     virtual QString toQString() override;
+
+    virtual QString getTypeofArgs() override;
 
 protected:
 

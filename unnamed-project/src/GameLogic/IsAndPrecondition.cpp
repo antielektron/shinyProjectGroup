@@ -27,7 +27,7 @@ bool IsAndPrecondition::evaluateCondition()
 QString IsAndPrecondition::toQString()
 {
     return QString("(") + m_baseA->toQString()
-                        + "&"
+                        + ")&("
                         + m_baseB->toQString()
                         + ")";
 }

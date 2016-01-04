@@ -12,6 +12,8 @@ public:
                            const QString objB);
     virtual ~BinaryPreconditionBase();
 
+    virtual QString getTypeofArgs() = 0;
+
 protected:
     QString m_objA;
     QString m_objB;

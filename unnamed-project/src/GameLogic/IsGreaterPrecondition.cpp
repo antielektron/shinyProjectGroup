@@ -50,8 +50,31 @@ template<>bool IsGreaterPrecondition<float>::evaluateCondition()
 template<class T>
 QString IsGreaterPrecondition<T>::toQString()
 {
-    return QString("(") + m_objA + ">" + m_objB + ")";
+    return QString("[") + getTypeofArgs() + "]{"
+            + m_objA + "}>[" + getTypeofArgs() + "]{" + m_objB + "}";
 }
+
+//------------------------------------------------------------------------------
+template <class T>
+QString IsGreaterPrecondition<T>::getTypeofArgs()
+{
+    // theoretically it should be impossible to call
+    // this, btw
+    return QString("unknown");
+}
+
+//------------------------------------------------------------------------------
+template<> QString IsGreaterPrecondition<int>::getTypeofArgs()
+{
+    return QString("int");
+}
+
+//------------------------------------------------------------------------------
+template<> QString IsGreaterPrecondition<float>::getTypeofArgs()
+{
+    return QString("float");
+}
+
 
 template class IsGreaterPrecondition<int>;
 template class IsGreaterPrecondition<float>;

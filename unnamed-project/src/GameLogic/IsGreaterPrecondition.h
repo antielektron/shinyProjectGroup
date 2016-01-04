@@ -16,6 +16,8 @@ public:
 
     virtual QString toQString() override;
 
+    virtual QString getTypeofArgs() override;
+
 protected:
 
 };

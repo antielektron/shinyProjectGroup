@@ -23,5 +23,5 @@ bool IsNotPrecondition::evaluateCondition()
 //------------------------------------------------------------------------------
 QString IsNotPrecondition::toQString()
 {
-    return QString("(!") + m_condition->toQString() + ")";
+    return QString("!(") + m_condition->toQString() + ")";
 }
