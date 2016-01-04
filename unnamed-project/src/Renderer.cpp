@@ -27,13 +27,11 @@ Renderer::Renderer() :
 
 Renderer::~Renderer()
 {
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-
     // Delete the manually created objects!
-    f->glDeleteFramebuffers(1, &m_renderFrameBuffer);
-    f->glDeleteTextures(1, &m_renderTexture);
-    f->glDeleteTextures(1, &m_normalTexture);
-    f->glDeleteRenderbuffers(1, &m_renderDepthBuffer);
+    glDeleteFramebuffers(1, &m_renderFrameBuffer);
+    glDeleteTextures(1, &m_renderTexture);
+    glDeleteTextures(1, &m_normalTexture);
+    glDeleteRenderbuffers(1, &m_renderDepthBuffer);
 }
 
 ShaderErrorType Renderer::createShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource)
@@ -115,8 +113,6 @@ void Renderer::createComposeProgram()
 
     m_composeProgram.release();
 
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-
     // Create quad
     m_quadVao.create();
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
@@ -134,8 +130,8 @@ void Renderer::createComposeProgram()
     m_quadVbo.allocate(vertices, 4*2*sizeof(float));
 
     // Store the vertex attribute bindings for the program.
-    f->glEnableVertexAttribArray(0);
-    f->glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
     m_quadVbo.release();
 }
 
@@ -163,30 +159,28 @@ void Renderer::createShadowMapProgram()
     m_shadowMapProgram.release();
 
     // Create ShadowMap
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-
     m_shadowMapSize = 2048;
 
     // Create Texture
-    f->glGenTextures(1, &m_shadowMapTexture);
-    f->glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
+    glGenTextures(1, &m_shadowMapTexture);
+    glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_shadowMapSize, m_shadowMapSize, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
-    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    f->glBindTexture(GL_TEXTURE_2D, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_shadowMapSize, m_shadowMapSize, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create DepthBuffer
-    f->glGenRenderbuffers(1, &m_shadowMapDepthBuffer);
-    f->glBindRenderbuffer(GL_RENDERBUFFER, m_shadowMapDepthBuffer);
-    f->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize);
-    f->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glGenRenderbuffers(1, &m_shadowMapDepthBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_shadowMapDepthBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // Create FrameBuffer
-    f->glGenFramebuffers(1, &m_shadowMapFrameBuffer);
-    f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
-    f->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_shadowMapDepthBuffer);
-    f->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_shadowMapTexture, 0);
+    glGenFramebuffers(1, &m_shadowMapFrameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_shadowMapDepthBuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_shadowMapTexture, 0);
 }
 
 void Renderer::initialize()
@@ -204,8 +198,6 @@ void Renderer::initialize()
 
 void Renderer::render(GLuint fbo, Scene *scene)
 {
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-
     /*
 
     CULLING snipet
@@ -370,16 +362,16 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     // Render to ShadowMap
 
-    f->glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
 
     // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
     glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
 
     // Initialize with max depth.
-    f->glClearColor(1, 0, 0, 1);
-    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(1, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    f->glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     m_shadowMapProgram.bind();
 
@@ -392,7 +384,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
         object->getModel()->draw();
     }
 
-    f->glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
 
     m_shadowMapProgram.release();
 
@@ -400,16 +392,16 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     // Render to Texture
 
-    f->glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
 
     // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
     glViewport(0, 0, m_width, m_height);
 
-    f->glClearColor(0, 0, 0, 0);
-    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    f->glEnable(GL_DEPTH_TEST);
-    f->glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
 
     m_program->bind();
 
@@ -418,7 +410,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     m_program->setUniformValue(m_lightColorLoc, scene->getLightColor());
 
     // Bind shadow map
-    f->glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
+    glBindTexture(GL_TEXTURE_2D, m_shadowMapTexture);
     m_program->setUniformValue(m_shadowMapSamplerLoc, 0);
 
     // Render regular objects
@@ -456,10 +448,10 @@ void Renderer::render(GLuint fbo, Scene *scene)
     }
 
     // Unbind shadow map texture
-    f->glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
-    f->glDisable(GL_CULL_FACE);
-    f->glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
 
     m_program->release();
 
@@ -467,31 +459,31 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     // Render to Screen
 
-    f->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-    f->glClearColor(0, 0, 0, 1);
-    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    f->glEnable(GL_BLEND);
-    f->glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_composeProgram.bind();
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
 
-    f->glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0);
     m_composeProgram.setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
 
-    f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
-    f->glDrawArrays(GL_QUADS, 0, 4);
+    glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+    glDrawArrays(GL_QUADS, 0, 4);
 
-    f->glViewport(0, 0, m_width/4, m_height/4);
-    f->glBindTexture(GL_TEXTURE_2D, m_normalTexture);
-    f->glDrawArrays(GL_QUADS, 0, 4);
+    glViewport(0, 0, m_width/4, m_height/4);
+    glBindTexture(GL_TEXTURE_2D, m_normalTexture);
+    glDrawArrays(GL_QUADS, 0, 4);
 
-    f->glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
-    f->glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
 
     m_composeProgram.release();
 
@@ -499,51 +491,49 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
 void Renderer::resize(int width, int height)
 {
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-
     m_width = width;
     m_height = height;
 
-    f->glDeleteFramebuffers(1, &m_renderFrameBuffer);
-    f->glDeleteTextures(1, &m_renderTexture);
-    f->glDeleteTextures(1, &m_normalTexture);
-    f->glDeleteRenderbuffers(1, &m_renderDepthBuffer);
+    glDeleteFramebuffers(1, &m_renderFrameBuffer);
+    glDeleteTextures(1, &m_renderTexture);
+    glDeleteTextures(1, &m_normalTexture);
+    glDeleteRenderbuffers(1, &m_renderDepthBuffer);
 
     // Create render texture
-    f->glGenTextures(1, &m_renderTexture);
-    f->glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+    glGenTextures(1, &m_renderTexture);
+    glBindTexture(GL_TEXTURE_2D, m_renderTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     // Poor filtering. Needed!
-    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    f->glBindTexture(GL_TEXTURE_2D, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 
     // Create normal texture
-    f->glGenTextures(1, &m_normalTexture);
-    f->glBindTexture(GL_TEXTURE_2D, m_normalTexture);
+    glGenTextures(1, &m_normalTexture);
+    glBindTexture(GL_TEXTURE_2D, m_normalTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    f->glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     // Poor filtering. Needed!
-    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    f->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    f->glBindTexture(GL_TEXTURE_2D, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
 
     // Create depth buffer!
-    f->glGenRenderbuffers(1, &m_renderDepthBuffer);
-    f->glBindRenderbuffer(GL_RENDERBUFFER, m_renderDepthBuffer);
-    f->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
-    f->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glGenRenderbuffers(1, &m_renderDepthBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_renderDepthBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
-    f->glGenFramebuffers(1, &m_renderFrameBuffer);
-    f->glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
-    f->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderDepthBuffer);
+    glGenFramebuffers(1, &m_renderFrameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderDepthBuffer);
     // Set "renderTexture" as our colour attachement #0
-    f->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_renderTexture, 0);
-    f->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_normalTexture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_renderTexture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_normalTexture, 0);
     // glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_renderTexture, 0);
 
     // Set the list of draw buffers.

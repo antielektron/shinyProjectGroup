@@ -1,8 +1,9 @@
 #ifndef UNNAMED_PROJECT_OPENGLWIDGET_H
 #define UNNAMED_PROJECT_OPENGLWIDGET_H
 
+#include <GL/glew.h>
+
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
 #include <QTimer>
 #include <QKeyEvent>
 

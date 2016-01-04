@@ -1,9 +1,10 @@
 #ifndef UNNAMED_PROJECT_SCENE_MODEL_H
 #define UNNAMED_PROJECT_SCENE_MODEL_H
 
+#include <GL/glew.h>
+
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
-#include <QOpenGLFunctions>
 
 #include <QVector3D>
 

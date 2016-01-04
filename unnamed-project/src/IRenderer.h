@@ -1,8 +1,10 @@
 #ifndef UNNAMED_PROJECT_IRENDERER_H
 #define UNNAMED_PROJECT_IRENDERER_H
 
-#include "utility.h"
+#include <GL/glew.h>
 #include <string>
+
+#include "utility.h"
 
 class Scene;
 

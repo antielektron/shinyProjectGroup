@@ -5,7 +5,10 @@
 #include <cmath>
 #include <climits>
 
+#include <GL/glew.h>
+
 #include "Scene/Model.h"
+
 
 namespace std
 {
@@ -167,8 +170,6 @@ void Model::loadObj(const std::string &fileName)
 //------------------------------------------------------------------------------
 void Model::createOpenGLStuff()
 {
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-
     m_vao.create();
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
 
@@ -178,8 +179,8 @@ void Model::createOpenGLStuff()
     m_vertexBuffer.allocate(m_vertices.data(), m_vertices.size()*3*sizeof(float));
 
     // Store the vertex attribute bindings for the program.
-    f->glEnableVertexAttribArray(0);
-    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
     m_vertexBuffer.release();
 
     // Setup our normal buffer object.
@@ -188,8 +189,8 @@ void Model::createOpenGLStuff()
     m_normalBuffer.allocate(m_normals.data(), m_normals.size()*3*sizeof(float));
 
     // Store the vertex attribute bindings for the program.
-    f->glEnableVertexAttribArray(1);
-    f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
     m_normalBuffer.release();
 
     // Create index buffer object.

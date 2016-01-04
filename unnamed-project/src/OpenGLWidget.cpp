@@ -73,15 +73,35 @@ IRenderer *OpenGLWidget::getRenderer()
 
 void OpenGLWidget::initializeGL()
 {
-    connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &OpenGLWidget::cleanup);
+    char *glVersion = (char*)glGetString(GL_VERSION);
+    if (glVersion)
+    {
+        std::cout << "OpenGL version: " << glVersion << "\n";
+    }
+
+    GLenum err = glewInit();
+    if(err != GLEW_OK)
+    {
+        std::cout << "GLEW init failed: " << glewGetErrorString(err) << std::endl;
+        exit(1);
+    }
+    else
+    {
+        std::cout << "Using GLEW " << glewGetString(GLEW_VERSION) << std::endl;
+    }
+
+    GLuint buf;
+    glGenRenderbuffers(1, &buf);
+
+    // connect(context(), &QOpenGLContext::aboutToBeDestroyed, this, &OpenGLWidget::cleanup);
 
     m_initialized = true;
 
     m_renderer->initialize();
     m_game->initialize();
 
-    auto version = context()->format().version();
-    std::cout << "Using OpenGL Version " << version.first << "." << version.second << std::endl;
+    // auto version = context()->format().version();
+    // std::cout << "Using OpenGL Version " << version.first << "." << version.second << std::endl;
 }
 
 void OpenGLWidget::paintGL()

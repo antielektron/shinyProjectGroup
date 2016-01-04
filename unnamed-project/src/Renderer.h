@@ -1,6 +1,8 @@
 #ifndef UNNAMED_PROJECT_RENDERER_H
 #define UNNAMED_PROJECT_RENDERER_H
 
+#include <GL/glew.h>
+
 #include <QOpenGLShaderProgram>
 #include <memory>
 

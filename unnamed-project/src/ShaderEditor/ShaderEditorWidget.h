@@ -6,7 +6,6 @@
 #include <QDockWidget>
 #include <QVBoxLayout>
 #include <QColor>
-#include <QOpenGLFunctions>
 
 #include "ShaderEditor/CodeEditor.h"
 #include "ShaderEditor/GLSLHighlighter.h"
