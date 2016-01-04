@@ -2,10 +2,10 @@
 #include "GameLogic/GlobalState.h"
 
 IsNotPrecondition::IsNotPrecondition(GlobalState *state,
-                                     PreconditionBase *condition) :
+                                     std::unique_ptr<PreconditionBase> condition) :
     PreconditionBase (state)
 {
-    m_condition = condition;
+    m_condition = std::move(condition);
 }
 
 //------------------------------------------------------------------------------
@@ -18,4 +18,10 @@ IsNotPrecondition::~IsNotPrecondition()
 bool IsNotPrecondition::evaluateCondition()
 {
     return !m_condition->evaluateCondition();
+}
+
+//------------------------------------------------------------------------------
+QString IsNotPrecondition::toQString()
+{
+    return QString("(!") + m_condition->toQString() + ")";
 }

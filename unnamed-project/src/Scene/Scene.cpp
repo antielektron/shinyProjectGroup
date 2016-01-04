@@ -20,6 +20,7 @@ Scene::Scene(const QString &filename)
 //------------------------------------------------------------------------------
 void Scene::clear()
 {
+    m_globalState.reset(new GlobalState());
     // TODO
 }
 
@@ -491,6 +492,12 @@ Model *Scene::getModel(const std::string &modelName)
 {
     assert(m_models.find(modelName) != m_models.end());
     return m_models[modelName].get();
+}
+
+//------------------------------------------------------------------------------
+GlobalState *Scene::getGlobalState()
+{
+    return m_globalState.get();
 }
 
 //------------------------------------------------------------------------------

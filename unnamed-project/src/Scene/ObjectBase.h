@@ -17,7 +17,8 @@ enum class ObjectType
     Undefined,
     ObjectGroup,
     Object,
-    EditorObject
+    EditorObject,
+    LogicObject
 };
 
 class ObjectBase

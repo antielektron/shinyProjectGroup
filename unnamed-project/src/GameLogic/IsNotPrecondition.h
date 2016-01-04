@@ -2,17 +2,20 @@
 #define UNNAMED_PROJECT_ISNOTPRECONDITION_H
 
 #include "GameLogic/PreconditionBase.h"
+#include <memory>
 
 class IsNotPrecondition : public PreconditionBase
 {
 public:
-    IsNotPrecondition(GlobalState *state, PreconditionBase *condition);
+    IsNotPrecondition(GlobalState *state, std::unique_ptr<PreconditionBase> condition);
     virtual ~IsNotPrecondition();
 
     virtual bool evaluateCondition() override;
 
+    virtual QString toQString() override;
+
 protected:
-    PreconditionBase *m_condition;
+    std::unique_ptr<PreconditionBase> m_condition;
 };
 
 #endif // ISNOTPRECONDITION_H

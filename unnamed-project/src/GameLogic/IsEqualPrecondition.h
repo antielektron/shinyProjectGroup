@@ -13,6 +13,8 @@ public:
 
     virtual bool evaluateCondition();
 
+    virtual QString toQString() override;
+
 protected:
 
 };

@@ -27,3 +27,31 @@ bool IsGreaterPrecondition<T>::evaluateCondition()
 
     return a > b;
 }
+
+//------------------------------------------------------------------------------
+template<>bool IsGreaterPrecondition<int>::evaluateCondition()
+{
+    int a = m_globalState->getValue(m_objA).toInt();
+    int b = m_globalState->getValue(m_objB).toInt();
+
+    return a > b;
+}
+
+//------------------------------------------------------------------------------
+template<>bool IsGreaterPrecondition<float>::evaluateCondition()
+{
+    float a = m_globalState->getValue(m_objA).toFloat();
+    float b = m_globalState->getValue(m_objB).toFloat();
+
+    return a > b;
+}
+
+//------------------------------------------------------------------------------
+template<class T>
+QString IsGreaterPrecondition<T>::toQString()
+{
+    return QString("(") + m_objA + ">" + m_objB + ")";
+}
+
+template class IsGreaterPrecondition<int>;
+template class IsGreaterPrecondition<float>;

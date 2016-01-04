@@ -22,6 +22,7 @@
 #include "smartiterator.h"
 
 #include "SceneEditor/EditorObject.h"
+#include "GameLogic/GlobalState.h"
 
 class Scene
 {
@@ -66,6 +67,8 @@ public:
     range<ObjectGroup::object_iterator_type> getEditorObjects();
 
     Model *getModel(const std::string &modelName);
+
+    GlobalState *getGlobalState();
 
 
     // Access metadata
@@ -119,6 +122,8 @@ private:
     QString m_sceneName;
     QString m_sceneVersion;
     QString m_sceneAuthor;
+
+    std::unique_ptr<GlobalState> m_globalState;
 };
 
 #endif // UNNAMED_PROJECT_SCENE_SCENE_H

@@ -2,6 +2,7 @@
 #define UNNAMED_PROJECT_PRECONDITIONBASE_H
 
 class GlobalState;
+class QString;
 
 class PreconditionBase
 {
@@ -10,6 +11,8 @@ public:
     virtual ~PreconditionBase();
 
     virtual bool evaluateCondition() = 0;
+
+    virtual QString toQString() = 0;
 
 protected:
     GlobalState *m_globalState;

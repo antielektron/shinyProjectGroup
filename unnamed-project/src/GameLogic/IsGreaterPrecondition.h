@@ -14,6 +14,8 @@ public:
 
     virtual bool evaluateCondition() override;
 
+    virtual QString toQString() override;
+
 protected:
 
 };

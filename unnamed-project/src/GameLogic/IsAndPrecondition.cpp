@@ -3,12 +3,12 @@
 
 //------------------------------------------------------------------------------
 IsAndPrecondition::IsAndPrecondition(GlobalState *state,
-                                     PreconditionBase *baseA,
-                                     PreconditionBase *baseB) :
+                                     std::unique_ptr<PreconditionBase> baseA,
+                                     std::unique_ptr<PreconditionBase> baseB) :
     PreconditionBase(state)
 {
-    m_baseA = baseA;
-    m_baseB = baseB;
+    m_baseA = std::move(baseA);
+    m_baseB = std::move(baseB);
 }
 
 //------------------------------------------------------------------------------
@@ -21,4 +21,13 @@ IsAndPrecondition::~IsAndPrecondition()
 bool IsAndPrecondition::evaluateCondition()
 {
     return m_baseA->evaluateCondition() && m_baseB->evaluateCondition();
+}
+
+//------------------------------------------------------------------------------
+QString IsAndPrecondition::toQString()
+{
+    return QString("(") + m_baseA->toQString()
+                        + "&"
+                        + m_baseB->toQString()
+                        + ")";
 }

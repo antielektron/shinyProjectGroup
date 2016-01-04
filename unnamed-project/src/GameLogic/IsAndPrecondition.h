@@ -2,21 +2,24 @@
 #define UNNAMED_PROJECT_ISANDPRECONDITION_H
 
 #include "GameLogic/PreconditionBase.h"
+#include <memory>
 
 class IsAndPrecondition : public PreconditionBase
 {
 public:
     IsAndPrecondition(GlobalState *state,
-                      PreconditionBase *baseA,
-                      PreconditionBase *baseB);
+                      std::unique_ptr<PreconditionBase> baseA,
+                      std::unique_ptr<PreconditionBase> baseB);
 
     virtual ~IsAndPrecondition();
 
     virtual bool evaluateCondition() override;
 
+    virtual QString toQString() override;
+
 protected:
-    PreconditionBase *m_baseA;
-    PreconditionBase *m_baseB;
+    std::unique_ptr<PreconditionBase> m_baseA;
+    std::unique_ptr<PreconditionBase> m_baseB;
 };
 
 #endif // UNNAMED_PROJECT_ISANDPRECONDITION_H
