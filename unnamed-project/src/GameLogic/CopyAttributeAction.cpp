@@ -22,3 +22,27 @@ void CopyAttributeAction::performAction()
     QVariant val = m_globalState->getValue(m_srcKey);
     m_globalState->setValue(m_dstKey, val);
 }
+
+//------------------------------------------------------------------------------
+ActionType CopyAttributeAction::getActionType()
+{
+    return ActionType::CopyAttribute;
+}
+
+//------------------------------------------------------------------------------
+QString CopyAttributeAction::getDataType()
+{
+    return QString("varying");
+}
+
+//------------------------------------------------------------------------------
+const QString &CopyAttributeAction::getSourceKey()
+{
+    return m_srcKey;
+}
+
+//------------------------------------------------------------------------------
+const QString &CopyAttributeAction::getDestKey()
+{
+    return m_dstKey;
+}

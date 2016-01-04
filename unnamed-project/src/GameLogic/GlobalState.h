@@ -7,8 +7,8 @@
 #include <QVariant>
 #include <memory>
 #include "smartiterator.h"
-#include "PreconditionBase.h"
-#include "ActionBase.h"
+#include "GameLogic/PreconditionBase.h"
+#include "GameLogic/ActionBase.h"
 
 class GlobalState
 {

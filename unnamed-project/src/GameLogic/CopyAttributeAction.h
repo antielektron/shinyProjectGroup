@@ -15,6 +15,13 @@ public:
 
     virtual void performAction() override;
 
+    virtual ActionType getActionType() override;
+
+    virtual QString getDataType() override;
+
+    const QString &getSourceKey();
+    const QString &getDestKey();
+
 protected:
     QString m_srcKey;
     QString m_dstKey;

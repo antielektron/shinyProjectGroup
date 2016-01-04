@@ -12,6 +12,8 @@ enum class ArithmeticalOperationType
     divisionType
 };
 
+class QVariant;
+
 template<class T>
 class ArithmeticalAction : public ActionBase
 {
@@ -26,7 +28,19 @@ public:
 
     virtual void performAction() override;
 
+    virtual ActionType getActionType() override;
+
+    virtual QString getDataType() override;
+
+    ArithmeticalOperationType getOperationType();
+
+    const QString &getLeftOperandKey();
+    const QString &getRightOperandKey();
+    const QString &getDestKey();
+
 protected:
+    T getValueFromQVariant(QVariant v);
+
     QString m_valA;
     QString m_valB;
     QString m_valDst;

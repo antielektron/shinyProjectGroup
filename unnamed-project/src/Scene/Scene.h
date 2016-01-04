@@ -83,6 +83,7 @@ public:
 private:
     void readObjectTreeFromDom(ObjectGroup *root, const QDomElement &domElement);
     void readModelsFromDom(const QDomElement &domElem);
+    void readEventsFromDom(const QDomElement &domElem);
     QVector3D getPositionFromDom(const QDomElement &domElement);
     QVector3D getRotationFromDom(const QDomElement &domElement);
     QVector3D getScalingFromDom(const QDomElement &domElement);
@@ -92,6 +93,10 @@ private:
     void writePosition(const QVector3D &position, QXmlStreamWriter &writer);
     void writeRotation(const QVector3D &rotation, QXmlStreamWriter &writer);
     void writeScaling(const QVector3D &scaling, QXmlStreamWriter &writer);
+    void writeEvent(const QString &key,
+                    PreconditionBase *condition,
+                    ActionBase *action,
+                    QXmlStreamWriter &writer);
 
     void addToObjectList(ObjectGroup *group);
 

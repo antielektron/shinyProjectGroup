@@ -53,3 +53,10 @@ range<GlobalState::AttributesIteratorType> GlobalState::getAttributes()
     return range<AttributesIteratorType>(m_attributes.begin(),
                                          m_attributes.end());
 }
+
+//------------------------------------------------------------------------------
+range<GlobalState::EventMapIteratorType> GlobalState::getEvents()
+{
+    return range<EventMapIteratorType>(m_eventMap.begin(),
+                                       m_eventMap.end());
+}

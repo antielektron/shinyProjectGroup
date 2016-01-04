@@ -22,3 +22,21 @@ void FlipBooleanAction::performAction()
     bool val =  m_globalState->getValue(m_key).toBool();
     m_globalState->setValue(m_key, !val);
 }
+
+//------------------------------------------------------------------------------
+ActionType FlipBooleanAction::getActionType()
+{
+    return ActionType::FlipBoolean;
+}
+
+//------------------------------------------------------------------------------
+QString FlipBooleanAction::getDataType()
+{
+    return QString("bool");
+}
+
+//------------------------------------------------------------------------------
+const QString &FlipBooleanAction::getKey()
+{
+    return m_key;
+}

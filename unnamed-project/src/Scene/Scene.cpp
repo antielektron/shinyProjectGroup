@@ -3,6 +3,10 @@
 #include <stdexcept>
 
 #include "Scene/Scene.h"
+#include "GameLogic/ArithmeticalAction.h"
+#include "GameLogic/FlipBooleanAction.h"
+#include "GameLogic/CopyAttributeAction.h"
+#include "GameLogic/GameLogicUtility.h"
 
 //------------------------------------------------------------------------------
 Scene::Scene()
@@ -66,6 +70,10 @@ void Scene::loadFromFile(const QString &filename)
         else if (tag == "Models")
         {
             readModelsFromDom(currentElement);
+        }
+        else if (tag == "Events")
+        {
+            readEventsFromDom(currentElement);
         }
         else if (tag == "DirectionalLight")
         {
@@ -186,6 +194,87 @@ void Scene::readModelsFromDom(const QDomElement &domElement)
 }
 
 //------------------------------------------------------------------------------
+void Scene::readEventsFromDom(const QDomElement &domElem)
+{
+    for (auto child = domElem.firstChildElement(); !child.isNull(); child = child.nextSiblingElement())
+    {
+        if (child.tagName() == "Event")
+        {
+            QString key = child.attribute("key", "");
+            QString condition = child.attribute("condition", "");
+            QString actionType = child.attribute("actionType", "");
+
+            std::unique_ptr<PreconditionBase> precondition
+                    = std::move(gameLogicUtility::stringToPrecondition(m_globalState.get(),
+                                                             condition.toStdString()));
+            std::unique_ptr<ActionBase> action(nullptr);
+
+            if (actionType == "arithmetical")
+            {
+                std::map<QString, ArithmeticalOperationType> opMap =
+                {{"+", ArithmeticalOperationType::additionType},
+                 {"-", ArithmeticalOperationType::subtractionType},
+                 {"*", ArithmeticalOperationType::multiplicationType},
+                 {"/", ArithmeticalOperationType::divisionType}
+                };
+
+                QString opType = child.attribute("operationType", "");
+                QString dataType = child.attribute("dataType", "");
+                QString valA = child.attribute("valA", "");
+                QString valB = child.attribute("valB", "");
+                QString valDst = child.attribute("valDst", "");
+
+                if (dataType == "int")
+                {
+                    action.reset(new ArithmeticalAction<int>(
+                                     m_globalState.get(),
+                                     valA,
+                                     valB,
+                                     valDst,
+                                     opMap[opType]));
+                }
+                else if (dataType == "float")
+                {
+                    action.reset(new ArithmeticalAction<float>(
+                                     m_globalState.get(),
+                                     valA,
+                                     valB,
+                                     valDst,
+                                     opMap[opType]));
+                }
+            }
+            else if (actionType == "copy")
+            {
+                QString valSrc = child.attribute("valSrc","");
+                QString valDst = child.attribute("valDst","");
+
+                action.reset(new CopyAttributeAction(
+                                 m_globalState.get(),
+                                 valSrc,
+                                 valDst));
+            }
+            else if (actionType == "flip")
+            {
+                QString val = child.attribute("val","");
+
+                action.reset(new FlipBooleanAction(
+                                 m_globalState.get(),
+                                 val));
+            }
+
+            m_globalState->setEvent(key, std::move(precondition), std::move(action));
+        }
+        else
+        {
+            std::cout << "WARNING: Unexpected tag '"
+            << child.tagName().toStdString()
+            << "' in Event List"
+            << std::endl;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
 QVector3D Scene::getPositionFromDom(const QDomElement &domElement)
 {
     float x = domElement.attribute("x", "0").toFloat();
@@ -250,6 +339,21 @@ void Scene::saveToFile(const QString &filename)
     // Write object tree:
     xmlWriter.writeStartElement("Objects");
     writeObjectTree(&m_rootGroup, xmlWriter);
+    xmlWriter.writeEndElement();
+
+    // events:
+
+    xmlWriter.writeStartElement("Events");
+
+    for (auto &event : m_globalState->getEvents())
+    {
+        const QString &key = event.first;
+        PreconditionBase *condition = event.second.first.get();
+        ActionBase *action = event.second.second.get();
+
+        writeEvent(key, condition, action, xmlWriter);
+    }
+
     xmlWriter.writeEndElement();
 
     //and the little other properties:
@@ -333,6 +437,82 @@ void Scene::writeScaling(const QVector3D &pos, QXmlStreamWriter &writer)
     writer.writeAttribute("sx", QString::number(pos.x()));
     writer.writeAttribute("sy", QString::number(pos.y()));
     writer.writeAttribute("sz", QString::number(pos.z()));
+}
+
+//------------------------------------------------------------------------------
+void Scene::writeEvent(const QString &key,
+                       PreconditionBase *condition,
+                       ActionBase *action,
+                       QXmlStreamWriter &writer)
+{
+    writer.writeStartElement("Event");
+
+    writer.writeAttribute("key", key);
+    writer.writeAttribute("condition", condition->toQString());
+
+    switch (action->getActionType())
+    {
+    case ActionType::ArithmeticalAction:
+    {
+
+        // determine data type and operation:
+        std::map<ArithmeticalOperationType, QString> opMap =
+        {{ArithmeticalOperationType::additionType, "+"},
+         {ArithmeticalOperationType::subtractionType, "-"},
+         {ArithmeticalOperationType::divisionType, "/"},
+         {ArithmeticalOperationType::multiplicationType, "*"}
+        };
+
+        writer.writeAttribute("actionType", "arithmetical");
+
+        if (action->getDataType() == "int")
+        {
+            ArithmeticalAction<int> *arithAction =
+                    static_cast<ArithmeticalAction<int> *>(action);
+            writer.writeAttribute("operationType",
+                                  opMap[arithAction->getOperationType()]);
+
+            writer.writeAttribute("dataType", "int");
+            writer.writeAttribute("valA", arithAction->getLeftOperandKey());
+            writer.writeAttribute("valB", arithAction->getRightOperandKey());
+            writer.writeAttribute("valResult", arithAction->getDestKey());
+        }
+        else
+        {
+            ArithmeticalAction<float> *arithAction =
+                    static_cast<ArithmeticalAction<float> *>(action);
+            writer.writeAttribute("operationType",
+                                  opMap[arithAction->getOperationType()]);
+
+            writer.writeAttribute("dataType", "float");
+            writer.writeAttribute("valA", arithAction->getLeftOperandKey());
+            writer.writeAttribute("valB", arithAction->getRightOperandKey());
+            writer.writeAttribute("valDst", arithAction->getDestKey());
+        }
+
+        break;
+    }
+    case ActionType::CopyAttribute:
+    {
+        writer.writeAttribute("actionType", "copy");
+        CopyAttributeAction *copyAction =
+                static_cast<CopyAttributeAction *>(action);
+        writer.writeAttribute("valSrc", copyAction->getSourceKey());
+        writer.writeAttribute("valDst", copyAction->getDestKey());
+
+        break;
+    }
+    case ActionType::FlipBoolean:
+    {
+        writer.writeAttribute("actionType", "flip");
+        FlipBooleanAction *flipAction =
+                static_cast<FlipBooleanAction *>(action);
+        writer.writeAttribute("val", flipAction->getKey());
+        break;
+    }
+    }
+
+    writer.writeEndElement();
 }
 
 //------------------------------------------------------------------------------
