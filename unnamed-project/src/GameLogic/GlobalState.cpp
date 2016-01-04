@@ -26,10 +26,18 @@ const QVariant &GlobalState::getValue(const QString &key)
 }
 
 //------------------------------------------------------------------------------
+AttributeDatatype GlobalState::getType(const QString &key)
+{
+    return m_datatypeMap[key];
+}
+
+//------------------------------------------------------------------------------
 void GlobalState::setValue(const QString &key,
-                           QVariant value)
+                           QVariant value,
+                           AttributeDatatype type)
 {
     m_attributes[key] = value;
+    m_datatypeMap[key] = type;
 }
 
 //------------------------------------------------------------------------------

@@ -20,7 +20,7 @@ FlipBooleanAction::~FlipBooleanAction()
 void FlipBooleanAction::performAction()
 {
     bool val =  m_globalState->getValue(m_key).toBool();
-    m_globalState->setValue(m_key, !val);
+    m_globalState->setValue(m_key, !val, AttributeDatatype::Bool);
 }
 
 //------------------------------------------------------------------------------

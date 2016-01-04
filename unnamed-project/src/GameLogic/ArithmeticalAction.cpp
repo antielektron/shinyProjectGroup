@@ -54,7 +54,7 @@ void ArithmeticalAction<T>::performAction()
     }
     }
 
-    m_globalState->setValue(m_valDst, result);
+    m_globalState->setValue(m_valDst, result, qStringToType.at(getDataType()));
 }
 
 //------------------------------------------------------------------------------

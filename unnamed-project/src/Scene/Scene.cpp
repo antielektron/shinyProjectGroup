@@ -2,11 +2,14 @@
 #include <iostream>
 #include <stdexcept>
 
+#include <QVector3D>
+
 #include "Scene/Scene.h"
 #include "GameLogic/ArithmeticalAction.h"
 #include "GameLogic/FlipBooleanAction.h"
 #include "GameLogic/CopyAttributeAction.h"
 #include "GameLogic/GameLogicUtility.h"
+#include "GameLogic/GameLogicDatatypes.h"
 
 //------------------------------------------------------------------------------
 Scene::Scene()
@@ -74,6 +77,10 @@ void Scene::loadFromFile(const QString &filename)
         else if (tag == "Events")
         {
             readEventsFromDom(currentElement);
+        }
+        else if (tag == "Attributes")
+        {
+            readAttributesFromDom(currentElement);
         }
         else if (tag == "DirectionalLight")
         {
@@ -275,6 +282,64 @@ void Scene::readEventsFromDom(const QDomElement &domElem)
 }
 
 //------------------------------------------------------------------------------
+void Scene::readAttributesFromDom(const QDomElement &domElem)
+{
+    for (auto child = domElem.firstChildElement(); !child.isNull(); child = child.nextSiblingElement())
+    {
+        if (child.tagName() == "Attribute")
+        {
+            QString type = child.attribute("type","");
+
+            QString key = child.attribute("key","");
+
+            switch (qStringToType.at(type))
+            {
+            case AttributeDatatype::Bool:
+            {
+                QString valueStr = child.attribute("value","");
+                m_globalState->setValue(key,
+                                        valueStr == "true",
+                                        AttributeDatatype::Bool);
+                break;
+            }
+            case AttributeDatatype::Int:
+            {
+                QString valueStr = child.attribute("value","");
+                m_globalState->setValue(key,
+                                        valueStr.toInt(),
+                                        AttributeDatatype::Int);
+                break;
+            }
+            case AttributeDatatype::Float:
+            {
+                QString valueStr = child.attribute("value","");
+                m_globalState->setValue(key,
+                                        valueStr.toFloat(),
+                                        AttributeDatatype::Float);
+                break;
+            }
+            case AttributeDatatype::QVector3D:
+            {
+                float x = child.attribute("x","").toFloat();
+                float y = child.attribute("y","").toFloat();
+                float z = child.attribute("z","").toFloat();
+                m_globalState->setValue(key,
+                                        QVector3D(x,y,z),
+                                        AttributeDatatype::QVector3D);
+            }
+            }
+        }
+        else
+        {
+            std::cout << "WARNING: Unexpected tag '"
+            << child.tagName().toStdString()
+            << "' in Event List"
+            << std::endl;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
 QVector3D Scene::getPositionFromDom(const QDomElement &domElement)
 {
     float x = domElement.attribute("x", "0").toFloat();
@@ -355,6 +420,47 @@ void Scene::saveToFile(const QString &filename)
     }
 
     xmlWriter.writeEndElement();
+
+    // attributes:
+
+    for (auto &attribute : m_globalState->getAttributes())
+    {
+        const QString &key = attribute.first;
+        QVariant value = attribute.second;
+        AttributeDatatype type = m_globalState->getType(key);
+
+        xmlWriter.writeAttribute("key", key);
+        xmlWriter.writeAttribute("type", typeToQString.at(type));
+
+        switch(type)
+        {
+        case AttributeDatatype::Bool:
+        {
+            bool v = value.toBool();
+            xmlWriter.writeAttribute("value", v ? "true" : "false");
+            break;
+        }
+        case AttributeDatatype::Int:
+        {
+            int v = value.toInt();
+            xmlWriter.writeAttribute("value", QString::number(v));
+            break;
+        }
+        case AttributeDatatype::Float:
+        {
+            float v = value.toFloat();
+            xmlWriter.writeAttribute("value", QString::number(v));
+            break;
+        }
+        case AttributeDatatype::QVector3D:
+        {
+            QVector3D v = value.value<QVector3D>();
+            xmlWriter.writeAttribute("x", QString::number(v[0]));
+            xmlWriter.writeAttribute("y", QString::number(v[1]));
+            xmlWriter.writeAttribute("z", QString::number(v[2]));
+        }
+        }
+    }
 
     //and the little other properties:
 

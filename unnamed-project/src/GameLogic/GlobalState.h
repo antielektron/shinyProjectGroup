@@ -9,10 +9,13 @@
 #include "smartiterator.h"
 #include "GameLogic/PreconditionBase.h"
 #include "GameLogic/ActionBase.h"
+#include "GameLogic/GameLogicDatatypes.h"
+
 
 class GlobalState
 {
 public:
+
     GlobalState();
     virtual ~GlobalState();
 
@@ -20,12 +23,15 @@ public:
     typedef std::pair<std::unique_ptr<PreconditionBase>, std::unique_ptr<ActionBase>> EventType;
     typedef std::map<QString, EventType> EventMapType;
     typedef EventMapType::iterator EventMapIteratorType;
+    typedef std::map<QString, AttributeDatatype> DatatypeMapType;
 
     virtual void Init();
 
     const QVariant &getValue(const QString &key);
+    AttributeDatatype getType(const QString &key);
     void setValue(const QString &key,
-                  QVariant value);
+                  QVariant value,
+                  AttributeDatatype type);
 
     const EventType &getEvent(const QString &key);
     void setEvent(const QString &key,
@@ -38,6 +44,7 @@ public:
 protected:
     std::map<QString, QVariant> m_attributes;
     EventMapType m_eventMap;
+    DatatypeMapType m_datatypeMap;
 };
 
 #endif // GLOBALSTATE_H

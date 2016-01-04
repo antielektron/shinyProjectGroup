@@ -20,7 +20,7 @@ CopyAttributeAction::~CopyAttributeAction()
 void CopyAttributeAction::performAction()
 {
     QVariant val = m_globalState->getValue(m_srcKey);
-    m_globalState->setValue(m_dstKey, val);
+    m_globalState->setValue(m_dstKey, val, m_globalState->getType(m_srcKey));
 }
 
 //------------------------------------------------------------------------------

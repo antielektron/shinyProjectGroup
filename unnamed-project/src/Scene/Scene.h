@@ -84,6 +84,7 @@ private:
     void readObjectTreeFromDom(ObjectGroup *root, const QDomElement &domElement);
     void readModelsFromDom(const QDomElement &domElem);
     void readEventsFromDom(const QDomElement &domElem);
+    void readAttributesFromDom(const QDomElement &domElem);
     QVector3D getPositionFromDom(const QDomElement &domElement);
     QVector3D getRotationFromDom(const QDomElement &domElement);
     QVector3D getScalingFromDom(const QDomElement &domElement);
