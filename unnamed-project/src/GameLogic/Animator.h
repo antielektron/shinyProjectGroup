@@ -39,6 +39,10 @@ public:
 
     virtual AnimationType getAnimationType() = 0;
 
+    InterpolationType getInterpolationType();
+
+    const QString &getAttributeKey();
+
     ObjectBase *getObject();
 
     /**
@@ -53,6 +57,8 @@ public:
      *        from the outside as something like a "red panic button"
      */
     void instantlyFinishCurrentAnimation();
+
+    float getAnimationTime();
 
 public slots:
 
@@ -87,6 +93,8 @@ protected:
     QVector3D m_startValue;
     QVector3D m_endValue;
     QVector3D m_interpolatedValue;
+
+    QString m_key;
 
     float m_animationTime;
 };

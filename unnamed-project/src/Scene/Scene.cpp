@@ -10,6 +10,8 @@
 #include "GameLogic/CopyAttributeAction.h"
 #include "GameLogic/GameLogicUtility.h"
 #include "GameLogic/GameLogicDatatypes.h"
+#include "GameLogic/RotationAnimator.h"
+#include "GameLogic/PositionAnimator.h"
 
 //------------------------------------------------------------------------------
 Scene::Scene()
@@ -81,6 +83,10 @@ void Scene::loadFromFile(const QString &filename)
         else if (tag == "Attributes")
         {
             readAttributesFromDom(currentElement);
+        }
+        else if (tag == "Animators")
+        {
+            readAnimatorsFromDom(currentElement);
         }
         else if (tag == "DirectionalLight")
         {
@@ -340,6 +346,62 @@ void Scene::readAttributesFromDom(const QDomElement &domElem)
 }
 
 //------------------------------------------------------------------------------
+void Scene::readAnimatorsFromDom(const QDomElement &domElem)
+{
+    for (auto child = domElem.firstChildElement(); !child.isNull(); child = child.nextSiblingElement())
+    {
+        if (child.tagName() == "Animator")
+        {
+            QString type = child.attribute("type", "");
+            QVector3D val = getPositionFromDom(child);
+
+            float animationTime = child.attribute("time", "").toFloat();
+            QString key = child.attribute("key", "");
+
+            QString interpolation = child.attribute("interpolation", "");
+
+            ObjectBase *object = nullptr; // FIXME: get stuff!!!
+
+            switch(qStringToAnimation.at(type))
+            {
+            case AnimationType::Position:
+            {
+                addAnimator(std::unique_ptr<Animator>(new PositionAnimator(
+                                                          object,
+                                                          m_globalState.get(),
+                                                          key,
+                                                          qStringToInterpolation.at(interpolation),
+                                                          animationTime)));
+                break;
+            }
+            case AnimationType::Rotation:
+            {
+                addAnimator(std::unique_ptr<Animator>(new RotationAnimator(
+                                                          object,
+                                                          m_globalState.get(),
+                                                          key,
+                                                          qStringToInterpolation.at(interpolation),
+                                                          animationTime)));
+                break;
+            }
+            case AnimationType::Scaling:
+            default:
+            {
+                std::cout << "Warning: unknown Animator type" << std::endl;
+            }
+            }
+        }
+        else
+        {
+            std::cout << "WARNING: Unexpected tag '"
+            << child.tagName().toStdString()
+            << "' in Animator List"
+            << std::endl;
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
 QVector3D Scene::getPositionFromDom(const QDomElement &domElement)
 {
     float x = domElement.attribute("x", "0").toFloat();
@@ -461,6 +523,16 @@ void Scene::saveToFile(const QString &filename)
         }
         }
     }
+
+    // Animators:
+    xmlWriter.writeStartElement("Animators");
+
+    for (const auto &anim : m_animators)
+    {
+        writeAnimator(anim.get(), xmlWriter);
+    }
+
+    xmlWriter.writeEndElement();
 
     //and the little other properties:
 
@@ -622,6 +694,22 @@ void Scene::writeEvent(const QString &key,
 }
 
 //------------------------------------------------------------------------------
+void Scene::writeAnimator(Animator *animation, QXmlStreamWriter &writer)
+{
+    writer.writeStartElement("Animator");
+
+    writer.writeAttribute("type", animationToQString.at(animation->getAnimationType()));
+    writer.writeAttribute("time", QString::number(animation->getAnimationTime()));
+
+    writer.writeAttribute("interpolation", interpolationToQString.at(
+                              animation->getInterpolationType()));
+    writer.writeAttribute("key", animation->getAttributeKey());
+
+    writer.writeEndElement();
+
+}
+
+//------------------------------------------------------------------------------
 void Scene::setCamera(const QMatrix4x4 &camera)
 {
     m_camera = camera;
@@ -708,6 +796,12 @@ EditorObject *Scene::createEditorObject(const std::string &modelName)
 range<Scene::ObjectIterator> Scene::getObjects()
 {
     return range<ObjectIterator>(m_objects.cbegin(),m_objects.cend());
+}
+
+//------------------------------------------------------------------------------
+range<Scene::AnimatorIterator> Scene::getAnimators()
+{
+    return range<AnimatorIterator>(m_animators.cbegin(), m_animators.cend());
 }
 
 //------------------------------------------------------------------------------
@@ -820,4 +914,10 @@ const QString &Scene::getVersion() const
 const QString &Scene::getAuthor() const
 {
     return m_sceneAuthor;
+}
+
+//------------------------------------------------------------------------------
+void Scene::addAnimator(std::unique_ptr<Animator> animator)
+{
+    m_animators.push_back(std::move(animator));
 }

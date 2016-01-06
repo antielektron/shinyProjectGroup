@@ -23,6 +23,7 @@
 
 #include "SceneEditor/EditorObject.h"
 #include "GameLogic/GlobalState.h"
+#include "GameLogic/Animator.h"
 
 class Scene
 {
@@ -64,6 +65,9 @@ public:
     typedef std::vector<Object *>::const_iterator ObjectIterator;
     range<ObjectIterator> getObjects();
 
+    typedef std::vector<std::unique_ptr<Animator>>::const_iterator AnimatorIterator;
+    range<AnimatorIterator> getAnimators();
+
     range<ObjectGroup::object_iterator_type> getEditorObjects();
 
     Model *getModel(const std::string &modelName);
@@ -80,11 +84,15 @@ public:
     const QString &getVersion() const;
     const QString &getAuthor() const;
 
+    void addAnimator(std::unique_ptr<Animator> animator);
+
 private:
     void readObjectTreeFromDom(ObjectGroup *root, const QDomElement &domElement);
     void readModelsFromDom(const QDomElement &domElem);
     void readEventsFromDom(const QDomElement &domElem);
     void readAttributesFromDom(const QDomElement &domElem);
+    void readAnimatorsFromDom(const QDomElement &domElem);
+
     QVector3D getPositionFromDom(const QDomElement &domElement);
     QVector3D getRotationFromDom(const QDomElement &domElement);
     QVector3D getScalingFromDom(const QDomElement &domElement);
@@ -98,6 +106,7 @@ private:
                     PreconditionBase *condition,
                     ActionBase *action,
                     QXmlStreamWriter &writer);
+    void writeAnimator(Animator *animation, QXmlStreamWriter &writer);
 
     void addToObjectList(ObjectGroup *group);
 
@@ -123,6 +132,8 @@ private:
     std::map<std::string, std::unique_ptr<Model>> m_models; // all basic models that are available (only for construction purposes, if needed!)
 
     std::vector<Object *> m_objects;
+
+    std::vector<std::unique_ptr<Animator>> m_animators;
 
     // Meta information
     QString m_sceneName;

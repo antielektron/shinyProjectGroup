@@ -15,13 +15,25 @@ Animator::Animator(ObjectBase *object,
     m_isAnimationRunning = false;
     m_animationTime = animationTime;
     m_interpolationType = interpolation;
-    // TODO register at globalState
+    m_key = attributeKey;
 }
 
 //------------------------------------------------------------------------------
 Animator::~Animator()
 {
     // nothing to do here...
+}
+
+//------------------------------------------------------------------------------
+InterpolationType Animator::getInterpolationType()
+{
+    return m_interpolationType;
+}
+
+//------------------------------------------------------------------------------
+const QString &Animator::getAttributeKey()
+{
+    return m_key;
 }
 
 //------------------------------------------------------------------------------
@@ -109,4 +121,7 @@ void Animator::onValueChanged(const QVector3D &val, float currentTime)
 }
 
 //------------------------------------------------------------------------------
-
+float Animator::getAnimationTime()
+{
+    return m_animationTime;
+}
