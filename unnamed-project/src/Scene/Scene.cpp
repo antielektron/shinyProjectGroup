@@ -348,14 +348,22 @@ void Scene::readAnimatorsFromDom(const QDomElement &domElem)
         if (child.tagName() == "Animator")
         {
             QString type = child.attribute("type", "");
-            QVector3D val = getPositionFromDom(child);
+            QString objectName = child.attribute("object", "");
 
             float animationTime = child.attribute("time", "").toFloat();
             QString key = child.attribute("key", "");
 
             QString interpolation = child.attribute("interpolation", "");
 
-            ObjectBase *object = nullptr; // FIXME: get stuff!!!
+            ObjectBase *object = findObjectByName(&m_rootGroup, objectName);
+            if (!object)
+            {
+                std::cout << "Warning: object " << key.toStdString()
+                          << "not found. Skipping it's " << type.toStdString()
+                          << "-Animator"
+                          << std::endl;
+                continue;
+            }
 
             switch(qStringToAnimation.at(type))
             {
@@ -705,6 +713,8 @@ void Scene::writeAnimator(Animator *animation, QXmlStreamWriter &writer)
                               animation->getInterpolationType()));
     writer.writeAttribute("key", animation->getAttributeKey());
 
+    writer.writeAttribute("object", animation->getObject()->getName());
+
     writer.writeEndElement();
 
 }
@@ -760,6 +770,7 @@ Object *Scene::createObject(const std::string &modelName, ObjectGroup *parent)
     object->setName(QString::fromStdString(modelName));
 
     m_objects.push_back(object);
+
     parent->addObject(std::unique_ptr<Object>(object));
     return object;
 }
@@ -861,6 +872,28 @@ void Scene::addToObjectList(ObjectGroup *root)
     {
         addToObjectList(group);
     }
+}
+
+//------------------------------------------------------------------------------
+ObjectBase *Scene::findObjectByName(ObjectGroup *root, const QString &name)
+{
+
+    for (auto child : root->getObjects())
+    {
+        if (child->getName() == name)
+        {
+            return child;
+        }
+    }
+    for (auto childGrp : root->getGroups())
+    {
+         ObjectBase *searchedObject = findObjectByName(childGrp, name);
+         if (searchedObject)
+         {
+             return searchedObject;
+         }
+    }
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------

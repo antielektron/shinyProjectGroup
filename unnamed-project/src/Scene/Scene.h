@@ -109,6 +109,8 @@ private:
 
     void addToObjectList(ObjectGroup *group);
 
+    ObjectBase *findObjectByName(ObjectGroup *root, const QString &name);
+
     QMatrix4x4 m_proj;
     QMatrix4x4 m_camera;
     /// QMatrix4x4 m_world;

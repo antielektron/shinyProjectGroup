@@ -105,7 +105,10 @@ void Animator::onValueChanged(const QVector3D &val, float currentTime)
 
     if (m_isAnimationRunning)
     {
-        instantlyFinishCurrentAnimation(); //hmmmm....
+        instantlyFinishCurrentAnimation();  // pro: could be important for
+                                            //      consistent game logic
+                                            // contra: object 'jumps' to
+                                            //         final position/rotation
     }
 
     // get start value from the object
