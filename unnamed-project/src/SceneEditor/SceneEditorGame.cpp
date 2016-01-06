@@ -264,5 +264,5 @@ void SceneEditorGame::createIndicatorObject()
 {
 	// NOTE: this model should NOT be part of the scene!!!
     Model *model = new Model("models/editorIndicator.obj");
-    m_indicatorObject = m_scene->createEditorObject(model);
+    m_indicatorObject = m_scene->createEditorObject("editor indicator", model);
 }

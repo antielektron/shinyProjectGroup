@@ -403,13 +403,12 @@ ObjectGroup *Scene::createObjectGroup(const std::string &name, ObjectGroup *pare
 }
 
 //------------------------------------------------------------------------------
-EditorObject *Scene::createEditorObject(Model *modelName)
+EditorObject *Scene::createEditorObject(const std::string &name, Model *model)
 {
     EditorObject *object = new EditorObject(model);
-    object->setName(QString::fromStdString(modelName));
+    object->setName(QString::fromStdString(name));
 
-    m_editorObjectRootGroup.addObject(
-                std::unique_ptr<Object>(object));
+    m_editorObjectRootGroup.addObject(std::unique_ptr<Object>(object));
 
     return object;
 }
