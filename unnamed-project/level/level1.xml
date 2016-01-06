@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scene name="Shiny Scene" version="42" author="Norby">
     <Models>
-        <Model name="editorIndicator" path="models/editorIndicator.obj"/>
         <Model name="floor" path="models/floor.obj"/>
         <Model name="octonorm" path="models/octonorm.obj"/>
         <Model name="randobj" path="models/randobj.obj"/>

@@ -262,7 +262,7 @@ ObjectGroup *SceneEditorGame::createObjectGroup(const std::string &name, ObjectG
 //------------------------------------------------------------------------------
 void SceneEditorGame::createIndicatorObject()
 {
+	// NOTE: this model should NOT be part of the scene!!!
     Model *model = new Model("models/editorIndicator.obj");
-    m_scene->addModel(std::unique_ptr<Model>(model));
     m_indicatorObject = m_scene->createEditorObject(model->getName());
 }
