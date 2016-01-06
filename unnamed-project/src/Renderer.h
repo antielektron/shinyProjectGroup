@@ -23,10 +23,14 @@ public:
     virtual std::string &getFragmentShader() override;
 
 private:
+    void rotateVectorToVector(const QVector3D &source, const QVector3D &destination, QMatrix4x4 &matrix);
+    void computeFrustumSlice(float sliceZ, const QMatrix4x4 &transformation, std::vector<QVector3D> &corners);
+
     GLsizei m_width;
     GLsizei m_height;
 
     GLsizei m_shadowMapSize;
+    GLsizei m_cascades;
 
     void createComposeProgram();
     void createShadowMapProgram();
@@ -36,7 +40,7 @@ private:
     std::unique_ptr<QOpenGLShaderProgram> m_program;
     int m_modelViewMatrixLoc;
     int m_projectionMatrixLoc;
-    int m_lightViewMatrixLoc;
+    int m_cascadeViewMatrixLoc;
     int m_lightDirectionLoc;
     int m_lightColorLoc;
     int m_specularColorLoc;
@@ -46,7 +50,8 @@ private:
 
     // ShadowMap Shader
     QOpenGLShaderProgram m_shadowMapProgram;
-    int m_shadowMapLightViewMatrixLoc;
+    int m_shadowMapWorldMatrixLoc;
+    int m_shadowMapCascadeViewMatrixLoc;
 
     GLuint m_shadowMapFrameBuffer;
     GLuint m_shadowMapTexture;

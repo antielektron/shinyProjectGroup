@@ -44,7 +44,7 @@ void SceneEditorGame::resize(int width, int height)
 {
     auto &proj = m_scene->getCameraProjection();
     proj.setToIdentity();
-    proj.perspective(45.0f, (float)width / height, 0.01f, 100.0f);
+    proj.perspective(45.0f, (float)width / height, 0.01f, 30.0f);
 }
 
 void SceneEditorGame::tick(float dt)
