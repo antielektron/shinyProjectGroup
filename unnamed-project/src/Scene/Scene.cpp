@@ -403,11 +403,8 @@ ObjectGroup *Scene::createObjectGroup(const std::string &name, ObjectGroup *pare
 }
 
 //------------------------------------------------------------------------------
-EditorObject *Scene::createEditorObject(const std::string &modelName)
+EditorObject *Scene::createEditorObject(Model *modelName)
 {
-    assert(m_models.find(modelName) != m_models.end());
-    Model *model = m_models[modelName].get();
-
     EditorObject *object = new EditorObject(model);
     object->setName(QString::fromStdString(modelName));
 

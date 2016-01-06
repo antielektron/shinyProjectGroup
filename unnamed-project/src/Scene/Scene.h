@@ -51,7 +51,7 @@ public:
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
-    EditorObject *createEditorObject(const std::string &modelName);
+    EditorObject *createEditorObject(Model *modelName);
 
     ObjectGroup *getSceneRoot();
 
