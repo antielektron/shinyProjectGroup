@@ -96,7 +96,7 @@ float simpleShadowTerm(vec2 lv, float d)
     if (depth - shadowMapDepth <= 0.01)
         return 1.;
     else
-        return 0.;
+        return 0.1;
 }
 
 void main()
