@@ -5,7 +5,10 @@
 #include <cmath>
 #include <climits>
 
+#include <GL/glew.h>
+
 #include "Scene/Model.h"
+
 
 namespace std
 {
@@ -167,8 +170,6 @@ void Model::loadObj(const std::string &fileName)
 //------------------------------------------------------------------------------
 void Model::createOpenGLStuff()
 {
-    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
-
     m_vao.create();
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_vao);
 
@@ -178,8 +179,8 @@ void Model::createOpenGLStuff()
     m_vertexBuffer.allocate(m_vertices.data(), m_vertices.size()*3*sizeof(float));
 
     // Store the vertex attribute bindings for the program.
-    f->glEnableVertexAttribArray(0);
-    f->glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
     m_vertexBuffer.release();
 
     // Setup our normal buffer object.
@@ -188,8 +189,8 @@ void Model::createOpenGLStuff()
     m_normalBuffer.allocate(m_normals.data(), m_normals.size()*3*sizeof(float));
 
     // Store the vertex attribute bindings for the program.
-    f->glEnableVertexAttribArray(1);
-    f->glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
     m_normalBuffer.release();
 
     // Create index buffer object.
@@ -240,14 +241,24 @@ const QVector3D &Model::getMinExtent()
 }
 
 //------------------------------------------------------------------------------
-
 const QVector3D &Model::getMaxExtent()
 {
     return m_maxExtent;
 }
 
 //------------------------------------------------------------------------------
+const std::vector<QVector3D> &Model::getVertices()
+{
+    return m_vertices;
+}
 
+//------------------------------------------------------------------------------
+const std::vector<unsigned int> &Model::getIndices()
+{
+    return m_indices;
+}
+
+//------------------------------------------------------------------------------
 void Model::updateExtent()
 {
     m_minExtent[0] = std::numeric_limits<float>::max();
@@ -256,9 +267,11 @@ void Model::updateExtent()
     m_maxExtent[0] = -std::numeric_limits<float>::max();
     m_maxExtent[1] = -std::numeric_limits<float>::max();
     m_maxExtent[2] = -std::numeric_limits<float>::max();
+
     m_center[0] = 0.0;
     m_center[1] = 0.0;
     m_center[2] = 0.0;
+
     for (auto &vertex : m_vertices)
     {
         for (int i = 0; i < 3; i++)

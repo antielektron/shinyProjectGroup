@@ -40,3 +40,12 @@ if (BULLET_FOUND)
     target_link_libraries(unnamed-project ${BULLET_LIBRARIES})
     add_definitions("-DHAVE_BULLET=1")
 endif()
+
+
+# Windows: http://glew.sourceforge.net/index.html
+find_package(GLEW REQUIRED)
+
+if (GLEW_FOUND)
+    include_directories(${GLEW_INCLUDE_DIRS})
+    target_link_libraries(unnamed-project ${GLEW_LIBRARIES})
+endif()

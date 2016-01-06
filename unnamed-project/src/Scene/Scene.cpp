@@ -470,69 +470,72 @@ void Scene::saveToFile(const QString &filename)
 
     // events:
 
-    xmlWriter.writeStartElement("Events");
-
-    for (auto &event : m_globalState->getEvents())
+    if (m_globalState)
     {
-        const QString &key = event.first;
-        PreconditionBase *condition = event.second.first.get();
-        ActionBase *action = event.second.second.get();
+        xmlWriter.writeStartElement("Events");
 
-        writeEvent(key, condition, action, xmlWriter);
+        for (auto &event : m_globalState->getEvents())
+        {
+            const QString &key = event.first;
+            PreconditionBase *condition = event.second.first.get();
+            ActionBase *action = event.second.second.get();
+
+            writeEvent(key, condition, action, xmlWriter);
+        }
+
+        xmlWriter.writeEndElement();
+
+        // attributes:
+
+        for (auto &attribute : m_globalState->getAttributes())
+        {
+            const QString &key = attribute.first;
+            QVariant value = attribute.second;
+            AttributeDatatype type = m_globalState->getType(key);
+
+            xmlWriter.writeAttribute("key", key);
+            xmlWriter.writeAttribute("type", typeToQString.at(type));
+
+            switch(type)
+            {
+            case AttributeDatatype::Bool:
+            {
+                bool v = value.toBool();
+                xmlWriter.writeAttribute("value", v ? "true" : "false");
+                break;
+            }
+            case AttributeDatatype::Int:
+            {
+                int v = value.toInt();
+                xmlWriter.writeAttribute("value", QString::number(v));
+                break;
+            }
+            case AttributeDatatype::Float:
+            {
+                float v = value.toFloat();
+                xmlWriter.writeAttribute("value", QString::number(v));
+                break;
+            }
+            case AttributeDatatype::QVector3D:
+            {
+                QVector3D v = value.value<QVector3D>();
+                xmlWriter.writeAttribute("x", QString::number(v[0]));
+                xmlWriter.writeAttribute("y", QString::number(v[1]));
+                xmlWriter.writeAttribute("z", QString::number(v[2]));
+            }
+            }
+        }
+
+        // Animators:
+        xmlWriter.writeStartElement("Animators");
+
+        for (const auto &anim : m_animators)
+        {
+            writeAnimator(anim.get(), xmlWriter);
+        }
+
+        xmlWriter.writeEndElement();
     }
-
-    xmlWriter.writeEndElement();
-
-    // attributes:
-
-    for (auto &attribute : m_globalState->getAttributes())
-    {
-        const QString &key = attribute.first;
-        QVariant value = attribute.second;
-        AttributeDatatype type = m_globalState->getType(key);
-
-        xmlWriter.writeAttribute("key", key);
-        xmlWriter.writeAttribute("type", typeToQString.at(type));
-
-        switch(type)
-        {
-        case AttributeDatatype::Bool:
-        {
-            bool v = value.toBool();
-            xmlWriter.writeAttribute("value", v ? "true" : "false");
-            break;
-        }
-        case AttributeDatatype::Int:
-        {
-            int v = value.toInt();
-            xmlWriter.writeAttribute("value", QString::number(v));
-            break;
-        }
-        case AttributeDatatype::Float:
-        {
-            float v = value.toFloat();
-            xmlWriter.writeAttribute("value", QString::number(v));
-            break;
-        }
-        case AttributeDatatype::QVector3D:
-        {
-            QVector3D v = value.value<QVector3D>();
-            xmlWriter.writeAttribute("x", QString::number(v[0]));
-            xmlWriter.writeAttribute("y", QString::number(v[1]));
-            xmlWriter.writeAttribute("z", QString::number(v[2]));
-        }
-        }
-    }
-
-    // Animators:
-    xmlWriter.writeStartElement("Animators");
-
-    for (const auto &anim : m_animators)
-    {
-        writeAnimator(anim.get(), xmlWriter);
-    }
-
-    xmlWriter.writeEndElement();
 
     //and the little other properties:
 
@@ -710,25 +713,25 @@ void Scene::writeAnimator(Animator *animation, QXmlStreamWriter &writer)
 }
 
 //------------------------------------------------------------------------------
-void Scene::setCamera(const QMatrix4x4 &camera)
+void Scene::setCameraView(const QMatrix4x4 &camera)
 {
     m_camera = camera;
 }
 
 //------------------------------------------------------------------------------
-void Scene::setProjection(const QMatrix4x4 &proj)
+void Scene::setCameraProjection(const QMatrix4x4 &proj)
 {
     m_proj = proj;
 }
 
 //------------------------------------------------------------------------------
-QMatrix4x4 &Scene::getCamera()
+QMatrix4x4 &Scene::getCameraView()
 {
     return m_camera;
 }
 
 //------------------------------------------------------------------------------
-QMatrix4x4 &Scene::getProjection()
+QMatrix4x4 &Scene::getCameraProjection()
 {
     return m_proj;
 }
@@ -778,16 +781,12 @@ ObjectGroup *Scene::createObjectGroup(const std::string &name, ObjectGroup *pare
 }
 
 //------------------------------------------------------------------------------
-EditorObject *Scene::createEditorObject(const std::string &modelName)
+EditorObject *Scene::createEditorObject(const std::string &name, Model *model)
 {
-    assert(m_models.find(modelName) != m_models.end());
-    Model *model = m_models[modelName].get();
-
     EditorObject *object = new EditorObject(model);
-    object->setName(QString::fromStdString(modelName));
+    object->setName(QString::fromStdString(name));
 
-    m_editorObjectRootGroup.addObject(
-                std::unique_ptr<Object>(object));
+    m_editorObjectRootGroup.addObject(std::unique_ptr<Object>(object));
 
     return object;
 }

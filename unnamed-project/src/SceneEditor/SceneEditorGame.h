@@ -41,6 +41,7 @@ public:
     void removeModel(const std::string &modelName);
 
 	void notifyCurrentObjectChanged(ObjectBase *object);
+	void removeCurrentObject();
 
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
@@ -68,8 +69,6 @@ private:
 
 	float m_rotY = 0;
 	float m_rotX = 0;
-
-	bool m_wasEscDown;
 
 	void updatePosMatrix(QVector3D deltaPos);
 

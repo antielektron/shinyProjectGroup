@@ -3,7 +3,6 @@
 
 #include <map>
 
-
 class KeyManager
 {
 public:
@@ -15,7 +14,10 @@ public:
 	void pressKey(int keycode);
 	void releaseKey(int keycode);
 
+	bool isKeyDown(int keycode);
+	// check if key was released/pressed during last frame
 	bool isKeyPressed(int keycode);
+	bool isKeyReleaseed(int keycode);
 
 	void mouseMoveRelative(float posX, float posY);
     void mouseMoveAbsolute(float posX, float posY);
@@ -30,7 +32,14 @@ public:
 	bool shouldCatchMouse();
 
 protected:
-	std::map<int, bool> m_keyMap;
+    enum KeyState
+    {
+        IS_DOWN = 1,
+        WAS_DOWN = 2,
+        PRESSED = 4,
+        RELEASED = 8
+    };
+	std::map<int, int> m_keyMap;
 
 	float m_absoluteX;
 	float m_absoluteY;

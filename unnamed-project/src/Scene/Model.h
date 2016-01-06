@@ -1,9 +1,10 @@
 #ifndef UNNAMED_PROJECT_SCENE_MODEL_H
 #define UNNAMED_PROJECT_SCENE_MODEL_H
 
+#include <GL/glew.h>
+
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
-#include <QOpenGLFunctions>
 
 #include <QVector3D>
 
@@ -24,6 +25,9 @@ public:
     const QVector3D &getCenter();
     const QVector3D &getMinExtent();
     const QVector3D &getMaxExtent();
+
+    const std::vector<QVector3D> &getVertices();
+    const std::vector<unsigned int> &getIndices();
 
 private:
     std::vector<QVector3D> m_vertices;

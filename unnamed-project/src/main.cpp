@@ -9,7 +9,6 @@
 #include "ShaderEditor/EditorWindow.h"
 #include "SceneEditor/SceneEditorWindow.h"
 
-
 // http://www.ics.com/blog/qt-and-opengl-part-2-rendering-3d-model
 // http://doc.qt.io/qt-5/qtopengl-hellogl2-example.html
 // http://doc.qt.io/qt-5/cmake-manual.html
@@ -60,7 +59,7 @@ int main(int argc, char **argv)
     {
         // TODO have window (with debug ui)
         // TODO add command line argument for level file to use!
-        OpenGLWidget widget(std::make_shared<BulletGame>("level/test.xml"));
+        OpenGLWidget widget(std::make_shared<BulletGame>("level/menger.xml"));
         widget.show();
 
         return app.exec();

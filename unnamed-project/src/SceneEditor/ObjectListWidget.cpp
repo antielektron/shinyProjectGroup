@@ -154,7 +154,7 @@ void ObjectListWidget::onRemoveClick()
 {
     if (m_currentObject)
     {
-        m_currentObject->destroy();
+        m_game->removeCurrentObject();
         m_currentObject = nullptr;
         updateModelTree();
         emit updateSceneObjectsRequest();

@@ -3,3 +3,9 @@ build/
 *-build/
 *.user
 build-unnamed-project-Desktop-Default/
+build/
+.idea/
+*-build/
+*.user
+build-unnamed-project-Desktop-Release/
+build-unnamed-project-Desktop-Debug/

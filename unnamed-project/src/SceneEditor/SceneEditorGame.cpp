@@ -27,7 +27,7 @@ void SceneEditorGame::reset(std::unique_ptr<Scene> scene)
 
     m_time = 0;
 
-    m_scene->getCamera().translate(0., 0., -10);
+	m_scene->getCameraView().translate(0., 0., -10);
 
     m_scene->getSceneRoot()->updateWorld();
 
@@ -42,7 +42,7 @@ void SceneEditorGame::reset(std::unique_ptr<Scene> scene)
 
 void SceneEditorGame::resize(int width, int height)
 {
-    auto &proj = m_scene->getProjection();
+    auto &proj = m_scene->getCameraProjection();
     proj.setToIdentity();
     proj.perspective(45.0f, (float)width / height, 0.01f, 100.0f);
 }
@@ -88,48 +88,49 @@ void SceneEditorGame::tick(float dt)
 		m_rotY += m_keyManager->getRelativeX() * .1;
 	}
 
-	if (m_keyManager->isKeyPressed(Qt::Key_Right))
+	if (m_keyManager->isKeyDown(Qt::Key_Right))
 	{
 		m_rotY += 0.5;
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_Left))
+	if (m_keyManager->isKeyDown(Qt::Key_Left))
 	{
 		m_rotY -= 0.5;
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_Up))
+	if (m_keyManager->isKeyDown(Qt::Key_Up))
 	{
 		m_rotX += 0.5;
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_Down))
+	if (m_keyManager->isKeyDown(Qt::Key_Down))
 	{
 		m_rotX -= 0.5;
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_S))
+	if (m_keyManager->isKeyDown(Qt::Key_S))
 	{
 		deltaPos += QVector3D(0, 0, speed);
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_W))
+	if (m_keyManager->isKeyDown(Qt::Key_W))
 	{
 		deltaPos += QVector3D(0, 0, -speed);
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_D))
+	if (m_keyManager->isKeyDown(Qt::Key_D))
 	{
 		deltaPos += QVector3D(speed, 0, 0);
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_A))
+	if (m_keyManager->isKeyDown(Qt::Key_A))
 	{
 		deltaPos += QVector3D(-speed, 0, 0);
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_Space) || m_keyManager->isKeyPressed(Qt::Key_Q))
+	if (m_keyManager->isKeyDown(Qt::Key_Space) || m_keyManager->isKeyDown(Qt::Key_Q))
 	{
 		deltaPos += QVector3D(0, speed, 0);
 	}
-	if (m_keyManager->isKeyPressed(Qt::Key_Shift) || m_keyManager->isKeyPressed(Qt::Key_Z) || m_keyManager->isKeyPressed(Qt::Key_Y))
+	if (m_keyManager->isKeyDown(Qt::Key_Shift) || m_keyManager->isKeyDown(Qt::Key_Z) ||
+		m_keyManager->isKeyDown(Qt::Key_Y))
 	{
 		deltaPos += QVector3D(0, -speed, 0);
 	}
 
-	if (m_keyManager->isKeyPressed(Qt::Key_T))
+	if (m_keyManager->isKeyDown(Qt::Key_T))
 	{
 		if (m_currentObject)
 		{
@@ -138,7 +139,7 @@ void SceneEditorGame::tick(float dt)
 	}
 
 	// Reset camera
-	if (m_keyManager->isKeyPressed(Qt::Key_R))
+	if (m_keyManager->isKeyDown(Qt::Key_R))
 	{
 		m_position = QVector3D(0, 0, 0);
 		m_rotX = 0;
@@ -153,11 +154,10 @@ void SceneEditorGame::tick(float dt)
 	updatePosMatrix(deltaPos);
 
 	// Start/Stop catching mouse
-	if (m_keyManager->isKeyPressed(Qt::Key_Escape) && !m_wasEscDown)
+	if (m_keyManager->isKeyPressed(Qt::Key_Escape))
 	{
 		m_keyManager->setCatchMouse(!m_keyManager->shouldCatchMouse());
 	}
-	m_wasEscDown = m_keyManager->isKeyPressed(Qt::Key_Escape);
 }
 
 Scene *SceneEditorGame::getScene()
@@ -172,7 +172,7 @@ ObjectGroup *SceneEditorGame::getRootObject()
 
 void SceneEditorGame::updatePosMatrix(QVector3D deltaPos)
 {
-	QMatrix4x4 &camera = m_scene->getCamera();
+	QMatrix4x4 &camera = m_scene->getCameraView();
 	QMatrix4x4 translation;
 	QMatrix4x4 xRotation;
 	QMatrix4x4 yRotation;
@@ -193,7 +193,7 @@ void SceneEditorGame::notifyCurrentObjectChanged(ObjectBase *object)
 	// Called when a new object was selected or the current object has changed.
     m_currentObject = object;
 
-    if (object->getObjectType() != ObjectType::ObjectGroup)
+    if (object && object->getObjectType() != ObjectType::ObjectGroup)
     {
         m_indicatorObject->makeVisible();
         QVector3D indicatorPosition = object->getAbsolutePosition();
@@ -213,6 +213,15 @@ void SceneEditorGame::notifyCurrentObjectChanged(ObjectBase *object)
     }
 
     emit currentObjectChanged();
+}
+
+void SceneEditorGame::removeCurrentObject()
+{
+	if (m_currentObject)
+	{
+		m_currentObject->destroy();
+        notifyCurrentObjectChanged(nullptr);
+	}
 }
 
 ObjectBase *SceneEditorGame::getCurrentObject()
@@ -262,7 +271,7 @@ ObjectGroup *SceneEditorGame::createObjectGroup(const std::string &name, ObjectG
 //------------------------------------------------------------------------------
 void SceneEditorGame::createIndicatorObject()
 {
+	// NOTE: this model should NOT be part of the scene!!!
     Model *model = new Model("models/editorIndicator.obj");
-    m_scene->addModel(std::unique_ptr<Model>(model));
-    m_indicatorObject = m_scene->createEditorObject(model->getName());
+    m_indicatorObject = m_scene->createEditorObject("editor indicator", model);
 }

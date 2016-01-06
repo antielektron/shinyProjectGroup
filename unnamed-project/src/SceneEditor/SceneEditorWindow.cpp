@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QAction>
 #include <QFileDialog>
+
 #include "SceneEditor/SceneEditorGame.h"
 #include "SceneEditor/ObjectDetailsWidget.h"
 #include "SceneEditor/ObjectListWidget.h"

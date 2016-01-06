@@ -20,17 +20,29 @@ KeyManager::~KeyManager()
 
 void KeyManager::pressKey(int keycode)
 {
-	m_keyMap[keycode] = true;
+	// set flag
+	m_keyMap[keycode] |= IS_DOWN;
 }
 
 void KeyManager::releaseKey(int keycode)
 {
-	m_keyMap[keycode] = false;
+	// reset flag
+	m_keyMap[keycode] &= ~IS_DOWN;
+}
+
+bool KeyManager::isKeyDown(int keycode)
+{
+	return (m_keyMap[keycode] & IS_DOWN) != 0;
 }
 
 bool KeyManager::isKeyPressed(int keycode)
 {
-	return m_keyMap[keycode];
+	return (m_keyMap[keycode] & PRESSED) != 0;
+}
+
+bool KeyManager::isKeyReleaseed(int keycode)
+{
+    return (m_keyMap[keycode] & RELEASED) != 0;
 }
 
 void KeyManager::tick()
@@ -40,6 +52,28 @@ void KeyManager::tick()
 
     m_currentRelativeX = 0;
     m_currentRelativeY = 0;
+
+	// reset pressed/released state
+	for (auto &entry : m_keyMap)
+	{
+        // update pressed flag
+        if ((entry.second & IS_DOWN) != 0 && (entry.second & WAS_DOWN) == 0)
+            entry.second |= PRESSED;
+        else
+            entry.second &= ~PRESSED;
+
+        // update released flag
+        if ((entry.second & WAS_DOWN) != 0 && (entry.second & IS_DOWN) == 0)
+            entry.second |= RELEASED;
+        else
+            entry.second &= ~RELEASED;
+
+        // update was down
+		if ((entry.second & IS_DOWN) != 0)
+			entry.second |= WAS_DOWN;
+        else
+            entry.second &= ~WAS_DOWN;
+	}
 }
 
 float KeyManager::getRelativeX()
