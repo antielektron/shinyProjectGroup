@@ -193,7 +193,7 @@ void SceneEditorGame::notifyCurrentObjectChanged(ObjectBase *object)
 	// Called when a new object was selected or the current object has changed.
     m_currentObject = object;
 
-    if (object->getObjectType() != ObjectType::ObjectGroup)
+    if (object && object->getObjectType() != ObjectType::ObjectGroup)
     {
         m_indicatorObject->makeVisible();
         QVector3D indicatorPosition = object->getAbsolutePosition();
@@ -213,6 +213,15 @@ void SceneEditorGame::notifyCurrentObjectChanged(ObjectBase *object)
     }
 
     emit currentObjectChanged();
+}
+
+void SceneEditorGame::removeCurrentObject()
+{
+	if (m_currentObject)
+	{
+		m_currentObject->destroy();
+        notifyCurrentObjectChanged(nullptr);
+	}
 }
 
 ObjectBase *SceneEditorGame::getCurrentObject()

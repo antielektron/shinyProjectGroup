@@ -41,6 +41,7 @@ public:
     void removeModel(const std::string &modelName);
 
 	void notifyCurrentObjectChanged(ObjectBase *object);
+	void removeCurrentObject();
 
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
