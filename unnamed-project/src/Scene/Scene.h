@@ -31,7 +31,6 @@ public:
     Scene();
     Scene(const QString &filename);
 
-    void clear();
     void loadFromFile(const QString &filename);
     void saveToFile(const QString &filename);
 

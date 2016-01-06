@@ -17,20 +17,15 @@
 Scene::Scene()
 {
     m_rootGroup.setName("SceneRoot");
+    m_globalState.reset(new GlobalState());
 }
 
 //------------------------------------------------------------------------------
 Scene::Scene(const QString &filename)
 {
+    m_globalState.reset(new GlobalState());
     m_rootGroup.setName("SceneRoot");
     loadFromFile(filename);
-}
-
-//------------------------------------------------------------------------------
-void Scene::clear()
-{
-    m_globalState.reset(new GlobalState());
-    // TODO
 }
 
 //------------------------------------------------------------------------------
@@ -470,72 +465,74 @@ void Scene::saveToFile(const QString &filename)
 
     // events:
 
-    if (m_globalState)
+    xmlWriter.writeStartElement("Events");
+
+    for (auto &event : m_globalState->getEvents())
     {
-        xmlWriter.writeStartElement("Events");
+        const QString &key = event.first;
+        PreconditionBase *condition = event.second.first.get();
+        ActionBase *action = event.second.second.get();
 
-        for (auto &event : m_globalState->getEvents())
-        {
-            const QString &key = event.first;
-            PreconditionBase *condition = event.second.first.get();
-            ActionBase *action = event.second.second.get();
-
-            writeEvent(key, condition, action, xmlWriter);
-        }
-
-        xmlWriter.writeEndElement();
-
-        // attributes:
-
-        for (auto &attribute : m_globalState->getAttributes())
-        {
-            const QString &key = attribute.first;
-            QVariant value = attribute.second;
-            AttributeDatatype type = m_globalState->getType(key);
-
-            xmlWriter.writeAttribute("key", key);
-            xmlWriter.writeAttribute("type", typeToQString.at(type));
-
-            switch(type)
-            {
-            case AttributeDatatype::Bool:
-            {
-                bool v = value.toBool();
-                xmlWriter.writeAttribute("value", v ? "true" : "false");
-                break;
-            }
-            case AttributeDatatype::Int:
-            {
-                int v = value.toInt();
-                xmlWriter.writeAttribute("value", QString::number(v));
-                break;
-            }
-            case AttributeDatatype::Float:
-            {
-                float v = value.toFloat();
-                xmlWriter.writeAttribute("value", QString::number(v));
-                break;
-            }
-            case AttributeDatatype::QVector3D:
-            {
-                QVector3D v = value.value<QVector3D>();
-                xmlWriter.writeAttribute("x", QString::number(v[0]));
-                xmlWriter.writeAttribute("y", QString::number(v[1]));
-                xmlWriter.writeAttribute("z", QString::number(v[2]));
-            }
-            }
-        }
-
-        // Animators:
-        xmlWriter.writeStartElement("Animators");
-
-        for (const auto &anim : m_animators)
-        {
-            writeAnimator(anim.get(), xmlWriter);
-        }
-
-        xmlWriter.writeEndElement();
+        writeEvent(key, condition, action, xmlWriter);
     }
+
+    xmlWriter.writeEndElement();
+
+    // attributes:
+
+    xmlWriter.writeStartElement("Attributes");
+
+    for (auto &attribute : m_globalState->getAttributes())
+    {
+        const QString &key = attribute.first;
+        QVariant value = attribute.second;
+        AttributeDatatype type = m_globalState->getType(key);
+
+        xmlWriter.writeAttribute("key", key);
+        xmlWriter.writeAttribute("type", typeToQString.at(type));
+
+        switch(type)
+        {
+        case AttributeDatatype::Bool:
+        {
+            bool v = value.toBool();
+            xmlWriter.writeAttribute("value", v ? "true" : "false");
+            break;
+        }
+        case AttributeDatatype::Int:
+        {
+            int v = value.toInt();
+            xmlWriter.writeAttribute("value", QString::number(v));
+            break;
+        }
+        case AttributeDatatype::Float:
+        {
+            float v = value.toFloat();
+            xmlWriter.writeAttribute("value", QString::number(v));
+            break;
+        }
+        case AttributeDatatype::QVector3D:
+        {
+            QVector3D v = value.value<QVector3D>();
+            xmlWriter.writeAttribute("x", QString::number(v[0]));
+            xmlWriter.writeAttribute("y", QString::number(v[1]));
+            xmlWriter.writeAttribute("z", QString::number(v[2]));
+        }
+        }
+
+    }
+
+    xmlWriter.writeEndElement();
+
+    // Animators:
+    xmlWriter.writeStartElement("Animators");
+
+    for (const auto &anim : m_animators)
+    {
+        writeAnimator(anim.get(), xmlWriter);
+    }
+
+    xmlWriter.writeEndElement();
 
     //and the little other properties:
 

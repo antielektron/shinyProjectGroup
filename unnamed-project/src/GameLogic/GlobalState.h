@@ -17,7 +17,7 @@ class GlobalState
 public:
 
     GlobalState();
-    virtual ~GlobalState();
+    ~GlobalState();
 
     typedef std::map<QString, QVariant>::iterator AttributesIteratorType;
     typedef std::pair<std::unique_ptr<PreconditionBase>, std::unique_ptr<ActionBase>> EventType;
@@ -25,7 +25,7 @@ public:
     typedef EventMapType::iterator EventMapIteratorType;
     typedef std::map<QString, AttributeDatatype> DatatypeMapType;
 
-    virtual void Init();
+    void init();
 
     const QVariant &getValue(const QString &key);
     AttributeDatatype getType(const QString &key);
