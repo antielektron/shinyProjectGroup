@@ -12,7 +12,7 @@ uniform vec3 specularColor;
 uniform vec3 diffuseColor;
 uniform vec3 ambientColor;
 
-uniform mat4 cascadeViewMatrix[4]; // TODO array!
+uniform mat4 cascadeViewMatrix[4];
 uniform float cascadeFar[4]; // where do the cascades end?
 
 // gl_TextureMatrix
@@ -91,13 +91,28 @@ float cooktorranceTerm(vec3 v, vec3 n, vec3 l)
     return D * F * G / (4.0 * dotVN * dotNL);
 }
 
+int getCascade()
+{
+    float z = -worldPosition.z;
+
+    if (z < cascadeFar[0])
+        return 0;
+    else if (z < cascadeFar[1])
+        return 1;
+    else if (z < cascadeFar[2])
+        return 2;
+    else
+        return 3;
+}
+
 float simpleShadowTerm()
 {
     // Find the correct cascade..
+    int index = getCascade();
 
-    vec4 lightViewPosition = cascadeViewMatrix[0] * vec4(worldPosition, 1.);
+    vec4 lightViewPosition = cascadeViewMatrix[index] * vec4(worldPosition, 1.);
     vec2 uv = vec2(lightViewPosition.xy * 0.5 + 0.5);
-    float shadowMapDepth = texture2DArray(shadowMapSampler, vec3(uv, 0.)).x;
+    float shadowMapDepth = texture2DArray(shadowMapSampler, vec3(uv, index)).x;
     float depth = lightViewPosition.z*0.5 + 0.5;
 
     // Add some epsilon
@@ -119,6 +134,18 @@ void main()
     float shadowTerm = simpleShadowTerm();
 
     fragColor = vec4(clamp(shadowTerm * (specularTerm * specularColor + diffuseTerm * diffuseColor) + ambientColor, 0., 1.), 1.);
+
+        /*
+    int index = getCascade();
+    if (index == 0)
+        fragColor.xyz *= vec3(1., 0., 0.);
+    else if (index == 1)
+        fragColor.xyz *= vec3(0., 1., 0.);
+    else if (index == 2)
+        fragColor.xyz *= vec3(0., 0., 1.);
+    else if (index == 3)
+        fragColor.xyz *= vec3(1., 1., 0.);
+        */
 
     fragNormalDepth = vec4(normal*0.5 + 0.5, gl_FragCoord.z*gl_FragCoord.w);
 }

@@ -40,6 +40,7 @@ private:
     int m_modelViewMatrixLoc;
     int m_projectionMatrixLoc;
     int m_cascadeViewMatrixLoc;
+    int m_cascadeFarLoc;
     int m_lightDirectionLoc;
     int m_lightColorLoc;
     int m_specularColorLoc;
@@ -59,6 +60,11 @@ private:
     // Compose Shader
     QOpenGLShaderProgram m_composeProgram;
     int m_composeSamplerLoc;
+
+    // Copy Shader for texture arrays
+    QOpenGLShaderProgram m_copyArrayProgram;
+    int m_copyArraySamplerLoc;
+    int m_copyArrayLayerLoc;
 
     QOpenGLVertexArrayObject m_quadVao;
     QOpenGLBuffer m_quadVbo;

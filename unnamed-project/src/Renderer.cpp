@@ -65,6 +65,7 @@ ShaderErrorType Renderer::createShaderProgram(const std::string &vertexShaderSou
     m_modelViewMatrixLoc = m_program->uniformLocation("modelViewMatrix");
     m_projectionMatrixLoc = m_program->uniformLocation("projectionMatrix");
     m_cascadeViewMatrixLoc = m_program->uniformLocation("cascadeViewMatrix");
+    m_cascadeFarLoc = m_program->uniformLocation("cascadeFar");
 
     m_lightDirectionLoc = m_program->uniformLocation("lightDirection");
     m_lightColorLoc = m_program->uniformLocation("lightColor");
@@ -112,6 +113,32 @@ void Renderer::createComposeProgram()
     m_composeSamplerLoc = m_composeProgram.uniformLocation("sampler");
 
     m_composeProgram.release();
+
+
+    // CopyArrayProgram
+    if (!m_copyArrayProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "shaders/vertex_copy.glsl"))
+    {
+        throw std::runtime_error("could not load vertex shader");
+    }
+    if (!m_copyArrayProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "shaders/fragment_copy_array.glsl"))
+    {
+        throw std::runtime_error("could not load fragment shader");
+    }
+    m_copyArrayProgram.bindAttributeLocation("v_position", 0);
+
+    if (!m_copyArrayProgram.link())
+    {
+        throw std::runtime_error("could not link shader program");
+    }
+
+    m_copyArrayProgram.bind();
+
+    m_copyArraySamplerLoc = m_copyArrayProgram.uniformLocation("sampler");
+    m_copyArrayLayerLoc = m_copyArrayProgram.uniformLocation("layer");
+
+    m_copyArrayProgram.release();
+
+
 
     // Create quad
     m_quadVao.create();
@@ -165,7 +192,7 @@ void Renderer::createShadowMapProgram()
 
     // Create ShadowMap
     m_shadowMapSize = 2048;
-    m_cascades = 2;
+    m_cascades = 4;
 
     // TODO don't render to texture but reuse depth buffer!!!
 
@@ -307,14 +334,12 @@ void Renderer::render(GLuint fbo, Scene *scene)
     auto inverseCameraTransformation = (scene->getCameraProjection() * scene->getCameraView()).inverted();
     auto screenToLightTransformation = lightViewRotation * inverseCameraTransformation;
 
-    float lambdaUniLog = 0.5;
-
     // Corners of slices
-    std::vector<float> slices;
     std::vector<std::vector<QVector3D>> sliceCorners(m_cascades+1);
 
+    // Compute these values, they will be given to the gpu!
     std::vector<QMatrix4x4> cascadeViews;
-    std::vector<float> cascadeFar;
+    std::vector<float> cascadeFars;
 
     QVector3D minCorners[] = {
             { -1, -1, -1 },
@@ -329,18 +354,36 @@ void Renderer::render(GLuint fbo, Scene *scene)
             {  1,  1,  1 }
     };
 
+    QVector3D nearFarCorners[] = {
+            { 0, 0, -1 },
+            { 0, 0,  1 }
+    };
+
     // Transform corners into light view space
     mathUtility::transformVectors(screenToLightTransformation, minCorners);
     mathUtility::transformVectors(screenToLightTransformation, maxCorners);
 
+    // Transform corners into light view space
+    mathUtility::transformVectors(scene->getCameraProjection().inverted(), nearFarCorners);
+    // NOTE: z values are inverted! multiply by -1
+    for (auto &corner : nearFarCorners)
+        corner = -corner;
+
+    // TODO
+    float lambdaUniLog = 0.5;
+
     // Interpolate corners in light view space, not screen space
     for (int i = 0; i <= m_cascades; i++)
     {
-        float cUni = 1 - 2 * i / m_cascades;
+        float cUni = 1 - (float) i / m_cascades; // 1 to 0
         // float cLog = -1 * -1 ^ (i/m_cascades); // COMPLEX!
-        slices.push_back(cUni);
 
-        float coeff = cUni * .5f + .5f;
+        // TODO combine cLog and cUni
+        float coeff = cUni;
+
+        if (i != 0)
+            cascadeFars.push_back(coeff * nearFarCorners[0].z() + (1 - coeff) * nearFarCorners[1].z());
+
         for (int j = 0; j < 4; j++)
         {
             sliceCorners[i].push_back(coeff * minCorners[j] + (1 - coeff) * maxCorners[j]);
@@ -448,9 +491,9 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     m_program->bind();
 
-    // TODO far
     m_program->setUniformValue(m_projectionMatrixLoc, scene->getCameraProjection());
     m_program->setUniformValueArray(m_cascadeViewMatrixLoc, cascadeViews.data(), m_cascades);
+    m_program->setUniformValueArray(m_cascadeFarLoc, cascadeFars.data(), m_cascades, 1);
     m_program->setUniformValue(m_lightDirectionLoc, QVector3D(lightDirection));
     m_program->setUniformValue(m_lightColorLoc, scene->getLightColor());
 
@@ -524,10 +567,11 @@ void Renderer::render(GLuint fbo, Scene *scene)
     glDrawArrays(GL_QUADS, 0, 4);
 
 
+    /*
     glViewport(0, 0, m_width/4, m_height/4);
     glBindTexture(GL_TEXTURE_2D, m_normalTexture);
     glDrawArrays(GL_QUADS, 0, 4);
-
+    */
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -535,6 +579,33 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     m_composeProgram.release();
 
+
+    /*
+    m_copyArrayProgram.bind();
+
+    m_copyArrayProgram.setUniformValue(m_copyArraySamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapDepthBuffer);
+
+    glViewport(m_width*0/4, m_height*3/4, m_width/4, m_height/4);
+    m_copyArrayProgram.setUniformValue(m_copyArrayLayerLoc, 0);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    glViewport(m_width*1/4, m_height*3/4, m_width/4, m_height/4);
+    m_copyArrayProgram.setUniformValue(m_copyArrayLayerLoc, 1);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    glViewport(m_width*2/4, m_height*3/4, m_width/4, m_height/4);
+    m_copyArrayProgram.setUniformValue(m_copyArrayLayerLoc, 2);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    glViewport(m_width*3/4, m_height*3/4, m_width/4, m_height/4);
+    m_copyArrayProgram.setUniformValue(m_copyArrayLayerLoc, 3);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+    m_copyArrayProgram.release();
+    */
 }
 
 void Renderer::resize(int width, int height)
