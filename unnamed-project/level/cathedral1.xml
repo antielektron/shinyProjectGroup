@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene name="Shiny Scene" version="42" author="Norby">
+    <Models>
+        <Model name="cathedralround" path="models/cathedralround.obj"/>
+        <Model name="floor" path="models/floor.obj"/>
+        <Model name="octonorm" path="models/octonorm.obj"/>
+        <Model name="sink" path="models/sink.obj"/>
+        <Model name="sphere" path="models/sphere.obj"/>
+        <Model name="suzanne" path="models/suzanne.obj"/>
+    </Models>
+    <Objects>
+        <Object name="cathedralround" model="cathedralround" x="0" y="-5" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
+    </Objects>
+    <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
+    <Player x="0" y="0" z="0"/>
+</Scene>
