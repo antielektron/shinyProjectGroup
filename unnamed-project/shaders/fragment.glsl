@@ -1,8 +1,9 @@
 #version 150
+#extension GL_EXT_texture_array : enable
 
 in vec3 normal;
 in vec3 worldPosition;
-in vec4 lightViewPosition;
+in float eyeZ;
 
 uniform vec3 lightDirection;
 uniform vec3 lightColor;
@@ -11,7 +12,11 @@ uniform vec3 specularColor;
 uniform vec3 diffuseColor;
 uniform vec3 ambientColor;
 
-uniform sampler2D shadowMapSampler;
+uniform mat4 cascadeViewMatrix[4];
+uniform float cascadeFar[4]; // where do the cascades end?
+
+// gl_TextureMatrix
+uniform sampler2DArray shadowMapSampler;
 
 const float roughness = 0.1;
 const float fresnelFactor = 1.;
@@ -86,14 +91,32 @@ float cooktorranceTerm(vec3 v, vec3 n, vec3 l)
     return D * F * G / (4.0 * dotVN * dotNL);
 }
 
-float simpleShadowTerm(vec2 lv, float d)
+int getCascade()
 {
-    vec2 uv = vec2(lv * 0.5 + 0.5);
-    float shadowMapDepth = texture2D(shadowMapSampler, uv).x;
-    float depth = d*0.5 + 0.5;
+    float z = -worldPosition.z;
+
+    if (z < cascadeFar[0])
+        return 0;
+    else if (z < cascadeFar[1])
+        return 1;
+    else if (z < cascadeFar[2])
+        return 2;
+    else
+        return 3;
+}
+
+float simpleShadowTerm()
+{
+    // Find the correct cascade..
+    int index = getCascade();
+
+    vec4 lightViewPosition = cascadeViewMatrix[index] * vec4(worldPosition, 1.);
+    vec2 uv = vec2(lightViewPosition.xy * 0.5 + 0.5);
+    float shadowMapDepth = texture2DArray(shadowMapSampler, vec3(uv, index)).x;
+    float depth = lightViewPosition.z*0.5 + 0.5;
 
     // Add some epsilon
-    if (depth - shadowMapDepth <= 0.01)
+    if (depth - shadowMapDepth <= 0.005)
         return 1.;
     else
         return 0.1;
@@ -108,11 +131,21 @@ void main()
 
     float specularTerm = cooktorranceTerm(v, n, l);
 
-    vec2 lv = lightViewPosition.xy;
-    float d = lightViewPosition.z;
-    float shadowTerm = simpleShadowTerm(lv, d);
+    float shadowTerm = simpleShadowTerm();
 
     fragColor = vec4(clamp(shadowTerm * (specularTerm * specularColor + diffuseTerm * diffuseColor) + ambientColor, 0., 1.), 1.);
+
+        /*
+    int index = getCascade();
+    if (index == 0)
+        fragColor.xyz *= vec3(1., 0., 0.);
+    else if (index == 1)
+        fragColor.xyz *= vec3(0., 1., 0.);
+    else if (index == 2)
+        fragColor.xyz *= vec3(0., 0., 1.);
+    else if (index == 3)
+        fragColor.xyz *= vec3(1., 1., 0.);
+        */
 
     fragNormalDepth = vec4(normal*0.5 + 0.5, gl_FragCoord.z*gl_FragCoord.w);
 }
