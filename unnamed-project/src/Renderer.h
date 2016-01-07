@@ -24,7 +24,6 @@ public:
 
 private:
     void rotateVectorToVector(const QVector3D &source, const QVector3D &destination, QMatrix4x4 &matrix);
-    void computeFrustumSlice(float sliceZ, const QMatrix4x4 &transformation, std::vector<QVector3D> &corners);
 
     GLsizei m_width;
     GLsizei m_height;

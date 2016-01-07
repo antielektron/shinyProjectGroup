@@ -13,7 +13,7 @@ uniform vec3 diffuseColor;
 uniform vec3 ambientColor;
 
 uniform mat4 cascadeViewMatrix[4]; // TODO array!
-
+uniform float cascadeFar[4]; // where do the cascades end?
 
 // gl_TextureMatrix
 uniform sampler2DArray shadowMapSampler;
@@ -93,6 +93,8 @@ float cooktorranceTerm(vec3 v, vec3 n, vec3 l)
 
 float simpleShadowTerm()
 {
+    // Find the correct cascade..
+
     vec4 lightViewPosition = cascadeViewMatrix[0] * vec4(worldPosition, 1.);
     vec2 uv = vec2(lightViewPosition.xy * 0.5 + 0.5);
     float shadowMapDepth = texture2DArray(shadowMapSampler, vec3(uv, 0.)).x;

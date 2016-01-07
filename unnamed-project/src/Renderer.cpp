@@ -216,22 +216,6 @@ void Renderer::rotateVectorToVector(const QVector3D &source, const QVector3D &de
     matrix.rotate(rotationAngle, rotationAxis);
 }
 
-void Renderer::computeFrustumSlice(float sliceZ, const QMatrix4x4 &transformation, std::vector<QVector3D> &corners)
-{
-    QVector2D inputCorners[4] = {
-            {-1., -1.},
-            { 1., -1.},
-            {-1.,  1.},
-            { 1.,  1.},
-    };
-
-    for (const auto &corner : inputCorners)
-    {
-        QVector4D res = transformation * QVector4D(corner, sliceZ, 1.);
-        corners.push_back(QVector3D(res / res.w()));
-    }
-}
-
 void Renderer::render(GLuint fbo, Scene *scene)
 {
     /*
@@ -326,19 +310,41 @@ void Renderer::render(GLuint fbo, Scene *scene)
     float lambdaUniLog = 0.5;
 
     // Corners of slices
+    std::vector<float> slices;
     std::vector<std::vector<QVector3D>> sliceCorners(m_cascades+1);
 
     std::vector<QMatrix4x4> cascadeViews;
     std::vector<float> cascadeFar;
 
+    QVector3D minCorners[] = {
+            { -1, -1, -1 },
+            {  1, -1, -1 },
+            { -1,  1, -1 },
+            {  1,  1, -1 }
+    };
+    QVector3D maxCorners[] = {
+            { -1, -1,  1 },
+            {  1, -1,  1 },
+            { -1,  1,  1 },
+            {  1,  1,  1 }
+    };
+
+    // Transform corners into light view space
+    mathUtility::transformVectors(screenToLightTransformation, minCorners);
+    mathUtility::transformVectors(screenToLightTransformation, maxCorners);
+
+    // Interpolate corners in light view space, not screen space
     for (int i = 0; i <= m_cascades; i++)
     {
         float cUni = 1 - 2 * i / m_cascades;
         // float cLog = -1 * -1 ^ (i/m_cascades); // COMPLEX!
+        slices.push_back(cUni);
 
-        if (i != 0)
-            cascadeFar.push_back(-(cUni*0.5f + 0.5f));
-        computeFrustumSlice(cUni, screenToLightTransformation, sliceCorners[i]);
+        float coeff = cUni * .5f + .5f;
+        for (int j = 0; j < 4; j++)
+        {
+            sliceCorners[i].push_back(coeff * minCorners[j] + (1 - coeff) * maxCorners[j]);
+        }
     }
 
     // For each cascade combine two slices
