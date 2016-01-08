@@ -3,6 +3,7 @@
 
 #include <array>
 #include <QVector2D>
+#include <QMatrix4x4>
 
 #define EPSILON 10e-10
 
@@ -46,6 +47,16 @@ namespace mathUtility
     inline bool isInEps(const QVector2D &a, const QVector2D &b)
     {
         return isInEps(a[0], b[0]) && isInEps(a[1], b[1]);
+    }
+
+    template <typename Container>
+    void transformVectors(const QMatrix4x4 &transformation, Container &corners)
+    {
+        for (auto &corner : corners)
+        {
+            QVector4D res = transformation * QVector4D(corner, 1.);
+            corner = QVector3D(res / res.w());
+        }
     }
 }
 
