@@ -366,27 +366,30 @@ void Renderer::render(GLuint fbo, Scene *scene)
     // Transform corners into light view space
     mathUtility::transformVectors(scene->getCameraProjection().inverted(), nearFarCorners);
     // NOTE: z values are inverted! multiply by -1
-    for (auto &corner : nearFarCorners)
-        corner = -corner;
+    float nearPlane = -nearFarCorners[0].z();
+    float farPlane = -nearFarCorners[1].z();
 
-    // TODO
-    float lambdaUniLog = 0.5;
+    // Coefficient for combining uniform and logarithmic results
+    float lambdaUniLog = 0.5f;
 
     // Interpolate corners in light view space, not screen space
     for (int i = 0; i <= m_cascades; i++)
     {
-        float cUni = 1 - (float) i / m_cascades; // 1 to 0
-        // float cLog = -1 * -1 ^ (i/m_cascades); // COMPLEX!
+        float cUni = nearPlane + (farPlane - nearPlane) * i / m_cascades;
+        float cLog = nearPlane * std::pow(farPlane / nearPlane, (float) i / m_cascades); // COMPLEX!
 
-        // TODO combine cLog and cUni
-        float coeff = cUni;
+        // combine cLog and cUni
+        float currentZ = lambdaUniLog * cUni + (1 - lambdaUniLog) * cLog;
 
         if (i != 0)
-            cascadeFars.push_back(coeff * nearFarCorners[0].z() + (1 - coeff) * nearFarCorners[1].z());
+            cascadeFars.push_back(currentZ);
+
+        // Coefficient for affine combination of frustum corners
+        float coeff = (currentZ - nearPlane) / (farPlane - nearPlane);
 
         for (int j = 0; j < 4; j++)
         {
-            sliceCorners[i].push_back(coeff * minCorners[j] + (1 - coeff) * maxCorners[j]);
+            sliceCorners[i].push_back((1 - coeff) * minCorners[j] + coeff * maxCorners[j]);
         }
     }
 
