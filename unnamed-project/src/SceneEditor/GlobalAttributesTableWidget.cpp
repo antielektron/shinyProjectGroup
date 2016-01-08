@@ -7,6 +7,9 @@
 
 #include "GameLogic/GameLogicDatatypes.h"
 
+// DEBUG
+#include <iostream>
+
 GlobalAttributesTableWidget::GlobalAttributesTableWidget(QWidget *parent) :
     QTableView(parent)
 {
@@ -36,6 +39,8 @@ void GlobalAttributesTableWidget::init()
     setModel(m_model);
 
     setShowGrid(true);
+
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
 //------------------------------------------------------------------------------
@@ -47,6 +52,10 @@ void GlobalAttributesTableWidget::addItem(const QString &key,
     list.append(new QStandardItem(key));
     list.append(new QStandardItem(typeToQString.at(type)));
     list.append(new QStandardItem(value));
+
+    std::cout << "added value: " << key.toStdString()
+              << " = " << value.toStdString()
+              << std::endl;
 
     m_model->appendRow(list);
 
@@ -108,15 +117,19 @@ QString GlobalAttributesTableWidget::attributeToString(const QVariant &attr,
     }
     case AttributeDatatype::Int:
     {
-        return QString("int");
+        return QString::number(attr.toInt());
     }
     case AttributeDatatype::Float:
     {
-        return QString("float");
+        return QString::number(attr.toFloat());
     }
     case AttributeDatatype::QVector3D:
     {
-        return QString("vector");
+        QVector3D val = attr.value<QVector3D>();
+        return QString("(") +
+                QString::number(val[0]) + ", " +
+                QString::number(val[1]) + ", " +
+                QString::number(val[2]) + ")";
     }
     }
     return "UNKNOWN";

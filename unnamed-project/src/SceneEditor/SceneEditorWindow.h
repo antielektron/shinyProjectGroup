@@ -21,6 +21,8 @@ class GlobalDetailsWidget;
 class ObjectBase;
 class Model;
 
+class AttributeWidget;
+
 class SceneEditorWindow : public QMainWindow
 {
     Q_OBJECT
@@ -65,6 +67,9 @@ private:
 
     QDockWidget *m_globalDetailsDock;
     GlobalDetailsWidget *m_globalDetails;
+
+    QDockWidget *m_attributeWidgetDock;
+    AttributeWidget *m_attributeWidget;
 
     std::shared_ptr<SceneEditorGame> m_game;
 

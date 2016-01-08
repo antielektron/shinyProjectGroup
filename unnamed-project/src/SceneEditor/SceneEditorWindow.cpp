@@ -9,6 +9,7 @@
 #include "SceneEditor/ObjectListWidget.h"
 #include "SceneEditor/ModelListWidget.h"
 #include "SceneEditor/GlobalDetailsWidget.h"
+#include "SceneEditor/AttributeWidget.h"
 
 #include "Scene/Model.h"
 
@@ -20,7 +21,7 @@
 //------------------------------------------------------------------------------
 SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
 {
-    this->setMinimumSize(800, 600);
+    this->setMinimumSize(1024, 700);
 
     m_game = std::make_shared<SceneEditorGame>();
 
@@ -33,6 +34,7 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     m_objectList = new ObjectListWidget(m_game, this);
     m_modelList = new ModelListWidget(m_game, this);
     m_globalDetails = new GlobalDetailsWidget(m_game, this);
+    m_attributeWidget = new AttributeWidget(this);
 
     m_objectDetailsDock = new QDockWidget("Object Details", this);
     m_objectDetailsDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
@@ -50,11 +52,18 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     m_globalDetailsDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
     m_globalDetailsDock->setWidget(m_globalDetails);
 
+    m_attributeWidgetDock = new QDockWidget("Attribue List", this);
+    m_attributeWidgetDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
+    m_attributeWidgetDock->setWidget(m_attributeWidget);
+
 
     this->addDockWidget(Qt::LeftDockWidgetArea, m_objectDetailsDock);
     this->addDockWidget(Qt::RightDockWidgetArea, m_objectListDock);
     this->addDockWidget(Qt::RightDockWidgetArea, m_modelListDock);
     this->addDockWidget(Qt::LeftDockWidgetArea, m_globalDetailsDock);
+    this->addDockWidget(Qt::LeftDockWidgetArea, m_attributeWidgetDock);
+
+    this->tabifyDockWidget(m_globalDetailsDock, m_objectDetailsDock);
 
     createActions();
     createToolbar();
@@ -132,6 +141,16 @@ void SceneEditorWindow::connectStuff()
 
     connect(m_objectList, SIGNAL(updateSceneObjectsRequest()),
             this, SLOT(onUpdateSceneObjectsRequest()));
+
+    connect(m_attributeWidget, SIGNAL(attributeAdded(const QString &,
+                                                     QVariant,
+                                                     AttributeDatatype)),
+            m_game.get(), SLOT(addAttribute(const QString &,
+                                              QVariant,
+                                              AttributeDatatype)));
+
+    connect(m_game.get(), SIGNAL(singleAttributeAdded(GlobalState *, const QString &)),
+            m_attributeWidget, SLOT(onSingleAttributeAdded(GlobalState *, const QString &)));
 
     //connect Actions:
     connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
