@@ -33,6 +33,8 @@ public:
                   QVariant value,
                   AttributeDatatype type);
 
+    void removeValue(const QString &key);
+
     const EventType &getEvent(const QString &key);
     void setEvent(const QString &key,
                   std::unique_ptr<PreconditionBase> precondition,

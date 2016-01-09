@@ -2,6 +2,9 @@
 #include <QInputDialog>
 #include <climits>
 
+//DEBUG
+#include <iostream>
+
 AttributeWidget::AttributeWidget(QWidget *parent) :
     QWidget(parent)
 {
@@ -32,6 +35,7 @@ void AttributeWidget::generateWidgets()
 void AttributeWidget::connectStuff()
 {
     connect(m_addValue, SIGNAL(clicked()), this, SLOT(onAddValueClicked()));
+    connect(m_delValue, SIGNAL(clicked()), this, SLOT(onDelValueClicked()));
 }
 
 //------------------------------------------------------------------------------
@@ -151,7 +155,11 @@ void AttributeWidget::onAddValueClicked()
 //------------------------------------------------------------------------------
 void AttributeWidget::onDelValueClicked()
 {
-    //todo get current selected key and emit deletion signal
+    QModelIndexList selectedList = m_attributeTable->selectionModel()->selectedRows();
+    for (int i = 0; i < selectedList.size(); i++)
+    {
+        emit attributeDeleted(selectedList.at(i).data(0).toString());
+    }
 }
 
 //------------------------------------------------------------------------------

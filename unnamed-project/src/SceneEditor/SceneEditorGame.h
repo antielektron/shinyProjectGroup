@@ -52,6 +52,8 @@ public slots:
                       QVariant value,
                       AttributeDatatype type);
 
+    void delAttribute(const QString &key);
+
 Q_SIGNALS:
     void currentObjectChanged();
     void modelsChanged();

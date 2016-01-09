@@ -1,5 +1,7 @@
 #include "GameLogic/GlobalState.h"
 
+#include <iostream>
+
 //------------------------------------------------------------------------------
 GlobalState::GlobalState()
 {
@@ -38,6 +40,21 @@ void GlobalState::setValue(const QString &key,
 {
     m_attributes[key] = value;
     m_datatypeMap[key] = type;
+}
+
+//------------------------------------------------------------------------------
+void GlobalState::removeValue(const QString &key)
+{
+    auto it = m_attributes.find(key);
+    if (it != m_attributes.end())
+    {
+        m_attributes.erase(it);
+    }
+    else
+    {
+        std::cout << "Warning: could not remove attribute '"
+                  << key.toStdString() << "'" << std::endl;
+    }
 }
 
 //------------------------------------------------------------------------------

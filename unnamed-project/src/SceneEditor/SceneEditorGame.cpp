@@ -278,6 +278,13 @@ void SceneEditorGame::addAttribute(const QString &key,
 }
 
 //------------------------------------------------------------------------------
+void SceneEditorGame::delAttribute(const QString &key)
+{
+    m_scene->getGlobalState()->removeValue(key);
+    emit attributesChanged(m_scene->getGlobalState());
+}
+
+//------------------------------------------------------------------------------
 void SceneEditorGame::createIndicatorObject()
 {
 	// NOTE: this model should NOT be part of the scene!!!

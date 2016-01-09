@@ -52,7 +52,7 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     m_globalDetailsDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
     m_globalDetailsDock->setWidget(m_globalDetails);
 
-    m_attributeWidgetDock = new QDockWidget("Attribue List", this);
+    m_attributeWidgetDock = new QDockWidget("Attribute List", this);
     m_attributeWidgetDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
     m_attributeWidgetDock->setWidget(m_attributeWidget);
 
@@ -152,6 +152,18 @@ void SceneEditorWindow::connectStuff()
     connect(m_game.get(), SIGNAL(singleAttributeAdded(GlobalState *, const QString &)),
             m_attributeWidget, SLOT(onSingleAttributeAdded(GlobalState *, const QString &)));
 
+    connect(this, SIGNAL(globalStateModified(GlobalState *)),
+            m_attributeWidget, SLOT(onAttributesChanged(GlobalState *)));
+
+    connect(m_game.get(), SIGNAL(sceneChanged()),
+           this, SLOT(onSceneChanged()));
+
+    connect (m_game.get(), SIGNAL(attributesChanged(GlobalState *)),
+             m_attributeWidget, SLOT(onAttributesChanged(GlobalState *)));
+
+    connect(m_attributeWidget, SIGNAL(attributeDeleted(const QString &)),
+            m_game.get(), SLOT(delAttribute(const QString &)));
+
     //connect Actions:
     connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
     connect(m_saveScene, SIGNAL(triggered()), this, SLOT(saveScene()));
@@ -220,5 +232,11 @@ void SceneEditorWindow::onCurrentModelChanged(QString model)
 void SceneEditorWindow::onUpdateSceneObjectsRequest()
 {
     m_game->getScene()->updateObjectList();
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorWindow::onSceneChanged()
+{
+    emit globalStateModified(m_game.get()->getScene()->getGlobalState());
 }
 

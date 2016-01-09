@@ -23,6 +23,8 @@ class Model;
 
 class AttributeWidget;
 
+class GlobalState;
+
 class SceneEditorWindow : public QMainWindow
 {
     Q_OBJECT
@@ -42,6 +44,11 @@ protected slots:
     // will be called if the scene has to rebuild
     // it's vector of objects
     void onUpdateSceneObjectsRequest();
+
+    void onSceneChanged();
+
+signals:
+    void globalStateModified(GlobalState *globalState);
 
 private:
     void connectStuff();
