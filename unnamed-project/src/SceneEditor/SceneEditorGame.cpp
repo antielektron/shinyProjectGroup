@@ -269,6 +269,22 @@ ObjectGroup *SceneEditorGame::createObjectGroup(const std::string &name, ObjectG
 }
 
 //------------------------------------------------------------------------------
+void SceneEditorGame::addAttribute(const QString &key,
+                                   QVariant value,
+                                   AttributeDatatype type)
+{
+    m_scene->getGlobalState()->setValue(key, value, type);
+    emit singleAttributeAdded(m_scene->getGlobalState(), key);
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::delAttribute(const QString &key)
+{
+    m_scene->getGlobalState()->removeValue(key);
+    emit attributesChanged(m_scene->getGlobalState());
+}
+
+//------------------------------------------------------------------------------
 void SceneEditorGame::createIndicatorObject()
 {
 	// NOTE: this model should NOT be part of the scene!!!
