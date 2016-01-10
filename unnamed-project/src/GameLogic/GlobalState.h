@@ -46,6 +46,8 @@ public:
     range<EventMapIteratorType> getEvents();
 
 protected:
+    void initializeConstantAttributes();
+
     std::map<QString, QVariant> m_attributes;
     EventMapType m_eventMap;
     DatatypeMapType m_datatypeMap;

@@ -18,6 +18,7 @@ GlobalState::~GlobalState()
 void GlobalState::init()
 {
     m_attributes.clear();
+    initializeConstantAttributes();
 }
 
 //------------------------------------------------------------------------------
@@ -99,4 +100,17 @@ range<GlobalState::EventMapIteratorType> GlobalState::getEvents()
 {
     return range<EventMapIteratorType>(m_eventMap.begin(),
                                        m_eventMap.end());
+}
+
+//------------------------------------------------------------------------------
+void GlobalState::initializeConstantAttributes()
+{
+    setValue(KEY_ATTRIBUTE_TIME, QVariant(0.0f), AttributeDatatype::Float);
+    setValue(KEY_ATTRIBUTE_TRUE, QVariant(true), AttributeDatatype::Bool);
+    setValue(KEY_ATTRIBUTE_FALSE, QVariant(false), AttributeDatatype::Bool);
+
+    QVector3D playerPosition(0,0,0);
+    setValue(KEY_ATTRIBUTE_PLAYER,
+             QVariant(playerPosition),
+             AttributeDatatype::QVector3D);
 }

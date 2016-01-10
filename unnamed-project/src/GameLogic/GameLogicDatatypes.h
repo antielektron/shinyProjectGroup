@@ -10,6 +10,11 @@
 // it to this header, make Scene io-stuff completely depended
 // from this shit!
 
+#define KEY_ATTRIBUTE_TIME "TIME"
+#define KEY_ATTRIBUTE_PLAYER "PLAYER_POSITION"
+#define KEY_ATTRIBUTE_TRUE "TRUE"
+#define KEY_ATTRIBUTE_FALSE "FALSE"
+
 enum class ArithmeticalOperationType
 {
     additionType,
