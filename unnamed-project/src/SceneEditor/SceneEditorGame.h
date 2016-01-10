@@ -7,6 +7,7 @@
 #include "Scene/Scene.h"
 #include "KeyManager.h"
 #include "Scene/Model.h"
+#include "GameLogic/GameLogicDatatypes.h"
 
 class ObjectBase;
 class ObjectGroup;
@@ -46,11 +47,21 @@ public:
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
+public slots:
+    void addAttribute(const QString &key,
+                      QVariant value,
+                      AttributeDatatype type);
+
+    void delAttribute(const QString &key);
+
 Q_SIGNALS:
     void currentObjectChanged();
     void modelsChanged();
     void objectsChanged();
 	void sceneChanged(); // emited when "global information" has changed
+
+    void attributesChanged(GlobalState *);
+    void singleAttributeAdded(GlobalState *, const QString &);
 
 private:
     void createIndicatorObject();

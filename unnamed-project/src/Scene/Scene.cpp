@@ -492,6 +492,8 @@ void Scene::saveToFile(const QString &filename)
 
     for (auto &attribute : m_globalState->getAttributes())
     {
+        xmlWriter.writeStartElement("Attribute");
+
         const QString &key = attribute.first;
         QVariant value = attribute.second;
         AttributeDatatype type = m_globalState->getType(key);
@@ -527,6 +529,8 @@ void Scene::saveToFile(const QString &filename)
             xmlWriter.writeAttribute("z", QString::number(v[2]));
         }
         }
+
+        xmlWriter.writeEndElement();
 
     }
 
