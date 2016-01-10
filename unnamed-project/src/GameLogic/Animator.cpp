@@ -16,6 +16,8 @@ Animator::Animator(ObjectBase *object,
     m_animationTime = animationTime;
     m_interpolationType = interpolation;
     m_key = attributeKey;
+
+    state->registerAnimator(attributeKey, this);
 }
 
 //------------------------------------------------------------------------------
@@ -45,8 +47,10 @@ ObjectBase *Animator::getObject()
 //------------------------------------------------------------------------------
 void Animator::tick(float currentTime)
 {
-    assert(m_isAnimationRunning);
-
+    if (!m_isAnimationRunning)
+    {
+        return;
+    }
     float dt = currentTime - m_animationStartTime;
     if (dt >= m_animationTime)
     {

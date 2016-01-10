@@ -8,7 +8,21 @@
 
 // TODO remove enums and type stuff from ligic classes and move
 // it to this header, make Scene io-stuff completely depended
-// from this shit!
+// from this!
+
+#define KEY_ATTRIBUTE_TIME "TIME"
+#define KEY_ATTRIBUTE_DELTA_TIME "DELTA_TIME"
+#define KEY_ATTRIBUTE_PLAYER "PLAYER_POSITION"
+#define KEY_ATTRIBUTE_TRUE "TRUE"
+#define KEY_ATTRIBUTE_FALSE "FALSE"
+
+enum class ArithmeticalOperationType
+{
+    additionType,
+    subtractionType,
+    multiplicationType,
+    divisionType
+};
 
 enum class AttributeDatatype
 {
@@ -74,6 +88,22 @@ const std::map<InterpolationType, QString> interpolationToQString =
     { InterpolationType::Jump, "jump" },
     { InterpolationType::Linear, "linear" },
     { InterpolationType::Trigonometric, "trigonometric" }
+};
+
+const std::map<QString, ArithmeticalOperationType> qStringToArithOperationType =
+{
+    {"+", ArithmeticalOperationType::additionType},
+    {"-", ArithmeticalOperationType::subtractionType},
+    {"*", ArithmeticalOperationType::multiplicationType},
+    {"/", ArithmeticalOperationType::divisionType}
+};
+
+const std::map<ArithmeticalOperationType, QString> arithOperationTypeToQString =
+{
+    {ArithmeticalOperationType::additionType, "+"},
+    {ArithmeticalOperationType::subtractionType, "-"},
+    {ArithmeticalOperationType::multiplicationType, "*"},
+    {ArithmeticalOperationType::divisionType, "/"}
 };
 
 

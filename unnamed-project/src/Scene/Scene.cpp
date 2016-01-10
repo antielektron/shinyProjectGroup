@@ -644,15 +644,6 @@ void Scene::writeEvent(const QString &key,
     {
     case ActionType::ArithmeticalAction:
     {
-
-        // determine data type and operation:
-        std::map<ArithmeticalOperationType, QString> opMap =
-        {{ArithmeticalOperationType::additionType, "+"},
-         {ArithmeticalOperationType::subtractionType, "-"},
-         {ArithmeticalOperationType::divisionType, "/"},
-         {ArithmeticalOperationType::multiplicationType, "*"}
-        };
-
         writer.writeAttribute("actionType", "arithmetical");
 
         if (action->getDataType() == "int")
@@ -660,7 +651,8 @@ void Scene::writeEvent(const QString &key,
             ArithmeticalAction<int> *arithAction =
                     static_cast<ArithmeticalAction<int> *>(action);
             writer.writeAttribute("operationType",
-                                  opMap[arithAction->getOperationType()]);
+                                  arithOperationTypeToQString.at(
+                                      arithAction->getOperationType()));
 
             writer.writeAttribute("dataType", "int");
             writer.writeAttribute("valA", arithAction->getLeftOperandKey());
@@ -672,7 +664,8 @@ void Scene::writeEvent(const QString &key,
             ArithmeticalAction<float> *arithAction =
                     static_cast<ArithmeticalAction<float> *>(action);
             writer.writeAttribute("operationType",
-                                  opMap[arithAction->getOperationType()]);
+                                  arithOperationTypeToQString.at(
+                                      arithAction->getOperationType()));
 
             writer.writeAttribute("dataType", "float");
             writer.writeAttribute("valA", arithAction->getLeftOperandKey());
@@ -759,6 +752,29 @@ void Scene::removeModel(const std::string &modelName)
 {
     assert(m_models.find(modelName) != m_models.end());
     m_models.erase(modelName);
+}
+
+//------------------------------------------------------------------------------
+void Scene::performAnimations()
+{
+    float curTime = m_globalState->getValue(KEY_ATTRIBUTE_TIME).toFloat();
+    for (const auto &anim : this->getAnimators())
+    {
+        anim->tick(curTime);
+    }
+}
+
+//------------------------------------------------------------------------------
+void Scene::performEvents()
+{
+    for (const auto &event : m_globalState->getEvents())
+    {
+        if (event.second.first->evaluateCondition())
+        {
+            event.second.second->performAction();
+        }
+    }
+    m_globalState->applyBuffer();
 }
 
 //------------------------------------------------------------------------------
@@ -953,4 +969,16 @@ const QString &Scene::getAuthor() const
 void Scene::addAnimator(std::unique_ptr<Animator> animator)
 {
     m_animators.push_back(std::move(animator));
+}
+
+//------------------------------------------------------------------------------
+void Scene::delAnimator(Animator *anim)
+{
+    for (auto it = m_animators.begin(); it != m_animators.end(); ++it)
+    {
+        if (it->get() == anim)
+        {
+            m_animators.erase(it);
+        }
+    }
 }

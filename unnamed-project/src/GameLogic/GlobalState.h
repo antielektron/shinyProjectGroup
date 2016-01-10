@@ -11,6 +11,8 @@
 #include "GameLogic/ActionBase.h"
 #include "GameLogic/GameLogicDatatypes.h"
 
+class Animator;
+
 
 class GlobalState
 {
@@ -29,24 +31,46 @@ public:
 
     const QVariant &getValue(const QString &key);
     AttributeDatatype getType(const QString &key);
+
+    /**
+     * @brief setValue add or replace a value. changes will only applied
+     *        after applyBuffer() is called
+     * @param key
+     * @param value
+     * @param type
+     */
     void setValue(const QString &key,
                   QVariant value,
                   AttributeDatatype type);
 
     void removeValue(const QString &key);
 
+    void applyBuffer();
+
     const EventType &getEvent(const QString &key);
     void setEvent(const QString &key,
                   std::unique_ptr<PreconditionBase> precondition,
                   std::unique_ptr<ActionBase> action);
 
+    void removeEvent(const QString &eventKey);
+
     range<AttributesIteratorType> getAttributes();
     range<EventMapIteratorType> getEvents();
 
+    void registerAnimator(const QString &watchedAttrib, Animator *anim);
+
 protected:
+    void initializeConstantAttributes();
+    void notifyListeners(const QString &key);
+
     std::map<QString, QVariant> m_attributes;
+    std::map<QString, std::vector<Animator *>> m_animatorsPerAttribute;
     EventMapType m_eventMap;
     DatatypeMapType m_datatypeMap;
+
+    std::vector<std::pair<QString, QVariant>> m_attributesQueue;
+    std::vector<std::pair<QString, AttributeDatatype>> m_datatypeQueue;
+    std::vector<QString> m_notifierList;
 };
 
 #endif // GLOBALSTATE_H

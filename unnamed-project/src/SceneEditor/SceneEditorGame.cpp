@@ -274,6 +274,7 @@ void SceneEditorGame::addAttribute(const QString &key,
                                    AttributeDatatype type)
 {
     m_scene->getGlobalState()->setValue(key, value, type);
+    m_scene->getGlobalState()->applyBuffer();
     emit singleAttributeAdded(m_scene->getGlobalState(), key);
 }
 
@@ -282,6 +283,38 @@ void SceneEditorGame::delAttribute(const QString &key)
 {
     m_scene->getGlobalState()->removeValue(key);
     emit attributesChanged(m_scene->getGlobalState());
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::addEvent(const QString &eventKey,
+                               std::unique_ptr<PreconditionBase> *precondition,
+                               std::unique_ptr<ActionBase> *action)
+{
+    m_scene->getGlobalState()->setEvent(eventKey,
+                                        std::move(*precondition),
+                                        std::move(*action));
+    emit eventsChanged(m_scene->getGlobalState());
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::delEvent(const QString &eventKey)
+{
+    m_scene->getGlobalState()->removeEvent(eventKey);
+    emit eventsChanged(m_scene->getGlobalState());
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::addAnimator(std::unique_ptr<Animator> *anim)
+{
+    m_scene->addAnimator(std::move(*anim));
+    emit animatorsChanged();
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::delAnimator(Animator *anim)
+{
+    m_scene->delAnimator(anim);
+    emit animatorsChanged();
 }
 
 //------------------------------------------------------------------------------

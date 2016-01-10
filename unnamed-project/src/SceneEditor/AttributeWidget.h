@@ -1,9 +1,7 @@
 #ifndef ATTRIBUTEWIDGET_H
 #define ATTRIBUTEWIDGET_H
 
-#include <QDockWidget>
 #include <QPushButton>
-#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include "SceneEditor/GlobalAttributesTableWidget.h"
 #include "GameLogic/GlobalState.h"
