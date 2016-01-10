@@ -31,11 +31,21 @@ public:
 
     const QVariant &getValue(const QString &key);
     AttributeDatatype getType(const QString &key);
+
+    /**
+     * @brief setValue add or replace a value. changes will only applied
+     *        after applyBuffer() is called
+     * @param key
+     * @param value
+     * @param type
+     */
     void setValue(const QString &key,
                   QVariant value,
                   AttributeDatatype type);
 
     void removeValue(const QString &key);
+
+    void applyBuffer();
 
     const EventType &getEvent(const QString &key);
     void setEvent(const QString &key,
@@ -57,6 +67,10 @@ protected:
     std::map<QString, std::vector<Animator *>> m_animatorsPerAttribute;
     EventMapType m_eventMap;
     DatatypeMapType m_datatypeMap;
+
+    std::vector<std::pair<QString, QVariant>> m_attributesQueue;
+    std::vector<std::pair<QString, AttributeDatatype>> m_datatypeQueue;
+    std::vector<QString> m_notifierList;
 };
 
 #endif // GLOBALSTATE_H

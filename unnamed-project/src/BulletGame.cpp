@@ -57,8 +57,6 @@ void BulletGame::tick(float dt)
     m_scene->performAnimations();
 
 
-
-
     m_bulletWorld->stepSimulation(dt);
 
     m_bulletWorld->debugDrawWorld();

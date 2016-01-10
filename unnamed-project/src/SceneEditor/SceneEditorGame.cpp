@@ -274,6 +274,7 @@ void SceneEditorGame::addAttribute(const QString &key,
                                    AttributeDatatype type)
 {
     m_scene->getGlobalState()->setValue(key, value, type);
+    m_scene->getGlobalState()->applyBuffer();
     emit singleAttributeAdded(m_scene->getGlobalState(), key);
 }
 

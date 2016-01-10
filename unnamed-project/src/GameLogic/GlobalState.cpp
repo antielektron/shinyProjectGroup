@@ -40,12 +40,12 @@ void GlobalState::setValue(const QString &key,
                            QVariant value,
                            AttributeDatatype type)
 {
-    m_attributes[key] = value;
-    m_datatypeMap[key] = type;
+    m_attributesQueue.push_back(std::make_pair(key, value));
+    m_datatypeQueue.push_back(std::make_pair(key, type));
 
     if (type == AttributeDatatype::QVector3D)
     {
-        notifyListeners(key);
+        m_notifierList.push_back(key);
     }
 }
 
@@ -62,6 +62,23 @@ void GlobalState::removeValue(const QString &key)
         std::cout << "Warning: could not remove attribute '"
                   << key.toStdString() << "'" << std::endl;
     }
+}
+
+//------------------------------------------------------------------------------
+void GlobalState::applyBuffer()
+{
+    for (size_t i = 0; i < m_attributesQueue.size(); i++)
+    {
+        m_attributes[m_attributesQueue[i].first] = m_attributesQueue[i].second;
+        m_datatypeMap[m_datatypeQueue[i].first] = m_datatypeQueue[i].second;
+    }
+    for (const auto &key : m_notifierList)
+    {
+        notifyListeners(key);
+    }
+    m_attributesQueue.clear();
+    m_datatypeQueue.clear();
+    m_notifierList.clear();
 }
 
 //------------------------------------------------------------------------------

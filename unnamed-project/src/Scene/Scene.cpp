@@ -774,6 +774,7 @@ void Scene::performEvents()
             event.second.second->performAction();
         }
     }
+    m_globalState->applyBuffer();
 }
 
 //------------------------------------------------------------------------------
