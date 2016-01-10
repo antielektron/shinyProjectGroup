@@ -160,7 +160,10 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
                   << "\nrightName: "    << rightName
                   << std::endl;
 
-        assert(leftType == rightType);
+        if(!(leftType == rightType))
+        {
+            return std::unique_ptr<PreconditionBase>(nullptr);
+        }
 
         if (op == OP_EQUALS)
         {
@@ -219,7 +222,10 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
         std::unique_ptr<PreconditionBase> rightCondition =
                 stringToPrecondition(state, rightTerm);
 
-        assert(leftCondition && rightCondition);
+        if (!(leftCondition && rightCondition))
+        {
+            return std::unique_ptr<PreconditionBase>(nullptr);
+        }
 
         // finally generate andCondition
         return std::unique_ptr<PreconditionBase>(
@@ -238,7 +244,11 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
         std::unique_ptr<PreconditionBase> rightCondition =
                 stringToPrecondition(state, term);
 
-        assert(rightCondition);
+        //assert(rightCondition);
+        if (!rightCondition)
+        {
+            return std::unique_ptr<PreconditionBase>(nullptr);
+        }
 
         // make the notCondition
         return std::unique_ptr<PreconditionBase>(

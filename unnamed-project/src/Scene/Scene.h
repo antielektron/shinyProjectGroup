@@ -49,6 +49,9 @@ public:
     void addModel(std::unique_ptr<Model> model);
     void removeModel(const std::string &modelName);
 
+    void performAnimations();
+    void performEvents();
+
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
@@ -84,6 +87,9 @@ public:
     const QString &getAuthor() const;
 
     void addAnimator(std::unique_ptr<Animator> animator);
+    void delAnimator(Animator *anim);
+
+    ObjectBase *findObjectByName(ObjectGroup *root, const QString &name);
 
 private:
     void readObjectTreeFromDom(ObjectGroup *root, const QDomElement &domElement);
@@ -108,8 +114,6 @@ private:
     void writeAnimator(Animator *animation, QXmlStreamWriter &writer);
 
     void addToObjectList(ObjectGroup *group);
-
-    ObjectBase *findObjectByName(ObjectGroup *root, const QString &name);
 
     QMatrix4x4 m_proj;
     QMatrix4x4 m_camera;
