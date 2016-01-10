@@ -22,6 +22,7 @@ class ObjectBase;
 class Model;
 
 class AttributeWidget;
+class EventWidget;
 
 class GlobalState;
 
@@ -77,6 +78,9 @@ private:
 
     QDockWidget *m_attributeWidgetDock;
     AttributeWidget *m_attributeWidget;
+
+    QDockWidget *m_eventWidgetDock;
+    EventWidget *m_eventWidget;
 
     std::shared_ptr<SceneEditorGame> m_game;
 

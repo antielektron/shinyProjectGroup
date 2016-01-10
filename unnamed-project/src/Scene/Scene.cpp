@@ -644,15 +644,6 @@ void Scene::writeEvent(const QString &key,
     {
     case ActionType::ArithmeticalAction:
     {
-
-        // determine data type and operation:
-        std::map<ArithmeticalOperationType, QString> opMap =
-        {{ArithmeticalOperationType::additionType, "+"},
-         {ArithmeticalOperationType::subtractionType, "-"},
-         {ArithmeticalOperationType::divisionType, "/"},
-         {ArithmeticalOperationType::multiplicationType, "*"}
-        };
-
         writer.writeAttribute("actionType", "arithmetical");
 
         if (action->getDataType() == "int")
@@ -660,7 +651,8 @@ void Scene::writeEvent(const QString &key,
             ArithmeticalAction<int> *arithAction =
                     static_cast<ArithmeticalAction<int> *>(action);
             writer.writeAttribute("operationType",
-                                  opMap[arithAction->getOperationType()]);
+                                  arithOperationTypeToQString.at(
+                                      arithAction->getOperationType()));
 
             writer.writeAttribute("dataType", "int");
             writer.writeAttribute("valA", arithAction->getLeftOperandKey());
@@ -672,7 +664,8 @@ void Scene::writeEvent(const QString &key,
             ArithmeticalAction<float> *arithAction =
                     static_cast<ArithmeticalAction<float> *>(action);
             writer.writeAttribute("operationType",
-                                  opMap[arithAction->getOperationType()]);
+                                  arithOperationTypeToQString.at(
+                                      arithAction->getOperationType()));
 
             writer.writeAttribute("dataType", "float");
             writer.writeAttribute("valA", arithAction->getLeftOperandKey());

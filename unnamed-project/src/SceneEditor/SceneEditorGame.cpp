@@ -285,6 +285,24 @@ void SceneEditorGame::delAttribute(const QString &key)
 }
 
 //------------------------------------------------------------------------------
+void SceneEditorGame::addEvent(const QString &eventKey,
+                               std::unique_ptr<PreconditionBase> *precondition,
+                               std::unique_ptr<ActionBase> *action)
+{
+    m_scene->getGlobalState()->setEvent(eventKey,
+                                        std::move(*precondition),
+                                        std::move(*action));
+    emit eventsChanged(m_scene->getGlobalState());
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::delEvent(const QString &eventKey)
+{
+    m_scene->getGlobalState()->removeEvent(eventKey);
+    emit eventsChanged(m_scene->getGlobalState());
+}
+
+//------------------------------------------------------------------------------
 void SceneEditorGame::createIndicatorObject()
 {
 	// NOTE: this model should NOT be part of the scene!!!

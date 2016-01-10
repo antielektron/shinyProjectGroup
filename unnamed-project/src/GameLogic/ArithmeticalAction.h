@@ -3,14 +3,9 @@
 
 #include <QString>
 #include "GameLogic/ActionBase.h"
+#include "GameLogic/GameLogicDatatypes.h"
 
-enum class ArithmeticalOperationType
-{
-    additionType,
-    subtractionType,
-    multiplicationType,
-    divisionType
-};
+
 
 class QVariant;
 

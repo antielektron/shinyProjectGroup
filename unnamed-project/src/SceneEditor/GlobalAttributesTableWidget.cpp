@@ -1,4 +1,4 @@
-#include "GlobalAttributesTableWidget.h"
+#include "SceneEditor/GlobalAttributesTableWidget.h"
 #include "GameLogic/GlobalState.h"
 
 #include <QStandardItem>
@@ -38,7 +38,7 @@ void GlobalAttributesTableWidget::init()
 
     setModel(m_model);
 
-    setShowGrid(true);
+    setShowGrid(false);
 
     setEditTriggers(QAbstractItemView::NoEditTriggers);
 }

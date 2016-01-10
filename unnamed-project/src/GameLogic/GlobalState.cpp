@@ -73,6 +73,21 @@ void GlobalState::setEvent(const QString &key,
 }
 
 //------------------------------------------------------------------------------
+void GlobalState::removeEvent(const QString &eventKey)
+{
+    auto it = m_eventMap.find(eventKey);
+    if (it != m_eventMap.end())
+    {
+        m_eventMap.erase(it);
+    }
+    else
+    {
+        std::cout << "Warning: could not remove event '"
+                  << eventKey.toStdString() << "'" << std::endl;
+    }
+}
+
+//------------------------------------------------------------------------------
 range<GlobalState::AttributesIteratorType> GlobalState::getAttributes()
 {
     return range<AttributesIteratorType>(m_attributes.begin(),

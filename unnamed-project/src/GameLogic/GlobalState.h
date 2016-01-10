@@ -40,6 +40,8 @@ public:
                   std::unique_ptr<PreconditionBase> precondition,
                   std::unique_ptr<ActionBase> action);
 
+    void removeEvent(const QString &eventKey);
+
     range<AttributesIteratorType> getAttributes();
     range<EventMapIteratorType> getEvents();
 

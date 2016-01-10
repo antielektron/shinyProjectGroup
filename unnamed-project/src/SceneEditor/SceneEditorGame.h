@@ -54,6 +54,12 @@ public slots:
 
     void delAttribute(const QString &key);
 
+    void addEvent(const QString &eventKey,
+                  std::unique_ptr<PreconditionBase> *precondition,
+                  std::unique_ptr<ActionBase> *action);
+
+    void delEvent(const QString &eventKey);
+
 Q_SIGNALS:
     void currentObjectChanged();
     void modelsChanged();
@@ -62,6 +68,8 @@ Q_SIGNALS:
 
     void attributesChanged(GlobalState *);
     void singleAttributeAdded(GlobalState *, const QString &);
+
+    void eventsChanged(GlobalState *);
 
 private:
     void createIndicatorObject();

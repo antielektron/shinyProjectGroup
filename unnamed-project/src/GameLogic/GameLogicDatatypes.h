@@ -10,6 +10,14 @@
 // it to this header, make Scene io-stuff completely depended
 // from this shit!
 
+enum class ArithmeticalOperationType
+{
+    additionType,
+    subtractionType,
+    multiplicationType,
+    divisionType
+};
+
 enum class AttributeDatatype
 {
     Bool,
@@ -74,6 +82,22 @@ const std::map<InterpolationType, QString> interpolationToQString =
     { InterpolationType::Jump, "jump" },
     { InterpolationType::Linear, "linear" },
     { InterpolationType::Trigonometric, "trigonometric" }
+};
+
+const std::map<QString, ArithmeticalOperationType> qStringToArithOperationType =
+{
+    {"+", ArithmeticalOperationType::additionType},
+    {"-", ArithmeticalOperationType::subtractionType},
+    {"*", ArithmeticalOperationType::multiplicationType},
+    {"/", ArithmeticalOperationType::divisionType}
+};
+
+const std::map<ArithmeticalOperationType, QString> arithOperationTypeToQString =
+{
+    {ArithmeticalOperationType::additionType, "+"},
+    {ArithmeticalOperationType::subtractionType, "-"},
+    {ArithmeticalOperationType::multiplicationType, "*"},
+    {ArithmeticalOperationType::divisionType, "/"}
 };
 
 
