@@ -113,6 +113,7 @@ void Scene::loadFromFile(const QString &filename)
         }
     }
 
+    m_globalState->applyBuffer();
     // Apply transformations to objects
     m_rootGroup.updateWorld();
 }

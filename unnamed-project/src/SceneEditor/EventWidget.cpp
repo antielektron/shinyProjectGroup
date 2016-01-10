@@ -169,7 +169,9 @@ void EventWidget::onAddEventClicked()
     }
     case ActionType::ArithmeticalAction:
     {
-        QStringList typeList = {"float", "int"};
+        QStringList typeList;
+        typeList.append("float");
+        typeList.append("int");
         QStringList operandList;
         for (const auto &pair : qStringToArithOperationType)
         {
