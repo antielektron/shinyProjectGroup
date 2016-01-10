@@ -60,6 +60,10 @@ public slots:
 
     void delEvent(const QString &eventKey);
 
+    void addAnimator(std::unique_ptr<Animator> *);
+
+    void delAnimator(Animator *);
+
 Q_SIGNALS:
     void currentObjectChanged();
     void modelsChanged();
@@ -70,6 +74,8 @@ Q_SIGNALS:
     void singleAttributeAdded(GlobalState *, const QString &);
 
     void eventsChanged(GlobalState *);
+
+    void animatorsChanged();
 
 private:
     void createIndicatorObject();

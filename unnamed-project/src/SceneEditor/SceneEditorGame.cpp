@@ -303,6 +303,20 @@ void SceneEditorGame::delEvent(const QString &eventKey)
 }
 
 //------------------------------------------------------------------------------
+void SceneEditorGame::addAnimator(std::unique_ptr<Animator> *anim)
+{
+    m_scene->addAnimator(std::move(*anim));
+    emit animatorsChanged();
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::delAnimator(Animator *anim)
+{
+    m_scene->delAnimator(anim);
+    emit animatorsChanged();
+}
+
+//------------------------------------------------------------------------------
 void SceneEditorGame::createIndicatorObject()
 {
 	// NOTE: this model should NOT be part of the scene!!!

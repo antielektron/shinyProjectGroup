@@ -8,7 +8,7 @@
 
 // TODO remove enums and type stuff from ligic classes and move
 // it to this header, make Scene io-stuff completely depended
-// from this shit!
+// from this!
 
 #define KEY_ATTRIBUTE_TIME "TIME"
 #define KEY_ATTRIBUTE_PLAYER "PLAYER_POSITION"

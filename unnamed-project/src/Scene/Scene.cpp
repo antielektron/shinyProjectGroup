@@ -947,3 +947,15 @@ void Scene::addAnimator(std::unique_ptr<Animator> animator)
 {
     m_animators.push_back(std::move(animator));
 }
+
+//------------------------------------------------------------------------------
+void Scene::delAnimator(Animator *anim)
+{
+    for (auto it = m_animators.begin(); it != m_animators.end(); ++it)
+    {
+        if (it->get() == anim)
+        {
+            m_animators.erase(it);
+        }
+    }
+}
