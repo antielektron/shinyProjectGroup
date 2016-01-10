@@ -143,6 +143,8 @@ void GlobalState::initializeConstantAttributes()
     setValue(KEY_ATTRIBUTE_PLAYER,
              QVariant(playerPosition),
              AttributeDatatype::QVector3D);
+
+    applyBuffer();
 }
 
 //------------------------------------------------------------------------------
