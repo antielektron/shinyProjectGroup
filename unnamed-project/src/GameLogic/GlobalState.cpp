@@ -118,6 +118,7 @@ void GlobalState::registerAnimator(const QString &watchedAttrib, Animator *anim)
 void GlobalState::initializeConstantAttributes()
 {
     setValue(KEY_ATTRIBUTE_TIME, QVariant(0.0f), AttributeDatatype::Float);
+    setValue(KEY_ATTRIBUTE_DELTA_TIME, QVariant(0.0f), AttributeDatatype::Float);
     setValue(KEY_ATTRIBUTE_TRUE, QVariant(true), AttributeDatatype::Bool);
     setValue(KEY_ATTRIBUTE_FALSE, QVariant(false), AttributeDatatype::Bool);
 

@@ -42,6 +42,21 @@ void BulletGame::tick(float dt)
 {
     handleInput(dt);
 
+    // update time in globalState:
+    float oldTime = m_scene->getGlobalState()->getValue(KEY_ATTRIBUTE_TIME).toFloat();
+    m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_TIME,
+                                        QVariant(oldTime + dt),
+                                        AttributeDatatype::Float);
+
+    m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_DELTA_TIME,
+                                        QVariant(dt),
+                                        AttributeDatatype::Float);
+
+    // run Animataions and run handle game logic events:
+    m_scene->performEvents();
+    m_scene->performAnimations();
+
+
 
 
     m_bulletWorld->stepSimulation(dt);
