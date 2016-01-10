@@ -1,4 +1,5 @@
 #include "GameLogic/GlobalState.h"
+#include "GameLogic/Animator.h"
 
 #include <iostream>
 
@@ -41,6 +42,11 @@ void GlobalState::setValue(const QString &key,
 {
     m_attributes[key] = value;
     m_datatypeMap[key] = type;
+
+    if (type == AttributeDatatype::QVector3D)
+    {
+        notifyListeners(key);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -103,6 +109,12 @@ range<GlobalState::EventMapIteratorType> GlobalState::getEvents()
 }
 
 //------------------------------------------------------------------------------
+void GlobalState::registerAnimator(const QString &watchedAttrib, Animator *anim)
+{
+    m_animatorsPerAttribute[watchedAttrib].push_back(anim);
+}
+
+//------------------------------------------------------------------------------
 void GlobalState::initializeConstantAttributes()
 {
     setValue(KEY_ATTRIBUTE_TIME, QVariant(0.0f), AttributeDatatype::Float);
@@ -113,4 +125,15 @@ void GlobalState::initializeConstantAttributes()
     setValue(KEY_ATTRIBUTE_PLAYER,
              QVariant(playerPosition),
              AttributeDatatype::QVector3D);
+}
+
+//------------------------------------------------------------------------------
+void GlobalState::notifyListeners(const QString &key)
+{
+    for (const auto &anim : m_animatorsPerAttribute[key])
+    {
+        float time = getValue(KEY_ATTRIBUTE_TIME).toFloat();
+        QVector3D vec = getValue(key).value<QVector3D>();
+        anim->onValueChanged(vec, time);
+    }
 }

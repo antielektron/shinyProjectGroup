@@ -11,6 +11,8 @@
 #include "GameLogic/ActionBase.h"
 #include "GameLogic/GameLogicDatatypes.h"
 
+class Animator;
+
 
 class GlobalState
 {
@@ -45,10 +47,14 @@ public:
     range<AttributesIteratorType> getAttributes();
     range<EventMapIteratorType> getEvents();
 
+    void registerAnimator(const QString &watchedAttrib, Animator *anim);
+
 protected:
     void initializeConstantAttributes();
+    void notifyListeners(const QString &key);
 
     std::map<QString, QVariant> m_attributes;
+    std::map<QString, std::vector<Animator *>> m_animatorsPerAttribute;
     EventMapType m_eventMap;
     DatatypeMapType m_datatypeMap;
 };

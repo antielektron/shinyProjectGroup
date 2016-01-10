@@ -755,6 +755,28 @@ void Scene::removeModel(const std::string &modelName)
 }
 
 //------------------------------------------------------------------------------
+void Scene::performAnimations()
+{
+    float curTime = m_globalState->getValue(KEY_ATTRIBUTE_TIME).toFloat();
+    for (const auto &anim : this->getAnimators())
+    {
+        anim->tick(curTime);
+    }
+}
+
+//------------------------------------------------------------------------------
+void Scene::performEvents()
+{
+    for (const auto &event : m_globalState->getEvents())
+    {
+        if (event.second.first->evaluateCondition())
+        {
+            event.second.second->performAction();
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
 Object *Scene::createObject(const std::string &modelName, ObjectGroup *parent)
 {
     if (!parent)
