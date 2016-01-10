@@ -60,8 +60,8 @@ int main(int argc, char **argv)
         // TODO have window (with debug ui)
         // TODO add command line argument for level file to use!
 
-        OpenGLWidget widget(std::make_shared<BulletGame>("level/logicMenger2.xml"));
-        widget.show();
+        OpenGLWidget widget(std::make_shared<BulletGame>("level/cathedral2.xml"));
+
 
         return app.exec();
     }
