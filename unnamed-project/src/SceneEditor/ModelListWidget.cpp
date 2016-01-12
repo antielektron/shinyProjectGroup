@@ -88,6 +88,7 @@ void ModelListWidget::onRemoveClick()
     }
 
     m_game->removeModel(modelName);
+    emit currentModelChanged(QString("")); // empty model String results in nullptr
 }
 
 //------------------------------------------------------------------------------
