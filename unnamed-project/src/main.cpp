@@ -62,7 +62,7 @@ int main(int argc, char **argv)
 
         OpenGLWidget widget(std::make_shared<BulletGame>("level/cathedral2.xml"));
 
-
+        widget.show();
         return app.exec();
     }
 #endif // HAVE_BULLET
