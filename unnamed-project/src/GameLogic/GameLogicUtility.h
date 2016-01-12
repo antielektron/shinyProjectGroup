@@ -7,9 +7,11 @@
 #include "GameLogic/PreconditionBase.h"
 
 #define OP_AND '&'
+#define OP_OR '|'
 #define OP_NOT '!'
 #define OP_EQUALS '='
 #define OP_GREATER '>'
+#define OP_LESS '<'
 #define TYPE_BRACKET_LEFT '['
 #define TYPE_BRACKET_RIGHT ']'
 #define NAME_BRACKET_LEFT '{'

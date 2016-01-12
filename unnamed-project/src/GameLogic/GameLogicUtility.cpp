@@ -1,5 +1,6 @@
 #include "GameLogic/GameLogicUtility.h"
 #include "GameLogic/IsAndPrecondition.h"
+#include "GameLogic/IsOrPrecondition.h"
 #include "GameLogic/IsNotPrecondition.h"
 #include "GameLogic/IsEqualPrecondition.h"
 #include "GameLogic/IsGreaterPrecondition.h"
@@ -82,6 +83,12 @@ std::pair<size_t, char> gameLogicUtility::findOperator(const std::string &src)
                 opIndex = i;
                 break;
             }
+            if (src[i] == OP_OR)
+            {
+                op = OP_OR;
+                opIndex = i;
+                break;
+            }
             if (src[i] == OP_EQUALS)
             {
                 op = OP_EQUALS;
@@ -91,6 +98,12 @@ std::pair<size_t, char> gameLogicUtility::findOperator(const std::string &src)
             if (src[i] == OP_GREATER)
             {
                 op = OP_GREATER;
+                opIndex = i;
+                break;
+            }
+            if (src[i] == OP_LESS)
+            {
+                op = OP_LESS;
                 opIndex = i;
                 break;
             }
@@ -132,7 +145,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
     std::cout << "source String: "
               << input << std::endl;
 
-    if (op == OP_EQUALS || op == OP_GREATER)
+    if (op == OP_EQUALS || op == OP_GREATER || op == OP_LESS)
     {
         // in this case we have to determine the type
         // and values from the substrings
@@ -203,6 +216,27 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
                                QString::fromStdString(rightName)));
             }
         }
+        if (op == OP_LESS)
+        {
+            // we will use IsGreater condition,
+            // but switch left and right operator
+            if (leftType == "int")
+            {
+                return std::unique_ptr<PreconditionBase>(
+                           new IsGreaterPrecondition<int>(
+                               state,
+                               QString::fromStdString(rightName),
+                               QString::fromStdString(leftName)));
+            }
+            else if (leftType == "float")
+            {
+                return std::unique_ptr<PreconditionBase>(
+                           new IsGreaterPrecondition<float>(
+                               state,
+                               QString::fromStdString(rightName),
+                               QString::fromStdString(leftName)));
+            }
+        }
     }
 
     else if (op == OP_AND)
@@ -230,6 +264,34 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
         // finally generate andCondition
         return std::unique_ptr<PreconditionBase>(
                     new IsAndPrecondition(state,
+                                          std::move(leftCondition),
+                                          std::move(rightCondition)));
+    }
+    else if (op == OP_OR)
+    {
+        // remove brackets around term:
+        std::string leftTerm = getSubstringByDelimiters(leftSubstring,
+                                                        BRACKET_LEFT,
+                                                        BRACKET_RIGHT);
+
+        std::string rightTerm = getSubstringByDelimiters(rightSubstring,
+                                                         BRACKET_LEFT,
+                                                         BRACKET_RIGHT);
+
+        // and generate conditions from terms:
+        std::unique_ptr<PreconditionBase> leftCondition =
+                stringToPrecondition(state,leftTerm);
+        std::unique_ptr<PreconditionBase> rightCondition =
+                stringToPrecondition(state, rightTerm);
+
+        if (!(leftCondition && rightCondition))
+        {
+            return std::unique_ptr<PreconditionBase>(nullptr);
+        }
+
+        // finally generate andCondition
+        return std::unique_ptr<PreconditionBase>(
+                    new IsOrPrecondition(state,
                                           std::move(leftCondition),
                                           std::move(rightCondition)));
     }
