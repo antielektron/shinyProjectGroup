@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene name="Shiny Scene" version="42" author="Norby">
+    <Models>
+        <Model name="cathedraAltar001" path="models/cathedraAltar001.obj"/>
+        <Model name="cathedral001" path="models/cathedral001.obj"/>
+        <Model name="floor" path="models/floor.obj"/>
+        <Model name="floor2" path="models/floor2.obj"/>
+        <Model name="meditationChamber2" path="models/meditationChamber2.obj"/>
+        <Model name="menger" path="models/menger.obj"/>
+        <Model name="mengerplat" path="models/mengerplat.obj"/>
+        <Model name="octonorm" path="models/octonorm.obj"/>
+        <Model name="sink" path="models/sink.obj"/>
+        <Model name="sphere" path="models/sphere.obj"/>
+        <Model name="suzanne" path="models/suzanne.obj"/>
+        <Model name="tunnel2" path="models/tunnel2.obj"/>
+    </Models>
+    <Objects>
+        <Object name="floor2" model="floor2" x="0" y="0" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="meditationChamber2" model="meditationChamber2" x="0" y="0" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="tunnel2" model="tunnel2" x="0" y="0" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="floor2" model="floor2" x="0" y="29" z="-75.2" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="cathedral001" model="cathedral001" x="0" y="29" z="-80" rx="0" ry="90" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="menger" model="menger" x="28.1" y="29" z="-106.5" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="mengerplat" model="mengerplat" x="26.2" y="38.2" z="-95.4" rx="0" ry="6.3" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="mengerplat2" model="mengerplat" x="28.9" y="37.1" z="-89.8" rx="0" ry="-8.9" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="mengerplat3" model="mengerplat" x="24.8" y="38.4" z="-83.4" rx="0" ry="-16.4" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="cathedraAltar001" model="cathedraAltar001" x="0.2" y="29" z="-79.3" rx="0" ry="90.1" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="octonorm" model="octonorm" x="-1.8" y="32.9" z="-84" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
+    </Objects>
+    <Events/>
+    <Attributes>
+        <Attribute key="DELTA_TIME" type="float" value="0"/>
+        <Attribute key="FALSE" type="bool" value="false"/>
+        <Attribute key="PLAYER_POSITION" type="vector" x="0" y="0" z="0"/>
+        <Attribute key="TIME" type="float" value="0"/>
+        <Attribute key="TRUE" type="bool" value="true"/>
+    </Attributes>
+    <Animators/>
+    <DirectionalLight x="-1.7486e-15" y="17.1" z="-4.5" r="0.2" g="0" b="0"/>
+    <Player x="0" y="0" z="0"/>
+</Scene>
