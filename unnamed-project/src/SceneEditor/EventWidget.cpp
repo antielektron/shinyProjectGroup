@@ -8,6 +8,7 @@
 #include "GameLogic/CopyAttributeAction.h"
 #include "GameLogic/FlipBooleanAction.h"
 #include "GameLogic/ArithmeticalAction.h"
+#include "Scene/Scene.h"
 
 //------------------------------------------------------------------------------
 EventWidget::EventWidget(QWidget *parent) :
@@ -67,6 +68,7 @@ void EventWidget::onAddEventClicked()
         QMessageBox::warning(this, "Warning", "Scene not initialized yet");
         return;
     }
+
     bool ok;
 
     QString eventKey =
@@ -130,18 +132,34 @@ void EventWidget::onAddEventClicked()
     {
     case ActionType::CopyAttribute:
     {
-        QString src = QInputDialog::getText(this,
+        QStringList availableAttributes;
+        for (const auto &attr : m_globalState->getAttributes())
+        {
+            availableAttributes.append(attr.first);
+        }
+        QString src = QInputDialog::getItem(this,
                                             "enter argument",
-                                            "source key",
-                                            QLineEdit::Normal,
-                                            "",
+                                            "select source key",
+                                            availableAttributes,
+                                            0,
+                                            false,
                                             &ok);
 
-        QString dst = QInputDialog::getText(this,
+        // only show attribs with same datatype:
+        availableAttributes.clear();
+        for (const auto &attr : m_globalState->getAttributes())
+        {
+            if (m_globalState->getType(attr.first) == m_globalState->getType(src))
+            {
+                availableAttributes.append(attr.first);
+            }
+        }
+        QString dst = QInputDialog::getItem(this,
                                             "enter argument",
-                                            "destination key",
-                                            QLineEdit::Normal,
-                                            "",
+                                            "select destination key",
+                                            availableAttributes,
+                                            0,
+                                            false,
                                             &ok);
 
         auto actionPtr = std::unique_ptr<ActionBase>(
@@ -153,11 +171,21 @@ void EventWidget::onAddEventClicked()
     }
     case ActionType::FlipBoolean:
     {
-        QString key = QInputDialog::getText(this,
+        QStringList availableAttributes;
+        for (const auto &attr : m_globalState->getAttributes())
+        {
+            // only add booleans:
+            if (m_globalState->getType(attr.first) == AttributeDatatype::Bool)
+            {
+                availableAttributes.append(attr.first);
+            }
+        }
+        QString key = QInputDialog::getItem(this,
                                             "enter argument",
-                                            "boolean key",
-                                            QLineEdit::Normal,
-                                            "",
+                                            "select boolean key",
+                                            availableAttributes,
+                                            0,
+                                            false,
                                             &ok);
 
         auto actionPtr = std::unique_ptr<ActionBase>(
@@ -194,25 +222,38 @@ void EventWidget::onAddEventClicked()
                                                  false,
                                                  &ok);
 
-        QString dst = QInputDialog::getText(this,
+        QStringList availableAttributes;
+        for (const auto &attr : m_globalState->getAttributes())
+        {
+            // only add, if datatype matches!
+            if (m_globalState->getType(attr.first) == qStringToType.at(dTypeStr))
+            {
+                availableAttributes.append(attr.first);
+            }
+        }
+
+        QString dst = QInputDialog::getItem(this,
                                             "enter argument",
                                             "destination key",
-                                            QLineEdit::Normal,
-                                            "",
+                                            availableAttributes,
+                                            0,
+                                            false,
                                             &ok);
 
-        QString a = QInputDialog::getText(this,
+        QString a = QInputDialog::getItem(this,
                                             "enter argument",
                                             "left operand key",
-                                            QLineEdit::Normal,
-                                            "",
+                                            availableAttributes,
+                                            0,
+                                            false,
                                             &ok);
 
-        QString b = QInputDialog::getText(this,
+        QString b = QInputDialog::getItem(this,
                                             "enter argument",
                                             "right operand key",
-                                            QLineEdit::Normal,
-                                            "",
+                                            availableAttributes,
+                                            0,
+                                            false,
                                             &ok);
 
         ActionBase *action = nullptr;

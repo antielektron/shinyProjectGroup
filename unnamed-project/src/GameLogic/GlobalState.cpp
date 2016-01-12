@@ -23,6 +23,49 @@ void GlobalState::init()
 }
 
 //------------------------------------------------------------------------------
+void GlobalState::stash()
+{
+
+    // apply Buffer (just in case)
+    applyBuffer();
+
+    // clear stash
+    m_stashedAttributes.clear();
+    m_stashedDatatypeMap.clear();
+
+    // build stash:
+    for (const auto &p : m_attributes)
+    {
+        m_stashedAttributes[p.first] = p.second;
+    }
+    for (const auto &p :m_datatypeMap)
+    {
+        m_stashedDatatypeMap[p.first] = p.second;
+    }
+}
+
+//------------------------------------------------------------------------------
+void GlobalState::applyStash()
+{
+    // apply buffer (just in case)
+    applyBuffer();
+
+    for (const auto &p : m_stashedAttributes)
+    {
+        m_attributes[p.first] = p.second;
+    }
+    for (const auto &p : m_stashedDatatypeMap)
+    {
+        m_datatypeMap[p.first] = p.second;
+        // notify animators:
+        if (p.second == AttributeDatatype::QVector3D)
+        {
+            notifyListeners(p.first);
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
 const QVariant &GlobalState::getValue(const QString &key)
 {
     // TODO: maybe check if is Valid?

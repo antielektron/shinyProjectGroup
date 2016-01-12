@@ -62,6 +62,9 @@ private:
     QAction     *m_loadScene;
     QAction     *m_saveScene;
     QAction     *m_newScene;
+    QAction     *m_play;
+    QAction     *m_stop;
+    QAction     *m_pause;
 
     OpenGLWidget *m_glWidget;
 

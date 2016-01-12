@@ -126,6 +126,18 @@ void SceneEditorWindow::createActions()
                              "new Scene",
                              this);
 
+    m_play = new QAction(style->standardIcon(QStyle::SP_MediaPlay),
+                            "run logic",
+                            this);
+
+    m_stop = new QAction(style->standardIcon(QStyle::SP_MediaStop),
+                         "stop logic",
+                         this);
+
+    m_pause = new QAction(style->standardIcon(QStyle::SP_MediaPause),
+                          "toggle pause",
+                          this);
+
     m_loadScene->setShortcut(QKeySequence::Open);
     m_saveScene->setShortcut(QKeySequence::Save);
     m_newScene->setShortcut(QKeySequence::New);
@@ -139,6 +151,9 @@ void SceneEditorWindow::createToolbar()
     m_toolbar->addAction(m_newScene);
     m_toolbar->addAction(m_loadScene);
     m_toolbar->addAction(m_saveScene);
+    m_toolbar->addAction(m_play);
+    m_toolbar->addAction(m_pause);
+    m_toolbar->addAction(m_stop);
 }
 
 //------------------------------------------------------------------------------
@@ -214,6 +229,9 @@ void SceneEditorWindow::connectStuff()
     connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
     connect(m_saveScene, SIGNAL(triggered()), this, SLOT(saveScene()));
     connect(m_newScene, SIGNAL(triggered()), this, SLOT(newScene()));
+    connect(m_play, SIGNAL(triggered()), m_game.get(), SLOT(runLogic()));
+    connect(m_stop, SIGNAL(triggered()), m_game.get(), SLOT(stopLogic()));
+    connect(m_pause, SIGNAL(triggered()), m_game.get(), SLOT(togglePauseLogic()));
 }
 
 //------------------------------------------------------------------------------

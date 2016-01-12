@@ -6,6 +6,8 @@
 #include "SceneEditor/EventTableWidget.h"
 #include "GameLogic/GlobalState.h"
 
+class Scene;
+
 class EventWidget : public QWidget
 {
     Q_OBJECT

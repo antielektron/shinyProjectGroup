@@ -779,6 +779,15 @@ void Scene::performEvents()
 }
 
 //------------------------------------------------------------------------------
+void Scene::instantlyFinishAnimations()
+{
+    for (auto const &anim : this->getAnimators())
+    {
+        anim->instantlyFinishCurrentAnimation();
+    }
+}
+
+//------------------------------------------------------------------------------
 Object *Scene::createObject(const std::string &modelName, ObjectGroup *parent)
 {
     if (!parent)
@@ -920,7 +929,14 @@ ObjectBase *Scene::findObjectByName(ObjectGroup *root, const QString &name)
 //------------------------------------------------------------------------------
 Model *Scene::getModel(const std::string &modelName)
 {
-    assert(m_models.find(modelName) != m_models.end());
+    if (modelName.length() == 0)
+    {
+        return nullptr;
+    }
+    if(m_models.find(modelName) == m_models.end())
+    {
+        return nullptr;
+    }
     return m_models[modelName].get();
 }
 
