@@ -64,6 +64,10 @@ public slots:
 
     void delAnimator(Animator *);
 
+    void runLogic();
+    void stopLogic();
+    void togglePauseLogic();
+
 Q_SIGNALS:
     void currentObjectChanged();
     void modelsChanged();
@@ -104,6 +108,10 @@ private:
     float m_extraIndicatorH;
     float m_indicatorRotation;
     float m_indicatorScale;
+
+    // for live logic testing:
+    bool m_logicRunning;
+    bool m_logicPaused;
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_GAME_H

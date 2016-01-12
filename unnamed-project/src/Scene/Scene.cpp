@@ -779,6 +779,15 @@ void Scene::performEvents()
 }
 
 //------------------------------------------------------------------------------
+void Scene::instantlyFinishAnimations()
+{
+    for (auto const &anim : this->getAnimators())
+    {
+        anim->instantlyFinishCurrentAnimation();
+    }
+}
+
+//------------------------------------------------------------------------------
 Object *Scene::createObject(const std::string &modelName, ObjectGroup *parent)
 {
     if (!parent)

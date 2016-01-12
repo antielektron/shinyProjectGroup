@@ -51,6 +51,7 @@ public:
 
     void performAnimations();
     void performEvents();
+    void instantlyFinishAnimations();
 
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);

@@ -8,6 +8,8 @@ SceneEditorGame::SceneEditorGame() :
 		QObject(nullptr), 
 		m_currentObject(nullptr)
 {
+    m_logicRunning = false;
+    m_logicPaused = false;
 }
 
 void SceneEditorGame::initialize()
@@ -34,6 +36,9 @@ void SceneEditorGame::reset(std::unique_ptr<Scene> scene)
     createIndicatorObject();
     m_indicatorObject->makeInvisible();
 
+    m_logicRunning = false;
+    m_logicPaused = false;
+
     emit currentObjectChanged();
     emit modelsChanged();
     emit objectsChanged();
@@ -51,6 +56,31 @@ void SceneEditorGame::tick(float dt)
 {
     m_deltaTime = dt;
     m_time += m_deltaTime;
+
+    // update time in globalState:
+    if (m_logicRunning && !m_logicPaused)
+    {
+        float oldTime = m_scene->getGlobalState()->getValue(KEY_ATTRIBUTE_TIME).toFloat();
+        m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_TIME,
+                                            QVariant(oldTime + dt),
+                                            AttributeDatatype::Float);
+
+        m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_DELTA_TIME,
+                                            QVariant(dt),
+                                            AttributeDatatype::Float);
+    }
+    // TODO: write player position in audomad!!!
+
+    // run Animataions and run handle game logic events:
+    if (m_logicRunning && !m_logicPaused)
+    {
+        m_scene->performEvents();
+        emit attributesChanged(m_scene->getGlobalState());
+    }
+    if (!m_logicPaused)
+    {
+        m_scene->performAnimations();
+    }
 
     // update indicator stuff
     m_extraIndicatorH = (std::sin(3.0f * m_time) + 1.0f) * 0.2f * m_indicatorScale;
@@ -266,6 +296,39 @@ ObjectGroup *SceneEditorGame::createObjectGroup(const std::string &name, ObjectG
     ObjectGroup *objGrp = m_scene->createObjectGroup(name, parent);
     emit objectsChanged();
     return objGrp;
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::runLogic()
+{
+    if (!m_logicRunning)
+    {
+        m_scene->instantlyFinishAnimations();
+        m_scene->getGlobalState()->stash();
+        m_logicRunning = true;
+        m_logicPaused = false;
+    }
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::stopLogic()
+{
+    if (m_logicRunning)
+    {
+        m_scene->getGlobalState()->applyStash();
+        m_logicRunning = false;
+        m_logicPaused = false;
+    }
+    emit attributesChanged(m_scene->getGlobalState());
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::togglePauseLogic()
+{
+    if (m_logicRunning)
+    {
+        m_logicPaused = !m_logicPaused;
+    }
 }
 
 //------------------------------------------------------------------------------

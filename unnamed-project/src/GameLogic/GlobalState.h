@@ -29,6 +29,12 @@ public:
 
     void init();
 
+    // stash current state, so we can apply it later again
+    void stash();
+
+    // apply prevoiusly stashed attributes
+    void applyStash();
+
     const QVariant &getValue(const QString &key);
     AttributeDatatype getType(const QString &key);
 
@@ -71,6 +77,10 @@ protected:
     std::vector<std::pair<QString, QVariant>> m_attributesQueue;
     std::vector<std::pair<QString, AttributeDatatype>> m_datatypeQueue;
     std::vector<QString> m_notifierList;
+
+    // stash:
+    std::map<QString, QVariant> m_stashedAttributes;
+    DatatypeMapType m_stashedDatatypeMap;
 };
 
 #endif // GLOBALSTATE_H
