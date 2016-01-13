@@ -265,10 +265,10 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
                 stringToPrecondition(state, rightTerm);
 
         // finally generate andCondition
-        return std::unique_ptr<PreconditionBase>(
-                    new ConjunctionPrecondition(state,
-                                          std::move(leftCondition),
-                                          std::move(rightCondition)));
+        auto result = std::unique_ptr<ConjunctionPrecondition>(new ConjunctionPrecondition(state));
+        result->addCondition(std::move(leftCondition));
+        result->addCondition(std::move(rightCondition));
+        return std::move(result);
     }
     else if (op == OP_OR)
     {
@@ -288,10 +288,10 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
                 stringToPrecondition(state, rightTerm);
 
         // finally generate andCondition
-        return std::unique_ptr<PreconditionBase>(
-                    new DisjunctionPrecondition(state,
-                                          std::move(leftCondition),
-                                          std::move(rightCondition)));
+        auto result = std::unique_ptr<DisjunctionPrecondition>(new DisjunctionPrecondition(state));
+        result->addCondition(std::move(leftCondition));
+        result->addCondition(std::move(rightCondition));
+        return std::move(result);
     }
     else if (op == OP_NOT)
     {

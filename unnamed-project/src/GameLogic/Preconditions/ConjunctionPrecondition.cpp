@@ -1,13 +1,11 @@
+#include <sstream>
+
 #include "GameLogic/Preconditions/ConjunctionPrecondition.h"
 #include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
-ConjunctionPrecondition::ConjunctionPrecondition(GlobalState *state,
-                                                 std::unique_ptr<PreconditionBase> baseA,
-                                                 std::unique_ptr<PreconditionBase> baseB) :
-    PreconditionBase(state),
-    m_baseA(std::move(baseA)),
-    m_baseB(std::move(baseB))
+ConjunctionPrecondition::ConjunctionPrecondition(GlobalState *state) :
+    BooleanPreconditionBase(state)
 {
 }
 
@@ -20,14 +18,25 @@ ConjunctionPrecondition::~ConjunctionPrecondition()
 //------------------------------------------------------------------------------
 bool ConjunctionPrecondition::evaluateCondition()
 {
-    return m_baseA->evaluateCondition() && m_baseB->evaluateCondition();
+    for (auto &condition : m_conditions)
+    {
+        if (!condition->evaluateCondition())
+            return false;
+    }
+    return true;
 }
 
 //------------------------------------------------------------------------------
 QString ConjunctionPrecondition::toQString()
 {
-    return QString("(") + m_baseA->toQString()
-                        + ")&("
-                        + m_baseB->toQString()
-                        + ")";
+    QString result;
+
+    for (auto it = m_conditions.begin(); it != m_conditions.end(); it++)
+    {
+        if (it != m_conditions.begin())
+            result += "&";
+        result += "(" + (*it)->toQString() + ")";
+    }
+
+    return result;
 }

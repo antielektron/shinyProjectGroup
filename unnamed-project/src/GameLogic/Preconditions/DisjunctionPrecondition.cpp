@@ -2,12 +2,8 @@
 #include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
-DisjunctionPrecondition::DisjunctionPrecondition(GlobalState *state,
-                                                   std::unique_ptr<PreconditionBase> baseA,
-                                                   std::unique_ptr<PreconditionBase> baseB) :
-    PreconditionBase(state),
-    m_baseA(std::move(baseA)),
-    m_baseB(std::move(baseB))
+DisjunctionPrecondition::DisjunctionPrecondition(GlobalState *state) :
+    BooleanPreconditionBase(state)
 {
 }
 
@@ -20,14 +16,25 @@ DisjunctionPrecondition::~DisjunctionPrecondition()
 //------------------------------------------------------------------------------
 bool DisjunctionPrecondition::evaluateCondition()
 {
-    return m_baseA->evaluateCondition() || m_baseB->evaluateCondition();
+    for (auto &condition : m_conditions)
+    {
+        if (condition->evaluateCondition())
+            return true;
+    }
+    return false;
 }
 
 //------------------------------------------------------------------------------
 QString DisjunctionPrecondition::toQString()
 {
-    return QString("(") + m_baseA->toQString()
-                        + ")|("
-                        + m_baseB->toQString()
-                        + ")";
+    QString result;
+
+    for (auto it = m_conditions.begin(); it != m_conditions.end(); it++)
+    {
+        if (it != m_conditions.begin())
+            result += "&";
+        result += "(" + (*it)->toQString() + ")";
+    }
+
+    return result;
 }

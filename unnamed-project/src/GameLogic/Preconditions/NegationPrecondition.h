@@ -1,8 +1,9 @@
 #ifndef UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_NEGATION_PRECONDITION_H
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_NEGATION_PRECONDITION_H
 
-#include "GameLogic/Preconditions/PreconditionBase.h"
 #include <memory>
+
+#include "GameLogic/Preconditions/PreconditionBase.h"
 
 class NegationPrecondition : public PreconditionBase
 {
