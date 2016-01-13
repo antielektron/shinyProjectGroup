@@ -213,9 +213,21 @@ void Scene::readEventsFromDom(const QDomElement &domElem)
             QString condition = child.attribute("condition", "");
             QString actionType = child.attribute("actionType", "");
 
-            std::unique_ptr<PreconditionBase> precondition
-                    = std::move(gameLogicUtility::stringToPrecondition(m_globalState.get(),
-                                                             condition.toStdString()));
+            std::unique_ptr<PreconditionBase> precondition;
+
+            try {
+                precondition
+                        = std::move(gameLogicUtility::stringToPrecondition(m_globalState.get(),
+                                                                 condition.toStdString()));
+            }
+            catch (std::runtime_error &e)
+            {
+                std::cout << "Error while parsing condition: "
+                          << e.what()
+                          << std::endl;
+                return;
+            }
+
             std::unique_ptr<ActionBase> action(nullptr);
 
             if (actionType == "arithmetical")

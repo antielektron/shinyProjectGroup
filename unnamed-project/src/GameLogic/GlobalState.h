@@ -36,6 +36,7 @@ public:
     void applyStash();
 
     const QVariant &getValue(const QString &key);
+    bool existValue(const QString &key);
     AttributeDatatype getType(const QString &key);
 
     /**

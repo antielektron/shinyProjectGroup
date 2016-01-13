@@ -73,6 +73,13 @@ const QVariant &GlobalState::getValue(const QString &key)
 }
 
 //------------------------------------------------------------------------------
+bool GlobalState::existValue(const QString &key)
+{
+    auto it = m_attributes.find(key);
+    return it != m_attributes.end();
+}
+
+//------------------------------------------------------------------------------
 AttributeDatatype GlobalState::getType(const QString &key)
 {
     return m_datatypeMap[key];

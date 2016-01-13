@@ -84,29 +84,43 @@ void EventWidget::onAddEventClicked()
         return;
     }
 
-    QString preconditionString =
-            QInputDialog::getText(this,
-                                  "enter precondition string",
-                                  "precondition",
-                                  QLineEdit::Normal,
-                                  "",
-                                  &ok);
-    if (!ok)
+    bool validCondition = false;
+    std::unique_ptr<PreconditionBase> precondition;
+    QString buffer("");
+
+    while (!validCondition)
     {
-        return;
+        QString preconditionString =
+                QInputDialog::getText(this,
+                                      "enter precondition string",
+                                      "precondition",
+                                      QLineEdit::Normal,
+                                      buffer,
+                                      &ok);
+        if (!ok)
+        {
+            return;
+        }
+
+        try{
+            // parse precondition:
+            precondition =
+                    gameLogicUtility::stringToPrecondition(
+                        m_globalState,
+                        preconditionString.toStdString());
+            validCondition = true;
+        }
+        catch (std::runtime_error &e){
+            QMessageBox::critical(this,
+                                  "Error",
+                                  "Error while parsing precondition: "
+                                  + QString::fromStdString(e.what())
+                                  + ". Please try it again");
+            buffer = preconditionString;
+        }
+
     }
 
-    // parse precondition:
-    std::unique_ptr<PreconditionBase> precondition =
-            gameLogicUtility::stringToPrecondition(
-                m_globalState,
-                preconditionString.toStdString());
-
-    if (!precondition)
-    {
-        QMessageBox::critical(this, "Error", "error while parsing precondition");
-        return;
-    }
 
     // get action:
 

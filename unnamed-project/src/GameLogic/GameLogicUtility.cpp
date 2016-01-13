@@ -7,6 +7,7 @@
 #include "GameLogic/GlobalState.h"
 
 #include <cassert>
+#include <stdexcept>
 
 // DEBUG
 #include <iostream>
@@ -134,7 +135,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
     if (opIndex == std::string::npos)
     {
         // this is a problem
-        return std::unique_ptr<PreconditionBase>(nullptr);
+        throw std::runtime_error("missing operator");
     }
 
     std::string leftSubstring = input.substr(0, opIndex);
@@ -150,37 +151,44 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
         // in this case we have to determine the type
         // and values from the substrings
 
-        std::string leftType = getSubstringByDelimiters(leftSubstring,
-                                                        TYPE_BRACKET_LEFT,
-                                                        TYPE_BRACKET_RIGHT);
+        std::string leftName = leftSubstring;
+        //remove whitespaces:
+        leftName.erase(std::remove (leftName.begin(), leftName.end(), ' '), leftName.end());
 
-        std::string rightType = getSubstringByDelimiters(rightSubstring,
-                                                         TYPE_BRACKET_LEFT,
-                                                         TYPE_BRACKET_RIGHT);
+        std::string rightName = rightSubstring;
+        // remove whitespaces:
+        rightName.erase(std::remove (rightName.begin(), rightName.end(), ' '), rightName.end());
 
-        std::string leftName = getSubstringByDelimiters(leftSubstring,
-                                                        NAME_BRACKET_LEFT,
-                                                        NAME_BRACKET_RIGHT);
+        // check if vars exists
+        if (!state->existValue(QString::fromStdString(leftName)))
+        {
+            throw std::runtime_error("unknown variable: " + leftName);
+        }
+        if (!state->existValue(QString::fromStdString(rightName)))
+        {
+            throw std::runtime_error("unknown variable: " + rightName);
+        }
 
-        std::string rightName = getSubstringByDelimiters(rightSubstring,
-                                                         NAME_BRACKET_LEFT,
-                                                         NAME_BRACKET_RIGHT);
+        AttributeDatatype leftType = state->getType(QString::fromStdString(leftName));
+
+        AttributeDatatype rightType = state->getType(QString::fromStdString(rightName));
 
         // DEBUG
-        std::cout << "leftType: "       << leftType
-                  << "\nrightType: "    << rightType
+        std::cout << "leftType: "       << typeToQString.at(leftType).toStdString()
+                  << "\nrightType: "    << typeToQString.at(rightType).toStdString()
                   << "\nleftName: "     << leftName
                   << "\nrightName: "    << rightName
                   << std::endl;
 
         if(!(leftType == rightType))
         {
-            return std::unique_ptr<PreconditionBase>(nullptr);
+            throw std::runtime_error("attributes " + leftName + " and "
+                                     + rightName + "have different types");
         }
 
         if (op == OP_EQUALS)
         {
-            if (leftType == "int")
+            if (leftType == AttributeDatatype::Int)
             {
                 return std::unique_ptr<PreconditionBase>(
                            new IsEqualPrecondition<int>(
@@ -188,7 +196,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
                                QString::fromStdString(leftName),
                                QString::fromStdString(rightName)));
             }
-            else if (leftType == "bool")
+            else if (leftType == AttributeDatatype::Bool)
             {
                 return std::unique_ptr<PreconditionBase>(
                            new IsEqualPrecondition<bool>(
@@ -199,7 +207,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
         }
         if (op == OP_GREATER)
         {
-            if (leftType == "int")
+            if (leftType == AttributeDatatype::Int)
             {
                 return std::unique_ptr<PreconditionBase>(
                            new IsGreaterPrecondition<int>(
@@ -207,7 +215,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
                                QString::fromStdString(leftName),
                                QString::fromStdString(rightName)));
             }
-            else if (leftType == "float")
+            else if (leftType == AttributeDatatype::Float)
             {
                 return std::unique_ptr<PreconditionBase>(
                            new IsGreaterPrecondition<float>(
@@ -220,7 +228,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
         {
             // we will use IsGreater condition,
             // but switch left and right operator
-            if (leftType == "int")
+            if (leftType == AttributeDatatype::Int)
             {
                 return std::unique_ptr<PreconditionBase>(
                            new IsGreaterPrecondition<int>(
@@ -228,7 +236,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
                                QString::fromStdString(rightName),
                                QString::fromStdString(leftName)));
             }
-            else if (leftType == "float")
+            else if (leftType == AttributeDatatype::Float)
             {
                 return std::unique_ptr<PreconditionBase>(
                            new IsGreaterPrecondition<float>(
@@ -256,11 +264,6 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
         std::unique_ptr<PreconditionBase> rightCondition =
                 stringToPrecondition(state, rightTerm);
 
-        if (!(leftCondition && rightCondition))
-        {
-            return std::unique_ptr<PreconditionBase>(nullptr);
-        }
-
         // finally generate andCondition
         return std::unique_ptr<PreconditionBase>(
                     new IsAndPrecondition(state,
@@ -284,11 +287,6 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
         std::unique_ptr<PreconditionBase> rightCondition =
                 stringToPrecondition(state, rightTerm);
 
-        if (!(leftCondition && rightCondition))
-        {
-            return std::unique_ptr<PreconditionBase>(nullptr);
-        }
-
         // finally generate andCondition
         return std::unique_ptr<PreconditionBase>(
                     new IsOrPrecondition(state,
@@ -306,12 +304,6 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
         std::unique_ptr<PreconditionBase> rightCondition =
                 stringToPrecondition(state, term);
 
-        //assert(rightCondition);
-        if (!rightCondition)
-        {
-            return std::unique_ptr<PreconditionBase>(nullptr);
-        }
-
         // make the notCondition
         return std::unique_ptr<PreconditionBase>(
                     new IsNotPrecondition(state,
@@ -321,7 +313,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
     // DEBUG
     std::cout << "something went wrong..." << std::endl;
 
-    return std::unique_ptr<PreconditionBase>(nullptr);
+    throw std::runtime_error("something went wrong");
 
 }
 
