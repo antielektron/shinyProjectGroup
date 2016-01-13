@@ -4,7 +4,11 @@
 #include "GameLogic/Preconditions/NegationPrecondition.h"
 #include "GameLogic/Preconditions/IsEqualPrecondition.h"
 #include "GameLogic/Preconditions/IsGreaterPrecondition.h"
+#include "GameLogic/Preconditions/IsLessPrecondition.h"
 #include "GameLogic/GlobalState.h"
+
+#include "GameLogic/Preconditions/Expressions/ExpressionVariable.h"
+#include "GameLogic/Preconditions/Expressions/ExpressionConstant.h"
 
 #include <cassert>
 #include <stdexcept>
@@ -190,59 +194,51 @@ std::unique_ptr<PreconditionBase> GameLogicUtility::stringToPrecondition(
         {
             if (leftType == AttributeDatatype::Int)
             {
-                return std::unique_ptr<PreconditionBase>(
-                           new IsEqualPrecondition<int>(
-                               state,
-                               QString::fromStdString(leftName),
-                               QString::fromStdString(rightName)));
+                auto lhs = std::unique_ptr<Expression<int>>(new ExpressionVariable<int>(state, QString::fromStdString(leftName)));
+                auto rhs = std::unique_ptr<Expression<int>>(new ExpressionVariable<int>(state, QString::fromStdString(rightName)));
+
+                return std::unique_ptr<PreconditionBase>(new IsEqualPrecondition<int>(state, std::move(lhs), std::move(rhs)));
             }
             else if (leftType == AttributeDatatype::Bool)
             {
-                return std::unique_ptr<PreconditionBase>(
-                           new IsEqualPrecondition<bool>(
-                               state,
-                               QString::fromStdString(leftName),
-                               QString::fromStdString(rightName)));
+                auto lhs = std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, QString::fromStdString(leftName)));
+                auto rhs = std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, QString::fromStdString(rightName)));
+
+                return std::unique_ptr<PreconditionBase>(new IsEqualPrecondition<bool>(state, std::move(lhs), std::move(rhs)));
             }
         }
         if (op == OP_GREATER)
         {
             if (leftType == AttributeDatatype::Int)
             {
-                return std::unique_ptr<PreconditionBase>(
-                           new IsGreaterPrecondition<int>(
-                               state,
-                               QString::fromStdString(leftName),
-                               QString::fromStdString(rightName)));
+                auto lhs = std::unique_ptr<Expression<int>>(new ExpressionVariable<int>(state, QString::fromStdString(leftName)));
+                auto rhs = std::unique_ptr<Expression<int>>(new ExpressionVariable<int>(state, QString::fromStdString(rightName)));
+
+                return std::unique_ptr<PreconditionBase>(new IsGreaterPrecondition<int>(state, std::move(lhs), std::move(rhs)));
             }
-            else if (leftType == AttributeDatatype::Float)
+            else if (leftType == AttributeDatatype::Bool)
             {
-                return std::unique_ptr<PreconditionBase>(
-                           new IsGreaterPrecondition<float>(
-                               state,
-                               QString::fromStdString(leftName),
-                               QString::fromStdString(rightName)));
+                auto lhs = std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, QString::fromStdString(leftName)));
+                auto rhs = std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, QString::fromStdString(rightName)));
+
+                return std::unique_ptr<PreconditionBase>(new IsGreaterPrecondition<bool>(state, std::move(lhs), std::move(rhs)));
             }
         }
         if (op == OP_LESS)
         {
-            // we will use IsGreater condition,
-            // but switch left and right operator
             if (leftType == AttributeDatatype::Int)
             {
-                return std::unique_ptr<PreconditionBase>(
-                           new IsGreaterPrecondition<int>(
-                               state,
-                               QString::fromStdString(rightName),
-                               QString::fromStdString(leftName)));
+                auto lhs = std::unique_ptr<Expression<int>>(new ExpressionVariable<int>(state, QString::fromStdString(leftName)));
+                auto rhs = std::unique_ptr<Expression<int>>(new ExpressionVariable<int>(state, QString::fromStdString(rightName)));
+
+                return std::unique_ptr<PreconditionBase>(new IsLessPrecondition<int>(state, std::move(lhs), std::move(rhs)));
             }
-            else if (leftType == AttributeDatatype::Float)
+            else if (leftType == AttributeDatatype::Bool)
             {
-                return std::unique_ptr<PreconditionBase>(
-                           new IsGreaterPrecondition<float>(
-                               state,
-                               QString::fromStdString(rightName),
-                               QString::fromStdString(leftName)));
+                auto lhs = std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, QString::fromStdString(leftName)));
+                auto rhs = std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, QString::fromStdString(rightName)));
+
+                return std::unique_ptr<PreconditionBase>(new IsLessPrecondition<bool>(state, std::move(lhs), std::move(rhs)));
             }
         }
     }
