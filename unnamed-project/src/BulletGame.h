@@ -10,19 +10,23 @@
 #include <QMatrix4x4>
 
 #include "IGame.h"
+#include "IObjectBaseObserver.h"
 
 class Scene;
 
-class BulletGame : public IGame
+class BulletGame : public IGame, public IObjectBaseObserver
 {
 public:
     BulletGame(const QString &scenefile);
+    virtual ~BulletGame();
 
     virtual void initialize() override;
     virtual void resize(int width, int height) override;
     virtual void tick(float dt) override;
 
     virtual Scene *getScene() override;
+
+    virtual void notify(ObjectBase *obj) override;
 
 private:
     // TODO maybe public..
@@ -31,10 +35,13 @@ private:
     void handleInput(float deltaTime);
     void updateCamera();
 
+    void updateBulletGeometry(ObjectBase *obj);
+
     QString m_scenefile;
     std::unique_ptr<Scene> m_scene;
 
-    std::vector<btRigidBody *> m_bodies;
+    std::map<ObjectBase *, btRigidBody *> m_bodies;
+
     std::unique_ptr<btRigidBody> m_playerBody;
     QVector3D m_position;
     float m_rotX;
@@ -45,6 +52,8 @@ private:
     std::unique_ptr<btBroadphaseInterface> m_broadphase; // TODO what's this
     std::unique_ptr<btSequentialImpulseConstraintSolver> m_solver;
     std::unique_ptr<btDiscreteDynamicsWorld> m_bulletWorld;
+
+
 };
 
 #endif // HAVE_BULLET

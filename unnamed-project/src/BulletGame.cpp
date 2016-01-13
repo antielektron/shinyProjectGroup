@@ -23,6 +23,11 @@ BulletGame::BulletGame(const QString &scenefile) :
 {
 }
 
+BulletGame::~BulletGame()
+{
+    // nothing to do here...
+}
+
 void BulletGame::initialize()
 {
     // call parent
@@ -54,26 +59,12 @@ void BulletGame::tick(float dt)
 
     // run Animataions and run handle game logic events:
     m_scene->performEvents();
-    m_scene->performAnimations();
+    m_scene->performAnimations(this);
 
 
     m_bulletWorld->stepSimulation(dt);
 
     m_bulletWorld->debugDrawWorld();
-
-    for (auto *body : m_bodies)
-    {
-        auto player = body->getWorldTransform() * btVector3(0., 0., 0.);
-        //std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
-    }
-    // auto player = m_playerBody->getWorldTransform() * btVector3(0., 0., 0.);
-    //std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
-    auto player = m_playerBody->getLinearVelocity();
-    // std::cout << player.x() << " " << player.y() << " " << player.z() << std::endl;
-
-    // std::cout << std::endl;
-
-    // TODO physics & camera
 
 }
 
@@ -186,9 +177,33 @@ void BulletGame::updateCamera()
     camera = rotation * translation;
 }
 
+void BulletGame::updateBulletGeometry(ObjectBase *obj)
+{
+    if (obj->getObjectType() == ObjectType::ObjectGroup)
+    {
+        for (auto *child : static_cast<ObjectGroup *>(obj)->getObjects())
+        {
+            updateBulletGeometry(child);
+        }
+    }
+    else
+    {
+        Object *object = static_cast<Object *>(obj);
+        btTransform transformation;
+        transformation.setFromOpenGLMatrix(object->getWorld().constData());
+        m_bodies[obj]->setWorldTransform(transformation);
+
+    }
+}
+
 Scene *BulletGame::getScene()
 {
     return m_scene.get();
+}
+
+void BulletGame::notify(ObjectBase *obj)
+{
+    updateBulletGeometry(obj);
 }
 
 void BulletGame::loadScene(const QString &filename)
@@ -245,7 +260,7 @@ void BulletGame::loadScene(const QString &filename)
         btRigidBody *body = new btRigidBody(0, nullptr, it->second, btVector3(0, 0, 0)); // No inertia
         body->setWorldTransform(transformation);
 
-        m_bodies.push_back(body);
+        m_bodies[object] = body;
 
         m_bulletWorld->addRigidBody(body);
     }

@@ -770,12 +770,16 @@ void Scene::removeModel(const std::string &modelName)
 }
 
 //------------------------------------------------------------------------------
-void Scene::performAnimations()
+void Scene::performAnimations(IObjectBaseObserver *listener)
 {
     float curTime = m_globalState->getValue(KEY_ATTRIBUTE_TIME).toFloat();
     for (const auto &anim : this->getAnimators())
     {
         anim->tick(curTime);
+        if (listener)
+        {
+            listener->notify(anim->getObject());
+        }
     }
 }
 
