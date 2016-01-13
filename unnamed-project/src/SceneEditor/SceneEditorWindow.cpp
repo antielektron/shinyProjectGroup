@@ -25,6 +25,8 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
 {
     this->setMinimumSize(1024, 700);
 
+    m_currentModel = nullptr;
+
     m_game = std::make_shared<SceneEditorGame>();
 
     // QObjects free their children, when freed
