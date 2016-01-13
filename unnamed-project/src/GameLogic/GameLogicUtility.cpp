@@ -1,9 +1,9 @@
 #include "GameLogic/GameLogicUtility.h"
-#include "GameLogic/IsAndPrecondition.h"
-#include "GameLogic/IsOrPrecondition.h"
-#include "GameLogic/IsNotPrecondition.h"
-#include "GameLogic/IsEqualPrecondition.h"
-#include "GameLogic/IsGreaterPrecondition.h"
+#include "GameLogic/Preconditions/ConjunctionPrecondition.h"
+#include "GameLogic/Preconditions/DisjunctionPrecondition.h"
+#include "GameLogic/Preconditions/NegationPrecondition.h"
+#include "GameLogic/Preconditions/IsEqualPrecondition.h"
+#include "GameLogic/Preconditions/IsGreaterPrecondition.h"
 #include "GameLogic/GlobalState.h"
 
 #include <cassert>
@@ -266,7 +266,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
 
         // finally generate andCondition
         return std::unique_ptr<PreconditionBase>(
-                    new IsAndPrecondition(state,
+                    new ConjunctionPrecondition(state,
                                           std::move(leftCondition),
                                           std::move(rightCondition)));
     }
@@ -289,7 +289,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
 
         // finally generate andCondition
         return std::unique_ptr<PreconditionBase>(
-                    new IsOrPrecondition(state,
+                    new DisjunctionPrecondition(state,
                                           std::move(leftCondition),
                                           std::move(rightCondition)));
     }
@@ -306,7 +306,7 @@ std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
 
         // make the notCondition
         return std::unique_ptr<PreconditionBase>(
-                    new IsNotPrecondition(state,
+                    new NegationPrecondition(state,
                                           std::move(rightCondition)));
     }
 

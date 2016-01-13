@@ -1,4 +1,4 @@
-#include "GameLogic/PreconditionBase.h"
+#include "GameLogic/Preconditions/PreconditionBase.h"
 #include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------

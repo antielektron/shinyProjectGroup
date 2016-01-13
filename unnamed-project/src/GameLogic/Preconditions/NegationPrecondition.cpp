@@ -1,27 +1,26 @@
-#include "GameLogic/IsNotPrecondition.h"
+#include "GameLogic/Preconditions/NegationPrecondition.h"
 #include "GameLogic/GlobalState.h"
 
-IsNotPrecondition::IsNotPrecondition(GlobalState *state,
-                                     std::unique_ptr<PreconditionBase> condition) :
-    PreconditionBase (state)
+NegationPrecondition::NegationPrecondition(GlobalState *state, std::unique_ptr<PreconditionBase> condition) :
+        PreconditionBase(state),
+        m_condition(std::move(condition))
 {
-    m_condition = std::move(condition);
 }
 
 //------------------------------------------------------------------------------
-IsNotPrecondition::~IsNotPrecondition()
+NegationPrecondition::~NegationPrecondition()
 {
     // nothing to do here...
 }
 
 //------------------------------------------------------------------------------
-bool IsNotPrecondition::evaluateCondition()
+bool NegationPrecondition::evaluateCondition()
 {
     return !m_condition->evaluateCondition();
 }
 
 //------------------------------------------------------------------------------
-QString IsNotPrecondition::toQString()
+QString NegationPrecondition::toQString()
 {
     return QString("!(") + m_condition->toQString() + ")";
 }

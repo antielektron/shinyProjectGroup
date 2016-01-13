@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 #include <utility>
-#include "GameLogic/PreconditionBase.h"
+#include "GameLogic/Preconditions/PreconditionBase.h"
 
 #define OP_AND '&'
 #define OP_OR '|'

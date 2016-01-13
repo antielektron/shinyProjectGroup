@@ -1,30 +1,30 @@
-#include "IsOrPrecondition.h"
+#include "GameLogic/Preconditions/DisjunctionPrecondition.h"
 #include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
-IsOrPrecondition::IsOrPrecondition(GlobalState *state,
-                                   std::unique_ptr<PreconditionBase> baseA,
-                                   std::unique_ptr<PreconditionBase> baseB) :
-    PreconditionBase(state)
+DisjunctionPrecondition::DisjunctionPrecondition(GlobalState *state,
+                                                   std::unique_ptr<PreconditionBase> baseA,
+                                                   std::unique_ptr<PreconditionBase> baseB) :
+    PreconditionBase(state),
+    m_baseA(std::move(baseA)),
+    m_baseB(std::move(baseB))
 {
-    m_baseA = std::move(baseA);
-    m_baseB = std::move(baseB);
 }
 
 //------------------------------------------------------------------------------
-IsOrPrecondition::~IsOrPrecondition()
+DisjunctionPrecondition::~DisjunctionPrecondition()
 {
     // nothing to do here...
 }
 
 //------------------------------------------------------------------------------
-bool IsOrPrecondition::evaluateCondition()
+bool DisjunctionPrecondition::evaluateCondition()
 {
     return m_baseA->evaluateCondition() || m_baseB->evaluateCondition();
 }
 
 //------------------------------------------------------------------------------
-QString IsOrPrecondition::toQString()
+QString DisjunctionPrecondition::toQString()
 {
     return QString("(") + m_baseA->toQString()
                         + ")|("
