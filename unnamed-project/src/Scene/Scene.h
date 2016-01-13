@@ -24,6 +24,7 @@
 #include "SceneEditor/EditorObject.h"
 #include "GameLogic/GlobalState.h"
 #include "GameLogic/Animator.h"
+#include "IObjectBaseObserver.h"
 
 class Scene
 {
@@ -49,7 +50,7 @@ public:
     void addModel(std::unique_ptr<Model> model);
     void removeModel(const std::string &modelName);
 
-    void performAnimations();
+    void performAnimations(IObjectBaseObserver *listener = nullptr);
     void performEvents();
     void instantlyFinishAnimations();
 
