@@ -1,9 +1,9 @@
-#include "GameLogic/ScalingAnimator.h"
+#include "GameLogic/Animators/RotationAnimator.h"
 #include "Scene/ObjectBase.h"
 #include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
-ScalingAnimator::ScalingAnimator(ObjectBase *object,
+RotationAnimator::RotationAnimator(ObjectBase *object,
                                    GlobalState *state,
                                    const QString &attributeKey,
                                    InterpolationType interpolation,
@@ -14,26 +14,26 @@ ScalingAnimator::ScalingAnimator(ObjectBase *object,
 }
 
 //------------------------------------------------------------------------------
-ScalingAnimator::~ScalingAnimator()
+RotationAnimator::~RotationAnimator()
 {
     // nothing to do here...
 }
 
 //------------------------------------------------------------------------------
-AnimationType ScalingAnimator::getAnimationType()
+AnimationType RotationAnimator::getAnimationType()
 {
-    return AnimationType::Scaling;
+    return AnimationType::Rotation;
 }
 
 //------------------------------------------------------------------------------
-void ScalingAnimator::updateObject()
+void RotationAnimator::updateObject()
 {
-    m_object->setScaling(m_interpolatedValue);
+    m_object->setRotation(m_interpolatedValue);
     m_object->updateWorld();
 }
 
 //------------------------------------------------------------------------------
-const QVector3D &ScalingAnimator::getObjectsValue()
+const QVector3D &RotationAnimator::getObjectsValue()
 {
-    return m_object->getScaling();
+    return m_object->getRotation();
 }

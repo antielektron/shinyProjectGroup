@@ -1,5 +1,5 @@
 #include "GameLogic/GlobalState.h"
-#include "GameLogic/Animator.h"
+#include "GameLogic/Animators/Animator.h"
 
 #include <iostream>
 
@@ -25,7 +25,6 @@ void GlobalState::init()
 //------------------------------------------------------------------------------
 void GlobalState::stash()
 {
-
     // apply Buffer (just in case)
     applyBuffer();
 

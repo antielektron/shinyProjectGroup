@@ -5,7 +5,7 @@
 #include <QTableView>
 #include <QStandardItemModel>
 #include <vector>
-#include "GameLogic/Animator.h"
+#include "GameLogic/Animators/Animator.h"
 
 class Scene;
 

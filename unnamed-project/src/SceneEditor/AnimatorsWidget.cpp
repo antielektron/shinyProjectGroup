@@ -4,8 +4,8 @@
 #include <QMessageBox>
 #include <QStringList>
 
-#include "GameLogic/PositionAnimator.h"
-#include "GameLogic/RotationAnimator.h"
+#include "GameLogic/Animators/PositionAnimator.h"
+#include "GameLogic/Animators/RotationAnimator.h"
 
 //------------------------------------------------------------------------------
 AnimatorsWidget::AnimatorsWidget(QWidget *parent) : QWidget (parent)

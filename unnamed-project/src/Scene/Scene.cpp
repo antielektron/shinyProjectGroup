@@ -10,8 +10,8 @@
 #include "GameLogic/Actions/CopyAttributeAction.h"
 #include "GameLogic/GameLogicUtility.h"
 #include "GameLogic/GameLogicDatatypes.h"
-#include "GameLogic/RotationAnimator.h"
-#include "GameLogic/PositionAnimator.h"
+#include "GameLogic/Animators/RotationAnimator.h"
+#include "GameLogic/Animators/PositionAnimator.h"
 
 //------------------------------------------------------------------------------
 Scene::Scene()

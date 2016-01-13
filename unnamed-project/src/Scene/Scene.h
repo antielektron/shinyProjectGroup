@@ -23,7 +23,7 @@
 
 #include "SceneEditor/EditorObject.h"
 #include "GameLogic/GlobalState.h"
-#include "GameLogic/Animator.h"
+#include "GameLogic/Animators/Animator.h"
 #include "IObjectBaseObserver.h"
 
 class Scene

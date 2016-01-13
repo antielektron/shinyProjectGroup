@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include "SceneEditor/AnimatorsTableWidget.h"
 #include "GameLogic/GlobalState.h"
-#include "GameLogic/Animator.h"
+#include "GameLogic/Animators/Animator.h"
 #include "Scene/Scene.h"
 
 class AnimatorsWidget : public QWidget

@@ -1,4 +1,4 @@
-#include "GameLogic/PositionAnimator.h"
+#include "GameLogic/Animators/PositionAnimator.h"
 #include "Scene/ObjectBase.h"
 #include "GameLogic/GlobalState.h"
 

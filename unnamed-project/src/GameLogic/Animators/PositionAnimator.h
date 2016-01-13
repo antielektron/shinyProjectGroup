@@ -1,19 +1,18 @@
-#ifndef UNNAMED_PROJECT_ROTATIONANIMATOR_H
-#define UNNAMED_PROJECT_ROTATIONANIMATOR_H
+#ifndef UNNAMED_PROJECT_GAME_LOGIC_ANIMATORS_POSITION_ANIMATOR_H
+#define UNNAMED_PROJECT_GAME_LOGIC_ANIMATORS_POSITION_ANIMATOR_H
 
-#include "GameLogic/Animator.h"
+#include "GameLogic/Animators/Animator.h"
 
-
-class RotationAnimator : public Animator
+class PositionAnimator : public Animator
 {
 public:
-    RotationAnimator(ObjectBase *object,
+    PositionAnimator(ObjectBase *object,
                      GlobalState *state,
                      const QString &attributeKey,
                      InterpolationType interpolation = InterpolationType::Linear,
                      float animationTime = 1.0f);
 
-    virtual ~RotationAnimator();
+    virtual ~PositionAnimator();
 
     virtual AnimationType getAnimationType() override;
 
@@ -22,4 +21,4 @@ protected:
     virtual const QVector3D &getObjectsValue() override;
 };
 
-#endif // UNNAMED_PROJECT_ROTATIONANIMATOR_H
+#endif // UNNAMED_PROJECT_GAME_LOGIC_ANIMATORS_POSITION_ANIMATOR_H

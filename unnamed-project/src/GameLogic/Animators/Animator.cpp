@@ -1,4 +1,4 @@
-#include "GameLogic/Animator.h"
+#include "GameLogic/Animators/Animator.h"
 #include "Scene/ObjectBase.h"
 #include "GameLogic/GlobalState.h"
 #include <cassert>

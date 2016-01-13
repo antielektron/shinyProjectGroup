@@ -1,5 +1,10 @@
-#ifndef UNNAMED_PROJECT_ANIMATOR_H
-#define UNNAMED_PROJECT_ANIMATOR_H
+#ifndef UNNAMED_PROJECT_GAME_LOGIC_ANIMATORS_ANIMATOR_H
+#define UNNAMED_PROJECT_GAME_LOGIC_ANIMATORS_ANIMATOR_H
+
+/*
+ * TODO
+ * move animators to Scene/Animators/
+ */
 
 #include <QObject>
 #include <QString>
@@ -99,4 +104,4 @@ protected:
     float m_animationTime;
 };
 
-#endif // UNNAMED_PROJECT_ANIMATOR_H
+#endif // UNNAMED_PROJECT_GAME_LOGIC_ANIMATORS_ANIMATOR_H

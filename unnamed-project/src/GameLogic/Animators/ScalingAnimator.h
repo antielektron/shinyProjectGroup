@@ -1,7 +1,9 @@
-#ifndef UNNAMED_PROJECT_SCALINGANIMATOR_H
-#define UNNAMED_PROJECT_SCALINGANIMATOR_H
+#ifndef UNNAMED_PROJECT_GAME_LOGIC_ANIMATORS_SCALING_ANIMATOR_H
+#define UNNAMED_PROJECT_GAME_LOGIC_ANIMATORS_SCALING_ANIMATOR_H
 
-#include "GameLogic/Animator.h"
+#include "GameLogic/Animators/Animator.h"
+
+/* using ScalingAnimator is dangerous, as bullet does not allow scaling of objects!! */
 
 class ScalingAnimator : public Animator
 {
@@ -21,4 +23,4 @@ protected:
     virtual const QVector3D &getObjectsValue() override;
 };
 
-#endif // UNNAMED_PROJECT_SCALINGANIMATOR_H
+#endif // UNNAMED_PROJECT_GAME_LOGIC_ANIMATORS_SCALING_ANIMATOR_H

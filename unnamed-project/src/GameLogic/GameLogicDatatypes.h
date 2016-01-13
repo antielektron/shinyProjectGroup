@@ -4,7 +4,7 @@
 #include <map>
 #include <QString>
 #include "GameLogic/Actions/ActionBase.h"
-#include "GameLogic/Animator.h"
+#include "GameLogic/Animators/Animator.h"
 
 // TODO remove enums and type stuff from ligic classes and move
 // it to this header, make Scene io-stuff completely depended
