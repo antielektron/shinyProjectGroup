@@ -78,6 +78,8 @@ void Scene::loadFromFile(const QString &filename)
         else if (tag == "Attributes")
         {
             readAttributesFromDom(currentElement);
+            m_globalState->applyBuffer();
+
         }
         else if (tag == "Animators")
         {
@@ -113,7 +115,6 @@ void Scene::loadFromFile(const QString &filename)
         }
     }
 
-    m_globalState->applyBuffer();
     // Apply transformations to objects
     m_rootGroup.updateWorld();
 }

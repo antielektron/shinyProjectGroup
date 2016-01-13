@@ -18,6 +18,8 @@ Animator::Animator(ObjectBase *object,
     m_key = attributeKey;
 
     state->registerAnimator(attributeKey, this);
+    m_endValue = state->getValue(attributeKey).value<QVector3D>();
+    instantlyFinishCurrentAnimation();
 }
 
 //------------------------------------------------------------------------------
