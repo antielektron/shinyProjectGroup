@@ -50,8 +50,7 @@ template<>bool IsGreaterPrecondition<float>::evaluateCondition()
 template<class T>
 QString IsGreaterPrecondition<T>::toQString()
 {
-    return QString("[") + getTypeofArgs() + "]{"
-            + m_objA + "}>[" + getTypeofArgs() + "]{" + m_objB + "}";
+    return QString("") + m_objA + ">" + m_objB;
 }
 
 //------------------------------------------------------------------------------

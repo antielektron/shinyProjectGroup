@@ -472,21 +472,6 @@ void Scene::saveToFile(const QString &filename)
     writeObjectTree(&m_rootGroup, xmlWriter);
     xmlWriter.writeEndElement();
 
-    // events:
-
-    xmlWriter.writeStartElement("Events");
-
-    for (auto &event : m_globalState->getEvents())
-    {
-        const QString &key = event.first;
-        PreconditionBase *condition = event.second.first.get();
-        ActionBase *action = event.second.second.get();
-
-        writeEvent(key, condition, action, xmlWriter);
-    }
-
-    xmlWriter.writeEndElement();
-
     // attributes:
 
     xmlWriter.writeStartElement("Attributes");
@@ -533,6 +518,21 @@ void Scene::saveToFile(const QString &filename)
 
         xmlWriter.writeEndElement();
 
+    }
+
+    xmlWriter.writeEndElement();
+
+    // events:
+
+    xmlWriter.writeStartElement("Events");
+
+    for (auto &event : m_globalState->getEvents())
+    {
+        const QString &key = event.first;
+        PreconditionBase *condition = event.second.first.get();
+        ActionBase *action = event.second.second.get();
+
+        writeEvent(key, condition, action, xmlWriter);
     }
 
     xmlWriter.writeEndElement();

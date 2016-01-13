@@ -14,17 +14,6 @@
         <Object name="mengerplat" model="mengerplat" x="-1" y="2.9" z="10.9" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
         <Object name="octonorm" model="octonorm" x="-3.6" y="7.6" z="0" rx="0" ry="50" rz="0" sx="1" sy="1" sz="1"/>
     </Objects>
-    <Events>
-        <Event key="animDown" condition="([bool]{switch}=[bool]{TRUE})&amp;([bool]{moveUp}=[bool]{TRUE})" actionType="copy" valSrc="downValue" valDst="pos"/>
-        <Event key="animUp" condition="([bool]{switch}=[bool]{TRUE})&amp;([bool]{moveUp}=[bool]{FALSE})" actionType="copy" valSrc="upValue" valDst="pos"/>
-        <Event key="count" condition="[bool]{TRUE}=[bool]{TRUE}" actionType="arithmetical" operationType="+" dataType="float" valA="count" valB="DELTA_TIME" valDst="count"/>
-        <Event key="isTimeOverflow" condition="[float]{count}&gt;[float]{AnimTime}" actionType="flip" val="timeOverflow"/>
-        <Event key="resetTime" condition="[bool]{timeOverflow}=[bool]{TRUE}" actionType="flip" val="timeOverflow"/>
-        <Event key="resetTime2" condition="[bool]{timeOverflow}=[bool]{TRUE}" actionType="copy" valSrc="zero" valDst="count"/>
-        <Event key="resetTime3" condition="[bool]{timeOverflow}=[bool]{TRUE}" actionType="flip" val="switch"/>
-        <Event key="switch" condition="[bool]{switch}=[bool]{TRUE}" actionType="flip" val="switch"/>
-        <Event key="switchMove" condition="[bool]{switch}=[bool]{TRUE}" actionType="flip" val="moveUp"/>
-    </Events>
     <Attributes>
         <Attribute key="AnimTime" type="float" value="4"/>
         <Attribute key="DELTA_TIME" type="float" value="0"/>
@@ -41,6 +30,17 @@
         <Attribute key="upValue" type="vector" x="-1" y="3" z="11"/>
         <Attribute key="zero" type="float" value="0"/>
     </Attributes>
+    <Events>
+        <Event key="animDown" condition="(switch=TRUE)&amp;(moveUp=TRUE)" actionType="copy" valSrc="downValue" valDst="pos"/>
+        <Event key="animUp" condition="(switch=TRUE)&amp;(moveUp=FALSE)" actionType="copy" valSrc="upValue" valDst="pos"/>
+        <Event key="count" condition="TRUE=TRUE" actionType="arithmetical" operationType="+" dataType="float" valA="count" valB="DELTA_TIME" valDst="count"/>
+        <Event key="isTimeOverflow" condition="count&gt;AnimTime" actionType="flip" val="timeOverflow"/>
+        <Event key="resetTime" condition="timeOverflow=TRUE" actionType="flip" val="timeOverflow"/>
+        <Event key="resetTime2" condition="timeOverflow=TRUE" actionType="copy" valSrc="zero" valDst="count"/>
+        <Event key="resetTime3" condition="timeOverflow=TRUE" actionType="flip" val="switch"/>
+        <Event key="switch" condition="switch=TRUE" actionType="flip" val="switch"/>
+        <Event key="switchMove" condition="switch=TRUE" actionType="flip" val="moveUp"/>
+    </Events>
     <Animators>
         <Animator type="position" time="4" interpolation="trigonometric" key="pos" object="mengerplat"/>
     </Animators>

@@ -51,8 +51,7 @@ template<>bool IsEqualPrecondition<bool>::evaluateCondition()
 template<class T>
 QString IsEqualPrecondition<T>::toQString()
 {
-    return QString("[") + getTypeofArgs() + "]{"
-            + m_objA + "}=[" + getTypeofArgs() + "]{" + m_objB + "}";
+    return QString("") + m_objA + "=" + m_objB;
 }
 
 //------------------------------------------------------------------------------
