@@ -4,6 +4,8 @@
 #include <cassert>
 #include <cmath>
 
+#define PI 3.1415926536f
+
 Animator::Animator(ObjectBase *object,
                    GlobalState *state,
                    const QString &attributeKey,
@@ -78,8 +80,8 @@ void Animator::tick(float currentTime)
         // just using the sinus for interpolating.
 
         // we have to map our animation Time to the range [0:pi/2]
-        float scale = 0.5f * 3.1415926536f / m_animationTime;
-        m_interpolatedValue = std::sin(scale * dt) *
+        float scale = PI / m_animationTime;
+        m_interpolatedValue = (0.5f + 0.5f * std::sin(scale * dt - 0.5f * PI)) *
                               (m_endValue - m_startValue) +
                               m_startValue;
         break;
