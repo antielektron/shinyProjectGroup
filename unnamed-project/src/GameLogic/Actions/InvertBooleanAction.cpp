@@ -1,42 +1,40 @@
-
-#include "GameLogic/FlipBooleanAction.h"
+#include "GameLogic/Actions/InvertBooleanAction.h"
 #include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
-FlipBooleanAction::FlipBooleanAction(GlobalState *state,
-                                     const QString &key) :
-    ActionBase (state)
+InvertBooleanAction::InvertBooleanAction(GlobalState *state, const QString &key) :
+    ActionBase(state)
 {
     m_key = key;
 }
 
 //------------------------------------------------------------------------------
-FlipBooleanAction::~FlipBooleanAction()
+InvertBooleanAction::~InvertBooleanAction()
 {
     // nothing to do here...
 }
 
 //------------------------------------------------------------------------------
-void FlipBooleanAction::performAction()
+void InvertBooleanAction::performAction()
 {
     bool val =  m_globalState->getValue(m_key).toBool();
     m_globalState->setValue(m_key, !val, AttributeDatatype::Bool);
 }
 
 //------------------------------------------------------------------------------
-ActionType FlipBooleanAction::getActionType()
+ActionType InvertBooleanAction::getActionType()
 {
     return ActionType::FlipBoolean;
 }
 
 //------------------------------------------------------------------------------
-QString FlipBooleanAction::getDataType()
+QString InvertBooleanAction::getDataType()
 {
     return QString("bool");
 }
 
 //------------------------------------------------------------------------------
-const QString &FlipBooleanAction::getKey()
+const QString &InvertBooleanAction::getKey()
 {
     return m_key;
 }

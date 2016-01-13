@@ -1,16 +1,12 @@
-#ifndef UNNAMED_PROJECT_SETATTRIBUTEACTION_H
-#define UNNAMED_PROJECT_SETATTRIBUTEACTION_H
+#ifndef UNNAMED_PROJECT_GAME_LOGIC_ACTIONS_COPY_ATTRIBUTE_ACTION_H
+#define UNNAMED_PROJECT_GAME_LOGIC_ACTIONS_COPY_ATTRIBUTE_ACTION_H
 
-#include <QString>
-#include "GameLogic/ActionBase.h"
+#include "GameLogic/Actions/ActionBase.h"
 
 class CopyAttributeAction : public ActionBase
 {
 public:
-    CopyAttributeAction(GlobalState *state,
-                       const QString &src,
-                       const QString &dst);
-
+    CopyAttributeAction(GlobalState *state, const QString &src, const QString &dst);
     virtual ~CopyAttributeAction();
 
     virtual void performAction() override;
@@ -25,7 +21,6 @@ public:
 protected:
     QString m_srcKey;
     QString m_dstKey;
-
 };
 
-#endif // UNNAMED_PROJECT_SETATTRIBUTEACTION_H
+#endif // UNNAMED_PROJECT_GAME_LOGIC_ACTIONS_COPY_ATTRIBUTE_ACTION_H

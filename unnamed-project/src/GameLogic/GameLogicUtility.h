@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <utility>
+
 #include "GameLogic/Preconditions/PreconditionBase.h"
 
 #define OP_AND '&'
@@ -21,7 +22,7 @@
 
 class GlobalState;
 
-namespace gameLogicUtility
+namespace GameLogicUtility
 {
 
 std::string getSubstringByDelimiters(const std::string &src,

@@ -5,9 +5,9 @@
 #include <QVector3D>
 
 #include "Scene/Scene.h"
-#include "GameLogic/ArithmeticalAction.h"
-#include "GameLogic/FlipBooleanAction.h"
-#include "GameLogic/CopyAttributeAction.h"
+#include "GameLogic/Actions/ArithmeticalAction.h"
+#include "GameLogic/Actions/InvertBooleanAction.h"
+#include "GameLogic/Actions/CopyAttributeAction.h"
 #include "GameLogic/GameLogicUtility.h"
 #include "GameLogic/GameLogicDatatypes.h"
 #include "GameLogic/RotationAnimator.h"
@@ -219,8 +219,8 @@ void Scene::readEventsFromDom(const QDomElement &domElem)
 
             try {
                 precondition
-                        = std::move(gameLogicUtility::stringToPrecondition(m_globalState.get(),
-                                                                 condition.toStdString()));
+                        = std::move(GameLogicUtility::stringToPrecondition(m_globalState.get(),
+                                                                           condition.toStdString()));
             }
             catch (std::runtime_error &e)
             {
@@ -280,7 +280,7 @@ void Scene::readEventsFromDom(const QDomElement &domElem)
             {
                 QString val = child.attribute("val","");
 
-                action.reset(new FlipBooleanAction(
+                action.reset(new InvertBooleanAction(
                                  m_globalState.get(),
                                  val));
             }
@@ -703,8 +703,8 @@ void Scene::writeEvent(const QString &key,
     case ActionType::FlipBoolean:
     {
         writer.writeAttribute("actionType", "flip");
-        FlipBooleanAction *flipAction =
-                static_cast<FlipBooleanAction *>(action);
+        InvertBooleanAction *flipAction =
+                static_cast<InvertBooleanAction *>(action);
         writer.writeAttribute("val", flipAction->getKey());
         break;
     }

@@ -8,7 +8,7 @@
 #include <memory>
 #include "smartiterator.h"
 #include "GameLogic/Preconditions/PreconditionBase.h"
-#include "GameLogic/ActionBase.h"
+#include "GameLogic/Actions/ActionBase.h"
 #include "GameLogic/GameLogicDatatypes.h"
 
 class Animator;
@@ -17,7 +17,6 @@ class Animator;
 class GlobalState
 {
 public:
-
     GlobalState();
     ~GlobalState();
 

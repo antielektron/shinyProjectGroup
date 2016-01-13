@@ -5,9 +5,9 @@
 #include <QList>
 
 #include "GameLogic/GameLogicDatatypes.h"
-#include "GameLogic/CopyAttributeAction.h"
-#include "GameLogic/FlipBooleanAction.h"
-#include "GameLogic/ArithmeticalAction.h"
+#include "GameLogic/Actions/CopyAttributeAction.h"
+#include "GameLogic/Actions/InvertBooleanAction.h"
+#include "GameLogic/Actions/ArithmeticalAction.h"
 
 //------------------------------------------------------------------------------
 EventTableWidget::EventTableWidget(QWidget *parent) : QTableView(parent)
@@ -66,7 +66,7 @@ QString EventTableWidget::actionToQString(ActionBase *action)
     }
     case ActionType::FlipBoolean:
     {
-        FlipBooleanAction *flipAction = static_cast<FlipBooleanAction *>(action);
+        InvertBooleanAction *flipAction = static_cast<InvertBooleanAction *>(action);
         return QString("flip '") + flipAction->getKey() + QString("'");
     }
     case ActionType::ArithmeticalAction:

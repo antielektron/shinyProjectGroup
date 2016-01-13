@@ -5,9 +5,9 @@
 #include <QStringList>
 #include <memory>
 
-#include "GameLogic/CopyAttributeAction.h"
-#include "GameLogic/FlipBooleanAction.h"
-#include "GameLogic/ArithmeticalAction.h"
+#include "GameLogic/Actions/CopyAttributeAction.h"
+#include "GameLogic/Actions/InvertBooleanAction.h"
+#include "GameLogic/Actions/ArithmeticalAction.h"
 #include "Scene/Scene.h"
 
 //------------------------------------------------------------------------------
@@ -105,7 +105,7 @@ void EventWidget::onAddEventClicked()
         try{
             // parse precondition:
             precondition =
-                    gameLogicUtility::stringToPrecondition(
+                    GameLogicUtility::stringToPrecondition(
                         m_globalState,
                         preconditionString.toStdString());
             validCondition = true;
@@ -203,7 +203,7 @@ void EventWidget::onAddEventClicked()
                                             &ok);
 
         auto actionPtr = std::unique_ptr<ActionBase>(
-                          new FlipBooleanAction(m_globalState, key));
+                          new InvertBooleanAction(m_globalState, key));
         emit eventAdded(eventKey,
                         &precondition,
                         &actionPtr);

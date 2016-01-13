@@ -1,5 +1,7 @@
-#ifndef UNNAMED_PROJET_ACTIONBASE_H
-#define UNNAMED_PROJET_ACTIONBASE_H
+#ifndef UNNAMED_PROJET_GAME_LOGIC_ACTIONS_ACTION_BASE_H
+#define UNNAMED_PROJET_GAME_LOGIC_ACTIONS_ACTION_BASE_H
+
+#include <QString>
 
 enum class ActionType
 {
@@ -9,7 +11,6 @@ enum class ActionType
 };
 
 class GlobalState;
-class QString;
 
 class ActionBase
 {
@@ -24,9 +25,7 @@ public:
     virtual QString getDataType() = 0;
 
 protected:
-
     GlobalState *m_globalState;
-
 };
 
-#endif // UNNAMED_PROJET_ACTIONBASE_H
+#endif // UNNAMED_PROJET_GAME_LOGIC_ACTIONS_ACTION_BASE_H

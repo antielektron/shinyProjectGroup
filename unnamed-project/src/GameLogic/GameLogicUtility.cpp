@@ -13,7 +13,7 @@
 #include <iostream>
 
 //------------------------------------------------------------------------------
-std::string gameLogicUtility::getSubstringByDelimiters(const std::string &src,
+std::string GameLogicUtility::getSubstringByDelimiters(const std::string &src,
                                                        char leftDelimiter,
                                                        char rightDelimiter)
 {
@@ -59,7 +59,7 @@ std::string gameLogicUtility::getSubstringByDelimiters(const std::string &src,
 }
 
 //------------------------------------------------------------------------------
-std::pair<size_t, char> gameLogicUtility::findOperator(const std::string &src)
+std::pair<size_t, char> GameLogicUtility::findOperator(const std::string &src)
 {
     size_t opIndex = std::string::npos;
     char op = 0;
@@ -121,7 +121,7 @@ std::pair<size_t, char> gameLogicUtility::findOperator(const std::string &src)
 }
 
 //------------------------------------------------------------------------------
-std::unique_ptr<PreconditionBase> gameLogicUtility::stringToPrecondition(
+std::unique_ptr<PreconditionBase> GameLogicUtility::stringToPrecondition(
         GlobalState *state,
         const std::string &input)
 {

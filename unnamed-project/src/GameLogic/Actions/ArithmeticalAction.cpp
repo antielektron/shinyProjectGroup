@@ -1,4 +1,4 @@
-#include "GameLogic/ArithmeticalAction.h"
+#include "GameLogic/Actions/ArithmeticalAction.h"
 #include "GameLogic/GlobalState.h"
 
 template<class T>

@@ -1,4 +1,4 @@
-#include "GameLogic/ActionBase.h"
+#include "GameLogic/Actions/ActionBase.h"
 #include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------

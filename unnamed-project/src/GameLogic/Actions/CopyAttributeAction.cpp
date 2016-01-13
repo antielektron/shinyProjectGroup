@@ -1,10 +1,8 @@
-#include "GameLogic/CopyAttributeAction.h"
+#include "GameLogic/Actions/CopyAttributeAction.h"
 #include "GameLogic/GlobalState.h"
 
-CopyAttributeAction::CopyAttributeAction(GlobalState *state,
-                                         const QString &src,
-                                         const QString &dst) :
-    ActionBase (state)
+CopyAttributeAction::CopyAttributeAction(GlobalState *state, const QString &src, const QString &dst) :
+    ActionBase(state)
 {
     m_srcKey = src;
     m_dstKey = dst;

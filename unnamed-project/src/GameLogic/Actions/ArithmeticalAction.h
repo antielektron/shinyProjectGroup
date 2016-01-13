@@ -1,11 +1,8 @@
-#ifndef ARITHMETICALACTION_H
-#define ARITHMETICALACTION_H
+#ifndef UNNAMED_PROJECT_GAME_LOGIC_ACTIONS_ARITHMETICAL_ACTION_H
+#define UNNAMED_PROJECT_GAME_LOGIC_ACTIONS_ARITHMETICAL_ACTION_H
 
-#include <QString>
-#include "GameLogic/ActionBase.h"
+#include "GameLogic/Actions/ActionBase.h"
 #include "GameLogic/GameLogicDatatypes.h"
-
-
 
 class QVariant;
 
@@ -43,4 +40,4 @@ protected:
     ArithmeticalOperationType m_type;
 };
 
-#endif // ARITHMETICALACTION_H
+#endif // UNNAMED_PROJECT_GAME_LOGIC_ACTIONS_ARITHMETICAL_ACTION_H
