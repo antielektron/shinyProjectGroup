@@ -115,6 +115,7 @@ void Scene::loadFromFile(const QString &filename)
         }
     }
 
+    instantlyFinishAnimations();
     // Apply transformations to objects
     m_rootGroup.updateWorld();
 }
