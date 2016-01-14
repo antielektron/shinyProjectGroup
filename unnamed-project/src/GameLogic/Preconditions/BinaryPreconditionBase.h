@@ -19,6 +19,11 @@ public:
 
     virtual ~BinaryPreconditionBase() {}
 
+    virtual QString string()
+    {
+        m_exprA->toQString() + " " + this->name() + " " + m_exprB->toQString();
+    }
+
 protected:
     std::unique_ptr<Expression<T>> m_exprA;
     std::unique_ptr<Expression<T>> m_exprB;

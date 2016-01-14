@@ -216,13 +216,6 @@ std::unique_ptr<PreconditionBase> GameLogicUtility::stringToPrecondition(
 
                 return std::unique_ptr<PreconditionBase>(new IsGreaterPrecondition<int>(state, std::move(lhs), std::move(rhs)));
             }
-            else if (leftType == AttributeDatatype::Bool)
-            {
-                auto lhs = std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, QString::fromStdString(leftName)));
-                auto rhs = std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, QString::fromStdString(rightName)));
-
-                return std::unique_ptr<PreconditionBase>(new IsGreaterPrecondition<bool>(state, std::move(lhs), std::move(rhs)));
-            }
         }
         if (op == OP_LESS)
         {
@@ -232,13 +225,6 @@ std::unique_ptr<PreconditionBase> GameLogicUtility::stringToPrecondition(
                 auto rhs = std::unique_ptr<Expression<int>>(new ExpressionVariable<int>(state, QString::fromStdString(rightName)));
 
                 return std::unique_ptr<PreconditionBase>(new IsLessPrecondition<int>(state, std::move(lhs), std::move(rhs)));
-            }
-            else if (leftType == AttributeDatatype::Bool)
-            {
-                auto lhs = std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, QString::fromStdString(leftName)));
-                auto rhs = std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, QString::fromStdString(rightName)));
-
-                return std::unique_ptr<PreconditionBase>(new IsLessPrecondition<bool>(state, std::move(lhs), std::move(rhs)));
             }
         }
     }

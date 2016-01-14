@@ -3,6 +3,7 @@
 
 #include "GameLogic/Preconditions/BinaryPreconditionBase.h"
 #include "GameLogic/GlobalState.h"
+#include "GameLogic/Preconditions/Traits.h"
 
 template <typename T>
 class IsEqualPrecondition : public BinaryPreconditionBase<T>
@@ -19,14 +20,38 @@ public:
         return m_exprA->evaluate() == m_exprB->evaluate();
     }
 
-    virtual QString toQString() override
+    virtual QString name() override
     {
-        return m_exprA->toQString() + "=" + m_exprB->toQString();
+        return QString(traits::precondition_name<IsEqualPrecondition<T>>::value);
     }
 
 protected:
     using BinaryPreconditionBase<T>::m_exprA;
     using BinaryPreconditionBase<T>::m_exprB;
 };
+
+
+namespace traits
+{
+
+    template <>
+    struct precondition_name<IsEqualPrecondition<int>>
+    {
+        static constexpr const char *value = "ieq";
+    };
+
+    template <>
+    struct precondition_name<IsEqualPrecondition<double>>
+    {
+        static constexpr const char *value = "feq";
+    };
+
+    template <>
+    struct precondition_name<IsEqualPrecondition<bool>>
+    {
+        static constexpr const char *value = "beq";
+    };
+}
+
 
 #endif // UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_IS_EQUAL_PRECONDITION_H

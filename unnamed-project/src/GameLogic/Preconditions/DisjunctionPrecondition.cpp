@@ -25,16 +25,7 @@ bool DisjunctionPrecondition::evaluateCondition()
 }
 
 //------------------------------------------------------------------------------
-QString DisjunctionPrecondition::toQString()
+QString DisjunctionPrecondition::name()
 {
-    QString result;
-
-    for (auto it = m_conditions.begin(); it != m_conditions.end(); it++)
-    {
-        if (it != m_conditions.begin())
-            result += "&";
-        result += "(" + (*it)->toQString() + ")";
-    }
-
-    return result;
+    return traits::precondition_name<DisjunctionPrecondition>::value;
 }

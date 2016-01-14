@@ -6,6 +6,8 @@
 #include "GameLogic/Preconditions/BinaryPreconditionBase.h"
 #include "GameLogic/GlobalState.h"
 
+#include "GameLogic/Preconditions/Traits.h"
+
 template <typename T>
 class IsLessPrecondition : public BinaryPreconditionBase<T>
 {
@@ -15,7 +17,10 @@ public:
 
     virtual bool evaluateCondition() override;
 
-    virtual QString toQString() override;
+    virtual QString name() override
+    {
+        return QString(traits::precondition_name<IsLessPrecondition<T>>::value);
+    }
 
 protected:
     using BinaryPreconditionBase<T>::m_exprA;
@@ -38,11 +43,20 @@ bool IsLessPrecondition<T>::evaluateCondition()
     return m_exprA->evaluate() < m_exprB->evaluate();
 }
 
-//------------------------------------------------------------------------------
-template <typename T>
-QString IsLessPrecondition<T>::toQString()
+
+namespace traits
 {
-    return m_exprA->toQString() + "<" + m_exprB->toQString();
+    template <>
+    struct precondition_name<IsLessPrecondition<int>>
+    {
+        static constexpr const char *value = "iless";
+    };
+
+    template <>
+    struct precondition_name<IsLessPrecondition<double>>
+    {
+        static constexpr const char *value = "fless";
+    };
 }
 
 

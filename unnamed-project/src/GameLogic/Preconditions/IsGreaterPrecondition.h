@@ -5,6 +5,7 @@
 
 #include "GameLogic/Preconditions/BinaryPreconditionBase.h"
 #include "GameLogic/GlobalState.h"
+#include "GameLogic/Preconditions/Traits.h"
 
 template <typename T>
 class IsGreaterPrecondition : public BinaryPreconditionBase<T>
@@ -15,7 +16,10 @@ public:
 
     virtual bool evaluateCondition() override;
 
-    virtual QString toQString() override;
+    virtual QString name() override
+    {
+        return QString(traits::precondition_name<IsGreaterPrecondition<T>>::value);
+    }
 
 protected:
     using BinaryPreconditionBase<T>::m_exprA;
@@ -38,11 +42,22 @@ bool IsGreaterPrecondition<T>::evaluateCondition()
     return m_exprA->evaluate() > m_exprB->evaluate();
 }
 
-//------------------------------------------------------------------------------
-template <typename T>
-QString IsGreaterPrecondition<T>::toQString()
+
+namespace traits
 {
-    return m_exprA->toQString() + ">" + m_exprB->toQString();
+
+    template <>
+    struct precondition_name<IsGreaterPrecondition<int>>
+    {
+        static constexpr const char *value = "igreater";
+    };
+
+    template <>
+    struct precondition_name<IsGreaterPrecondition<double>>
+    {
+        static constexpr const char *value = "fgreater";
+    };
+
 }
 
 

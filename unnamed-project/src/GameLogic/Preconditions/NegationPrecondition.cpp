@@ -1,5 +1,7 @@
 #include "GameLogic/Preconditions/NegationPrecondition.h"
 #include "GameLogic/GlobalState.h"
+#include "IsLessPrecondition.h"
+#include "IsGreaterPrecondition.h"
 
 NegationPrecondition::NegationPrecondition(GlobalState *state, std::unique_ptr<PreconditionBase> condition) :
         PreconditionBase(state),
@@ -20,7 +22,13 @@ bool NegationPrecondition::evaluateCondition()
 }
 
 //------------------------------------------------------------------------------
-QString NegationPrecondition::toQString()
+QString NegationPrecondition::string()
 {
-    return QString("!(") + m_condition->toQString() + ")";
+    return name() + "(" + m_condition->string() + ")";
+}
+
+//------------------------------------------------------------------------------
+QString NegationPrecondition::name()
+{
+    return traits::precondition_name<NegationPrecondition>::value;
 }

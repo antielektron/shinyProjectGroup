@@ -13,7 +13,10 @@ public:
 
     virtual bool evaluateCondition() = 0;
 
-    virtual QString toQString() = 0;
+    virtual QString string() = 0;
+
+    virtual QString name() = 0;
+
 
 protected:
     GlobalState *m_globalState;

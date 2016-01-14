@@ -659,7 +659,7 @@ void Scene::writeEvent(const QString &key,
     writer.writeStartElement("Event");
 
     writer.writeAttribute("key", key);
-    writer.writeAttribute("condition", condition->toQString());
+    writer.writeAttribute("condition", condition->string());
 
     switch (action->getActionType())
     {

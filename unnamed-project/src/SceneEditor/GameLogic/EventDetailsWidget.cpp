@@ -130,7 +130,7 @@ void EventDetailsWidget::onEventsChanged()
     auto preconditions = m_event->getPreconditions();
     for (auto it = preconditions.begin(); it != preconditions.end(); it++)
     {
-        QListWidgetItem *item = new QListWidgetItem((*it)->toQString(), m_preconditions);
+        QListWidgetItem *item = new QListWidgetItem((*it)->string(), m_preconditions);
         m_preconditionsMap[item] = it;
         m_preconditions->addItem(item);
     }

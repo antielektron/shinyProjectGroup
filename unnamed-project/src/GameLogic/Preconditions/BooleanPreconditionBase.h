@@ -16,6 +16,8 @@ public:
 
     // TODO begin/end
 
+    virtual QString string() override;
+
 protected:
     std::vector<std::unique_ptr<PreconditionBase>> m_conditions;
 };

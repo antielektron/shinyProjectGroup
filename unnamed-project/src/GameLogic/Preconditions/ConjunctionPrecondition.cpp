@@ -2,6 +2,7 @@
 
 #include "GameLogic/Preconditions/ConjunctionPrecondition.h"
 #include "GameLogic/GlobalState.h"
+#include "NegationPrecondition.h"
 
 //------------------------------------------------------------------------------
 ConjunctionPrecondition::ConjunctionPrecondition(GlobalState *state) :
@@ -27,16 +28,7 @@ bool ConjunctionPrecondition::evaluateCondition()
 }
 
 //------------------------------------------------------------------------------
-QString ConjunctionPrecondition::toQString()
+QString ConjunctionPrecondition::name()
 {
-    QString result;
-
-    for (auto it = m_conditions.begin(); it != m_conditions.end(); it++)
-    {
-        if (it != m_conditions.begin())
-            result += "&";
-        result += "(" + (*it)->toQString() + ")";
-    }
-
-    return result;
+    return traits::precondition_name<ConjunctionPrecondition>::value;
 }
