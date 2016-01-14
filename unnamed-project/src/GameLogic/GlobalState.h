@@ -12,7 +12,7 @@
 #include "GameLogic/GameLogicDatatypes.h"
 
 class Animator;
-
+class Event;
 
 class GlobalState
 {
@@ -21,9 +21,6 @@ public:
     ~GlobalState();
 
     typedef std::map<QString, QVariant>::iterator AttributesIteratorType;
-    typedef std::pair<std::unique_ptr<PreconditionBase>, std::unique_ptr<ActionBase>> EventType;
-    typedef std::map<QString, EventType> EventMapType;
-    typedef EventMapType::iterator EventMapIteratorType;
     typedef std::map<QString, AttributeDatatype> DatatypeMapType;
 
     void init();
@@ -53,15 +50,17 @@ public:
 
     void applyBuffer();
 
-    const EventType &getEvent(const QString &key);
-    void setEvent(const QString &key,
-                  std::unique_ptr<PreconditionBase> precondition,
-                  std::unique_ptr<ActionBase> action);
 
-    void removeEvent(const QString &eventKey);
+    typedef std::vector<std::unique_ptr<Event>>::iterator EventIterator;
+
+    void addEvent(std::unique_ptr<Event> event);
+    void removeEvent(EventIterator iterator);
+
+    range<EventIterator> getEvents();
+
+    void triggerEvent(const QString &name);
 
     range<AttributesIteratorType> getAttributes();
-    range<EventMapIteratorType> getEvents();
 
     void registerAnimator(const QString &watchedAttrib, Animator *anim);
 
@@ -71,12 +70,13 @@ protected:
 
     std::map<QString, QVariant> m_attributes;
     std::map<QString, std::vector<Animator *>> m_animatorsPerAttribute;
-    EventMapType m_eventMap;
     DatatypeMapType m_datatypeMap;
 
     std::vector<std::pair<QString, QVariant>> m_attributesQueue;
     std::vector<std::pair<QString, AttributeDatatype>> m_datatypeQueue;
     std::vector<QString> m_notifierList;
+
+    std::vector<std::unique_ptr<Event>> m_events;
 
     // stash:
     std::map<QString, QVariant> m_stashedAttributes;

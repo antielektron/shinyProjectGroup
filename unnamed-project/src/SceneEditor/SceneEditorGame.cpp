@@ -1,6 +1,7 @@
 #include "SceneEditor/SceneEditorGame.h"
 #include "Scene/Object.h"
 #include "Scene/ObjectGroup.h"
+#include "GameLogic/Event.h"
 #include <cmath>
 #include <iostream>
 
@@ -195,6 +196,14 @@ Scene *SceneEditorGame::getScene()
     return m_scene.get();
 }
 
+GlobalState *SceneEditorGame::getGlobalState()
+{
+    if (m_scene)
+        return m_scene->getGlobalState();
+    else
+        return nullptr;
+}
+
 ObjectGroup *SceneEditorGame::getRootObject()
 {
     return m_scene->getSceneRoot();
@@ -342,41 +351,37 @@ void SceneEditorGame::addAttribute(const QString &key,
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::delAttribute(const QString &key)
+void SceneEditorGame::deleteAttribute(const QString &key)
 {
     m_scene->getGlobalState()->removeValue(key);
     emit attributesChanged(m_scene->getGlobalState());
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::addEvent(const QString &eventKey,
-                               std::unique_ptr<PreconditionBase> *precondition,
-                               std::unique_ptr<ActionBase> *action)
+void SceneEditorGame::addEvent(std::unique_ptr<Event> event)
 {
-    m_scene->getGlobalState()->setEvent(eventKey,
-                                        std::move(*precondition),
-                                        std::move(*action));
+    m_scene->getGlobalState()->addEvent(std::move(event));
     emit eventsChanged(m_scene->getGlobalState());
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::delEvent(const QString &eventKey)
+void SceneEditorGame::deleteEvent(GlobalState::EventIterator iterator)
 {
-    m_scene->getGlobalState()->removeEvent(eventKey);
+    m_scene->getGlobalState()->removeEvent(iterator);
     emit eventsChanged(m_scene->getGlobalState());
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::addAnimator(std::unique_ptr<Animator> *anim)
+void SceneEditorGame::addAnimator(std::unique_ptr<Animator> animator)
 {
-    m_scene->addAnimator(std::move(*anim));
+    m_scene->addAnimator(std::move(animator));
     emit animatorsChanged();
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::delAnimator(Animator *anim)
+void SceneEditorGame::deleteAnimator(Animator *animator)
 {
-    m_scene->delAnimator(anim);
+    m_scene->delAnimator(animator);
     emit animatorsChanged();
 }
 

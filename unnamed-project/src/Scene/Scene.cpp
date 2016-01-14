@@ -8,6 +8,7 @@
 #include "GameLogic/Actions/ArithmeticalAction.h"
 #include "GameLogic/Actions/InvertBooleanAction.h"
 #include "GameLogic/Actions/CopyAttributeAction.h"
+#include "GameLogic/Event.h"
 #include "GameLogic/GameLogicUtility.h"
 #include "GameLogic/GameLogicDatatypes.h"
 #include "GameLogic/Animators/RotationAnimator.h"
@@ -285,7 +286,11 @@ void Scene::readEventsFromDom(const QDomElement &domElem)
                                  val));
             }
 
-            m_globalState->setEvent(key, std::move(precondition), std::move(action));
+            auto event = std::unique_ptr<Event>(new Event());
+            event->setName(key);
+            event->addPrecondition(std::move(precondition));
+            event->addAction(std::move(action));
+            m_globalState->addEvent(std::move(event));
         }
         else
         {
@@ -540,11 +545,12 @@ void Scene::saveToFile(const QString &filename)
 
     xmlWriter.writeStartElement("Events");
 
+    // TODO
     for (auto &event : m_globalState->getEvents())
     {
-        const QString &key = event.first;
-        PreconditionBase *condition = event.second.first.get();
-        ActionBase *action = event.second.second.get();
+        const QString &key = event->getName();
+        PreconditionBase *condition = event->getPreconditions().begin()->get();
+        ActionBase *action = event->getActions().begin()->get();
 
         writeEvent(key, condition, action, xmlWriter);
     }
@@ -786,12 +792,15 @@ void Scene::performAnimations(IObjectBaseObserver *listener)
 //------------------------------------------------------------------------------
 void Scene::performEvents()
 {
+    // Hä?
     for (const auto &event : m_globalState->getEvents())
     {
+        /*
         if (event.second.first->evaluateCondition())
         {
             event.second.second->performAction();
         }
+        */
     }
     m_globalState->applyBuffer();
 }

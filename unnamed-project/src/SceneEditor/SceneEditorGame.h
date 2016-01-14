@@ -27,6 +27,7 @@ public:
     virtual void tick(float dt = 1.0f/60.0f) override;
 
     virtual Scene *getScene() override;
+    GlobalState *getGlobalState();
 
 	void reset(std::unique_ptr<Scene> scene);
 
@@ -47,23 +48,21 @@ public:
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
+	// Hm
+	void addAttribute(const QString &key,
+					  QVariant value,
+					  AttributeDatatype type);
+
+	void deleteAttribute(const QString &key);
+
+
+	void addEvent(std::unique_ptr<Event> event);
+	void deleteEvent(GlobalState::EventIterator iterator);
+
+	void addAnimator(std::unique_ptr<Animator> animator);
+	void deleteAnimator(Animator *animator);
+
 public slots:
-    void addAttribute(const QString &key,
-                      QVariant value,
-                      AttributeDatatype type);
-
-    void delAttribute(const QString &key);
-
-    void addEvent(const QString &eventKey,
-                  std::unique_ptr<PreconditionBase> *precondition,
-                  std::unique_ptr<ActionBase> *action);
-
-    void delEvent(const QString &eventKey);
-
-    void addAnimator(std::unique_ptr<Animator> *);
-
-    void delAnimator(Animator *);
-
     void runLogic();
     void stopLogic();
     void togglePauseLogic();

@@ -53,5 +53,10 @@ private:
     Iterator end_;
 };
 
+template <typename Iterator>
+range<Iterator> createRange(Iterator begin, Iterator end)
+{
+    return range<Iterator>(begin, end);
+}
 
 #endif // UNNAMED_PROJECT_SMARTITERATOR_H

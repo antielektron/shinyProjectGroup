@@ -1,5 +1,6 @@
 #include "GameLogic/GlobalState.h"
 #include "GameLogic/Animators/Animator.h"
+#include "GameLogic/Event.h"
 
 #include <iostream>
 
@@ -130,48 +131,46 @@ void GlobalState::applyBuffer()
     m_notifierList.clear();
 }
 
+
 //------------------------------------------------------------------------------
-const GlobalState::EventType &GlobalState::getEvent(const QString &key)
+void GlobalState::addEvent(std::unique_ptr<Event> event)
 {
-    return m_eventMap[key];
+    m_events.push_back(std::move(event));
+    // TODO notify!! (SceneEditorGames responsibility!)
 }
 
 //------------------------------------------------------------------------------
-void GlobalState::setEvent(const QString &key,
-                           std::unique_ptr<PreconditionBase> precondition,
-                           std::unique_ptr<ActionBase> action)
+void GlobalState::removeEvent(EventIterator iterator)
 {
-    m_eventMap[key] = std::make_pair(std::move(precondition),
-                                     std::move(action));
+    m_events.erase(iterator);
+    // TODO notify!! (critical) (SceneEditorGames responsibility!)
 }
 
 //------------------------------------------------------------------------------
-void GlobalState::removeEvent(const QString &eventKey)
+range<GlobalState::EventIterator> GlobalState::getEvents()
 {
-    auto it = m_eventMap.find(eventKey);
-    if (it != m_eventMap.end())
+    return createRange(m_events.begin(), m_events.end());
+}
+
+//------------------------------------------------------------------------------
+void GlobalState::triggerEvent(const QString &name)
+{
+    // trigger all events with the coresponding name
+    for (auto &event : m_events)
     {
-        m_eventMap.erase(it);
-    }
-    else
-    {
-        std::cout << "Warning: could not remove event '"
-                  << eventKey.toStdString() << "'" << std::endl;
+        if (event->getName() == name)
+        {
+            event->triger();
+        }
     }
 }
+
 
 //------------------------------------------------------------------------------
 range<GlobalState::AttributesIteratorType> GlobalState::getAttributes()
 {
     return range<AttributesIteratorType>(m_attributes.begin(),
                                          m_attributes.end());
-}
-
-//------------------------------------------------------------------------------
-range<GlobalState::EventMapIteratorType> GlobalState::getEvents()
-{
-    return range<EventMapIteratorType>(m_eventMap.begin(),
-                                       m_eventMap.end());
 }
 
 //------------------------------------------------------------------------------
