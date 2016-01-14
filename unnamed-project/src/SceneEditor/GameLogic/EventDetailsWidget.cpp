@@ -1,5 +1,4 @@
 #include "SceneEditor/GameLogic/EventDetailsWidget.h"
-#include "GameLogic/Event.h"
 #include "GameLogic/GlobalState.h"
 #include "SceneEditor/SceneEditorGame.h"
 
@@ -13,8 +12,9 @@ EventDetailsWidget::EventDetailsWidget(std::shared_ptr<SceneEditorGame> game, Ev
 {
     generateWidgets();
     connectStuff();
-    // Connect...
-    // TODO
+
+    // Update ui
+    onEventsChanged();
 }
 
 //------------------------------------------------------------------------------
@@ -101,14 +101,46 @@ void EventDetailsWidget::connectStuff()
     connect(m_removePrecondition, SIGNAL(clicked()), this, SLOT(onRemovePreconditionClicked()));
     connect(m_editPrecondition, SIGNAL(clicked()), this, SLOT(onEditPreconditionClicked()));
 
-    // TODO connect to game
+    // connect to game
+    connect(m_game.get(), SIGNAL(eventsChanged()), this, SLOT(onEventsChanged()));
+    connect(m_game.get(), SIGNAL(eventsInvalidated()), this, SLOT(close()));
 }
 
 
 //------------------------------------------------------------------------------
+void EventDetailsWidget::onEventsChanged()
+{
+    // TODO verify that this event has not been deleted!
+    auto globalState = m_game->getGlobalState();
+    // NOTE: global state has to exist at this point!
+
+    m_nameEdit->setText(m_event->getName());
+
+    m_actions->clear();
+    m_preconditions->clear();
+
+    auto actions = m_event->getActions();
+    for (auto it = actions.begin(); it != actions.end(); it++)
+    {
+        QListWidgetItem *item = new QListWidgetItem((*it)->toQString(), m_actions);
+        m_actionsMap[item] = it;
+        m_actions->addItem(item);
+    }
+
+    auto preconditions = m_event->getPreconditions();
+    for (auto it = preconditions.begin(); it != preconditions.end(); it++)
+    {
+        QListWidgetItem *item = new QListWidgetItem((*it)->toQString(), m_preconditions);
+        m_preconditionsMap[item] = it;
+        m_preconditions->addItem(item);
+    }
+}
+
+//------------------------------------------------------------------------------
 void EventDetailsWidget::onApplyNameClicked()
 {
-    // TODO
+    m_event->setName(m_nameEdit->text());
+    m_game->notifyEventChanged();
 }
 
 //------------------------------------------------------------------------------
@@ -145,4 +177,10 @@ void EventDetailsWidget::onRemovePreconditionClicked()
 void EventDetailsWidget::onEditPreconditionClicked()
 {
     // TODO
+}
+
+void EventDetailsWidget::closeEvent(QCloseEvent *event)
+{
+    deleteLater();
+    QWidget::closeEvent(event);
 }

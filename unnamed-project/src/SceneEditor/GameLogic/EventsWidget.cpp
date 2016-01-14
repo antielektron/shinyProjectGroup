@@ -60,7 +60,9 @@ void EventsWidget::connectStuff()
     connect(m_removeEvent, SIGNAL(clicked()), this, SLOT(onRemoveEventClicked()));
     connect(m_editEvent, SIGNAL(clicked()), this, SLOT(onEditEventClicked()));
 
-    // TODO connecto to game
+    // connecto to game
+    connect(m_game.get(), SIGNAL(eventsChanged()), this, SLOT(onEventsChanged()));
+    connect(m_game.get(), SIGNAL(eventsInvalidated()), this, SLOT(onEventsChanged()));
 }
 
 //------------------------------------------------------------------------------

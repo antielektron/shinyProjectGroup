@@ -24,6 +24,8 @@ public:
 
     virtual QString getDataType() = 0;
 
+    virtual QString toQString() { return "Empty Action"; } // TODO
+
 protected:
     GlobalState *m_globalState;
 };

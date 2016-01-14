@@ -361,14 +361,20 @@ void SceneEditorGame::deleteAttribute(const QString &key)
 void SceneEditorGame::addEvent(std::unique_ptr<Event> event)
 {
     m_scene->getGlobalState()->addEvent(std::move(event));
-    emit eventsChanged(m_scene->getGlobalState());
+    emit eventsChanged();
 }
 
 //------------------------------------------------------------------------------
 void SceneEditorGame::deleteEvent(GlobalState::EventIterator iterator)
 {
     m_scene->getGlobalState()->removeEvent(iterator);
-    emit eventsChanged(m_scene->getGlobalState());
+    emit eventsInvalidated();
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::notifyEventChanged()
+{
+    emit eventsChanged();
 }
 
 //------------------------------------------------------------------------------

@@ -186,21 +186,11 @@ void SceneEditorWindow::connectStuff()
     connect(m_animatorsWidget, SIGNAL(animatorAdded(std::unique_ptr<Animator> *)),
             m_game.get(), SLOT(addAnimator(std::unique_ptr<Animator> *)));
 
-    connect(m_eventsWidget, SIGNAL(eventAdded(const QString &,
-                                             std::unique_ptr<PreconditionBase> *,
-                                             std::unique_ptr<ActionBase> *)),
-            m_game.get(), SLOT(addEvent(const QString &,
-                                        std::unique_ptr<PreconditionBase> *,
-                                        std::unique_ptr<ActionBase> *)));
-
     connect(m_game.get(), SIGNAL(singleAttributeAdded(GlobalState *, const QString &)),
             m_attributeWidget, SLOT(onSingleAttributeAdded(GlobalState *, const QString &)));
 
     connect(this, SIGNAL(globalStateModified(GlobalState *)),
             m_attributeWidget, SLOT(onAttributesChanged(GlobalState *)));
-
-    connect(this, SIGNAL(globalStateModified(GlobalState *)),
-            m_eventsWidget, SLOT(onEventsChanged()));
 
     connect(this, SIGNAL(globalStateModified(GlobalState *)),
             m_animatorsWidget, SLOT(onAnimatorsChanged()));
@@ -211,17 +201,11 @@ void SceneEditorWindow::connectStuff()
     connect (m_game.get(), SIGNAL(attributesChanged(GlobalState *)),
              m_attributeWidget, SLOT(onAttributesChanged(GlobalState *)));
 
-    connect (m_game.get(), SIGNAL(eventsChanged(GlobalState *)),
-             m_eventsWidget, SLOT(onEventsChanged()));
-
     connect(m_game.get(), SIGNAL(animatorsChanged()),
             m_animatorsWidget, SLOT(onAnimatorsChanged()));
 
     connect(m_attributeWidget, SIGNAL(attributeDeleted(const QString &)),
             m_game.get(), SLOT(delAttribute(const QString &)));
-
-    connect(m_eventsWidget, SIGNAL(eventDeleted(const QString &)),
-            m_game.get(), SLOT(delEvent(const QString &)));
 
     connect(m_animatorsWidget, SIGNAL(animatorDeleted(Animator *)),
             m_game.get(), SLOT(delAnimator(Animator *)));

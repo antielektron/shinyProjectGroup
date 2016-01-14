@@ -58,6 +58,7 @@ public:
 
 	void addEvent(std::unique_ptr<Event> event);
 	void deleteEvent(GlobalState::EventIterator iterator);
+	void notifyEventChanged();
 
 	void addAnimator(std::unique_ptr<Animator> animator);
 	void deleteAnimator(Animator *animator);
@@ -76,7 +77,8 @@ Q_SIGNALS:
     void attributesChanged(GlobalState *);
     void singleAttributeAdded(GlobalState *, const QString &);
 
-    void eventsChanged(GlobalState *);
+    void eventsChanged();
+    void eventsInvalidated(); // an event got deleted
 
     void animatorsChanged();
 
