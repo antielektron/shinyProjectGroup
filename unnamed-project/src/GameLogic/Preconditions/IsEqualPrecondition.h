@@ -2,15 +2,15 @@
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_IS_EQUAL_PRECONDITION_H
 
 #include "GameLogic/Preconditions/BinaryPreconditionBase.h"
-#include "GameLogic/GlobalState.h"
 #include "GameLogic/Preconditions/Traits.h"
 
 template <typename T>
 class IsEqualPrecondition : public BinaryPreconditionBase<T>
 {
 public:
-    IsEqualPrecondition(GlobalState *state, std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB) :
-            BinaryPreconditionBase<T>(state, std::move(exprA), std::move(exprB))
+    IsEqualPrecondition() = default;
+    IsEqualPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB) :
+            BinaryPreconditionBase<T>(std::move(exprA), std::move(exprB))
     {}
 
     virtual ~IsEqualPrecondition() {};

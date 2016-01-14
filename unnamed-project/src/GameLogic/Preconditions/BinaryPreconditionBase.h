@@ -2,17 +2,19 @@
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_BINARY_PRECONDITION_BASE_H
 
 #include <memory>
-#include <QString>
 
 #include "GameLogic/Preconditions/PreconditionBase.h"
-#include "GameLogic/Preconditions/Expressions/Expression.h"
+#include "GameLogic/Preconditions/Expressions/ExpressionConstant.h"
 
 template <typename T>
 class BinaryPreconditionBase : public PreconditionBase
 {
 public:
-    BinaryPreconditionBase(GlobalState *globalState, std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB) :
-            PreconditionBase(globalState),
+    BinaryPreconditionBase() :
+            m_exprA(new ExpressionConstant<T>()),
+            m_exprB(new ExpressionConstant<T>())
+    {}
+    BinaryPreconditionBase(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB) :
             m_exprA(std::move(exprA)),
             m_exprB(std::move(exprB))
     {}
@@ -21,7 +23,7 @@ public:
 
     virtual QString string()
     {
-        m_exprA->toQString() + " " + this->name() + " " + m_exprB->toQString();
+        return m_exprA->string() + " " + this->name() + " " + m_exprB->string();
     }
 
 protected:

@@ -1,10 +1,6 @@
 #include "GameLogic/Preconditions/NegationPrecondition.h"
-#include "GameLogic/GlobalState.h"
-#include "IsLessPrecondition.h"
-#include "IsGreaterPrecondition.h"
 
-NegationPrecondition::NegationPrecondition(GlobalState *state, std::unique_ptr<PreconditionBase> condition) :
-        PreconditionBase(state),
+NegationPrecondition::NegationPrecondition(std::unique_ptr<PreconditionBase> condition) :
         m_condition(std::move(condition))
 {
 }

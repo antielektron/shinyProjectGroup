@@ -9,7 +9,7 @@
 class NegationPrecondition : public PreconditionBase
 {
 public:
-    NegationPrecondition(GlobalState *state, std::unique_ptr<PreconditionBase> condition);
+    NegationPrecondition(std::unique_ptr<PreconditionBase> condition);
     virtual ~NegationPrecondition();
 
     virtual bool evaluateCondition() override;

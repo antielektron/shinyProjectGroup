@@ -11,7 +11,7 @@ public:
     virtual ~Expression() {}
 
     virtual T evaluate() = 0;
-    virtual QString toQString() = 0;
+    virtual QString string() = 0;
 };
 
 #endif // UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_EXPRESSIONS_EXPRESSION_BASE_H

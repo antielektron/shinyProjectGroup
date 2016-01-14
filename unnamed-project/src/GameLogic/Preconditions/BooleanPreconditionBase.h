@@ -1,14 +1,15 @@
 #ifndef UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_BOOLEAN_PRECONDITION_BASE_H
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_BOOLEAN_PRECONDITION_BASE_H
 
-#include "GameLogic/Preconditions/PreconditionBase.h"
 #include <memory>
 #include <vector>
+
+#include "GameLogic/Preconditions/PreconditionBase.h"
 
 class BooleanPreconditionBase : public PreconditionBase
 {
 public:
-    BooleanPreconditionBase(GlobalState *state);
+    BooleanPreconditionBase();
     virtual ~BooleanPreconditionBase() {}
 
     void addCondition(std::unique_ptr<PreconditionBase> condition);

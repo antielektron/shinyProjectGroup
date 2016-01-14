@@ -7,7 +7,7 @@
 class DisjunctionPrecondition : public BooleanPreconditionBase
 {
 public:
-    DisjunctionPrecondition(GlobalState *state);
+    DisjunctionPrecondition();
     virtual ~DisjunctionPrecondition();
 
     virtual bool evaluateCondition() override;

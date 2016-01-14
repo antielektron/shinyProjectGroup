@@ -1,12 +1,7 @@
-#include <sstream>
-
 #include "GameLogic/Preconditions/ConjunctionPrecondition.h"
-#include "GameLogic/GlobalState.h"
-#include "NegationPrecondition.h"
 
 //------------------------------------------------------------------------------
-ConjunctionPrecondition::ConjunctionPrecondition(GlobalState *state) :
-    BooleanPreconditionBase(state)
+ConjunctionPrecondition::ConjunctionPrecondition()
 {
 }
 

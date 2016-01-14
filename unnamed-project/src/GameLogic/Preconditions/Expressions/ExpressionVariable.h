@@ -17,7 +17,7 @@ public:
         m_globalState->getValue(m_key).value<T>();
     }
 
-    virtual QString toQString()
+    virtual QString string()
     {
         return m_key;
         // return QString("[") + m_key + "]";

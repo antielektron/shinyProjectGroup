@@ -1,9 +1,7 @@
 #include "GameLogic/Preconditions/BooleanPreconditionBase.h"
-#include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
-BooleanPreconditionBase::BooleanPreconditionBase(GlobalState *state) :
-        PreconditionBase(state)
+BooleanPreconditionBase::BooleanPreconditionBase()
 {}
 
 //------------------------------------------------------------------------------

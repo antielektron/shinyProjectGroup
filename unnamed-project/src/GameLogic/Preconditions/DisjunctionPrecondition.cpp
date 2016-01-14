@@ -1,9 +1,7 @@
 #include "GameLogic/Preconditions/DisjunctionPrecondition.h"
-#include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
-DisjunctionPrecondition::DisjunctionPrecondition(GlobalState *state) :
-    BooleanPreconditionBase(state)
+DisjunctionPrecondition::DisjunctionPrecondition()
 {
 }
 
