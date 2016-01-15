@@ -17,7 +17,7 @@ public:
 
     BinaryPreconditionBase();
     BinaryPreconditionBase(GlobalState *state, const QDomElement &domElement);
-    BinaryPreconditionBase(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB);
+    BinaryPreconditionBase(std::unique_ptr<ExpressionType> exprA, std::unique_ptr<ExpressionType> exprB);
 
     virtual ~BinaryPreconditionBase() {}
 
@@ -25,15 +25,15 @@ public:
 
     virtual void writeToXml(QXmlStreamWriter &writer) override;
 
-    inline Expression<T> *getLhs() { return m_exprA.get(); }
-    inline Expression<T> *getRhs() { return m_exprB.get(); }
+    inline ExpressionType *getLhs() { return m_exprA.get(); }
+    inline ExpressionType *getRhs() { return m_exprB.get(); }
 
-    void setLhs(std::unique_ptr<Expression<T>> expr) { m_exprA = std::move(expr); }
-    void setRhs(std::unique_ptr<Expression<T>> expr) { m_exprB = std::move(expr); }
+    void setLhs(std::unique_ptr<ExpressionType> expr) { m_exprA = std::move(expr); }
+    void setRhs(std::unique_ptr<ExpressionType> expr) { m_exprB = std::move(expr); }
 
 protected:
-    std::unique_ptr<Expression<T>> m_exprA;
-    std::unique_ptr<Expression<T>> m_exprB;
+    std::unique_ptr<ExpressionType> m_exprA;
+    std::unique_ptr<ExpressionType> m_exprB;
 };
 
 
@@ -48,7 +48,6 @@ BinaryPreconditionBase<T>::BinaryPreconditionBase() :
 template <typename T>
 BinaryPreconditionBase<T>::BinaryPreconditionBase(GlobalState *state, const QDomElement &domElement)
 {
-    // TODO expressions from DOM
     QString lhs = domElement.attribute("lhs");
     QString rhs = domElement.attribute("rhs");
 
@@ -58,7 +57,7 @@ BinaryPreconditionBase<T>::BinaryPreconditionBase(GlobalState *state, const QDom
 
 //------------------------------------------------------------------------------
 template <typename T>
-BinaryPreconditionBase<T>::BinaryPreconditionBase(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB) :
+BinaryPreconditionBase<T>::BinaryPreconditionBase(std::unique_ptr<ExpressionType> exprA, std::unique_ptr<ExpressionType> exprB) :
         m_exprA(std::move(exprA)),
         m_exprB(std::move(exprB))
 {}

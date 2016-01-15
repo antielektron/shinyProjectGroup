@@ -52,10 +52,9 @@ void Event::writeToXml(QXmlStreamWriter &writer)
         condition->writeToXml(writer);
     }
 
-    std::cerr << "Warnig: skipping actions!" << std::endl;
     for (auto &action : m_actions)
     {
-        // TODO action->writeToXml(writer);
+        action->writeToXml(writer);
     }
 
     writer.writeEndElement();

@@ -48,20 +48,6 @@ const std::map<QString, AttributeDatatype> qStringToType =
     { "vector", AttributeDatatype::QVector3D }
 };
 
-const std::map<ActionType, QString> actionToQString =
-{
-    { ActionType::ArithmeticalAction, "arithmetical" },
-    { ActionType::CopyAttribute, "copy" },
-    { ActionType::FlipBoolean, "flip" }
-};
-
-const std::map<QString, ActionType> qStringToAction =
-{
-    { "arithmetical", ActionType::ArithmeticalAction },
-    { "copy", ActionType::CopyAttribute },
-    { "flip", ActionType::FlipBoolean }
-};
-
 const std::map<AnimationType, QString> animationToQString =
 {
     { AnimationType::Position, "position" },

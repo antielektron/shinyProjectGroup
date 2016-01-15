@@ -109,10 +109,6 @@ private:
     void writePosition(const QVector3D &position, QXmlStreamWriter &writer);
     void writeRotation(const QVector3D &rotation, QXmlStreamWriter &writer);
     void writeScaling(const QVector3D &scaling, QXmlStreamWriter &writer);
-    void writeEvent(const QString &key,
-                    PreconditionBase *condition,
-                    ActionBase *action,
-                    QXmlStreamWriter &writer);
     void writeAnimator(Animator *animation, QXmlStreamWriter &writer);
 
     void addToObjectList(ObjectGroup *group);

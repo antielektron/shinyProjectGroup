@@ -5,9 +5,6 @@
 #include <QVector3D>
 
 #include "Scene/Scene.h"
-#include "GameLogic/Actions/ArithmeticalAction.h"
-#include "GameLogic/Actions/InvertBooleanAction.h"
-#include "GameLogic/Actions/CopyAttributeAction.h"
 #include "GameLogic/Event.h"
 #include "GameLogic/GameLogicUtility.h"
 #include "GameLogic/GameLogicDatatypes.h"
@@ -242,34 +239,22 @@ void Scene::readAttributesFromDom(const QDomElement &domElem)
             {
                 QString valueStr = child.attribute("value","");
                 m_globalState->setValue(key,
-                                        valueStr == "true",
-                                        AttributeDatatype::Bool);
+                                        valueStr == "true");
                 break;
             }
             case AttributeDatatype::Int:
             {
                 QString valueStr = child.attribute("value","");
                 m_globalState->setValue(key,
-                                        valueStr.toInt(),
-                                        AttributeDatatype::Int);
+                                        valueStr.toInt());
                 break;
             }
             case AttributeDatatype::Float:
             {
                 QString valueStr = child.attribute("value","");
                 m_globalState->setValue(key,
-                                        valueStr.toFloat(),
-                                        AttributeDatatype::Float);
+                                        valueStr.toFloat());
                 break;
-            }
-            case AttributeDatatype::QVector3D:
-            {
-                float x = child.attribute("x","").toFloat();
-                float y = child.attribute("y","").toFloat();
-                float z = child.attribute("z","").toFloat();
-                m_globalState->setValue(key,
-                                        QVector3D(x,y,z),
-                                        AttributeDatatype::QVector3D);
             }
             }
         }
@@ -566,75 +551,6 @@ void Scene::writeScaling(const QVector3D &pos, QXmlStreamWriter &writer)
     writer.writeAttribute("sx", QString::number(pos.x()));
     writer.writeAttribute("sy", QString::number(pos.y()));
     writer.writeAttribute("sz", QString::number(pos.z()));
-}
-
-//------------------------------------------------------------------------------
-void Scene::writeEvent(const QString &key,
-                       PreconditionBase *condition,
-                       ActionBase *action,
-                       QXmlStreamWriter &writer)
-{
-    writer.writeStartElement("Event");
-
-    writer.writeAttribute("key", key);
-    writer.writeAttribute("condition", condition->string());
-
-    switch (action->getActionType())
-    {
-    case ActionType::ArithmeticalAction:
-    {
-        writer.writeAttribute("actionType", "arithmetical");
-
-        if (action->getDataType() == "int")
-        {
-            ArithmeticalAction<int> *arithAction =
-                    static_cast<ArithmeticalAction<int> *>(action);
-            writer.writeAttribute("operationType",
-                                  arithOperationTypeToQString.at(
-                                      arithAction->getOperationType()));
-
-            writer.writeAttribute("dataType", "int");
-            writer.writeAttribute("valA", arithAction->getLeftOperandKey());
-            writer.writeAttribute("valB", arithAction->getRightOperandKey());
-            writer.writeAttribute("valResult", arithAction->getDestKey());
-        }
-        else
-        {
-            ArithmeticalAction<float> *arithAction =
-                    static_cast<ArithmeticalAction<float> *>(action);
-            writer.writeAttribute("operationType",
-                                  arithOperationTypeToQString.at(
-                                      arithAction->getOperationType()));
-
-            writer.writeAttribute("dataType", "float");
-            writer.writeAttribute("valA", arithAction->getLeftOperandKey());
-            writer.writeAttribute("valB", arithAction->getRightOperandKey());
-            writer.writeAttribute("valDst", arithAction->getDestKey());
-        }
-
-        break;
-    }
-    case ActionType::CopyAttribute:
-    {
-        writer.writeAttribute("actionType", "copy");
-        CopyAttributeAction *copyAction =
-                static_cast<CopyAttributeAction *>(action);
-        writer.writeAttribute("valSrc", copyAction->getSourceKey());
-        writer.writeAttribute("valDst", copyAction->getDestKey());
-
-        break;
-    }
-    case ActionType::FlipBoolean:
-    {
-        writer.writeAttribute("actionType", "flip");
-        InvertBooleanAction *flipAction =
-                static_cast<InvertBooleanAction *>(action);
-        writer.writeAttribute("val", flipAction->getKey());
-        break;
-    }
-    }
-
-    writer.writeEndElement();
 }
 
 //------------------------------------------------------------------------------

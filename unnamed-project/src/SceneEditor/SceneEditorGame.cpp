@@ -63,12 +63,10 @@ void SceneEditorGame::tick(float dt)
     {
         float oldTime = m_scene->getGlobalState()->getValue(KEY_ATTRIBUTE_TIME).toFloat();
         m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_TIME,
-                                            QVariant(oldTime + dt),
-                                            AttributeDatatype::Float);
+                                            QVariant(oldTime + dt));
 
         m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_DELTA_TIME,
-                                            QVariant(dt),
-                                            AttributeDatatype::Float);
+                                            QVariant(dt));
     }
     // TODO: write player position in audomad!!!
 
@@ -345,7 +343,7 @@ void SceneEditorGame::addAttribute(const QString &key,
                                    QVariant value,
                                    AttributeDatatype type)
 {
-    m_scene->getGlobalState()->setValue(key, value, type);
+    m_scene->getGlobalState()->setValue(key, value);
     m_scene->getGlobalState()->applyBuffer();
     emit singleAttributeAdded(m_scene->getGlobalState(), key);
 }

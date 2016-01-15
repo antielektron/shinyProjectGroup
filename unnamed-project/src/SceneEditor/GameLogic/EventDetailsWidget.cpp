@@ -2,11 +2,8 @@
 #include "GameLogic/GlobalState.h"
 #include "SceneEditor/SceneEditorGame.h"
 
-#include "GameLogic/Preconditions/IsEqualPrecondition.h"
-#include "GameLogic/Preconditions/IsGreaterPrecondition.h"
-#include "GameLogic/Preconditions/IsLessPrecondition.h"
-
 #include "GameLogic/Factories/PreconditionFactory.h"
+#include "GameLogic/Factories/ActionFactory.h"
 #include "SceneEditor/Factories/PreconditionDetailsWidgetFactory.h"
 
 #include <QBoxLayout>
@@ -132,7 +129,7 @@ void EventDetailsWidget::onEventsChanged()
     auto actions = m_event->getActions();
     for (auto it = actions.begin(); it != actions.end(); it++)
     {
-        QListWidgetItem *item = new QListWidgetItem((*it)->toQString(), m_actions);
+        QListWidgetItem *item = new QListWidgetItem((*it)->string(), m_actions);
         m_actionsMap[item] = it;
         m_actions->addItem(item);
     }
@@ -140,7 +137,6 @@ void EventDetailsWidget::onEventsChanged()
     auto preconditions = m_event->getPreconditions();
     for (auto it = preconditions.begin(); it != preconditions.end(); it++)
     {
-        std::cout << (*it)->string().toStdString() << std::endl;
         QListWidgetItem *item = new QListWidgetItem((*it)->string(), m_preconditions);
         m_preconditionsMap[item] = it;
         m_preconditions->addItem(item);
@@ -157,19 +153,47 @@ void EventDetailsWidget::onApplyNameClicked()
 //------------------------------------------------------------------------------
 void EventDetailsWidget::onAddActionClicked()
 {
-    // TODO
+    bool ok;
+
+    QStringList types;
+
+    auto vecTypes = Factory::getKnownActionTypes();
+    std::copy(vecTypes.begin(), vecTypes.end(), std::back_inserter(types));
+
+    // ask user what type he wants to add, and default construct one
+    QString type = QInputDialog::getItem(this, "select action type", "type", types, 0, false, &ok);
+
+    if (ok)
+    {
+        // ask factory to create one
+        auto action = Factory::createActionFromType(m_game->getGlobalState(), type);
+        m_event->addAction(std::move(action));
+
+        m_game->notifyEventChanged();
+    }
 }
 
 //------------------------------------------------------------------------------
 void EventDetailsWidget::onRemoveActionClicked()
 {
-    // TODO
+    auto it = m_actionsMap.find(m_actions->currentItem());
+    if (it != m_actionsMap.end())
+    {
+        m_event->removeAction(it->second);
+        m_game->notifyEventChanged();
+    }
 }
 
 //------------------------------------------------------------------------------
 void EventDetailsWidget::onEditActionClicked()
 {
-    // TODO
+    auto it = m_actionsMap.find(m_actions->currentItem());
+    if (it != m_actionsMap.end())
+    {
+        // TODO
+        // auto widget = Factory::createActionDetailsWidget(m_game, it->second->get(), nullptr);
+        // widget->show();
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -10,7 +10,7 @@ class GlobalState;
 
 namespace Factory
 {
-    std::unique_ptr<ActionBase> createActionFromType(const QString &type);
+    std::unique_ptr<ActionBase> createActionFromType(GlobalState *state, const QString &type);
     std::unique_ptr<ActionBase> createActionFromDomElement(GlobalState *state, const QDomElement &domElement);
 
     std::vector<QString> getKnownActionTypes();

@@ -14,10 +14,6 @@
 #include <QStringList>
 #include <QListWidgetItem>
 
-#include "GameLogic/Actions/CopyAttributeAction.h"
-#include "GameLogic/Actions/InvertBooleanAction.h"
-#include "GameLogic/Actions/ArithmeticalAction.h"
-
 //------------------------------------------------------------------------------
 EventsWidget::EventsWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) :
     QWidget(parent),

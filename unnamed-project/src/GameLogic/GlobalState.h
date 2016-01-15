@@ -38,13 +38,11 @@ public:
     /**
      * @brief setValue add or replace a value. changes will only applied
      *        after applyBuffer() is called
+     *        TODO change this, as we want to perform calculations in the attributes!
      * @param key
      * @param value
-     * @param type
      */
-    void setValue(const QString &key,
-                  QVariant value,
-                  AttributeDatatype type);
+    void setValue(const QString &key, QVariant value);
 
     void removeValue(const QString &key);
 
@@ -73,7 +71,6 @@ protected:
     DatatypeMapType m_datatypeMap;
 
     std::vector<std::pair<QString, QVariant>> m_attributesQueue;
-    std::vector<std::pair<QString, AttributeDatatype>> m_datatypeQueue;
     std::vector<QString> m_notifierList;
 
     std::vector<std::unique_ptr<Event>> m_events;

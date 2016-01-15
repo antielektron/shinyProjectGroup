@@ -63,8 +63,10 @@ typedef CreatePreconditionHelper<
         IsEqualPrecondition<int>,
         IsEqualPrecondition<double>,
         IsEqualPrecondition<bool>,
+
         IsGreaterPrecondition<int>,
         IsGreaterPrecondition<double>,
+
         IsLessPrecondition<int>,
         IsLessPrecondition<double>
 > HelperType;
