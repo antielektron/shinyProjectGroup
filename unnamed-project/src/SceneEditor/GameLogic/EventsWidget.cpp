@@ -1,8 +1,6 @@
 #include "SceneEditor/GameLogic/EventsWidget.h"
 #include "SceneEditor/SceneEditorGame.h"
 
-#include "GameLogic/GameLogicUtility.h"
-
 #include "SceneEditor/GameLogic/EventDetailsWidget.h"
 
 #include "GameLogic/GlobalState.h"

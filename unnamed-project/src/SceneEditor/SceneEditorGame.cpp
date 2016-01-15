@@ -64,17 +64,14 @@ void SceneEditorGame::tick(float dt)
         float oldTime = m_scene->getGlobalState()->getValue(KEY_ATTRIBUTE_TIME).toFloat();
         m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_TIME,
                                             QVariant(oldTime + dt));
-
-        m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_DELTA_TIME,
-                                            QVariant(dt));
     }
     // TODO: write player position in audomad!!!
 
-    // run Animataions and run handle game logic events:
+    // run animataions and run handle game logic events
     if (m_logicRunning && !m_logicPaused)
     {
-        m_scene->performEvents();
-        emit attributesChanged(m_scene->getGlobalState());
+        // only trigger the tick event that is triggered every tick ;)
+        m_scene->getGlobalState()->triggerEvent("tick");
     }
     if (!m_logicPaused)
     {
@@ -326,7 +323,7 @@ void SceneEditorGame::stopLogic()
         m_logicRunning = false;
         m_logicPaused = false;
     }
-    emit attributesChanged(m_scene->getGlobalState());
+    emit attributesChanged(); // TODO hm
 }
 
 //------------------------------------------------------------------------------
@@ -339,20 +336,23 @@ void SceneEditorGame::togglePauseLogic()
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::addAttribute(const QString &key,
-                                   QVariant value,
-                                   AttributeDatatype type)
+void SceneEditorGame::addAttribute(const QString &key, const QVariant &value)
 {
     m_scene->getGlobalState()->setValue(key, value);
-    m_scene->getGlobalState()->applyBuffer();
-    emit singleAttributeAdded(m_scene->getGlobalState(), key);
+    emit attributesChanged();
 }
 
 //------------------------------------------------------------------------------
 void SceneEditorGame::deleteAttribute(const QString &key)
 {
     m_scene->getGlobalState()->removeValue(key);
-    emit attributesChanged(m_scene->getGlobalState());
+    emit attributesChanged();
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::notifyAttributeChanged()
+{
+    emit attributesChanged();
 }
 
 //------------------------------------------------------------------------------

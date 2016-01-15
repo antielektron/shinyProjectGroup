@@ -51,7 +51,6 @@ public:
     void removeModel(const std::string &modelName);
 
     void performAnimations(IObjectBaseObserver *listener = nullptr);
-    void performEvents();
     void instantlyFinishAnimations();
 
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);

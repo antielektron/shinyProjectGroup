@@ -9,7 +9,6 @@
 #include "smartiterator.h"
 #include "GameLogic/Preconditions/PreconditionBase.h"
 #include "GameLogic/Actions/ActionBase.h"
-#include "GameLogic/GameLogicDatatypes.h"
 
 class Animator;
 class Event;
@@ -19,9 +18,6 @@ class GlobalState
 public:
     GlobalState();
     ~GlobalState();
-
-    typedef std::map<QString, QVariant>::iterator AttributesIteratorType;
-    typedef std::map<QString, AttributeDatatype> DatatypeMapType;
 
     void init();
 
@@ -33,20 +29,14 @@ public:
 
     const QVariant &getValue(const QString &key);
     bool existValue(const QString &key);
-    AttributeDatatype getType(const QString &key);
-
-    /**
-     * @brief setValue add or replace a value. changes will only applied
-     *        after applyBuffer() is called
-     *        TODO change this, as we want to perform calculations in the attributes!
-     * @param key
-     * @param value
-     */
-    void setValue(const QString &key, QVariant value);
-
+    void setValue(const QString &key, const QVariant &value);
     void removeValue(const QString &key);
 
-    void applyBuffer();
+    typedef std::map<QString, QVariant>::iterator AttributesIterator;
+
+    range<AttributesIterator> getAttributes();
+
+    void registerAnimator(const QString &watchedAttrib, Animator *anim);
 
 
     typedef std::vector<std::unique_ptr<Event>>::iterator EventIterator;
@@ -58,26 +48,19 @@ public:
 
     void triggerEvent(const QString &name);
 
-    range<AttributesIteratorType> getAttributes();
-
-    void registerAnimator(const QString &watchedAttrib, Animator *anim);
-
 protected:
     void initializeConstantAttributes();
     void notifyListeners(const QString &key);
 
     std::map<QString, QVariant> m_attributes;
     std::map<QString, std::vector<Animator *>> m_animatorsPerAttribute;
-    DatatypeMapType m_datatypeMap;
 
-    std::vector<std::pair<QString, QVariant>> m_attributesQueue;
     std::vector<QString> m_notifierList;
 
     std::vector<std::unique_ptr<Event>> m_events;
 
     // stash:
     std::map<QString, QVariant> m_stashedAttributes;
-    DatatypeMapType m_stashedDatatypeMap;
 };
 
 #endif // GLOBALSTATE_H

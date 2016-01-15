@@ -21,7 +21,7 @@ class GlobalDetailsWidget;
 class ObjectBase;
 class Model;
 
-class AttributeWidget;
+class AttributesWidget;
 class EventsWidget;
 class AnimatorsWidget;
 
@@ -81,7 +81,7 @@ private:
     GlobalDetailsWidget *m_globalDetails;
 
     QDockWidget *m_attributeWidgetDock;
-    AttributeWidget *m_attributeWidget;
+    AttributesWidget *m_attributeWidget;
 
     QDockWidget *m_eventWidgetDock;
     EventsWidget *m_eventsWidget;

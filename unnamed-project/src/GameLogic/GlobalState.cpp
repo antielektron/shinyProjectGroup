@@ -2,6 +2,8 @@
 #include "GameLogic/Animators/Animator.h"
 #include "GameLogic/Event.h"
 
+#include "GameLogic/GameLogicDatatypes.h"
+
 #include <iostream>
 
 //------------------------------------------------------------------------------
@@ -26,43 +28,15 @@ void GlobalState::init()
 //------------------------------------------------------------------------------
 void GlobalState::stash()
 {
-    // apply Buffer (just in case)
-    applyBuffer();
-
-    // clear stash
-    m_stashedAttributes.clear();
-    m_stashedDatatypeMap.clear();
-
-    // build stash:
-    for (const auto &p : m_attributes)
-    {
-        m_stashedAttributes[p.first] = p.second;
-    }
-    for (const auto &p :m_datatypeMap)
-    {
-        m_stashedDatatypeMap[p.first] = p.second;
-    }
+    // copy everything to stash
+    m_stashedAttributes = m_attributes;
 }
 
 //------------------------------------------------------------------------------
 void GlobalState::applyStash()
 {
-    // apply buffer (just in case)
-    applyBuffer();
-
-    for (const auto &p : m_stashedAttributes)
-    {
-        m_attributes[p.first] = p.second;
-    }
-    for (const auto &p : m_stashedDatatypeMap)
-    {
-        m_datatypeMap[p.first] = p.second;
-        // notify animators:
-        if (p.second == AttributeDatatype::QVector3D)
-        {
-            notifyListeners(p.first);
-        }
-    }
+    // copy back (TODO move back?)
+    m_attributes = m_stashedAttributes;
 }
 
 //------------------------------------------------------------------------------
@@ -80,15 +54,9 @@ bool GlobalState::existValue(const QString &key)
 }
 
 //------------------------------------------------------------------------------
-AttributeDatatype GlobalState::getType(const QString &key)
+void GlobalState::setValue(const QString &key, const QVariant &value)
 {
-    return m_datatypeMap[key];
-}
-
-//------------------------------------------------------------------------------
-void GlobalState::setValue(const QString &key, QVariant value)
-{
-    m_attributesQueue.push_back(std::make_pair(key, value));
+    m_attributes[key] = value;
 }
 
 //------------------------------------------------------------------------------
@@ -107,33 +75,15 @@ void GlobalState::removeValue(const QString &key)
 }
 
 //------------------------------------------------------------------------------
-void GlobalState::applyBuffer()
-{
-    for (size_t i = 0; i < m_attributesQueue.size(); i++)
-    {
-        m_attributes[m_attributesQueue[i].first] = m_attributesQueue[i].second;
-    }
-    for (const auto &key : m_notifierList)
-    {
-        notifyListeners(key);
-    }
-    m_attributesQueue.clear();
-    m_notifierList.clear();
-}
-
-
-//------------------------------------------------------------------------------
 void GlobalState::addEvent(std::unique_ptr<Event> event)
 {
     m_events.push_back(std::move(event));
-    // TODO notify!! (SceneEditorGames responsibility!)
 }
 
 //------------------------------------------------------------------------------
 void GlobalState::removeEvent(EventIterator iterator)
 {
     m_events.erase(iterator);
-    // TODO notify!! (critical) (SceneEditorGames responsibility!)
 }
 
 //------------------------------------------------------------------------------
@@ -155,12 +105,10 @@ void GlobalState::triggerEvent(const QString &name)
     }
 }
 
-
 //------------------------------------------------------------------------------
-range<GlobalState::AttributesIteratorType> GlobalState::getAttributes()
+range<GlobalState::AttributesIterator> GlobalState::getAttributes()
 {
-    return range<AttributesIteratorType>(m_attributes.begin(),
-                                         m_attributes.end());
+    return range<AttributesIterator>(m_attributes.begin(), m_attributes.end());
 }
 
 //------------------------------------------------------------------------------
@@ -172,18 +120,12 @@ void GlobalState::registerAnimator(const QString &watchedAttrib, Animator *anim)
 //------------------------------------------------------------------------------
 void GlobalState::initializeConstantAttributes()
 {
+    // TODO check what we need!
     setValue(KEY_ATTRIBUTE_TIME, QVariant(0.0f));
-    setValue(KEY_ATTRIBUTE_DELTA_TIME, QVariant(0.0f));
-    setValue(KEY_ATTRIBUTE_TRUE, QVariant(true));
-    setValue(KEY_ATTRIBUTE_FALSE, QVariant(false));
 
-    /* TODO store coordinates in player_x, player_y, player_z
-    QVector3D playerPosition(0,0,0);
-    setValue(KEY_ATTRIBUTE_PLAYER,
-             QVariant(playerPosition),
-             AttributeDatatype::QVector3D);
-    */
-    applyBuffer();
+    // TODO store coordinates in player_x, player_y, player_z (maybe, maybe not!)
+    QVector3D playerPosition(0, 0, 0);
+    setValue(KEY_ATTRIBUTE_PLAYER, QVariant(playerPosition));
 }
 
 //------------------------------------------------------------------------------

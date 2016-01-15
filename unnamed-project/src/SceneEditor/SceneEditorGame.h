@@ -48,12 +48,10 @@ public:
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
-	// Hm
-	void addAttribute(const QString &key,
-					  QVariant value,
-					  AttributeDatatype type);
 
+	void addAttribute(const QString &key, const QVariant &value);
 	void deleteAttribute(const QString &key);
+	void notifyAttributeChanged();
 
 
 	void addEvent(std::unique_ptr<Event> event);
@@ -74,8 +72,7 @@ Q_SIGNALS:
     void objectsChanged();
 	void sceneChanged(); // emited when "global information" has changed
 
-    void attributesChanged(GlobalState *);
-    void singleAttributeAdded(GlobalState *, const QString &);
+    void attributesChanged();
 
     void eventsChanged();
     void eventsInvalidated(); // an event got deleted

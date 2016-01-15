@@ -6,10 +6,10 @@
 
 #include "Scene/Scene.h"
 #include "GameLogic/Event.h"
-#include "GameLogic/GameLogicUtility.h"
-#include "GameLogic/GameLogicDatatypes.h"
 #include "GameLogic/Animators/RotationAnimator.h"
 #include "GameLogic/Animators/PositionAnimator.h"
+
+#include "GameLogic/GameLogicDatatypes.h"
 
 //------------------------------------------------------------------------------
 Scene::Scene()
@@ -76,8 +76,6 @@ void Scene::loadFromFile(const QString &filename)
         else if (tag == "Attributes")
         {
             readAttributesFromDom(currentElement);
-            m_globalState->applyBuffer();
-
         }
         else if (tag == "Animators")
         {
@@ -233,29 +231,39 @@ void Scene::readAttributesFromDom(const QDomElement &domElem)
 
             QString key = child.attribute("key","");
 
-            switch (qStringToType.at(type))
+            switch (QMetaType::type(type.toStdString().c_str()))
             {
-            case AttributeDatatype::Bool:
-            {
-                QString valueStr = child.attribute("value","");
-                m_globalState->setValue(key,
-                                        valueStr == "true");
-                break;
-            }
-            case AttributeDatatype::Int:
-            {
-                QString valueStr = child.attribute("value","");
-                m_globalState->setValue(key,
-                                        valueStr.toInt());
-                break;
-            }
-            case AttributeDatatype::Float:
-            {
-                QString valueStr = child.attribute("value","");
-                m_globalState->setValue(key,
-                                        valueStr.toFloat());
-                break;
-            }
+                case QMetaType::Bool:
+                {
+                    QString valueStr = child.attribute("value", "");
+                    m_globalState->setValue(key,
+                                            valueStr == "true");
+                    break;
+                }
+                case QMetaType::Int:
+                {
+                    QString valueStr = child.attribute("value", "");
+                    m_globalState->setValue(key,
+                                            valueStr.toInt());
+                    break;
+                }
+                case QMetaType::Float:
+                {
+                    QString valueStr = child.attribute("value", "");
+                    m_globalState->setValue(key,
+                                            valueStr.toFloat());
+                    break;
+                }
+                case QMetaType::QVector3D:
+                {
+                    // TODO
+                }
+                default:
+                {
+                    std::cout << "WARNING: Unknown attribute type '"
+                    << type.toStdString()
+                    << std::endl;
+                }
             }
         }
         else
@@ -409,38 +417,45 @@ void Scene::saveToFile(const QString &filename)
 
         const QString &key = attribute.first;
         QVariant value = attribute.second;
-        AttributeDatatype type = m_globalState->getType(key);
 
         xmlWriter.writeAttribute("key", key);
-        xmlWriter.writeAttribute("type", typeToQString.at(type));
+        xmlWriter.writeAttribute("type", value.typeName());
 
-        switch(type)
+        switch((QMetaType::Type)value.type())
         {
-        case AttributeDatatype::Bool:
-        {
-            bool v = value.toBool();
-            xmlWriter.writeAttribute("value", v ? "true" : "false");
-            break;
-        }
-        case AttributeDatatype::Int:
-        {
-            int v = value.toInt();
-            xmlWriter.writeAttribute("value", QString::number(v));
-            break;
-        }
-        case AttributeDatatype::Float:
-        {
-            float v = value.toFloat();
-            xmlWriter.writeAttribute("value", QString::number(v));
-            break;
-        }
-        case AttributeDatatype::QVector3D:
-        {
-            QVector3D v = value.value<QVector3D>();
-            xmlWriter.writeAttribute("x", QString::number(v[0]));
-            xmlWriter.writeAttribute("y", QString::number(v[1]));
-            xmlWriter.writeAttribute("z", QString::number(v[2]));
-        }
+            case QMetaType::Bool:
+            {
+                bool v = value.toBool();
+                xmlWriter.writeAttribute("value", v ? "true" : "false");
+                break;
+            }
+            case QMetaType::Int:
+            {
+                int v = value.toInt();
+                xmlWriter.writeAttribute("value", QString::number(v));
+                break;
+            }
+            case QMetaType::Float:
+            {
+                float v = value.toFloat();
+                xmlWriter.writeAttribute("value", QString::number(v));
+                break;
+            }
+            case QMetaType::QVector3D:
+            {
+                QVector3D v = value.value<QVector3D>();
+                xmlWriter.writeAttribute("x", QString::number(v[0]));
+                xmlWriter.writeAttribute("y", QString::number(v[1]));
+                xmlWriter.writeAttribute("z", QString::number(v[2]));
+                break;
+            }
+            default:
+            {
+                std::cout << "WARNING: Unknown attribute type '"
+                << QMetaType::typeName(value.type())
+                << "' in GlobalState"
+                << std::endl;
+            }
         }
 
         xmlWriter.writeEndElement();
@@ -621,22 +636,6 @@ void Scene::performAnimations(IObjectBaseObserver *listener)
             listener->notify(anim->getObject());
         }
     }
-}
-
-//------------------------------------------------------------------------------
-void Scene::performEvents()
-{
-    // Hä?
-    for (const auto &event : m_globalState->getEvents())
-    {
-        /*
-        if (event.second.first->evaluateCondition())
-        {
-            event.second.second->performAction();
-        }
-        */
-    }
-    m_globalState->applyBuffer();
 }
 
 //------------------------------------------------------------------------------
