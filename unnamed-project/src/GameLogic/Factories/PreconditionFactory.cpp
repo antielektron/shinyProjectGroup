@@ -4,38 +4,88 @@
 #include "GameLogic/Preconditions/IsLessPrecondition.h"
 #include "GameLogic/Preconditions/IsGreaterPrecondition.h"
 
-std::unique_ptr<PreconditionBase> PreconditionFactory::createFromType(const QString &type)
+template <typename ...Args>
+struct CreatePreconditionHelper {};
+
+template <typename T, typename ...Args>
+struct CreatePreconditionHelper<T, Args...>
 {
-    if (type == traits::precondition_name<IsEqualPrecondition<int>>::value)
+    static std::unique_ptr<PreconditionBase> create(const QString &type)
     {
-        return std::unique_ptr<PreconditionBase>(new IsEqualPrecondition<int>());
+        if (type == traits::precondition_name<T>::value)
+        {
+            return std::unique_ptr<PreconditionBase>(new T());
+        }
+        else
+        {
+            return CreatePreconditionHelper<Args...>::create(type);
+        }
     }
-    else if (type == traits::precondition_name<IsEqualPrecondition<double>>::value)
+
+    static std::unique_ptr<PreconditionBase> create(const QString &type, const QDomElement &domElement)
     {
-        return std::unique_ptr<PreconditionBase>(new IsEqualPrecondition<double>());
+        if (type == traits::precondition_name<T>::value)
+        {
+            return std::unique_ptr<PreconditionBase>(new T(domElement));
+        }
+        else
+        {
+            return CreatePreconditionHelper<Args...>::create(type, domElement);
+        }
     }
-    else if (type == traits::precondition_name<IsEqualPrecondition<bool>>::value)
+
+    static void getTypes(std::vector<QString> &types)
     {
-        return std::unique_ptr<PreconditionBase>(new IsEqualPrecondition<bool>());
+        types.push_back(QString(traits::precondition_name<T>::value));
+        CreatePreconditionHelper<Args...>::getTypes(types);
     }
-    else if (type == traits::precondition_name<IsGreaterPrecondition<int>>::value)
-    {
-        return std::unique_ptr<PreconditionBase>(new IsGreaterPrecondition<int>());
-    }
-    else if (type == traits::precondition_name<IsGreaterPrecondition<double>>::value)
-    {
-        return std::unique_ptr<PreconditionBase>(new IsGreaterPrecondition<double>());
-    }
-    else if (type == traits::precondition_name<IsLessPrecondition<int>>::value)
-    {
-        return std::unique_ptr<PreconditionBase>(new IsLessPrecondition<int>());
-    }
-    else if (type == traits::precondition_name<IsLessPrecondition<double>>::value)
-    {
-        return std::unique_ptr<PreconditionBase>(new IsLessPrecondition<double>());
-    }
-    else
+};
+
+template <>
+struct CreatePreconditionHelper<>
+{
+    static std::unique_ptr<PreconditionBase> create(const QString &type)
     {
         throw std::runtime_error("Unknown precondition type: " + type.toStdString());
     }
+
+    static std::unique_ptr<PreconditionBase> create(const QString &type, const QDomElement &domElement)
+    {
+        throw std::runtime_error("Unknown precondition type: " + type.toStdString());
+    }
+
+    static void getTypes(std::vector<QString> &types)
+    {
+    }
+};
+
+typedef CreatePreconditionHelper<
+        IsEqualPrecondition<int>,
+        IsEqualPrecondition<double>,
+        IsEqualPrecondition<bool>,
+        IsGreaterPrecondition<int>,
+        IsGreaterPrecondition<double>,
+        IsLessPrecondition<int>,
+        IsLessPrecondition<double>
+> HelperType;
+
+std::unique_ptr<PreconditionBase> Factory::createPreconditionFromType(const QString &type)
+{
+    return HelperType::create(type);
+}
+
+std::unique_ptr<PreconditionBase> Factory::createPreconditionFromDomElement(const QDomElement &domElement)
+{
+    auto type = domElement.attribute("type");
+
+    return HelperType::create(type, domElement);
+}
+
+std::vector<QString> Factory::getKnownPreconditionTypes()
+{
+    std::vector<QString> types;
+
+    HelperType::getTypes(types);
+
+    return std::move(types);
 }

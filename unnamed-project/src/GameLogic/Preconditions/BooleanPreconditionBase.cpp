@@ -5,6 +5,12 @@ BooleanPreconditionBase::BooleanPreconditionBase()
 {}
 
 //------------------------------------------------------------------------------
+BooleanPreconditionBase::BooleanPreconditionBase(const QDomElement &domElement)
+{
+    // TODO iterate over children, use factory!
+}
+
+//------------------------------------------------------------------------------
 void BooleanPreconditionBase::addCondition(std::unique_ptr<PreconditionBase> condition)
 {
     m_conditions.push_back(std::move(condition));

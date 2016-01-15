@@ -5,6 +5,8 @@
 #include <memory>
 
 #include <QString>
+#include <QDomElement>
+#include <QXmlStreamWriter>
 
 #include "smartiterator.h"
 
@@ -17,7 +19,10 @@ public:
     // default -> empty event.
     Event();
     Event(const QString &name);
+    Event(const QDomElement &domElement);
     ~Event();
+
+    void writeToXml(QXmlStreamWriter &writer);
 
     // TODO evaluate logic
     void triger();

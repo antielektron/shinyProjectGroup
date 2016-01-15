@@ -6,6 +6,12 @@ ConjunctionPrecondition::ConjunctionPrecondition()
 }
 
 //------------------------------------------------------------------------------
+ConjunctionPrecondition::ConjunctionPrecondition(const QDomElement &domElement) :
+        BooleanPreconditionBase(domElement)
+{
+}
+
+//------------------------------------------------------------------------------
 ConjunctionPrecondition::~ConjunctionPrecondition()
 {
     // nothing to do here...

@@ -7,6 +7,7 @@
 class DisjunctionPrecondition : public BooleanPreconditionBase
 {
 public:
+    DisjunctionPrecondition(const QDomElement &domElement);
     DisjunctionPrecondition();
     virtual ~DisjunctionPrecondition();
 

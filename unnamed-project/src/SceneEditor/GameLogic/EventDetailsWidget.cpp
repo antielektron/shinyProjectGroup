@@ -177,15 +177,8 @@ void EventDetailsWidget::onAddPreconditionClicked()
 
     QStringList types;
 
-    types.push_back(traits::precondition_name<IsEqualPrecondition<int>>::value);
-    types.push_back(traits::precondition_name<IsEqualPrecondition<double>>::value);
-    types.push_back(traits::precondition_name<IsEqualPrecondition<bool>>::value);
-
-    types.push_back(traits::precondition_name<IsGreaterPrecondition<int>>::value);
-    types.push_back(traits::precondition_name<IsGreaterPrecondition<double>>::value);
-
-    types.push_back(traits::precondition_name<IsLessPrecondition<int>>::value);
-    types.push_back(traits::precondition_name<IsLessPrecondition<double>>::value);
+    auto vecTypes = Factory::getKnownPreconditionTypes();
+    std::copy(vecTypes.begin(), vecTypes.end(), std::back_inserter(types));
 
     // ask user what type he wants to add, and default construct one
     QString type = QInputDialog::getItem(this, "select precondition type", "type", types, 0, false, &ok);
@@ -193,7 +186,7 @@ void EventDetailsWidget::onAddPreconditionClicked()
     if (ok)
     {
         // ask factory to create one
-        auto precondition = PreconditionFactory::createFromType(type);
+        auto precondition = Factory::createPreconditionFromType(type);
         m_event->addPrecondition(std::move(precondition));
 
         m_game->notifyEventChanged();

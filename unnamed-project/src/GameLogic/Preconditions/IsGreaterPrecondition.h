@@ -9,6 +9,7 @@ class IsGreaterPrecondition : public BinaryPreconditionBase<T>
 {
 public:
     IsGreaterPrecondition() = default;
+    IsGreaterPrecondition(const QDomElement &domElement);
     IsGreaterPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB);
     virtual ~IsGreaterPrecondition() {};
 
@@ -24,11 +25,15 @@ protected:
 
 //------------------------------------------------------------------------------
 template <typename T>
+IsGreaterPrecondition<T>::IsGreaterPrecondition(const QDomElement &domElement) :
+        BinaryPreconditionBase<T>(domElement)
+{}
+
+//------------------------------------------------------------------------------
+template <typename T>
 IsGreaterPrecondition<T>::IsGreaterPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB) :
         BinaryPreconditionBase<T>(std::move(exprA), std::move(exprB))
-{
-    // nothing to do here...
-}
+{}
 
 //------------------------------------------------------------------------------
 template <typename T>

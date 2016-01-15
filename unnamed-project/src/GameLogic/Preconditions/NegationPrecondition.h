@@ -2,6 +2,7 @@
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_NEGATION_PRECONDITION_H
 
 #include <memory>
+#include <QDomElement>
 
 #include "GameLogic/Preconditions/PreconditionBase.h"
 #include "GameLogic/Preconditions/Traits.h"
@@ -9,6 +10,7 @@
 class NegationPrecondition : public PreconditionBase
 {
 public:
+    NegationPrecondition(const QDomElement &domElement);
     NegationPrecondition(std::unique_ptr<PreconditionBase> condition);
     virtual ~NegationPrecondition();
 

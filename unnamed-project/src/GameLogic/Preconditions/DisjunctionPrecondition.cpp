@@ -6,6 +6,12 @@ DisjunctionPrecondition::DisjunctionPrecondition()
 }
 
 //------------------------------------------------------------------------------
+DisjunctionPrecondition::DisjunctionPrecondition(const QDomElement &domElement) :
+        BooleanPreconditionBase(domElement)
+{
+}
+
+//------------------------------------------------------------------------------
 DisjunctionPrecondition::~DisjunctionPrecondition()
 {
     // nothing to do here...

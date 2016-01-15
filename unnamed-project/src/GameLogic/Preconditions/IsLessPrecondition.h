@@ -9,6 +9,7 @@ class IsLessPrecondition : public BinaryPreconditionBase<T>
 {
 public:
     IsLessPrecondition() = default;
+    IsLessPrecondition(const QDomElement &domElement);
     IsLessPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB);
     virtual ~IsLessPrecondition() {};
 
@@ -24,11 +25,15 @@ protected:
 
 //------------------------------------------------------------------------------
 template <typename T>
+IsLessPrecondition<T>::IsLessPrecondition(const QDomElement &domElement) :
+        BinaryPreconditionBase<T>(domElement)
+{}
+
+//------------------------------------------------------------------------------
+template <typename T>
 IsLessPrecondition<T>::IsLessPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB) :
         BinaryPreconditionBase<T>(std::move(exprA), std::move(exprB))
-{
-    // nothing to do here...
-}
+{}
 
 //------------------------------------------------------------------------------
 template <typename T>
@@ -40,7 +45,6 @@ bool IsLessPrecondition<T>::evaluateCondition()
 //------------------------------------------------------------------------------
 template <typename T>
 QString IsLessPrecondition<T>::type()
-
 {
     return QString(traits::precondition_name<IsLessPrecondition<T>>::value);
 }

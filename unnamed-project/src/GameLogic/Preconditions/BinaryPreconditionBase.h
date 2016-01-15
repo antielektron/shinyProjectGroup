@@ -2,6 +2,7 @@
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_BINARY_PRECONDITION_BASE_H
 
 #include <memory>
+#include <QDomElement>
 
 #include "GameLogic/Preconditions/PreconditionBase.h"
 #include "GameLogic/Preconditions/Expressions/ExpressionConstant.h"
@@ -10,21 +11,13 @@ template <typename T>
 class BinaryPreconditionBase : public PreconditionBase
 {
 public:
-    BinaryPreconditionBase() :
-            m_exprA(new ExpressionConstant<T>()),
-            m_exprB(new ExpressionConstant<T>())
-    {}
-    BinaryPreconditionBase(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB) :
-            m_exprA(std::move(exprA)),
-            m_exprB(std::move(exprB))
-    {}
+    BinaryPreconditionBase();
+    BinaryPreconditionBase(const QDomElement &domElement);
+    BinaryPreconditionBase(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB);
 
     virtual ~BinaryPreconditionBase() {}
 
-    virtual QString string()
-    {
-        return m_exprA->string() + " " + this->type() + " " + m_exprB->string();
-    }
+    virtual QString string() override;
 
     virtual void writeToXml(QXmlStreamWriter &writer) override;
 
@@ -40,6 +33,13 @@ BinaryPreconditionBase<T>::BinaryPreconditionBase() :
         m_exprA(new ExpressionConstant<T>()),
         m_exprB(new ExpressionConstant<T>())
 {}
+
+//------------------------------------------------------------------------------
+template <typename T>
+BinaryPreconditionBase<T>::BinaryPreconditionBase(const QDomElement &domElement)
+{
+    // TODO expressions from DOM
+}
 
 //------------------------------------------------------------------------------
 template <typename T>

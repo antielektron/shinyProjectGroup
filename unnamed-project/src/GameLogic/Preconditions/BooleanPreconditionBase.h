@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <QDomElement>
 
 #include "GameLogic/Preconditions/PreconditionBase.h"
 
@@ -10,6 +11,7 @@ class BooleanPreconditionBase : public PreconditionBase
 {
 public:
     BooleanPreconditionBase();
+    BooleanPreconditionBase(const QDomElement &domElement);
     virtual ~BooleanPreconditionBase() {}
 
     void addCondition(std::unique_ptr<PreconditionBase> condition);

@@ -8,6 +8,7 @@ class ConjunctionPrecondition : public BooleanPreconditionBase
 {
 public:
     ConjunctionPrecondition();
+    ConjunctionPrecondition(const QDomElement &domElement);
     virtual ~ConjunctionPrecondition();
 
     virtual bool evaluateCondition() override;
