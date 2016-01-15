@@ -25,11 +25,14 @@ public:
 
     void writeToXml(QXmlStreamWriter &writer);
 
-    // TODO evaluate logic
+    // evaluate logic
     void triger();
 
     void setName(const QString &name);
     const QString &getName();
+
+    void setDescription(const QString &description);
+    const QString &getDescription();
 
     typedef std::vector<std::unique_ptr<PreconditionBase>>::iterator PreconditionIterator;
 
@@ -46,7 +49,8 @@ public:
     range<ActionIterator> getActions();
 
 private:
-    QString m_eventName;
+    QString m_name;
+    QString m_description;
     std::vector<std::unique_ptr<PreconditionBase>> m_preconditions;
 
     // ORDERED list

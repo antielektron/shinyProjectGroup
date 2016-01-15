@@ -12,14 +12,14 @@ Event::Event()
 {
 }
 
-Event::Event(const QString &name) : m_eventName(name)
+Event::Event(const QString &name) : m_name(name)
 {
 }
 
 Event::Event(GlobalState *state, const QDomElement &domElement)
 {
-    m_eventName = domElement.attribute("name");
-
+    m_name = domElement.attribute("name");
+    m_description = domElement.attribute("description");
 
     for (auto child = domElement.firstChildElement(); !child.isNull(); child = child.nextSiblingElement())
     {
@@ -45,7 +45,8 @@ Event::~Event()
 void Event::writeToXml(QXmlStreamWriter &writer)
 {
     writer.writeStartElement("Event");
-    writer.writeAttribute("name", m_eventName);
+    writer.writeAttribute("name", m_name);
+    writer.writeAttribute("description", m_description);
 
     for (auto &condition : m_preconditions)
     {
@@ -78,12 +79,22 @@ void Event::triger()
 
 void Event::setName(const QString &name)
 {
-    m_eventName = name;
+    m_name = name;
 }
 
 const QString &Event::getName()
 {
-    return m_eventName;
+    return m_name;
+}
+
+void Event::setDescription(const QString &description)
+{
+    m_description = description;
+}
+
+const QString &Event::getDescription()
+{
+    return m_description;
 }
 
 void Event::addPrecondition(std::unique_ptr<PreconditionBase> condition)

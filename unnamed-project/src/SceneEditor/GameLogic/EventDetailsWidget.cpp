@@ -9,7 +9,7 @@
 
 #include <QBoxLayout>
 #include <QInputDialog>
-#include <iostream>
+#include <QLabel>
 
 //------------------------------------------------------------------------------
 EventDetailsWidget::EventDetailsWidget(std::shared_ptr<SceneEditorGame> game, Event *event, QWidget *parent) :
@@ -32,30 +32,43 @@ EventDetailsWidget::~EventDetailsWidget()
 //------------------------------------------------------------------------------
 void EventDetailsWidget::generateWidgets()
 {
-    this->setLayout(new QHBoxLayout());
-
-    QWidget *containerLeft = new QWidget(this);
-    containerLeft->setLayout(new QVBoxLayout());
-    this->layout()->addWidget(containerLeft);
-
-
-    QWidget *containerRight = new QWidget(this);
-    containerRight->setLayout(new QVBoxLayout());
-    this->layout()->addWidget(containerRight);
-
+    this->setLayout(new QVBoxLayout());
 
     // Name
-    QWidget *containerName = new QWidget(containerLeft);
+    QWidget *containerName = new QWidget(this);
     containerName->setLayout(new QHBoxLayout());
-    containerName->layout()->setMargin(0);
-    containerLeft->layout()->addWidget(containerName);
+    this->layout()->addWidget(containerName);
+
+    QLabel *nameLabel = new QLabel("Name:", containerName);
+    containerName->layout()->addWidget(nameLabel);
 
     m_nameEdit = new QLineEdit(containerName);
     containerName->layout()->addWidget(m_nameEdit);
 
-    m_applyName = new QPushButton("Apply Name", containerName);
+    QLabel *descriptionLabel = new QLabel("Description:", containerName);
+    containerName->layout()->addWidget(descriptionLabel);
+
+    m_descriptionEdit = new QLineEdit(containerName);
+    containerName->layout()->addWidget(m_descriptionEdit);
+
+    m_applyName = new QPushButton("Apply", containerName);
     containerName->layout()->addWidget(m_applyName);
 
+
+    // Lower part
+    QWidget *containerLower = new QWidget(this);
+    containerLower->setLayout(new QHBoxLayout());
+    containerLower->layout()->setMargin(0);
+    this->layout()->addWidget(containerLower);
+
+    QWidget *containerLeft = new QWidget(containerLower);
+    containerLeft->setLayout(new QVBoxLayout());
+    containerLower->layout()->addWidget(containerLeft);
+
+
+    QWidget *containerRight = new QWidget(containerLower);
+    containerRight->setLayout(new QVBoxLayout());
+    containerLower->layout()->addWidget(containerRight);
 
     // Actions List + Buttons
     m_actions = new QListWidget(containerLeft);
@@ -164,6 +177,7 @@ void EventDetailsWidget::onEventsChanged()
 void EventDetailsWidget::onApplyNameClicked()
 {
     m_event->setName(m_nameEdit->text());
+    m_event->setDescription(m_descriptionEdit->text());
     m_game->notifyEventChanged();
 }
 

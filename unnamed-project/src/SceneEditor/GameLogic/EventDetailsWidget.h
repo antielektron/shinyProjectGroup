@@ -6,6 +6,7 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
+#include <QtWidgets/qlabel.h>
 
 #include "GameLogic/Event.h"
 
@@ -46,6 +47,7 @@ private:
     Event *m_event;
 
     QLineEdit *m_nameEdit;
+    QLineEdit *m_descriptionEdit;
     QPushButton *m_applyName;
 
     QListWidget *m_actions;

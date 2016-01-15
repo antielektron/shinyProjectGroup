@@ -75,7 +75,7 @@ void EventsWidget::onEventsChanged()
         for (auto it = events.begin(); it != events.end(); it++)
         {
             // TODO also information about preconditons n stuff
-            QListWidgetItem *item = new QListWidgetItem((*it)->getName(), m_events);
+            QListWidgetItem *item = new QListWidgetItem((*it)->getName() + " (" + (*it)->getDescription() + ")", m_events);
             m_eventMap[item] = it;
             m_events->addItem(item);
         }
