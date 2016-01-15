@@ -2,6 +2,7 @@
 
 #include "GameLogic/Expressions/ExpressionVariable.h"
 #include "GameLogic/Expressions/ExpressionConstant.h"
+#include "GameLogic/Expressions/ExpressionExtern.h"
 
 namespace Factory
 {
@@ -15,6 +16,11 @@ namespace Factory
         {
             QString key = string.mid(1, string.length()-2);
             return std::unique_ptr<Expression<int>>(new ExpressionVariable<int>(state, key));
+        }
+        else if (string.startsWith('{') && string.endsWith('}'))
+        {
+            QString key = string.mid(1, string.length()-2);
+            return std::unique_ptr<Expression<int>>(new ExpressionExtern<int>(state, key));
         }
         else
         {
@@ -42,6 +48,11 @@ namespace Factory
             QString key = string.mid(1, string.length()-2);
             return std::unique_ptr<Expression<double>>(new ExpressionVariable<double>(state, key));
         }
+        else if (string.startsWith('{') && string.endsWith('}'))
+        {
+            QString key = string.mid(1, string.length()-2);
+            return std::unique_ptr<Expression<double>>(new ExpressionExtern<double>(state, key));
+        }
         else
         {
             bool ok;
@@ -67,6 +78,11 @@ namespace Factory
         {
             QString key = string.mid(1, string.length()-2);
             return std::unique_ptr<Expression<bool>>(new ExpressionVariable<bool>(state, key));
+        }
+        else if (string.startsWith('{') && string.endsWith('}'))
+        {
+            QString key = string.mid(1, string.length()-2);
+            return std::unique_ptr<Expression<bool>>(new ExpressionExtern<bool>(state, key));
         }
         else if (string == "true")
         {

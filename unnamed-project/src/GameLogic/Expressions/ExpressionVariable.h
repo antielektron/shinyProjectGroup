@@ -1,8 +1,6 @@
 #ifndef UNNAMED_PROJECT_GAME_LOGIC_EXPRESSIONS_EXPRESSION_VARIABLE_H
 #define UNNAMED_PROJECT_GAME_LOGIC_EXPRESSIONS_EXPRESSION_VARIABLE_H
 
-#include <QString>
-
 #include "GameLogic/Expressions/Expression.h"
 #include "GameLogic/GlobalState.h"
 
