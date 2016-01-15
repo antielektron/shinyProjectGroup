@@ -1,6 +1,7 @@
 #include "SceneEditor/SceneEditorGame.h"
 #include "Scene/Object.h"
 #include "Scene/ObjectGroup.h"
+#include "GameLogic/Event.h"
 #include <cmath>
 #include <iostream>
 
@@ -62,20 +63,15 @@ void SceneEditorGame::tick(float dt)
     {
         float oldTime = m_scene->getGlobalState()->getValue(KEY_ATTRIBUTE_TIME).toFloat();
         m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_TIME,
-                                            QVariant(oldTime + dt),
-                                            AttributeDatatype::Float);
-
-        m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_DELTA_TIME,
-                                            QVariant(dt),
-                                            AttributeDatatype::Float);
+                                            QVariant(oldTime + dt));
     }
     // TODO: write player position in audomad!!!
 
-    // run Animataions and run handle game logic events:
+    // run animataions and run handle game logic events
     if (m_logicRunning && !m_logicPaused)
     {
-        m_scene->performEvents();
-        emit attributesChanged(m_scene->getGlobalState());
+        // only trigger the tick event that is triggered every tick ;)
+        m_scene->getGlobalState()->triggerEvent("tick");
     }
     if (!m_logicPaused)
     {
@@ -193,6 +189,14 @@ void SceneEditorGame::tick(float dt)
 Scene *SceneEditorGame::getScene()
 {
     return m_scene.get();
+}
+
+GlobalState *SceneEditorGame::getGlobalState()
+{
+    if (m_scene)
+        return m_scene->getGlobalState();
+    else
+        return nullptr;
 }
 
 ObjectGroup *SceneEditorGame::getRootObject()
@@ -319,7 +323,7 @@ void SceneEditorGame::stopLogic()
         m_logicRunning = false;
         m_logicPaused = false;
     }
-    emit attributesChanged(m_scene->getGlobalState());
+    emit attributesChanged(); // TODO hm
 }
 
 //------------------------------------------------------------------------------
@@ -332,51 +336,56 @@ void SceneEditorGame::togglePauseLogic()
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::addAttribute(const QString &key,
-                                   QVariant value,
-                                   AttributeDatatype type)
+void SceneEditorGame::addAttribute(const QString &key, const QVariant &value)
 {
-    m_scene->getGlobalState()->setValue(key, value, type);
-    m_scene->getGlobalState()->applyBuffer();
-    emit singleAttributeAdded(m_scene->getGlobalState(), key);
+    m_scene->getGlobalState()->setValue(key, value);
+    emit attributesChanged();
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::delAttribute(const QString &key)
+void SceneEditorGame::deleteAttribute(const QString &key)
 {
     m_scene->getGlobalState()->removeValue(key);
-    emit attributesChanged(m_scene->getGlobalState());
+    emit attributesChanged();
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::addEvent(const QString &eventKey,
-                               std::unique_ptr<PreconditionBase> *precondition,
-                               std::unique_ptr<ActionBase> *action)
+void SceneEditorGame::notifyAttributeChanged()
 {
-    m_scene->getGlobalState()->setEvent(eventKey,
-                                        std::move(*precondition),
-                                        std::move(*action));
-    emit eventsChanged(m_scene->getGlobalState());
+    emit attributesChanged();
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::delEvent(const QString &eventKey)
+void SceneEditorGame::addEvent(std::unique_ptr<Event> event)
 {
-    m_scene->getGlobalState()->removeEvent(eventKey);
-    emit eventsChanged(m_scene->getGlobalState());
+    m_scene->getGlobalState()->addEvent(std::move(event));
+    emit eventsChanged();
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::addAnimator(std::unique_ptr<Animator> *anim)
+void SceneEditorGame::deleteEvent(GlobalState::EventIterator iterator)
 {
-    m_scene->addAnimator(std::move(*anim));
+    m_scene->getGlobalState()->removeEvent(iterator);
+    emit eventsInvalidated();
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::notifyEventChanged()
+{
+    emit eventsChanged();
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorGame::addAnimator(std::unique_ptr<Animator> animator)
+{
+    m_scene->addAnimator(std::move(animator));
     emit animatorsChanged();
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::delAnimator(Animator *anim)
+void SceneEditorGame::deleteAnimator(Animator *animator)
 {
-    m_scene->delAnimator(anim);
+    m_scene->delAnimator(animator);
     emit animatorsChanged();
 }
 

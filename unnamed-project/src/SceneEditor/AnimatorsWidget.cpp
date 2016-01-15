@@ -7,6 +7,8 @@
 #include "GameLogic/Animators/PositionAnimator.h"
 #include "GameLogic/Animators/RotationAnimator.h"
 
+#include "GameLogic/GameLogicDatatypes.h"
+
 //------------------------------------------------------------------------------
 AnimatorsWidget::AnimatorsWidget(QWidget *parent) : QWidget (parent)
 {

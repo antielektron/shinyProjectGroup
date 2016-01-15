@@ -1,9 +1,10 @@
-#ifndef UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_EXPRESSIONS_EXPRESSION_VARIABLE_H
-#define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_EXPRESSIONS_EXPRESSION_VARIABLE_H
+#ifndef UNNAMED_PROJECT_GAME_LOGIC_EXPRESSIONS_EXPRESSION_VARIABLE_H
+#define UNNAMED_PROJECT_GAME_LOGIC_EXPRESSIONS_EXPRESSION_VARIABLE_H
 
 #include <QString>
 
-#include "GameLogic/Preconditions/Expressions/Expression.h"
+#include "GameLogic/Expressions/Expression.h"
+#include "GameLogic/GlobalState.h"
 
 template <typename T>
 class ExpressionVariable : public Expression<T>
@@ -17,10 +18,9 @@ public:
         m_globalState->getValue(m_key).value<T>();
     }
 
-    virtual QString toQString()
+    virtual QString string()
     {
-        return m_key;
-        // return QString("[") + m_key + "]";
+        return QString("[") + m_key + "]";
     }
 
 private:
@@ -28,4 +28,4 @@ private:
     QString m_key;
 };
 
-#endif // UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_EXPRESSIONS_EXPRESSION_BASE_H
+#endif // UNNAMED_PROJECT_GAME_LOGIC_EXPRESSIONS_EXPRESSION_BASE_H

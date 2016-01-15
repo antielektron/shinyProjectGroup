@@ -5,13 +5,11 @@
 #include <QVector3D>
 
 #include "Scene/Scene.h"
-#include "GameLogic/Actions/ArithmeticalAction.h"
-#include "GameLogic/Actions/InvertBooleanAction.h"
-#include "GameLogic/Actions/CopyAttributeAction.h"
-#include "GameLogic/GameLogicUtility.h"
-#include "GameLogic/GameLogicDatatypes.h"
+#include "GameLogic/Event.h"
 #include "GameLogic/Animators/RotationAnimator.h"
 #include "GameLogic/Animators/PositionAnimator.h"
+
+#include "GameLogic/GameLogicDatatypes.h"
 
 //------------------------------------------------------------------------------
 Scene::Scene()
@@ -78,8 +76,6 @@ void Scene::loadFromFile(const QString &filename)
         else if (tag == "Attributes")
         {
             readAttributesFromDom(currentElement);
-            m_globalState->applyBuffer();
-
         }
         else if (tag == "Animators")
         {
@@ -211,87 +207,14 @@ void Scene::readEventsFromDom(const QDomElement &domElem)
     {
         if (child.tagName() == "Event")
         {
-            QString key = child.attribute("key", "");
-            QString condition = child.attribute("condition", "");
-            QString actionType = child.attribute("actionType", "");
-
-            std::unique_ptr<PreconditionBase> precondition;
-
-            try {
-                precondition
-                        = std::move(GameLogicUtility::stringToPrecondition(m_globalState.get(),
-                                                                           condition.toStdString()));
-            }
-            catch (std::runtime_error &e)
-            {
-                std::cout << "Error while parsing condition: "
-                          << e.what()
-                          << std::endl;
-                return;
-            }
-
-            std::unique_ptr<ActionBase> action(nullptr);
-
-            if (actionType == "arithmetical")
-            {
-                std::map<QString, ArithmeticalOperationType> opMap =
-                {{"+", ArithmeticalOperationType::additionType},
-                 {"-", ArithmeticalOperationType::subtractionType},
-                 {"*", ArithmeticalOperationType::multiplicationType},
-                 {"/", ArithmeticalOperationType::divisionType}
-                };
-
-                QString opType = child.attribute("operationType", "");
-                QString dataType = child.attribute("dataType", "");
-                QString valA = child.attribute("valA", "");
-                QString valB = child.attribute("valB", "");
-                QString valDst = child.attribute("valDst", "");
-
-                if (dataType == "int")
-                {
-                    action.reset(new ArithmeticalAction<int>(
-                                     m_globalState.get(),
-                                     valA,
-                                     valB,
-                                     valDst,
-                                     opMap[opType]));
-                }
-                else if (dataType == "float")
-                {
-                    action.reset(new ArithmeticalAction<float>(
-                                     m_globalState.get(),
-                                     valA,
-                                     valB,
-                                     valDst,
-                                     opMap[opType]));
-                }
-            }
-            else if (actionType == "copy")
-            {
-                QString valSrc = child.attribute("valSrc","");
-                QString valDst = child.attribute("valDst","");
-
-                action.reset(new CopyAttributeAction(
-                                 m_globalState.get(),
-                                 valSrc,
-                                 valDst));
-            }
-            else if (actionType == "flip")
-            {
-                QString val = child.attribute("val","");
-
-                action.reset(new InvertBooleanAction(
-                                 m_globalState.get(),
-                                 val));
-            }
-
-            m_globalState->setEvent(key, std::move(precondition), std::move(action));
+            auto event = std::unique_ptr<Event>(new Event(m_globalState.get(), child));
+            m_globalState->addEvent(std::move(event));
         }
         else
         {
             std::cout << "WARNING: Unexpected tag '"
             << child.tagName().toStdString()
-            << "' in Event List"
+            << "' in Events List"
             << std::endl;
         }
     }
@@ -308,41 +231,39 @@ void Scene::readAttributesFromDom(const QDomElement &domElem)
 
             QString key = child.attribute("key","");
 
-            switch (qStringToType.at(type))
+            switch (QMetaType::type(type.toStdString().c_str()))
             {
-            case AttributeDatatype::Bool:
-            {
-                QString valueStr = child.attribute("value","");
-                m_globalState->setValue(key,
-                                        valueStr == "true",
-                                        AttributeDatatype::Bool);
-                break;
-            }
-            case AttributeDatatype::Int:
-            {
-                QString valueStr = child.attribute("value","");
-                m_globalState->setValue(key,
-                                        valueStr.toInt(),
-                                        AttributeDatatype::Int);
-                break;
-            }
-            case AttributeDatatype::Float:
-            {
-                QString valueStr = child.attribute("value","");
-                m_globalState->setValue(key,
-                                        valueStr.toFloat(),
-                                        AttributeDatatype::Float);
-                break;
-            }
-            case AttributeDatatype::QVector3D:
-            {
-                float x = child.attribute("x","").toFloat();
-                float y = child.attribute("y","").toFloat();
-                float z = child.attribute("z","").toFloat();
-                m_globalState->setValue(key,
-                                        QVector3D(x,y,z),
-                                        AttributeDatatype::QVector3D);
-            }
+                case QMetaType::Bool:
+                {
+                    QString valueStr = child.attribute("value", "");
+                    m_globalState->setValue(key,
+                                            valueStr == "true");
+                    break;
+                }
+                case QMetaType::Int:
+                {
+                    QString valueStr = child.attribute("value", "");
+                    m_globalState->setValue(key,
+                                            valueStr.toInt());
+                    break;
+                }
+                case QMetaType::Float:
+                {
+                    QString valueStr = child.attribute("value", "");
+                    m_globalState->setValue(key,
+                                            valueStr.toFloat());
+                    break;
+                }
+                case QMetaType::QVector3D:
+                {
+                    // TODO
+                }
+                default:
+                {
+                    std::cout << "WARNING: Unknown attribute type '"
+                    << type.toStdString()
+                    << std::endl;
+                }
             }
         }
         else
@@ -496,38 +417,45 @@ void Scene::saveToFile(const QString &filename)
 
         const QString &key = attribute.first;
         QVariant value = attribute.second;
-        AttributeDatatype type = m_globalState->getType(key);
 
         xmlWriter.writeAttribute("key", key);
-        xmlWriter.writeAttribute("type", typeToQString.at(type));
+        xmlWriter.writeAttribute("type", value.typeName());
 
-        switch(type)
+        switch((QMetaType::Type)value.type())
         {
-        case AttributeDatatype::Bool:
-        {
-            bool v = value.toBool();
-            xmlWriter.writeAttribute("value", v ? "true" : "false");
-            break;
-        }
-        case AttributeDatatype::Int:
-        {
-            int v = value.toInt();
-            xmlWriter.writeAttribute("value", QString::number(v));
-            break;
-        }
-        case AttributeDatatype::Float:
-        {
-            float v = value.toFloat();
-            xmlWriter.writeAttribute("value", QString::number(v));
-            break;
-        }
-        case AttributeDatatype::QVector3D:
-        {
-            QVector3D v = value.value<QVector3D>();
-            xmlWriter.writeAttribute("x", QString::number(v[0]));
-            xmlWriter.writeAttribute("y", QString::number(v[1]));
-            xmlWriter.writeAttribute("z", QString::number(v[2]));
-        }
+            case QMetaType::Bool:
+            {
+                bool v = value.toBool();
+                xmlWriter.writeAttribute("value", v ? "true" : "false");
+                break;
+            }
+            case QMetaType::Int:
+            {
+                int v = value.toInt();
+                xmlWriter.writeAttribute("value", QString::number(v));
+                break;
+            }
+            case QMetaType::Float:
+            {
+                float v = value.toFloat();
+                xmlWriter.writeAttribute("value", QString::number(v));
+                break;
+            }
+            case QMetaType::QVector3D:
+            {
+                QVector3D v = value.value<QVector3D>();
+                xmlWriter.writeAttribute("x", QString::number(v[0]));
+                xmlWriter.writeAttribute("y", QString::number(v[1]));
+                xmlWriter.writeAttribute("z", QString::number(v[2]));
+                break;
+            }
+            default:
+            {
+                std::cout << "WARNING: Unknown attribute type '"
+                << QMetaType::typeName(value.type())
+                << "' in GlobalState"
+                << std::endl;
+            }
         }
 
         xmlWriter.writeEndElement();
@@ -536,17 +464,13 @@ void Scene::saveToFile(const QString &filename)
 
     xmlWriter.writeEndElement();
 
-    // events:
+    // Events:
 
     xmlWriter.writeStartElement("Events");
 
     for (auto &event : m_globalState->getEvents())
     {
-        const QString &key = event.first;
-        PreconditionBase *condition = event.second.first.get();
-        ActionBase *action = event.second.second.get();
-
-        writeEvent(key, condition, action, xmlWriter);
+        event->writeToXml(xmlWriter);
     }
 
     xmlWriter.writeEndElement();
@@ -645,75 +569,6 @@ void Scene::writeScaling(const QVector3D &pos, QXmlStreamWriter &writer)
 }
 
 //------------------------------------------------------------------------------
-void Scene::writeEvent(const QString &key,
-                       PreconditionBase *condition,
-                       ActionBase *action,
-                       QXmlStreamWriter &writer)
-{
-    writer.writeStartElement("Event");
-
-    writer.writeAttribute("key", key);
-    writer.writeAttribute("condition", condition->toQString());
-
-    switch (action->getActionType())
-    {
-    case ActionType::ArithmeticalAction:
-    {
-        writer.writeAttribute("actionType", "arithmetical");
-
-        if (action->getDataType() == "int")
-        {
-            ArithmeticalAction<int> *arithAction =
-                    static_cast<ArithmeticalAction<int> *>(action);
-            writer.writeAttribute("operationType",
-                                  arithOperationTypeToQString.at(
-                                      arithAction->getOperationType()));
-
-            writer.writeAttribute("dataType", "int");
-            writer.writeAttribute("valA", arithAction->getLeftOperandKey());
-            writer.writeAttribute("valB", arithAction->getRightOperandKey());
-            writer.writeAttribute("valResult", arithAction->getDestKey());
-        }
-        else
-        {
-            ArithmeticalAction<float> *arithAction =
-                    static_cast<ArithmeticalAction<float> *>(action);
-            writer.writeAttribute("operationType",
-                                  arithOperationTypeToQString.at(
-                                      arithAction->getOperationType()));
-
-            writer.writeAttribute("dataType", "float");
-            writer.writeAttribute("valA", arithAction->getLeftOperandKey());
-            writer.writeAttribute("valB", arithAction->getRightOperandKey());
-            writer.writeAttribute("valDst", arithAction->getDestKey());
-        }
-
-        break;
-    }
-    case ActionType::CopyAttribute:
-    {
-        writer.writeAttribute("actionType", "copy");
-        CopyAttributeAction *copyAction =
-                static_cast<CopyAttributeAction *>(action);
-        writer.writeAttribute("valSrc", copyAction->getSourceKey());
-        writer.writeAttribute("valDst", copyAction->getDestKey());
-
-        break;
-    }
-    case ActionType::FlipBoolean:
-    {
-        writer.writeAttribute("actionType", "flip");
-        InvertBooleanAction *flipAction =
-                static_cast<InvertBooleanAction *>(action);
-        writer.writeAttribute("val", flipAction->getKey());
-        break;
-    }
-    }
-
-    writer.writeEndElement();
-}
-
-//------------------------------------------------------------------------------
 void Scene::writeAnimator(Animator *animation, QXmlStreamWriter &writer)
 {
     writer.writeStartElement("Animator");
@@ -781,19 +636,6 @@ void Scene::performAnimations(IObjectBaseObserver *listener)
             listener->notify(anim->getObject());
         }
     }
-}
-
-//------------------------------------------------------------------------------
-void Scene::performEvents()
-{
-    for (const auto &event : m_globalState->getEvents())
-    {
-        if (event.second.first->evaluateCondition())
-        {
-            event.second.second->performAction();
-        }
-    }
-    m_globalState->applyBuffer();
 }
 
 //------------------------------------------------------------------------------

@@ -11,56 +11,7 @@
 // from this!
 
 #define KEY_ATTRIBUTE_TIME "TIME"
-#define KEY_ATTRIBUTE_DELTA_TIME "DELTA_TIME"
 #define KEY_ATTRIBUTE_PLAYER "PLAYER_POSITION"
-#define KEY_ATTRIBUTE_TRUE "TRUE"
-#define KEY_ATTRIBUTE_FALSE "FALSE"
-
-enum class ArithmeticalOperationType
-{
-    additionType,
-    subtractionType,
-    multiplicationType,
-    divisionType
-};
-
-enum class AttributeDatatype
-{
-    Bool,
-    Int,
-    Float,
-    QVector3D
-};
-
-const std::map<AttributeDatatype, QString> typeToQString =
-{
-    { AttributeDatatype::Bool, "bool" },
-    { AttributeDatatype::Int, "int" },
-    { AttributeDatatype::Float, "float" },
-    { AttributeDatatype::QVector3D, "vector" }
-};
-
-const std::map<QString, AttributeDatatype> qStringToType =
-{
-    { "bool", AttributeDatatype::Bool },
-    { "int", AttributeDatatype::Int },
-    { "float", AttributeDatatype::Float },
-    { "vector", AttributeDatatype::QVector3D }
-};
-
-const std::map<ActionType, QString> actionToQString =
-{
-    { ActionType::ArithmeticalAction, "arithmetical" },
-    { ActionType::CopyAttribute, "copy" },
-    { ActionType::FlipBoolean, "flip" }
-};
-
-const std::map<QString, ActionType> qStringToAction =
-{
-    { "arithmetical", ActionType::ArithmeticalAction },
-    { "copy", ActionType::CopyAttribute },
-    { "flip", ActionType::FlipBoolean }
-};
 
 const std::map<AnimationType, QString> animationToQString =
 {
@@ -90,24 +41,4 @@ const std::map<InterpolationType, QString> interpolationToQString =
     { InterpolationType::Trigonometric, "trigonometric" }
 };
 
-const std::map<QString, ArithmeticalOperationType> qStringToArithOperationType =
-{
-    {"+", ArithmeticalOperationType::additionType},
-    {"-", ArithmeticalOperationType::subtractionType},
-    {"*", ArithmeticalOperationType::multiplicationType},
-    {"/", ArithmeticalOperationType::divisionType}
-};
-
-const std::map<ArithmeticalOperationType, QString> arithOperationTypeToQString =
-{
-    {ArithmeticalOperationType::additionType, "+"},
-    {ArithmeticalOperationType::subtractionType, "-"},
-    {ArithmeticalOperationType::multiplicationType, "*"},
-    {ArithmeticalOperationType::divisionType, "/"}
-};
-
-
-
-
-
-#endif //UNNAMED_PROJECT_GAME_LOGIC_DATATYPES_H
+#endif // UNNAMED_PROJECT_GAME_LOGIC_DATATYPES_H

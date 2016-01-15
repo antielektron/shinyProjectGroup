@@ -51,7 +51,6 @@ public:
     void removeModel(const std::string &modelName);
 
     void performAnimations(IObjectBaseObserver *listener = nullptr);
-    void performEvents();
     void instantlyFinishAnimations();
 
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
@@ -109,10 +108,6 @@ private:
     void writePosition(const QVector3D &position, QXmlStreamWriter &writer);
     void writeRotation(const QVector3D &rotation, QXmlStreamWriter &writer);
     void writeScaling(const QVector3D &scaling, QXmlStreamWriter &writer);
-    void writeEvent(const QString &key,
-                    PreconditionBase *condition,
-                    ActionBase *action,
-                    QXmlStreamWriter &writer);
     void writeAnimator(Animator *animation, QXmlStreamWriter &writer);
 
     void addToObjectList(ObjectGroup *group);

@@ -1,8 +1,6 @@
 #include "GameLogic/Preconditions/NegationPrecondition.h"
-#include "GameLogic/GlobalState.h"
 
-NegationPrecondition::NegationPrecondition(GlobalState *state, std::unique_ptr<PreconditionBase> condition) :
-        PreconditionBase(state),
+NegationPrecondition::NegationPrecondition(std::unique_ptr<PreconditionBase> condition) :
         m_condition(std::move(condition))
 {
 }
@@ -20,7 +18,24 @@ bool NegationPrecondition::evaluateCondition()
 }
 
 //------------------------------------------------------------------------------
-QString NegationPrecondition::toQString()
+QString NegationPrecondition::string()
 {
-    return QString("!(") + m_condition->toQString() + ")";
+    return this->type() + "(" + m_condition->string() + ")";
+}
+
+//------------------------------------------------------------------------------
+QString NegationPrecondition::type()
+{
+    return traits::precondition_name<NegationPrecondition>::value;
+}
+
+//------------------------------------------------------------------------------
+void NegationPrecondition::writeToXml(QXmlStreamWriter &writer)
+{
+    writer.writeStartElement("Precondition");
+    writer.writeAttribute("type", this->type());
+
+    m_condition->writeToXml(writer);
+
+    writer.writeEndElement();
 }

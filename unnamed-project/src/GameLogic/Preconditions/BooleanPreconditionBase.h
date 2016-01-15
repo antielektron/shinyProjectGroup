@@ -1,20 +1,29 @@
 #ifndef UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_BOOLEAN_PRECONDITION_BASE_H
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_BOOLEAN_PRECONDITION_BASE_H
 
-#include "GameLogic/Preconditions/PreconditionBase.h"
 #include <memory>
 #include <vector>
+#include <QDomElement>
+
+#include "GameLogic/Preconditions/PreconditionBase.h"
+
+class GlobalState;
 
 class BooleanPreconditionBase : public PreconditionBase
 {
 public:
-    BooleanPreconditionBase(GlobalState *state);
+    BooleanPreconditionBase();
+    BooleanPreconditionBase(GlobalState *state, const QDomElement &domElement);
     virtual ~BooleanPreconditionBase() {}
 
     void addCondition(std::unique_ptr<PreconditionBase> condition);
     void removeCondition(size_t i);
 
     // TODO begin/end
+
+    virtual QString string() override;
+
+    virtual void writeToXml(QXmlStreamWriter &writer) override;
 
 protected:
     std::vector<std::unique_ptr<PreconditionBase>> m_conditions;

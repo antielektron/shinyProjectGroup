@@ -2,21 +2,21 @@
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_PRECONDITION_BASE_H
 
 #include <QString>
-
-class GlobalState;
+#include <QXmlStreamWriter>
 
 class PreconditionBase
 {
 public:
-    PreconditionBase(GlobalState *state);
-    virtual ~PreconditionBase();
+    PreconditionBase() {};
+    virtual ~PreconditionBase() {};
 
     virtual bool evaluateCondition() = 0;
 
-    virtual QString toQString() = 0;
+    virtual QString string() = 0;
 
-protected:
-    GlobalState *m_globalState;
+    virtual QString type() = 0;
+
+    virtual void writeToXml(QXmlStreamWriter &writer) = 0;
 };
 
 #endif // UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_PRECONDITION_BASE_H
