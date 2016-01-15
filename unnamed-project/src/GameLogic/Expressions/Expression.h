@@ -7,7 +7,7 @@ template <typename T>
 class Expression
 {
 public:
-    typedef T ResultType;
+    typedef T ValueType;
 
     Expression() {}
     virtual ~Expression() {}

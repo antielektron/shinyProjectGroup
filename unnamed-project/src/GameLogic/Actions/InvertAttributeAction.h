@@ -11,6 +11,8 @@ template <typename T>
 class InvertAttributeAction : public ActionBase
 {
 public:
+    typedef T ValueType;
+
     InvertAttributeAction(GlobalState *state);
     InvertAttributeAction(GlobalState *state, const QString &key);
     InvertAttributeAction(GlobalState *state, const QDomElement &domElement);
@@ -26,6 +28,7 @@ public:
     virtual void writeToXml(QXmlStreamWriter &writer) override;
 
     inline const QString &getKey() { return m_key; }
+    inline void setKey(const QString &key) { m_key = key; }
 
 protected:
     GlobalState *m_globalState;

@@ -18,19 +18,22 @@ public:
     EventDetailsWidget(std::shared_ptr<SceneEditorGame> game, Event *event, QWidget *parent = nullptr);
     virtual ~EventDetailsWidget();
 
-public slots:
+protected slots:
     void onEventsChanged();
 
-protected slots:
     void onApplyNameClicked();
 
     void onAddActionClicked();
     void onRemoveActionClicked();
     void onEditActionClicked();
+    void onMoveActionUpClicked();
+    void onMoveActionDownClicked();
 
     void onAddPreconditionClicked();
     void onRemovePreconditionClicked();
     void onEditPreconditionClicked();
+    void onMovePreconditionUpClicked();
+    void onMovePreconditionDownClicked();
 
 protected:
     virtual void closeEvent(QCloseEvent *event) override;
@@ -50,12 +53,16 @@ private:
     QPushButton *m_addAction;
     QPushButton *m_removeAction;
     QPushButton *m_editAction;
+    QPushButton *m_moveActionUp;
+    QPushButton *m_moveActionDown;
 
     QListWidget *m_preconditions;
     std::map<QListWidgetItem *, Event::PreconditionIterator> m_preconditionsMap;
     QPushButton *m_addPrecondition;
     QPushButton *m_removePrecondition;
     QPushButton *m_editPrecondition;
+    QPushButton *m_movePreconditionUp;
+    QPushButton *m_movePreconditionDown;
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_GAME_LOGIC_EVENT_DETAILS_WIDGET_H

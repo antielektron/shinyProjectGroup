@@ -15,10 +15,9 @@ class EventsWidget : public QWidget
 public:
     EventsWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent = nullptr);
 
-public slots:
+protected slots:
     void onEventsChanged();
 
-protected slots:
     void onAddEventClicked();
     void onRemoveEventClicked();
     void onEditEventClicked();

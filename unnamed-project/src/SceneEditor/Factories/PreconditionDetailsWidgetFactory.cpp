@@ -21,7 +21,7 @@ template <typename Precondition>
 struct BinaryPreconditionMap
 {
     typedef Precondition PreconditionType;
-    typedef BinaryPreconditionWidget<typename Precondition::ExpressionType::ResultType> WidgetType;
+    typedef BinaryPreconditionWidget<typename Precondition::ExpressionType::ValueType> WidgetType;
 };
 
 

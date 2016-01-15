@@ -5,6 +5,7 @@
 #include "GameLogic/Factories/PreconditionFactory.h"
 #include "GameLogic/Factories/ActionFactory.h"
 #include "SceneEditor/Factories/PreconditionDetailsWidgetFactory.h"
+#include "SceneEditor/Factories/ActionDetailsWidgetFactory.h"
 
 #include <QBoxLayout>
 #include <QInputDialog>
@@ -74,6 +75,12 @@ void EventDetailsWidget::generateWidgets()
     m_editAction = new QPushButton("Edit Action", containerActionsButtons);
     containerActionsButtons->layout()->addWidget(m_editAction);
 
+    m_moveActionUp = new QPushButton("Up", containerActionsButtons);
+    containerActionsButtons->layout()->addWidget(m_moveActionUp);
+
+    m_moveActionDown = new QPushButton("Down", containerActionsButtons);
+    containerActionsButtons->layout()->addWidget(m_moveActionDown);
+
 
     // Preconditions List + Buttons
     m_preconditions = new QListWidget(containerRight);
@@ -92,6 +99,12 @@ void EventDetailsWidget::generateWidgets()
 
     m_editPrecondition = new QPushButton("Edit Precondition", containerPreconditionsButtons);
     containerPreconditionsButtons->layout()->addWidget(m_editPrecondition);
+
+    m_movePreconditionUp = new QPushButton("Up", containerPreconditionsButtons);
+    containerPreconditionsButtons->layout()->addWidget(m_movePreconditionUp);
+
+    m_movePreconditionDown = new QPushButton("Down", containerPreconditionsButtons);
+    containerPreconditionsButtons->layout()->addWidget(m_movePreconditionDown);
 }
 
 //------------------------------------------------------------------------------
@@ -102,10 +115,14 @@ void EventDetailsWidget::connectStuff()
     connect(m_addAction, SIGNAL(clicked()), this, SLOT(onAddActionClicked()));
     connect(m_removeAction, SIGNAL(clicked()), this, SLOT(onRemoveActionClicked()));
     connect(m_editAction, SIGNAL(clicked()), this, SLOT(onEditActionClicked()));
+    connect(m_moveActionUp, SIGNAL(clicked()), this, SLOT(onMoveActionUpClicked()));
+    connect(m_moveActionDown, SIGNAL(clicked()), this, SLOT(onMoveActionDownClicked()));
 
     connect(m_addPrecondition, SIGNAL(clicked()), this, SLOT(onAddPreconditionClicked()));
     connect(m_removePrecondition, SIGNAL(clicked()), this, SLOT(onRemovePreconditionClicked()));
     connect(m_editPrecondition, SIGNAL(clicked()), this, SLOT(onEditPreconditionClicked()));
+    connect(m_movePreconditionUp, SIGNAL(clicked()), this, SLOT(onMovePreconditionUpClicked()));
+    connect(m_movePreconditionDown, SIGNAL(clicked()), this, SLOT(onMovePreconditionDownClicked()));
 
     // connect to game
     connect(m_game.get(), SIGNAL(eventsChanged()), this, SLOT(onEventsChanged()));
@@ -190,9 +207,32 @@ void EventDetailsWidget::onEditActionClicked()
     auto it = m_actionsMap.find(m_actions->currentItem());
     if (it != m_actionsMap.end())
     {
-        // TODO
-        // auto widget = Factory::createActionDetailsWidget(m_game, it->second->get(), nullptr);
-        // widget->show();
+        auto widget = Factory::createActionDetailsWidget(m_game, it->second->get(), nullptr);
+        widget->show();
+    }
+}
+
+//------------------------------------------------------------------------------
+void EventDetailsWidget::onMoveActionDownClicked()
+{
+    int row = m_actions->currentRow();
+    if (row < m_actions->count()-1)
+    {
+        auto item = m_actions->takeItem(row);
+        m_actions->insertItem(row+1, item);
+        m_actions->setCurrentItem(item);
+    }
+}
+
+//------------------------------------------------------------------------------
+void EventDetailsWidget::onMoveActionUpClicked()
+{
+    int row = m_actions->currentRow();
+    if (row > 0)
+    {
+        auto item = m_actions->takeItem(row);
+        m_actions->insertItem(row-1, item);
+        m_actions->setCurrentItem(item);
     }
 }
 
@@ -238,6 +278,30 @@ void EventDetailsWidget::onEditPreconditionClicked()
     {
         auto widget = Factory::createPreconditionDetailsWidget(m_game, it->second->get(), nullptr);
         widget->show();
+    }
+}
+
+//------------------------------------------------------------------------------
+void EventDetailsWidget::onMovePreconditionDownClicked()
+{
+    int row = m_preconditions->currentRow();
+    if (row < m_preconditions->count()-1)
+    {
+        auto item = m_preconditions->takeItem(row);
+        m_preconditions->insertItem(row+1, item);
+        m_preconditions->setCurrentItem(item);
+    }
+}
+
+//------------------------------------------------------------------------------
+void EventDetailsWidget::onMovePreconditionUpClicked()
+{
+    int row = m_preconditions->currentRow();
+    if (row > 0)
+    {
+        auto item = m_preconditions->takeItem(row);
+        m_preconditions->insertItem(row-1, item);
+        m_preconditions->setCurrentItem(item);
     }
 }
 

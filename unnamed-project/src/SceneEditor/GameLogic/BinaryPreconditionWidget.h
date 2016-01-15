@@ -3,12 +3,13 @@
 
 #include <QMessageBox>
 
-#include "SceneEditor/GameLogic/BinaryPreconditionBaseWidget.h"
+#include "SceneEditor/GameLogic/BinaryBaseWidget.h"
+#include "GameLogic/GlobalState.h"
 #include "GameLogic/Preconditions/BinaryPreconditionBase.h"
 #include "GameLogic/Factories/ExpressionFactory.h"
 
 template <typename T>
-class BinaryPreconditionWidget : public BinaryPreconditionBaseWidget
+class BinaryPreconditionWidget : public BinaryBaseWidget
 {
 public:
     typedef BinaryPreconditionBase<T> PreconditionType;
@@ -27,7 +28,7 @@ private:
 
 template <typename T>
 BinaryPreconditionWidget<T>::BinaryPreconditionWidget(std::shared_ptr<SceneEditorGame> game, PreconditionType *condition, QWidget *parent) :
-        BinaryPreconditionBaseWidget(game, parent),
+        BinaryBaseWidget(game, parent),
         m_precondition(condition)
 {
     // Set UI values
@@ -43,13 +44,12 @@ BinaryPreconditionWidget<T>::~BinaryPreconditionWidget()
 template <typename T>
 void BinaryPreconditionWidget<T>::onApplyClicked()
 {
-    // TODO interpret values in m_lhs, m_rhs and create expression!
     try
     {
-        std::unique_ptr<ExpressionType> lhsExpr = Factory::createExpressionFromString<typename ExpressionType::ResultType>(m_game->getGlobalState(), m_lhs->text());
-        std::unique_ptr<ExpressionType> rhsExpr = Factory::createExpressionFromString<typename ExpressionType::ResultType>(m_game->getGlobalState(), m_rhs->text());
-
+        std::unique_ptr<ExpressionType> lhsExpr = Factory::createExpressionFromString<typename ExpressionType::ValueType>(m_game->getGlobalState(), m_lhs->text());
         m_precondition->setLhs(std::move(lhsExpr));
+
+        std::unique_ptr<ExpressionType> rhsExpr = Factory::createExpressionFromString<typename ExpressionType::ValueType>(m_game->getGlobalState(), m_rhs->text());
         m_precondition->setRhs(std::move(rhsExpr));
 
         m_game->notifyEventChanged();

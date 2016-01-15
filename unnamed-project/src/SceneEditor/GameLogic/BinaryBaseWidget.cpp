@@ -1,9 +1,9 @@
-#include "SceneEditor/GameLogic/BinaryPreconditionBaseWidget.h"
+#include "SceneEditor/GameLogic/BinaryBaseWidget.h"
 #include "SceneEditor/SceneEditorGame.h"
 
 #include <QBoxLayout>
 
-BinaryPreconditionBaseWidget::BinaryPreconditionBaseWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) :
+BinaryBaseWidget::BinaryBaseWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) :
         QWidget(parent),
         m_game(game)
 {
@@ -11,11 +11,11 @@ BinaryPreconditionBaseWidget::BinaryPreconditionBaseWidget(std::shared_ptr<Scene
     connectStuff();
 }
 
-BinaryPreconditionBaseWidget::~BinaryPreconditionBaseWidget()
+BinaryBaseWidget::~BinaryBaseWidget()
 {
 }
 
-void BinaryPreconditionBaseWidget::generateWidgets()
+void BinaryBaseWidget::generateWidgets()
 {
     this->setLayout(new QVBoxLayout());
 
@@ -36,16 +36,17 @@ void BinaryPreconditionBaseWidget::generateWidgets()
     this->layout()->addWidget(m_apply);
 }
 
-void BinaryPreconditionBaseWidget::connectStuff()
+void BinaryBaseWidget::connectStuff()
 {
     connect(m_apply, SIGNAL(clicked()), this, SLOT(onApplyClicked()));
 
     // connect to game, always close! (even when apply was clicked)
     connect(m_game.get(), SIGNAL(eventsChanged()), this, SLOT(close()));
     connect(m_game.get(), SIGNAL(eventsInvalidated()), this, SLOT(close()));
+    connect(m_game.get(), SIGNAL(sceneChanged()), this, SLOT(close()));
 }
 
-void BinaryPreconditionBaseWidget::closeEvent(QCloseEvent *event)
+void BinaryBaseWidget::closeEvent(QCloseEvent *event)
 {
     deleteLater();
     QWidget::closeEvent(event);
