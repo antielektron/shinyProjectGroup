@@ -7,8 +7,8 @@
 #include "GameLogic/Preconditions/IsLessPrecondition.h"
 #include "GameLogic/GlobalState.h"
 
-#include "GameLogic/Preconditions/Expressions/ExpressionVariable.h"
-#include "GameLogic/Preconditions/Expressions/ExpressionConstant.h"
+#include "GameLogic/Expressions/ExpressionVariable.h"
+#include "GameLogic/Expressions/ExpressionConstant.h"
 
 #include <cassert>
 #include <stdexcept>

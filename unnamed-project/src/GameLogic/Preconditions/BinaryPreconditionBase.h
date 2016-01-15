@@ -5,12 +5,14 @@
 #include <QDomElement>
 
 #include "GameLogic/Preconditions/PreconditionBase.h"
-#include "GameLogic/Preconditions/Expressions/ExpressionConstant.h"
+#include "GameLogic/Expressions/ExpressionConstant.h"
 
 template <typename T>
 class BinaryPreconditionBase : public PreconditionBase
 {
 public:
+    typedef Expression<T> ExpressionType;
+
     BinaryPreconditionBase();
     BinaryPreconditionBase(const QDomElement &domElement);
     BinaryPreconditionBase(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB);
@@ -20,6 +22,12 @@ public:
     virtual QString string() override;
 
     virtual void writeToXml(QXmlStreamWriter &writer) override;
+
+    inline Expression<T> *getLhs() { return m_exprA.get(); }
+    inline Expression<T> *getRhs() { return m_exprB.get(); }
+
+    void setLhs(std::unique_ptr<Expression<T>> expr) { m_exprA = std::move(expr); }
+    void setRhs(std::unique_ptr<Expression<T>> expr) { m_exprB = std::move(expr); }
 
 protected:
     std::unique_ptr<Expression<T>> m_exprA;

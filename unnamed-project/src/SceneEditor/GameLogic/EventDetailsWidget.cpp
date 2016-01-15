@@ -7,6 +7,7 @@
 #include "GameLogic/Preconditions/IsLessPrecondition.h"
 
 #include "GameLogic/Factories/PreconditionFactory.h"
+#include "SceneEditor/Factories/PreconditionDetailsWidgetFactory.h"
 
 #include <QBoxLayout>
 #include <QInputDialog>
@@ -207,7 +208,12 @@ void EventDetailsWidget::onRemovePreconditionClicked()
 //------------------------------------------------------------------------------
 void EventDetailsWidget::onEditPreconditionClicked()
 {
-    // TODO create widget depending on preconditon type
+    auto it = m_preconditionsMap.find(m_preconditions->currentItem());
+    if (it != m_preconditionsMap.end())
+    {
+        auto widget = Factory::createPreconditionDetailsWidget(m_game, it->second->get(), nullptr);
+        widget->show();
+    }
 }
 
 void EventDetailsWidget::closeEvent(QCloseEvent *event)
