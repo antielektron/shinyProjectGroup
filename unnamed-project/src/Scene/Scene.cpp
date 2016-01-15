@@ -15,13 +15,13 @@
 Scene::Scene()
 {
     m_rootGroup.setName("SceneRoot");
-    m_globalState.reset(new GlobalState());
+    m_globalState.reset(new GlobalState(this));
 }
 
 //------------------------------------------------------------------------------
 Scene::Scene(const QString &filename)
 {
-    m_globalState.reset(new GlobalState());
+    m_globalState.reset(new GlobalState(this));
     m_rootGroup.setName("SceneRoot");
     loadFromFile(filename);
 }

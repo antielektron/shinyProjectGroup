@@ -12,14 +12,17 @@
 
 class Animator;
 class Event;
+class Scene;
 
 class GlobalState
 {
 public:
-    GlobalState();
+    GlobalState(Scene *scene);
     ~GlobalState();
 
     void init();
+
+    Scene *getScene();
 
     // stash current state, so we can apply it later again
     void stash();
@@ -51,6 +54,8 @@ public:
 protected:
     void initializeConstantAttributes();
     void notifyListeners(const QString &key);
+
+    Scene *m_scene;
 
     std::map<QString, QVariant> m_attributes;
     std::map<QString, std::vector<Animator *>> m_animatorsPerAttribute;

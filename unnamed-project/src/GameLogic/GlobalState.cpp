@@ -7,7 +7,8 @@
 #include <iostream>
 
 //------------------------------------------------------------------------------
-GlobalState::GlobalState()
+GlobalState::GlobalState(Scene *scene) :
+        m_scene(scene)
 {
     init();
 }
@@ -23,6 +24,12 @@ void GlobalState::init()
 {
     m_attributes.clear();
     initializeConstantAttributes();
+}
+
+//------------------------------------------------------------------------------
+Scene *GlobalState::getScene()
+{
+    return m_scene;
 }
 
 //------------------------------------------------------------------------------
