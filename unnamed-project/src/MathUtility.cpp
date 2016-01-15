@@ -12,7 +12,7 @@ struct AngleComparator{
     }
 };
 
-void mathUtility::getMinimalBoundingBox(
+void MathUtility::getMinimalBoundingBox(
         const std::vector<QVector2D> &points,
         QVector2D &lowerPoint,
         QVector2D &upperPoint,
@@ -104,7 +104,7 @@ inline float T(const QVector2D &a, const QVector2D &b, const QVector2D &c)
     return (b[0] - a[0])*(c[1] - a[1]) - (c[0] - a[0])*(b[1] - a[1]);
 }
 
-void mathUtility::getConvexHull(const std::vector<QVector2D> &points,
+void MathUtility::getConvexHull(const std::vector<QVector2D> &points,
                                 std::vector<QVector2D> &hull)
 {
     assert(points.size() > 2);

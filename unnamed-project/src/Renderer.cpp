@@ -360,11 +360,11 @@ void Renderer::render(GLuint fbo, Scene *scene)
     };
 
     // Transform corners into light view space
-    mathUtility::transformVectors(screenToLightTransformation, minCorners);
-    mathUtility::transformVectors(screenToLightTransformation, maxCorners);
+    MathUtility::transformVectors(screenToLightTransformation, minCorners);
+    MathUtility::transformVectors(screenToLightTransformation, maxCorners);
 
     // Transform corners into light view space
-    mathUtility::transformVectors(scene->getCameraProjection().inverted(), nearFarCorners);
+    MathUtility::transformVectors(scene->getCameraProjection().inverted(), nearFarCorners);
     // NOTE: z values are inverted! multiply by -1
     float nearPlane = -nearFarCorners[0].z();
     float farPlane = -nearFarCorners[1].z();
@@ -425,8 +425,8 @@ void Renderer::render(GLuint fbo, Scene *scene)
         QVector2D minCorner2D;
         float frustumRotationAngle;
 
-        mathUtility::getConvexHull(corners2D, hull2D);
-        mathUtility::getMinimalBoundingBox(hull2D,
+        MathUtility::getConvexHull(corners2D, hull2D);
+        MathUtility::getMinimalBoundingBox(hull2D,
                                            minCorner2D,
                                            maxCorner2D,
                                            frustumRotationAngle);
