@@ -19,6 +19,8 @@ public:
 
     virtual QString string() override;
 
+    virtual void writeToXml(QXmlStreamWriter &writer) override;
+
 protected:
     std::vector<std::unique_ptr<PreconditionBase>> m_conditions;
 };

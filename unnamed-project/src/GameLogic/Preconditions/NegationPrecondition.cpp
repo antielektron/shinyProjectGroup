@@ -20,11 +20,22 @@ bool NegationPrecondition::evaluateCondition()
 //------------------------------------------------------------------------------
 QString NegationPrecondition::string()
 {
-    return name() + "(" + m_condition->string() + ")";
+    return this->type() + "(" + m_condition->string() + ")";
 }
 
 //------------------------------------------------------------------------------
-QString NegationPrecondition::name()
+QString NegationPrecondition::type()
 {
     return traits::precondition_name<NegationPrecondition>::value;
+}
+
+//------------------------------------------------------------------------------
+void NegationPrecondition::writeToXml(QXmlStreamWriter &writer)
+{
+    writer.writeStartElement("Precondition");
+    writer.writeAttribute("type", this->type());
+
+    m_condition->writeToXml(writer);
+
+    writer.writeEndElement();
 }

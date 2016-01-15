@@ -14,7 +14,7 @@ public:
 
     virtual bool evaluateCondition() override;
 
-    virtual QString name() override;
+    virtual QString type() override;
 
 protected:
     using BinaryPreconditionBase<T>::m_exprA;
@@ -39,7 +39,7 @@ bool IsGreaterPrecondition<T>::evaluateCondition()
 
 //------------------------------------------------------------------------------
 template <typename T>
-QString IsGreaterPrecondition<T>::name()
+QString IsGreaterPrecondition<T>::type()
 {
     return QString(traits::precondition_name<IsGreaterPrecondition<T>>::value);
 }

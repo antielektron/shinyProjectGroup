@@ -193,7 +193,7 @@ void EventDetailsWidget::onAddPreconditionClicked()
     if (ok)
     {
         // ask factory to create one
-        auto precondition = PreconditionFactory::createFromName(type);
+        auto precondition = PreconditionFactory::createFromType(type);
         m_event->addPrecondition(std::move(precondition));
 
         m_game->notifyEventChanged();
@@ -214,7 +214,7 @@ void EventDetailsWidget::onRemovePreconditionClicked()
 //------------------------------------------------------------------------------
 void EventDetailsWidget::onEditPreconditionClicked()
 {
-    // TODO
+    // TODO create widget depending on preconditon type
 }
 
 void EventDetailsWidget::closeEvent(QCloseEvent *event)

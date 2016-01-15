@@ -12,8 +12,9 @@ public:
 
     virtual bool evaluateCondition() override;
 
-    virtual QString name() override;
+    virtual QString type() override;
 };
+
 
 namespace traits
 {

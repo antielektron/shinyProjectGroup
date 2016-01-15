@@ -23,7 +23,7 @@ bool ConjunctionPrecondition::evaluateCondition()
 }
 
 //------------------------------------------------------------------------------
-QString ConjunctionPrecondition::name()
+QString ConjunctionPrecondition::type()
 {
     return traits::precondition_name<ConjunctionPrecondition>::value;
 }

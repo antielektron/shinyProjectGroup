@@ -23,7 +23,7 @@ bool DisjunctionPrecondition::evaluateCondition()
 }
 
 //------------------------------------------------------------------------------
-QString DisjunctionPrecondition::name()
+QString DisjunctionPrecondition::type()
 {
     return traits::precondition_name<DisjunctionPrecondition>::value;
 }

@@ -14,12 +14,13 @@ public:
 
     virtual bool evaluateCondition() override;
 
-    virtual QString name() override;
+    virtual QString type() override;
 
 protected:
     using BinaryPreconditionBase<T>::m_exprA;
     using BinaryPreconditionBase<T>::m_exprB;
 };
+
 
 //------------------------------------------------------------------------------
 template <typename T>
@@ -38,11 +39,12 @@ bool IsLessPrecondition<T>::evaluateCondition()
 
 //------------------------------------------------------------------------------
 template <typename T>
-QString IsLessPrecondition<T>::name()
+QString IsLessPrecondition<T>::type()
 
 {
     return QString(traits::precondition_name<IsLessPrecondition<T>>::value);
 }
+
 
 namespace traits
 {

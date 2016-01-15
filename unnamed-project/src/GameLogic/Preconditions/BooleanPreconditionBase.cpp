@@ -20,7 +20,7 @@ void BooleanPreconditionBase::removeCondition(size_t i)
 QString BooleanPreconditionBase::string()
 {
     QString result;
-    QString opName = this->name();
+    QString opName = this->type();
 
     for (auto it = m_conditions.begin(); it != m_conditions.end(); it++)
     {
@@ -30,4 +30,18 @@ QString BooleanPreconditionBase::string()
     }
 
     return result;
+}
+
+//------------------------------------------------------------------------------
+void BooleanPreconditionBase::writeToXml(QXmlStreamWriter &writer)
+{
+    writer.writeStartElement("Precondtion");
+    writer.writeAttribute("type", this->type());
+
+    for (auto &condition : m_conditions)
+    {
+        condition->writeToXml(writer);
+    }
+
+    writer.writeEndElement();
 }
