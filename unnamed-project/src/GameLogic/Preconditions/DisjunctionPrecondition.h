@@ -4,10 +4,12 @@
 #include "GameLogic/Preconditions/BooleanPreconditionBase.h"
 #include "GameLogic/Preconditions/Traits.h"
 
+class GlobalState;
+
 class DisjunctionPrecondition : public BooleanPreconditionBase
 {
 public:
-    DisjunctionPrecondition(const QDomElement &domElement);
+    DisjunctionPrecondition(GlobalState *state, const QDomElement &domElement);
     DisjunctionPrecondition();
     virtual ~DisjunctionPrecondition();
 

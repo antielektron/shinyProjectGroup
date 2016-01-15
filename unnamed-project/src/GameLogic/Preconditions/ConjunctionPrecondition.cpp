@@ -6,8 +6,8 @@ ConjunctionPrecondition::ConjunctionPrecondition()
 }
 
 //------------------------------------------------------------------------------
-ConjunctionPrecondition::ConjunctionPrecondition(const QDomElement &domElement) :
-        BooleanPreconditionBase(domElement)
+ConjunctionPrecondition::ConjunctionPrecondition(GlobalState *state, const QDomElement &domElement) :
+        BooleanPreconditionBase(state,domElement)
 {
 }
 

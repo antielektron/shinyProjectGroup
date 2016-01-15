@@ -9,7 +9,7 @@ class IsEqualPrecondition : public BinaryPreconditionBase<T>
 {
 public:
     IsEqualPrecondition() = default;
-    IsEqualPrecondition(const QDomElement &domElement);
+    IsEqualPrecondition(GlobalState *state, const QDomElement &domElement);
     IsEqualPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB);
     virtual ~IsEqualPrecondition() {};
 
@@ -25,8 +25,8 @@ protected:
 
 //------------------------------------------------------------------------------
 template <typename T>
-IsEqualPrecondition<T>::IsEqualPrecondition(const QDomElement &domElement) :
-        BinaryPreconditionBase<T>(domElement)
+IsEqualPrecondition<T>::IsEqualPrecondition(GlobalState *state, const QDomElement &domElement) :
+        BinaryPreconditionBase<T>(state, domElement)
 {}
 
 //------------------------------------------------------------------------------

@@ -7,11 +7,13 @@
 
 #include "GameLogic/Preconditions/PreconditionBase.h"
 
+class GlobalState;
+
 class BooleanPreconditionBase : public PreconditionBase
 {
 public:
     BooleanPreconditionBase();
-    BooleanPreconditionBase(const QDomElement &domElement);
+    BooleanPreconditionBase(GlobalState *state, const QDomElement &domElement);
     virtual ~BooleanPreconditionBase() {}
 
     void addCondition(std::unique_ptr<PreconditionBase> condition);

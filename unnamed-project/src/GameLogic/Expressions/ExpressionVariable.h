@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "GameLogic/Expressions/Expression.h"
+#include "GameLogic/GlobalState.h"
 
 template <typename T>
 class ExpressionVariable : public Expression<T>

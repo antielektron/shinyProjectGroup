@@ -16,7 +16,7 @@ Event::Event(const QString &name) : m_eventName(name)
 {
 }
 
-Event::Event(const QDomElement &domElement)
+Event::Event(GlobalState *state, const QDomElement &domElement)
 {
     m_eventName = domElement.attribute("name");
 
@@ -27,12 +27,12 @@ Event::Event(const QDomElement &domElement)
 
         if (tag == "Precondition")
         {
-            auto precondition = Factory::createPreconditionFromDomElement(child);
+            auto precondition = Factory::createPreconditionFromDomElement(state, child);
             m_preconditions.push_back(std::move(precondition));
         }
         else if (tag == "Action")
         {
-            auto action = Factory::createActionFromDomElement(child);
+            auto action = Factory::createActionFromDomElement(state, child);
             m_actions.push_back(std::move(action));
         }
     }

@@ -12,6 +12,7 @@
 
 class PreconditionBase;
 class ActionBase;
+class GlobalState;
 
 class Event
 {
@@ -19,7 +20,7 @@ public:
     // default -> empty event.
     Event();
     Event(const QString &name);
-    Event(const QDomElement &domElement);
+    Event(GlobalState *state, const QDomElement &domElement);
     ~Event();
 
     void writeToXml(QXmlStreamWriter &writer);

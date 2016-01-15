@@ -6,8 +6,8 @@ DisjunctionPrecondition::DisjunctionPrecondition()
 }
 
 //------------------------------------------------------------------------------
-DisjunctionPrecondition::DisjunctionPrecondition(const QDomElement &domElement) :
-        BooleanPreconditionBase(domElement)
+DisjunctionPrecondition::DisjunctionPrecondition(GlobalState *state, const QDomElement &domElement) :
+        BooleanPreconditionBase(state, domElement)
 {
 }
 

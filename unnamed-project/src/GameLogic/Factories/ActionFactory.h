@@ -6,11 +6,12 @@
 #include <QDomElement>
 
 class ActionBase;
+class GlobalState;
 
 namespace Factory
 {
     std::unique_ptr<ActionBase> createActionFromType(const QString &type);
-    std::unique_ptr<ActionBase> createActionFromDomElement(const QDomElement &domElement);
+    std::unique_ptr<ActionBase> createActionFromDomElement(GlobalState *state, const QDomElement &domElement);
 
     std::vector<QString> getKnownActionTypes();
 }

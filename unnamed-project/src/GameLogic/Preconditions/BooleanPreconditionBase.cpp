@@ -5,7 +5,7 @@ BooleanPreconditionBase::BooleanPreconditionBase()
 {}
 
 //------------------------------------------------------------------------------
-BooleanPreconditionBase::BooleanPreconditionBase(const QDomElement &domElement)
+BooleanPreconditionBase::BooleanPreconditionBase(GlobalState *state, const QDomElement &domElement)
 {
     // TODO iterate over children, use factory!
 }

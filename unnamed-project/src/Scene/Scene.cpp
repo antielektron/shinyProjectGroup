@@ -212,91 +212,14 @@ void Scene::readEventsFromDom(const QDomElement &domElem)
     {
         if (child.tagName() == "Event")
         {
-            QString key = child.attribute("key", "");
-            QString condition = child.attribute("condition", "");
-            QString actionType = child.attribute("actionType", "");
-
-            std::unique_ptr<PreconditionBase> precondition;
-
-            try {
-                precondition
-                        = std::move(GameLogicUtility::stringToPrecondition(m_globalState.get(),
-                                                                           condition.toStdString()));
-            }
-            catch (std::runtime_error &e)
-            {
-                std::cout << "Error while parsing condition: "
-                          << e.what()
-                          << std::endl;
-                return;
-            }
-
-            std::unique_ptr<ActionBase> action(nullptr);
-
-            if (actionType == "arithmetical")
-            {
-                std::map<QString, ArithmeticalOperationType> opMap =
-                {{"+", ArithmeticalOperationType::additionType},
-                 {"-", ArithmeticalOperationType::subtractionType},
-                 {"*", ArithmeticalOperationType::multiplicationType},
-                 {"/", ArithmeticalOperationType::divisionType}
-                };
-
-                QString opType = child.attribute("operationType", "");
-                QString dataType = child.attribute("dataType", "");
-                QString valA = child.attribute("valA", "");
-                QString valB = child.attribute("valB", "");
-                QString valDst = child.attribute("valDst", "");
-
-                if (dataType == "int")
-                {
-                    action.reset(new ArithmeticalAction<int>(
-                                     m_globalState.get(),
-                                     valA,
-                                     valB,
-                                     valDst,
-                                     opMap[opType]));
-                }
-                else if (dataType == "float")
-                {
-                    action.reset(new ArithmeticalAction<float>(
-                                     m_globalState.get(),
-                                     valA,
-                                     valB,
-                                     valDst,
-                                     opMap[opType]));
-                }
-            }
-            else if (actionType == "copy")
-            {
-                QString valSrc = child.attribute("valSrc","");
-                QString valDst = child.attribute("valDst","");
-
-                action.reset(new CopyAttributeAction(
-                                 m_globalState.get(),
-                                 valSrc,
-                                 valDst));
-            }
-            else if (actionType == "flip")
-            {
-                QString val = child.attribute("val","");
-
-                action.reset(new InvertBooleanAction(
-                                 m_globalState.get(),
-                                 val));
-            }
-
-            auto event = std::unique_ptr<Event>(new Event());
-            event->setName(key);
-            event->addPrecondition(std::move(precondition));
-            event->addAction(std::move(action));
+            auto event = std::unique_ptr<Event>(new Event(m_globalState.get(), child));
             m_globalState->addEvent(std::move(event));
         }
         else
         {
             std::cout << "WARNING: Unexpected tag '"
             << child.tagName().toStdString()
-            << "' in Event List"
+            << "' in Events List"
             << std::endl;
         }
     }
@@ -541,18 +464,13 @@ void Scene::saveToFile(const QString &filename)
 
     xmlWriter.writeEndElement();
 
-    // events:
+    // Events:
 
     xmlWriter.writeStartElement("Events");
 
-    // TODO
     for (auto &event : m_globalState->getEvents())
     {
-        const QString &key = event->getName();
-        PreconditionBase *condition = event->getPreconditions().begin()->get();
-        ActionBase *action = event->getActions().begin()->get();
-
-        writeEvent(key, condition, action, xmlWriter);
+        event->writeToXml(xmlWriter);
     }
 
     xmlWriter.writeEndElement();

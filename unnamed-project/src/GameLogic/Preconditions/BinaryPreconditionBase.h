@@ -7,6 +7,8 @@
 #include "GameLogic/Preconditions/PreconditionBase.h"
 #include "GameLogic/Expressions/ExpressionConstant.h"
 
+#include "GameLogic/Factories/ExpressionFactory.h"
+
 template <typename T>
 class BinaryPreconditionBase : public PreconditionBase
 {
@@ -14,7 +16,7 @@ public:
     typedef Expression<T> ExpressionType;
 
     BinaryPreconditionBase();
-    BinaryPreconditionBase(const QDomElement &domElement);
+    BinaryPreconditionBase(GlobalState *state, const QDomElement &domElement);
     BinaryPreconditionBase(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB);
 
     virtual ~BinaryPreconditionBase() {}
@@ -44,9 +46,14 @@ BinaryPreconditionBase<T>::BinaryPreconditionBase() :
 
 //------------------------------------------------------------------------------
 template <typename T>
-BinaryPreconditionBase<T>::BinaryPreconditionBase(const QDomElement &domElement)
+BinaryPreconditionBase<T>::BinaryPreconditionBase(GlobalState *state, const QDomElement &domElement)
 {
     // TODO expressions from DOM
+    QString lhs = domElement.attribute("lhs");
+    QString rhs = domElement.attribute("rhs");
+
+    m_exprA = Factory::createExpressionFromString<T>(state, lhs);
+    m_exprB = Factory::createExpressionFromString<T>(state, rhs);
 }
 
 //------------------------------------------------------------------------------
@@ -70,7 +77,6 @@ void BinaryPreconditionBase<T>::writeToXml(QXmlStreamWriter &writer)
     writer.writeStartElement("Precondition");
     writer.writeAttribute("type", this->type());
 
-    // TODO
     writer.writeAttribute("lhs", m_exprA->string());
     writer.writeAttribute("rhs", m_exprB->string());
 

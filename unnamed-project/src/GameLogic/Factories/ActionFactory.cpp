@@ -9,7 +9,7 @@ std::unique_ptr<ActionBase> Factory::createActionFromType(const QString &type)
     throw std::runtime_error("Not implemented yet");
 }
 
-std::unique_ptr<ActionBase> Factory::createActionFromDomElement(const QDomElement &domElement)
+std::unique_ptr<ActionBase> Factory::createActionFromDomElement(GlobalState *state, const QDomElement &domElement)
 {
     throw std::runtime_error("Not implemented yet");
 }

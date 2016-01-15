@@ -63,6 +63,7 @@ void EventsWidget::connectStuff()
     // connecto to game
     connect(m_game.get(), SIGNAL(eventsChanged()), this, SLOT(onEventsChanged()));
     connect(m_game.get(), SIGNAL(eventsInvalidated()), this, SLOT(onEventsChanged()));
+    connect(m_game.get(), SIGNAL(sceneChanged()), this, SLOT(onEventsChanged()));
 }
 
 //------------------------------------------------------------------------------

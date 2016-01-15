@@ -9,7 +9,7 @@ class IsLessPrecondition : public BinaryPreconditionBase<T>
 {
 public:
     IsLessPrecondition() = default;
-    IsLessPrecondition(const QDomElement &domElement);
+    IsLessPrecondition(GlobalState *state, const QDomElement &domElement);
     IsLessPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB);
     virtual ~IsLessPrecondition() {};
 
@@ -25,8 +25,8 @@ protected:
 
 //------------------------------------------------------------------------------
 template <typename T>
-IsLessPrecondition<T>::IsLessPrecondition(const QDomElement &domElement) :
-        BinaryPreconditionBase<T>(domElement)
+IsLessPrecondition<T>::IsLessPrecondition(GlobalState *state, const QDomElement &domElement) :
+        BinaryPreconditionBase<T>(state, domElement)
 {}
 
 //------------------------------------------------------------------------------

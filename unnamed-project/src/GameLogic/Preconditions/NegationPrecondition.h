@@ -7,10 +7,12 @@
 #include "GameLogic/Preconditions/PreconditionBase.h"
 #include "GameLogic/Preconditions/Traits.h"
 
+class GlobalState;
+
 class NegationPrecondition : public PreconditionBase
 {
 public:
-    NegationPrecondition(const QDomElement &domElement);
+    NegationPrecondition(GlobalState *state, const QDomElement &domElement);
     NegationPrecondition(std::unique_ptr<PreconditionBase> condition);
     virtual ~NegationPrecondition();
 

@@ -22,15 +22,15 @@ struct CreatePreconditionHelper<T, Args...>
         }
     }
 
-    static std::unique_ptr<PreconditionBase> create(const QString &type, const QDomElement &domElement)
+    static std::unique_ptr<PreconditionBase> create(const QString &type, GlobalState *state, const QDomElement &domElement)
     {
         if (type == traits::precondition_name<T>::value)
         {
-            return std::unique_ptr<PreconditionBase>(new T(domElement));
+            return std::unique_ptr<PreconditionBase>(new T(state, domElement));
         }
         else
         {
-            return CreatePreconditionHelper<Args...>::create(type, domElement);
+            return CreatePreconditionHelper<Args...>::create(type, state, domElement);
         }
     }
 
@@ -49,7 +49,7 @@ struct CreatePreconditionHelper<>
         throw std::runtime_error("Unknown precondition type: " + type.toStdString());
     }
 
-    static std::unique_ptr<PreconditionBase> create(const QString &type, const QDomElement &domElement)
+    static std::unique_ptr<PreconditionBase> create(const QString &type, GlobalState *state, const QDomElement &domElement)
     {
         throw std::runtime_error("Unknown precondition type: " + type.toStdString());
     }
@@ -74,11 +74,11 @@ std::unique_ptr<PreconditionBase> Factory::createPreconditionFromType(const QStr
     return HelperType::create(type);
 }
 
-std::unique_ptr<PreconditionBase> Factory::createPreconditionFromDomElement(const QDomElement &domElement)
+std::unique_ptr<PreconditionBase> Factory::createPreconditionFromDomElement(GlobalState *state, const QDomElement &domElement)
 {
     auto type = domElement.attribute("type");
 
-    return HelperType::create(type, domElement);
+    return HelperType::create(type, state, domElement);
 }
 
 std::vector<QString> Factory::getKnownPreconditionTypes()

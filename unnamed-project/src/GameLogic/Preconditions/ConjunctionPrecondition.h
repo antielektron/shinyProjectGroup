@@ -4,11 +4,13 @@
 #include "GameLogic/Preconditions/BooleanPreconditionBase.h"
 #include "GameLogic/Preconditions/Traits.h"
 
+class GlobalState;
+
 class ConjunctionPrecondition : public BooleanPreconditionBase
 {
 public:
     ConjunctionPrecondition();
-    ConjunctionPrecondition(const QDomElement &domElement);
+    ConjunctionPrecondition(GlobalState *state, const QDomElement &domElement);
     virtual ~ConjunctionPrecondition();
 
     virtual bool evaluateCondition() override;
