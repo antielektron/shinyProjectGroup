@@ -3,26 +3,37 @@
 #include "Scene/Model.h"
 
 Object::Object(Model *model) :
-    m_model(model)
+    m_model(model),
+    m_color(1., 1., 1.)
 {
-    specularAmount = 0.5;
-    diffuseAmount = 0.5; //0.4;
-    ambientAmount = 0.4;
+    m_specularAmount = 0.5;
+    m_diffuseAmount = 0.5; //0.4;
+    m_ambientAmount = 0.4;
+}
+
+void Object::setColor(const QVector3D &color)
+{
+    m_color = color;
+}
+
+QVector3D &Object::getColor()
+{
+    return m_color;
 }
 
 void Object::setDiffuseAmount(float diff)
 {
-    this->diffuseAmount = diff;
+    this->m_diffuseAmount = diff;
 }
 
 void Object::setSpecularAmount(float specular)
 {
-    this->specularAmount = specular;
+    this->m_specularAmount = specular;
 }
 
 void Object::setAmbientAmount(float ambient)
 {
-    this->ambientAmount = ambient;
+    this->m_ambientAmount = ambient;
 }
 
 Model *Object::getModel()
@@ -37,18 +48,18 @@ void Object::setModel(Model *model)
 
 float Object::getDiffuseAmount()
 {
-    return diffuseAmount;
+    return m_diffuseAmount;
 }
 
 float Object::getSpecularAmount()
 {
-    return specularAmount;
+    return m_specularAmount;
 }
 
 
 float Object::getAmbientAmount()
 {
-    return ambientAmount;
+    return m_ambientAmount;
 }
 
 ObjectType Object::getObjectType()

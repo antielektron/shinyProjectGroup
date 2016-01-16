@@ -508,13 +508,12 @@ void Renderer::render(GLuint fbo, Scene *scene)
     for (auto &object : scene->getObjects())
     {
         auto cameraModelView = scene->getCameraView() * object->getWorld();
-        // auto lightModelView = lightView * object->getWorld(); // TODO
+        auto color = object->getColor();
 
         m_program->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        // m_program->setUniformValue(m_lightViewMatrixLoc, lightModelView);
-        m_program->setUniformValue(m_specularColorLoc, object->getSpecularAmount() * QVector3D(1., 1., 1.));
-        m_program->setUniformValue(m_diffuseColorLoc, object->getDiffuseAmount() * QVector3D(1., 1., 1.));
-        m_program->setUniformValue(m_ambientColorLoc, object->getAmbientAmount() * QVector3D(1., 1., 1.));
+        m_program->setUniformValue(m_specularColorLoc, object->getSpecularAmount() * color);
+        m_program->setUniformValue(m_diffuseColorLoc, object->getDiffuseAmount() * color);
+        m_program->setUniformValue(m_ambientColorLoc, object->getAmbientAmount() * color);
 
         object->getModel()->draw();
     }
@@ -528,13 +527,12 @@ void Renderer::render(GLuint fbo, Scene *scene)
         }
 
         auto cameraModelView = scene->getCameraView() * editorObject->getWorld();
-        // auto lightModelView = lightView * editorObject->getWorld(); // TODO
+        auto color = editorObject->getColor();
 
         m_program->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        // m_program->setUniformValue(m_lightViewMatrixLoc, lightModelView);
-        m_program->setUniformValue(m_specularColorLoc, editorObject->getSpecularAmount() * QVector3D(1., 1., 1.));
-        m_program->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseAmount() * QVector3D(1., 1., 1.));
-        m_program->setUniformValue(m_ambientColorLoc, editorObject->getAmbientAmount() * QVector3D(1., 1., 1.));
+        m_program->setUniformValue(m_specularColorLoc, editorObject->getSpecularAmount() * color);
+        m_program->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseAmount() * color);
+        m_program->setUniformValue(m_ambientColorLoc, editorObject->getAmbientAmount() * color);
 
         editorObject->getModel()->draw();
     }
