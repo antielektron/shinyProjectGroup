@@ -508,12 +508,11 @@ void Renderer::render(GLuint fbo, Scene *scene)
     for (auto &object : scene->getObjects())
     {
         auto cameraModelView = scene->getCameraView() * object->getWorld();
-        auto color = object->getColor();
 
         m_program->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        m_program->setUniformValue(m_specularColorLoc, object->getSpecularAmount() * color);
-        m_program->setUniformValue(m_diffuseColorLoc, object->getDiffuseAmount() * color);
-        m_program->setUniformValue(m_ambientColorLoc, object->getAmbientAmount() * color);
+        m_program->setUniformValue(m_specularColorLoc, object->getSpecularColor());
+        m_program->setUniformValue(m_diffuseColorLoc, object->getDiffuseColor());
+        m_program->setUniformValue(m_ambientColorLoc, object->getAmbientColor());
 
         object->getModel()->draw();
     }
@@ -527,12 +526,11 @@ void Renderer::render(GLuint fbo, Scene *scene)
         }
 
         auto cameraModelView = scene->getCameraView() * editorObject->getWorld();
-        auto color = editorObject->getColor();
 
         m_program->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        m_program->setUniformValue(m_specularColorLoc, editorObject->getSpecularAmount() * color);
-        m_program->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseAmount() * color);
-        m_program->setUniformValue(m_ambientColorLoc, editorObject->getAmbientAmount() * color);
+        m_program->setUniformValue(m_specularColorLoc, editorObject->getSpecularColor());
+        m_program->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseColor());
+        m_program->setUniformValue(m_ambientColorLoc, editorObject->getAmbientColor());
 
         editorObject->getModel()->draw();
     }
