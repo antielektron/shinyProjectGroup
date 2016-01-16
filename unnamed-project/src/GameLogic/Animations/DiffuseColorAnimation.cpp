@@ -30,5 +30,5 @@ void DiffuseColorAnimation::tick(float time)
 //------------------------------------------------------------------------------
 QString DiffuseColorAnimation::type()
 {
-    return QString(traits::animation_name<DiffuseColorAnimation>::value);
+    return QString(traits::animation_name<DiffuseColorAnimation>::value());
 }

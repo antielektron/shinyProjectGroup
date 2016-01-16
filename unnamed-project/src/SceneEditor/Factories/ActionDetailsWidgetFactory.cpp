@@ -46,7 +46,7 @@ struct CreateActionDetailsWidgetHelper<T, Args...>
     static QWidget *create(const QString &type, std::shared_ptr<SceneEditorGame> game, ActionBase *action, QWidget *parent)
     {
         // TODO maybe try to dynamic cast instead of name comparision?
-        if (type == traits::action_name<typename T::ActionType>::value)
+        if (type == traits::action_name<typename T::ActionType>::value())
         {
             auto c = dynamic_cast<typename T::ActionType *>(action);
             assert(c != nullptr);

@@ -79,7 +79,7 @@ QString InvertAttributeAction<T>::string()
 template <typename T>
 QString InvertAttributeAction<T>::type()
 {
-    return QString(traits::action_name<InvertAttributeAction<T>>::value);
+    return QString(traits::action_name<InvertAttributeAction<T>>::value());
 }
 
 //------------------------------------------------------------------------------
@@ -100,19 +100,19 @@ namespace traits
     template <>
     struct action_name<InvertAttributeAction<int>>
     {
-        static constexpr const char *value = "iinv";
+        static const char *value() { return "iinv"; }
     };
 
     template <>
     struct action_name<InvertAttributeAction<double>>
     {
-        static constexpr const char *value = "finv";
+        static const char *value() { return "finv"; }
     };
 
     template <>
     struct action_name<InvertAttributeAction<bool>>
     {
-        static constexpr const char *value = "binv";
+        static const char *value() { return "binv"; }
     };
 }
 

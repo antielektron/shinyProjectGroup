@@ -29,5 +29,5 @@ void PositionAnimation::tick(float time)
 //------------------------------------------------------------------------------
 QString PositionAnimation::type()
 {
-    return QString(traits::animation_name<PositionAnimation>::value);
+    return QString(traits::animation_name<PositionAnimation>::value());
 }

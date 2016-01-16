@@ -30,7 +30,7 @@ namespace traits
     template <>
     struct animation_name<DiffuseColorAnimation>
     {
-        static constexpr const char *value = "Diffuse Color Animation";
+        static const char *value() { return "Diffuse Color Animation"; }
     };
 }
 

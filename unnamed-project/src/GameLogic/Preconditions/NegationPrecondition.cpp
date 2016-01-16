@@ -26,7 +26,7 @@ QString NegationPrecondition::string()
 //------------------------------------------------------------------------------
 QString NegationPrecondition::type()
 {
-    return traits::precondition_name<NegationPrecondition>::value;
+    return traits::precondition_name<NegationPrecondition>::value();
 }
 
 //------------------------------------------------------------------------------

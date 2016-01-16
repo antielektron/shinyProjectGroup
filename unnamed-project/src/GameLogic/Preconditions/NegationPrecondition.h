@@ -31,13 +31,11 @@ protected:
 
 namespace traits
 {
-
     template <>
     struct precondition_name<NegationPrecondition>
     {
-        static constexpr const char *value = "neg";
+        static const char *value() { return "neg"; }
     };
-
 }
 
 

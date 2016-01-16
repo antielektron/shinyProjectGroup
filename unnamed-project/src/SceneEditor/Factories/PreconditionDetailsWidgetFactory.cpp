@@ -34,7 +34,7 @@ struct CreatePreconditionDetailsWidgetHelper<T, Args...>
     static QWidget *create(const QString &type, std::shared_ptr<SceneEditorGame> game, PreconditionBase *precondition, QWidget *parent)
     {
         // TODO maybe try to dynamic cast instead of name comparision?
-        if (type == traits::precondition_name<typename T::PreconditionType>::value)
+        if (type == traits::precondition_name<typename T::PreconditionType>::value())
         {
             auto c = dynamic_cast<typename T::PreconditionType *>(precondition);
             assert(c != nullptr);

@@ -31,5 +31,5 @@ bool ConjunctionPrecondition::evaluateCondition()
 //------------------------------------------------------------------------------
 QString ConjunctionPrecondition::type()
 {
-    return traits::precondition_name<ConjunctionPrecondition>::value;
+    return traits::precondition_name<ConjunctionPrecondition>::value();
 }

@@ -29,5 +29,5 @@ void ScalingAnimation::tick(float time)
 //------------------------------------------------------------------------------
 QString ScalingAnimation::type()
 {
-    return QString(traits::animation_name<ScalingAnimation>::value);
+    return QString(traits::animation_name<ScalingAnimation>::value());
 }

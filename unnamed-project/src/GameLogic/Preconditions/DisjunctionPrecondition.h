@@ -21,13 +21,11 @@ public:
 
 namespace traits
 {
-
     template <>
     struct precondition_name<DisjunctionPrecondition>
     {
-        static constexpr const char *value = "or";
+        static const char *value() { return "or"; }
     };
-
 }
 
 

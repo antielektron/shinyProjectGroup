@@ -55,7 +55,7 @@ void MultiplyAttributeAction<T>::performAction()
 template <typename T>
 QString MultiplyAttributeAction<T>::type()
 {
-    return QString(traits::action_name<MultiplyAttributeAction<T>>::value);
+    return QString(traits::action_name<MultiplyAttributeAction<T>>::value());
 }
 
 
@@ -64,13 +64,13 @@ namespace traits
     template <>
     struct action_name<MultiplyAttributeAction<int>>
     {
-        static constexpr const char *value = "imul";
+        static const char *value() { return "imul"; }
     };
 
     template <>
     struct action_name<MultiplyAttributeAction<double>>
     {
-        static constexpr const char *value = "fmul";
+        static const char *value() { return "fmul"; }
     };
 }
 

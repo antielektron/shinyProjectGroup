@@ -46,25 +46,23 @@ bool IsGreaterPrecondition<T>::evaluateCondition()
 template <typename T>
 QString IsGreaterPrecondition<T>::type()
 {
-    return QString(traits::precondition_name<IsGreaterPrecondition<T>>::value);
+    return QString(traits::precondition_name<IsGreaterPrecondition<T>>::value());
 }
 
 
 namespace traits
 {
-
     template <>
     struct precondition_name<IsGreaterPrecondition<int>>
     {
-        static constexpr const char *value = "igreater";
+        static const char *value() { return "igreater"; }
     };
 
     template <>
     struct precondition_name<IsGreaterPrecondition<double>>
     {
-        static constexpr const char *value = "fgreater";
+        static const char *value() { return "fgreater"; }
     };
-
 }
 
 

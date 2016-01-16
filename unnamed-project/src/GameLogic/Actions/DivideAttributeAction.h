@@ -55,7 +55,7 @@ void DivideAttributeAction<T>::performAction()
 template <typename T>
 QString DivideAttributeAction<T>::type()
 {
-    return QString(traits::action_name<DivideAttributeAction<T>>::value);
+    return QString(traits::action_name<DivideAttributeAction<T>>::value());
 }
 
 
@@ -64,13 +64,13 @@ namespace traits
     template <>
     struct action_name<DivideAttributeAction<int>>
     {
-        static constexpr const char *value = "idiv";
+        static const char *value() { return "idiv"; }
     };
 
     template <>
     struct action_name<DivideAttributeAction<double>>
     {
-        static constexpr const char *value = "fdiv";
+        static const char *value() { return "fdiv"; }
     };
 }
 

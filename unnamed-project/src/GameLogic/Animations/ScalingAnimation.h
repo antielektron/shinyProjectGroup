@@ -27,7 +27,7 @@ namespace traits
     template <>
     struct animation_name<ScalingAnimation>
     {
-        static constexpr const char *value = "Scaling Animation";
+        static const char *value() { return "Scaling Animation"; }
     };
 }
 

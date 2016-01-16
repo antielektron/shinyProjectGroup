@@ -46,7 +46,7 @@ bool IsLessPrecondition<T>::evaluateCondition()
 template <typename T>
 QString IsLessPrecondition<T>::type()
 {
-    return QString(traits::precondition_name<IsLessPrecondition<T>>::value);
+    return QString(traits::precondition_name<IsLessPrecondition<T>>::value());
 }
 
 
@@ -55,13 +55,13 @@ namespace traits
     template <>
     struct precondition_name<IsLessPrecondition<int>>
     {
-        static constexpr const char *value = "iless";
+        static const char *value() { return "iless"; }
     };
 
     template <>
     struct precondition_name<IsLessPrecondition<double>>
     {
-        static constexpr const char *value = "fless";
+        static const char *value() { return "fless"; }
     };
 }
 

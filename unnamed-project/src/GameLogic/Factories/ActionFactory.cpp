@@ -15,7 +15,7 @@ struct CreateActionHelper<T, Args...>
 {
     static std::unique_ptr<ActionBase> create(const QString &type, GlobalState *state)
     {
-        if (type == traits::action_name<T>::value)
+        if (type == traits::action_name<T>::value())
         {
             return std::unique_ptr<ActionBase>(new T(state));
         }
@@ -27,7 +27,7 @@ struct CreateActionHelper<T, Args...>
 
     static std::unique_ptr<ActionBase> create(const QString &type, GlobalState *state, const QDomElement &domElement)
     {
-        if (type == traits::action_name<T>::value)
+        if (type == traits::action_name<T>::value())
         {
             return std::unique_ptr<ActionBase>(new T(state, domElement));
         }
@@ -39,7 +39,7 @@ struct CreateActionHelper<T, Args...>
 
     static void getTypes(std::vector<QString> &types)
     {
-        types.push_back(QString(traits::action_name<T>::value));
+        types.push_back(QString(traits::action_name<T>::value()));
         CreateActionHelper<Args...>::getTypes(types);
     }
 };

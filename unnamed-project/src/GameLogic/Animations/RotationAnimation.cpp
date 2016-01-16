@@ -27,5 +27,5 @@ void RotationAnimation::tick(float time)
 //------------------------------------------------------------------------------
 QString RotationAnimation::type()
 {
-    return QString(traits::animation_name<RotationAnimation>::value);
+    return QString(traits::animation_name<RotationAnimation>::value());
 }

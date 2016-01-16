@@ -52,7 +52,7 @@ void AssignAttributeAction<T>::performAction()
 template <typename T>
 QString AssignAttributeAction<T>::type()
 {
-    return QString(traits::action_name<AssignAttributeAction<T>>::value);
+    return QString(traits::action_name<AssignAttributeAction<T>>::value());
 }
 
 
@@ -61,19 +61,19 @@ namespace traits
     template <>
     struct action_name<AssignAttributeAction<int>>
     {
-        static constexpr const char *value = "imov";
+        static const char *value() { return "imov"; }
     };
 
     template <>
     struct action_name<AssignAttributeAction<double>>
     {
-    static constexpr const char *value = "fmov";
+        static const char *value() { return "fmov"; }
     };
 
     template <>
     struct action_name<AssignAttributeAction<bool>>
     {
-    static constexpr const char *value = "bmov";
+        static const char *value() { return "bmov"; }
     };
 }
 

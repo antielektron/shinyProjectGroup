@@ -55,7 +55,7 @@ void DecrementAttributeAction<T>::performAction()
 template <typename T>
 QString DecrementAttributeAction<T>::type()
 {
-    return QString(traits::action_name<DecrementAttributeAction<T>>::value);
+    return QString(traits::action_name<DecrementAttributeAction<T>>::value());
 }
 
 
@@ -64,13 +64,13 @@ namespace traits
     template <>
     struct action_name<DecrementAttributeAction<int>>
     {
-        static constexpr const char *value = "idec";
+        static const char *value() { return "idec"; }
     };
 
     template <>
     struct action_name<DecrementAttributeAction<double>>
     {
-        static constexpr const char *value = "fdec";
+        static const char *value() { return "fdec"; }
     };
 }
 

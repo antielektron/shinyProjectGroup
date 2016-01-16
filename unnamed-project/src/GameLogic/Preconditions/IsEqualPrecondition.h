@@ -46,31 +46,29 @@ bool IsEqualPrecondition<T>::evaluateCondition()
 template <typename T>
 QString IsEqualPrecondition<T>::type()
 {
-    return QString(traits::precondition_name<IsEqualPrecondition<T>>::value);
+    return QString(traits::precondition_name<IsEqualPrecondition<T>>::value());
 }
 
 
 namespace traits
 {
-
     template <>
     struct precondition_name<IsEqualPrecondition<int>>
     {
-        static constexpr const char *value = "ieq";
+        static const char *value() { return "ieq"; }
     };
 
     template <>
     struct precondition_name<IsEqualPrecondition<double>>
     {
-        static constexpr const char *value = "feq";
+        static const char *value() { return "feq"; }
     };
 
     template <>
     struct precondition_name<IsEqualPrecondition<bool>>
     {
-        static constexpr const char *value = "beq";
+        static const char *value() { return "beq"; }
     };
-
 }
 
 

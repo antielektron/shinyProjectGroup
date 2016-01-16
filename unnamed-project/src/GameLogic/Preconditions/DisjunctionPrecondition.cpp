@@ -31,5 +31,5 @@ bool DisjunctionPrecondition::evaluateCondition()
 //------------------------------------------------------------------------------
 QString DisjunctionPrecondition::type()
 {
-    return traits::precondition_name<DisjunctionPrecondition>::value;
+    return traits::precondition_name<DisjunctionPrecondition>::value();
 }

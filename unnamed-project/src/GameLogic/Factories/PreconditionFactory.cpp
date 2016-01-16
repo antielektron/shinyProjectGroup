@@ -12,7 +12,7 @@ struct CreatePreconditionHelper<T, Args...>
 {
     static std::unique_ptr<PreconditionBase> create(const QString &type)
     {
-        if (type == traits::precondition_name<T>::value)
+        if (type == traits::precondition_name<T>::value())
         {
             return std::unique_ptr<PreconditionBase>(new T());
         }
@@ -24,7 +24,7 @@ struct CreatePreconditionHelper<T, Args...>
 
     static std::unique_ptr<PreconditionBase> create(const QString &type, GlobalState *state, const QDomElement &domElement)
     {
-        if (type == traits::precondition_name<T>::value)
+        if (type == traits::precondition_name<T>::value())
         {
             return std::unique_ptr<PreconditionBase>(new T(state, domElement));
         }
@@ -36,7 +36,7 @@ struct CreatePreconditionHelper<T, Args...>
 
     static void getTypes(std::vector<QString> &types)
     {
-        types.push_back(QString(traits::precondition_name<T>::value));
+        types.push_back(QString(traits::precondition_name<T>::value()));
         CreatePreconditionHelper<Args...>::getTypes(types);
     }
 };

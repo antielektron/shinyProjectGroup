@@ -25,7 +25,7 @@ namespace traits
     template <>
     struct animation_name<PositionAnimation>
     {
-        static constexpr const char *value = "Position Animation";
+        static const char *value() { return "Position Animation"; }
     };
 }
 

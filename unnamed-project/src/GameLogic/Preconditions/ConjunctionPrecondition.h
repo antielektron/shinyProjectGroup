@@ -25,7 +25,7 @@ namespace traits
     template <>
     struct precondition_name<ConjunctionPrecondition>
     {
-        static constexpr const char *value = "and";
+        static const char *value() { return "and"; }
     };
 
 }

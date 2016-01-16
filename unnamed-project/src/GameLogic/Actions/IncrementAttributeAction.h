@@ -55,7 +55,7 @@ void IncrementAttributeAction<T>::performAction()
 template <typename T>
 QString IncrementAttributeAction<T>::type()
 {
-    return QString(traits::action_name<IncrementAttributeAction<T>>::value);
+    return QString(traits::action_name<IncrementAttributeAction<T>>::value());
 }
 
 
@@ -64,13 +64,13 @@ namespace traits
     template <>
     struct action_name<IncrementAttributeAction<int>>
     {
-        static constexpr const char *value = "iadd";
+        static const char *value() { return "iadd"; }
     };
 
     template <>
     struct action_name<IncrementAttributeAction<double>>
     {
-        static constexpr const char *value = "fadd";
+        static const char *value() { return "fadd"; }
     };
 }
 
