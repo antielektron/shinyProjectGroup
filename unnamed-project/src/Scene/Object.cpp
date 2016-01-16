@@ -3,7 +3,8 @@
 #include "Scene/Model.h"
 
 Object::Object(Model *model) :
-    m_model(model)
+    m_model(model),
+    m_userPointer(nullptr)
 {
     m_specularColor = QVector3D(0.5, 0.5, 0.5);
     m_diffuseColor = QVector3D(0.5, 0.5, 0.5); //0.4;
@@ -54,4 +55,24 @@ QVector3D &Object::getAmbientColor()
 ObjectType Object::getObjectType()
 {
     return ObjectType::Object;
+}
+
+void Object::setUserPointer(void *userPointer)
+{
+    m_userPointer = userPointer;
+}
+
+void *Object::getUserPointer()
+{
+    return m_userPointer;
+}
+
+void Object::setInteractionEvent(const QString &interactionEvent)
+{
+    m_interactionEvent = interactionEvent;
+}
+
+const QString &Object::getInteractionEvent()
+{
+    return m_interactionEvent;
 }

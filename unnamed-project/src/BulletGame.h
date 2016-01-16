@@ -8,11 +8,13 @@
 
 #include <QString>
 #include <QMatrix4x4>
+#include <QMatrix3x3>
 
 #include "IGame.h"
 #include "IObjectBaseObserver.h"
 
 class Scene;
+class Object;
 
 class BulletGame : public IGame, public IObjectBaseObserver
 {
@@ -37,10 +39,12 @@ private:
 
     void updateBulletGeometry(ObjectBase *obj);
 
+    void performInteraction();
+
     QString m_scenefile;
     std::unique_ptr<Scene> m_scene;
 
-    std::map<ObjectBase *, btRigidBody *> m_bodies;
+    std::vector<Object *> m_bodies;
 
     std::unique_ptr<btRigidBody> m_playerBody;
     QVector3D m_position;

@@ -20,6 +20,12 @@ public:
     QVector3D &getDiffuseColor();
     QVector3D &getAmbientColor();
 
+    void setUserPointer(void *userPointer);
+    void *getUserPointer();
+
+    void setInteractionEvent(const QString &interactionEvent);
+    const QString &getInteractionEvent();
+
     virtual ObjectType getObjectType();
 
     Model *getModel();
@@ -32,6 +38,9 @@ private:
     QVector3D m_specularColor;
     QVector3D m_diffuseColor;
     QVector3D m_ambientColor;
+
+    void *m_userPointer;
+    QString m_interactionEvent;
 
     // TODO material information
 };

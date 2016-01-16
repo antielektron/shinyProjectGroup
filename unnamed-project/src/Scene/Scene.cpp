@@ -81,19 +81,19 @@ void Scene::loadFromFile(const QString &filename)
         }
         else if (tag == "DirectionalLight")
         {
-            QVector3D pos = getPositionFromDom(currentElement);
+            // TODO subelements
+            QVector3D pos = readVectorFromDom(currentElement);
             float r = currentElement.attribute("r", "0").toFloat();
             float g = currentElement.attribute("g", "0").toFloat();
             float b = currentElement.attribute("b", "0").toFloat();
 
             this->setDirectionalLightDirection(pos);
             this->setLightColor(QVector3D(r,g,b));
-
         }
         else if (tag == "Player")
         {
             // TODO: embed "Spawn" objects into the object tree, that the "real" game can query for!
-            QVector3D pos = getPositionFromDom(currentElement);
+            QVector3D pos = readVectorFromDom(currentElement);
 
             //TODO: set camera/player Position;
             std::cout << "TODO: set player Position to"
@@ -109,7 +109,7 @@ void Scene::loadFromFile(const QString &filename)
         }
     }
 
-    cancelAnimations();
+    cancelAllAnimations();
     // Apply transformations to objects
     m_rootGroup.updateWorld();
 }
@@ -124,23 +124,74 @@ void Scene::readObjectTreeFromDom(ObjectGroup *root, const QDomElement &domEleme
 
         if (tag == "Object")
         {
-            QString name = child.attribute("name", "unnamedObject");
-            QString modelName = child.attribute("model","");
+            QString name = child.attribute("name", "unnamed object");
+            QString modelName = child.attribute("model");
+            QString event = child.attribute("interactionEvent");
 
             auto object = createObject(modelName.toStdString(), root);
             object->setName(name);
-            object->setPosition(getPositionFromDom(child));
-            object->setRotation(getRotationFromDom(child));
-            object->setScaling(getScalingFromDom(child));
+            object->setInteractionEvent(event);
+
+            for (auto child2 = child.firstChildElement(); !child2.isNull(); child2 = child2.nextSiblingElement())
+            {
+                QString tag2 = child2.tagName();
+                if (tag2 == "Position")
+                {
+                    auto position = readVectorFromDom(child2);
+                    object->setPosition(position);
+                }
+                else if (tag2 == "Rotation")
+                {
+                    auto rotation = readVectorFromDom(child2);
+                    object->setRotation(rotation);
+                }
+                else if (tag2 == "Scaling")
+                {
+                    auto scaling = readVectorFromDom(child2, QVector3D(1, 1, 1));
+                    object->setScaling(scaling);
+                }
+                else if (tag2 == "SpecularColor")
+                {
+                    auto color = readVectorFromDom(child2, QVector3D(0.5, 0.5, 0.5));
+                    object->setSpecularColor(color);
+                }
+                else if (tag2 == "DiffuseColor")
+                {
+                    auto color = readVectorFromDom(child2, QVector3D(0.5, 0.5, 0.5));
+                    object->setDiffuseColor(color);
+                }
+                else if (tag2 == "AmbientColor")
+                {
+                    auto color = readVectorFromDom(child2, QVector3D(0.4, 0.4, 0.4));
+                    object->setAmbientColor(color);
+                }
+            }
         }
         else if(tag == "ObjectGroup")
         {
-            QString name = child.attribute("name", "unnamedGroup");
+            QString name = child.attribute("name", "unnamed group");
 
             auto objectGroup = createObjectGroup(name.toStdString(), root);
-            objectGroup->setPosition(getPositionFromDom(child));
-            objectGroup->setRotation(getRotationFromDom(child));
-            objectGroup->setScaling(getScalingFromDom(child));
+
+            for (auto child2 = child.firstChildElement(); !child2.isNull(); child2 = child2.nextSiblingElement())
+            {
+                QString tag2 = child2.tagName();
+                if (tag2 == "Position")
+                {
+                    auto position = readVectorFromDom(child2);
+                    objectGroup->setPosition(position);
+                }
+                else if (tag2 == "Rotation")
+                {
+                    auto rotation = readVectorFromDom(child2);
+                    objectGroup->setRotation(rotation);
+                }
+                else if (tag2 == "Scaling")
+                {
+                    auto scaling = readVectorFromDom(child2, QVector3D(1, 1, 1));
+                    objectGroup->setScaling(scaling);
+                }
+            }
 
             // Build object tree recursively
             readObjectTreeFromDom(objectGroup, child);
@@ -225,29 +276,28 @@ void Scene::readAttributesFromDom(const QDomElement &domElem)
     {
         if (child.tagName() == "Attribute")
         {
-            QString type = child.attribute("type","");
-
-            QString key = child.attribute("key","");
+            QString type = child.attribute("type");
+            QString key = child.attribute("key");
 
             switch (QMetaType::type(type.toStdString().c_str()))
             {
                 case QMetaType::Bool:
                 {
-                    QString valueStr = child.attribute("value", "");
+                    QString valueStr = child.attribute("value");
                     m_globalState->setValue(key,
                                             valueStr == "true");
                     break;
                 }
                 case QMetaType::Int:
                 {
-                    QString valueStr = child.attribute("value", "");
+                    QString valueStr = child.attribute("value");
                     m_globalState->setValue(key,
                                             valueStr.toInt());
                     break;
                 }
                 case QMetaType::Float:
                 {
-                    QString valueStr = child.attribute("value", "");
+                    QString valueStr = child.attribute("value");
                     m_globalState->setValue(key,
                                             valueStr.toFloat());
                     break;
@@ -341,29 +391,11 @@ void Scene::readAnimatorsFromDom(const QDomElement &domElem)
 }
 
 //------------------------------------------------------------------------------
-QVector3D Scene::getPositionFromDom(const QDomElement &domElement)
+QVector3D Scene::readVectorFromDom(const QDomElement &domElement, const QVector3D &defValue)
 {
-    float x = domElement.attribute("x", "0").toFloat();
-    float y = domElement.attribute("y", "0").toFloat();
-    float z = domElement.attribute("z", "0").toFloat();
-    return QVector3D(x, y, z);
-}
-
-//------------------------------------------------------------------------------
-QVector3D Scene::getRotationFromDom(const QDomElement &domElement)
-{
-    float x = domElement.attribute("rx", "0").toFloat();
-    float y = domElement.attribute("ry", "0").toFloat();
-    float z = domElement.attribute("rz", "0").toFloat();
-    return QVector3D(x, y, z);
-}
-
-//------------------------------------------------------------------------------
-QVector3D Scene::getScalingFromDom(const QDomElement &domElement)
-{
-    float x = domElement.attribute("sx", "1").toFloat();
-    float y = domElement.attribute("sy", "1").toFloat();
-    float z = domElement.attribute("sz", "1").toFloat();
+    float x = domElement.hasAttribute("x") ? domElement.attribute("x").toFloat() : defValue.x();
+    float y = domElement.hasAttribute("y") ? domElement.attribute("y").toFloat() : defValue.y();
+    float z = domElement.hasAttribute("z") ? domElement.attribute("z").toFloat() : defValue.z();
     return QVector3D(x, y, z);
 }
 
@@ -407,72 +439,20 @@ void Scene::saveToFile(const QString &filename)
     writeObjectTree(&m_rootGroup, xmlWriter);
     xmlWriter.writeEndElement();
 
-    // attributes:
-
+    // Write attributes:
     xmlWriter.writeStartElement("Attributes");
-
     for (auto &attribute : m_globalState->getAttributes())
     {
-        xmlWriter.writeStartElement("Attribute");
-
-        const QString &key = attribute.first;
-        QVariant value = attribute.second;
-
-        xmlWriter.writeAttribute("key", key);
-        xmlWriter.writeAttribute("type", value.typeName());
-
-        switch((QMetaType::Type)value.type())
-        {
-            case QMetaType::Bool:
-            {
-                bool v = value.toBool();
-                xmlWriter.writeAttribute("value", v ? "true" : "false");
-                break;
-            }
-            case QMetaType::Int:
-            {
-                int v = value.toInt();
-                xmlWriter.writeAttribute("value", QString::number(v));
-                break;
-            }
-            case QMetaType::Float:
-            {
-                float v = value.toFloat();
-                xmlWriter.writeAttribute("value", QString::number(v));
-                break;
-            }
-            case QMetaType::QVector3D:
-            {
-                QVector3D v = value.value<QVector3D>();
-                xmlWriter.writeAttribute("x", QString::number(v[0]));
-                xmlWriter.writeAttribute("y", QString::number(v[1]));
-                xmlWriter.writeAttribute("z", QString::number(v[2]));
-                break;
-            }
-            default:
-            {
-                std::cout << "WARNING: Unknown attribute type '"
-                << QMetaType::typeName(value.type())
-                << "' in GlobalState"
-                << std::endl;
-            }
-        }
-
-        xmlWriter.writeEndElement();
-
+        writeAttribute(xmlWriter, attribute.first, attribute.second);
     }
-
     xmlWriter.writeEndElement();
 
     // Events:
-
     xmlWriter.writeStartElement("Events");
-
     for (auto &event : m_globalState->getEvents())
     {
         event->writeToXml(xmlWriter);
     }
-
     xmlWriter.writeEndElement();
 
     // Animators:
@@ -489,7 +469,7 @@ void Scene::saveToFile(const QString &filename)
 
     //light:
     xmlWriter.writeStartElement("DirectionalLight");
-    writePosition(getDirectionalLightDirection(), xmlWriter);
+    writeVectorToXml(getDirectionalLightDirection(), xmlWriter);
     QVector3D lightColor = getLightColor();
     xmlWriter.writeAttribute("r", QString::number(lightColor.x()));
     xmlWriter.writeAttribute("g", QString::number(lightColor.y()));
@@ -498,7 +478,7 @@ void Scene::saveToFile(const QString &filename)
 
     //player:
     xmlWriter.writeStartElement("Player");
-    writePosition(QVector3D(0,0,0), xmlWriter); //TODO
+    writeVectorToXml(QVector3D(0, 0, 0), xmlWriter); //TODO
     xmlWriter.writeEndElement();
 
     xmlWriter.writeEndDocument();
@@ -516,9 +496,17 @@ void Scene::writeObjectTree(ObjectGroup *root, QXmlStreamWriter &writer)
 
         writer.writeAttribute("name", group->getName());
 
-        writePosition(group->getPosition(), writer);
-        writeRotation(group->getRotation(), writer);
-        writeScaling(group->getScaling(), writer);
+        writer.writeStartElement("Position");
+        writeVectorToXml(group->getPosition(), writer);
+        writer.writeEndElement();
+
+        writer.writeStartElement("Rotation");
+        writeVectorToXml(group->getRotation(), writer);
+        writer.writeEndElement();
+
+        writer.writeStartElement("Scaling");
+        writeVectorToXml(group->getScaling(), writer);
+        writer.writeEndElement();
 
         // Write object tree recursively:
         writeObjectTree(group, writer);
@@ -535,37 +523,90 @@ void Scene::writeObjectTree(ObjectGroup *root, QXmlStreamWriter &writer)
 
         writer.writeAttribute("name", object->getName());
         writer.writeAttribute("model", modelName);
+        writer.writeAttribute("interactionEvent", object->getInteractionEvent());
 
-        writePosition(object->getPosition(), writer);
-        writeRotation(object->getRotation(), writer);
-        writeScaling(object->getScaling(), writer);
+        writer.writeStartElement("Position");
+        writeVectorToXml(object->getPosition(), writer);
+        writer.writeEndElement();
+
+        writer.writeStartElement("Rotation");
+        writeVectorToXml(object->getRotation(), writer);
+        writer.writeEndElement();
+
+        writer.writeStartElement("Scaling");
+        writeVectorToXml(object->getScaling(), writer);
+        writer.writeEndElement();
+
+        writer.writeStartElement("SpecularColor");
+        writeVectorToXml(object->getSpecularColor(), writer);
+        writer.writeEndElement();
+
+        writer.writeStartElement("DiffuseColor");
+        writeVectorToXml(object->getDiffuseColor(), writer);
+        writer.writeEndElement();
+
+        writer.writeStartElement("AmbientColor");
+        writeVectorToXml(object->getAmbientColor(), writer);
+        writer.writeEndElement();
 
         writer.writeEndElement();
     }
 }
 
 //------------------------------------------------------------------------------
-void Scene::writePosition(const QVector3D &pos, QXmlStreamWriter &writer)
+void Scene::writeAttribute(QXmlStreamWriter &writer, const QString &key, const QVariant &value)
+{
+    writer.writeStartElement("Attribute");
+
+    writer.writeAttribute("key", key);
+    writer.writeAttribute("type", value.typeName());
+
+    switch((QMetaType::Type)value.type())
+    {
+        case QMetaType::Bool:
+        {
+            bool v = value.toBool();
+            writer.writeAttribute("value", v ? "true" : "false");
+            break;
+        }
+        case QMetaType::Int:
+        {
+            int v = value.toInt();
+            writer.writeAttribute("value", QString::number(v));
+            break;
+        }
+        case QMetaType::Float:
+        {
+            float v = value.toFloat();
+            writer.writeAttribute("value", QString::number(v));
+            break;
+        }
+        case QMetaType::QVector3D:
+        {
+            QVector3D v = value.value<QVector3D>();
+            writer.writeAttribute("x", QString::number(v[0]));
+            writer.writeAttribute("y", QString::number(v[1]));
+            writer.writeAttribute("z", QString::number(v[2]));
+            break;
+        }
+        default:
+        {
+            std::cout << "WARNING: Unknown attribute type '"
+            << QMetaType::typeName(value.type())
+            << "' in GlobalState"
+            << std::endl;
+        }
+    }
+
+    writer.writeEndElement();
+}
+
+//------------------------------------------------------------------------------
+void Scene::writeVectorToXml(const QVector3D &pos, QXmlStreamWriter &writer)
 {
     writer.writeAttribute("x", QString::number(pos.x()));
     writer.writeAttribute("y", QString::number(pos.y()));
     writer.writeAttribute("z", QString::number(pos.z()));
-}
-
-//------------------------------------------------------------------------------
-void Scene::writeRotation(const QVector3D &pos, QXmlStreamWriter &writer)
-{
-    writer.writeAttribute("rx", QString::number(pos.x()));
-    writer.writeAttribute("ry", QString::number(pos.y()));
-    writer.writeAttribute("rz", QString::number(pos.z()));
-}
-
-//------------------------------------------------------------------------------
-void Scene::writeScaling(const QVector3D &pos, QXmlStreamWriter &writer)
-{
-    writer.writeAttribute("sx", QString::number(pos.x()));
-    writer.writeAttribute("sy", QString::number(pos.y()));
-    writer.writeAttribute("sz", QString::number(pos.z()));
 }
 
 //------------------------------------------------------------------------------
@@ -607,24 +648,45 @@ void Scene::removeModel(const std::string &modelName)
 }
 
 //------------------------------------------------------------------------------
-void Scene::performAnimations(IObjectBaseObserver *listener)
+void Scene::addAnimation(std::unique_ptr<AnimationBase> animation)
 {
-    // TODO
-    for (const auto &anim : this->getAnimations())
+    m_animations.push_back(std::move(animation));
+}
+
+//------------------------------------------------------------------------------
+void Scene::deleteAnimation(AnimationBase *animation)
+{
+    for (auto it = m_animations.begin(); it != m_animations.end(); it++)
     {
-        anim->tick(0);
-        if (listener)
+        if (it->get() == animation)
         {
-            listener->notify(anim->getObject());
+            m_animations.erase(it);
+            break;
         }
     }
 }
 
 //------------------------------------------------------------------------------
-void Scene::cancelAnimations()
+void Scene::performAnimations(IObjectBaseObserver *listener)
+{
+    // TODO
+    for (const auto &animation : m_animations)
+    {
+        // TODO what happens if the animation deletes itself and invalidates the animators list?!
+        animation->tick(0);
+        if (listener)
+        {
+            listener->notify(animation->getObject());
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+void Scene::cancelAllAnimations()
 {
     for (auto const &animation : this->getAnimations())
     {
+        // TODO what happens if the animation deletes itself and invalidates the animators list?!
         animation->cancelAnimation();
     }
 }
@@ -638,7 +700,7 @@ Object *Scene::createObject(const std::string &modelName, ObjectGroup *parent)
     assert(m_models.find(modelName) != m_models.end());
     Model *model = m_models[modelName].get();
 
-    Object *object = new Object(model);
+    auto object = new Object(model);
     object->setName(QString::fromStdString(modelName));
 
     m_objects.push_back(object);
@@ -651,9 +713,11 @@ Object *Scene::createObject(const std::string &modelName, ObjectGroup *parent)
 ObjectGroup *Scene::createObjectGroup(const std::string &name, ObjectGroup *parent)
 {
     if (!parent)
+    {
         parent = &m_rootGroup;
+    }
 
-    ObjectGroup *newGroup = new ObjectGroup();
+    auto newGroup = new ObjectGroup();
     newGroup->setName(QString::fromStdString(name));
 
     parent->addObjectGroup(std::unique_ptr<ObjectGroup>(newGroup));
@@ -663,7 +727,7 @@ ObjectGroup *Scene::createObjectGroup(const std::string &name, ObjectGroup *pare
 //------------------------------------------------------------------------------
 EditorObject *Scene::createEditorObject(const std::string &name, Model *model)
 {
-    EditorObject *object = new EditorObject(model);
+    auto object = new EditorObject(model);
     object->setName(QString::fromStdString(name));
 
     m_editorObjectRootGroup.addObject(std::unique_ptr<Object>(object));
@@ -822,23 +886,4 @@ const QString &Scene::getVersion() const
 const QString &Scene::getAuthor() const
 {
     return m_sceneAuthor;
-}
-
-//------------------------------------------------------------------------------
-void Scene::addAnimation(std::unique_ptr<AnimationBase> animation)
-{
-    m_animations.push_back(std::move(animation));
-}
-
-//------------------------------------------------------------------------------
-void Scene::deleteAnimation(AnimationBase *animation)
-{
-    for (auto it = m_animations.begin(); it != m_animations.end(); it++)
-    {
-        if (it->get() == animation)
-        {
-            m_animations.erase(it);
-            break;
-        }
-    }
 }

@@ -34,9 +34,6 @@ public:
 	ObjectGroup *getRootObject();
     ObjectBase *getCurrentObject();
 
-    // wrapper stuff
-    void getModels(std::vector<Model *> &models);
-
     Model *getModelByName(const std::string &modelName);
 
     void addModel(std::unique_ptr<Model> model);
@@ -58,10 +55,12 @@ public:
 	void deleteEvent(GlobalState::EventIterator iterator);
 	void notifyEventChanged();
 
+
 	void addAnimation(std::unique_ptr<AnimationBase> animator);
 	void deleteAnimation(AnimationBase *animation);
 
 public slots:
+	// NOTE: running logic would require to stash the whole scene beforehand!! (does only make sense with player) instead launch bullet game.
     void runLogic();
     void stopLogic();
     void togglePauseLogic();
@@ -75,7 +74,7 @@ Q_SIGNALS:
     void attributesChanged();
 
     void eventsChanged();
-    void eventsInvalidated(); // an event got deleted
+    void eventsInvalidated(); // an event got deleted (needed for closing some widgets)
 
     void animatorsChanged();
 

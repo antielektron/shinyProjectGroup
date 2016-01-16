@@ -72,10 +72,8 @@ void SceneEditorGame::tick(float dt)
     {
         // only trigger the tick event that is triggered every tick ;)
         m_scene->getGlobalState()->triggerEvent("tick");
-    }
-    if (!m_logicPaused)
-    {
-        m_scene->performAnimations();
+        // m_scene->performAnimations();
+        // TODO have to notify ui about changes in attributes!
     }
 
     // update indicator stuff
@@ -263,14 +261,6 @@ ObjectBase *SceneEditorGame::getCurrentObject()
 	return m_currentObject;
 }
 
-void SceneEditorGame::getModels(std::vector<Model *> &models)
-{
-    for (auto &mapItem : m_scene->getModels())
-    {
-        models.push_back(mapItem.second.get());
-    }
-}
-
 Model *SceneEditorGame::getModelByName(const std::string &modelName)
 {
     return m_scene->getModel(modelName);
@@ -307,7 +297,7 @@ void SceneEditorGame::runLogic()
 {
     if (!m_logicRunning)
     {
-        m_scene->cancelAnimations();
+        m_scene->cancelAllAnimations();
         m_scene->getGlobalState()->stash();
         m_logicRunning = true;
         m_logicPaused = false;

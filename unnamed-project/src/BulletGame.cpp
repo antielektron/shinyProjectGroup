@@ -57,6 +57,7 @@ void BulletGame::tick(float dt)
     m_scene->getGlobalState()->triggerEvent("tick");
     m_scene->performAnimations(this);
 
+    // TODO check if we clicked anything!
 
     m_bulletWorld->stepSimulation(dt);
 
@@ -72,6 +73,11 @@ void BulletGame::handleInput(float deltaTime)
     m_keyManager->tick();
 
     float speed = 10.0f;
+
+    if (m_keyManager->isKeyPressed(Qt::Key_F))
+    {
+        performInteraction();
+    }
 
     if (m_keyManager->shouldCatchMouse())
     {
@@ -184,11 +190,39 @@ void BulletGame::updateBulletGeometry(ObjectBase *obj)
     }
     else
     {
-        Object *object = static_cast<Object *>(obj);
+        auto object = static_cast<Object *>(obj);
+        auto body = static_cast<btRigidBody *>(object->getUserPointer());
+
         btTransform transformation;
         transformation.setFromOpenGLMatrix(object->getWorld().constData());
-        m_bodies[obj]->setWorldTransform(transformation);
+        body->setWorldTransform(transformation);
 
+    }
+}
+
+void BulletGame::performInteraction()
+{
+    QMatrix4x4 xRotation;
+    xRotation.rotate(m_rotX, 1, 0, 0);
+    QMatrix4x4 yRotation;
+    yRotation.rotate(m_rotY, 0, 1, 0);
+    QMatrix4x4 rotation = xRotation * yRotation;
+
+    // TODO adjust range!!
+
+    btVector3 start = toBulletVector3(m_position);
+    btVector3 end = toBulletVector3(m_position + QVector3D(rotation.transposed() * QVector4D(0, 0, -100, 0.)));
+
+    btCollisionWorld::ClosestRayResultCallback callback(start, end);
+
+    // Perform raycast
+    m_bulletWorld->rayTest(start, end, callback);
+
+    if(callback.hasHit())
+    {
+        auto object = (Object *)callback.m_collisionObject->getUserPointer();
+
+        // TODO trigger event
     }
 }
 
@@ -256,7 +290,9 @@ void BulletGame::loadScene(const QString &filename)
         btRigidBody *body = new btRigidBody(0, nullptr, it->second, btVector3(0, 0, 0)); // No inertia
         body->setWorldTransform(transformation);
 
-        m_bodies[object] = body;
+        // link body and object together!
+        body->setUserPointer(object);
+        object->setUserPointer(body);
 
         m_bulletWorld->addRigidBody(body);
     }

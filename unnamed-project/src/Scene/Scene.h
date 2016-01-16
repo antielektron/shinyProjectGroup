@@ -47,9 +47,17 @@ public:
     QVector3D &getDirectionalLightDirection();
     QVector3D &getLightColor();
 
+    // Models
     void addModel(std::unique_ptr<Model> model);
     void removeModel(const std::string &modelName);
 
+    Model *getModel(const std::string &modelName);
+
+    typedef std::map<std::string, std::unique_ptr<Model>>::const_iterator ModelIterator;
+    range<ModelIterator> getModels();
+
+
+    // Objects
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
@@ -59,26 +67,22 @@ public:
 
     void updateObjectList();
 
-    typedef std::map<std::string, std::unique_ptr<Model>>::const_iterator ModelIterator;
-    range<ModelIterator> getModels();
-
     typedef std::vector<Object *>::const_iterator ObjectIterator;
     range<ObjectIterator> getObjects();
 
+    range<ObjectGroup::object_iterator_type> getEditorObjects();
 
-    void performAnimations(IObjectBaseObserver *listener = nullptr);
-    void cancelAnimations();
 
+    // Animations
     void addAnimation(std::unique_ptr<AnimationBase> animation);
     void deleteAnimation(AnimationBase *animation);
+
+    void performAnimations(IObjectBaseObserver *listener = nullptr);
+    void cancelAllAnimations();
 
     typedef std::vector<std::unique_ptr<AnimationBase>>::const_iterator AnimationIterator;
     range<AnimationIterator> getAnimations();
 
-
-    range<ObjectGroup::object_iterator_type> getEditorObjects();
-
-    Model *getModel(const std::string &modelName);
 
     GlobalState *getGlobalState();
 
@@ -101,13 +105,12 @@ private:
     void readAttributesFromDom(const QDomElement &domElem);
     void readAnimatorsFromDom(const QDomElement &domElem);
 
-    QVector3D getPositionFromDom(const QDomElement &domElement);
-    QVector3D getRotationFromDom(const QDomElement &domElement);
-    QVector3D getScalingFromDom(const QDomElement &domElement);
+    QVector3D readVectorFromDom(const QDomElement &domElement, const QVector3D &defValue = QVector3D(0, 0, 0));
 
     void writeObjectTree(ObjectGroup *root, QXmlStreamWriter &writer);
     void writeModels(QXmlStreamWriter &writer);
-    void writePosition(const QVector3D &position, QXmlStreamWriter &writer);
+    void writeAttribute(QXmlStreamWriter &writer, const QString &key, const QVariant &value);
+    void writeVectorToXml(const QVector3D &position, QXmlStreamWriter &writer);
     void writeRotation(const QVector3D &rotation, QXmlStreamWriter &writer);
     void writeScaling(const QVector3D &scaling, QXmlStreamWriter &writer);
 
