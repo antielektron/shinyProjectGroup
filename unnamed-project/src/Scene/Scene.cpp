@@ -670,10 +670,12 @@ void Scene::performAnimations(float time, IObjectBaseObserver *listener)
     // TODO move this to global state maybe..
     m_globalState->setTime(time);
 
-    typedef smart_iterator<std::vector<std::unique_ptr<AnimationBase>>::iterator> Iterator;
     std::vector<AnimationBase *> weakAnimations;
 
-    std::copy(Iterator(m_animations.begin()), Iterator(m_animations.end()), std::back_inserter(weakAnimations));
+    for (auto &animation : m_animations)
+    {
+        weakAnimations.push_back(animation.get());
+    }
 
     // TODO
     for (const auto &animation : weakAnimations)
