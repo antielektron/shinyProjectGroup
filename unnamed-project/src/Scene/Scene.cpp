@@ -816,6 +816,8 @@ void Scene::addToObjectList(ObjectGroup *root)
 //------------------------------------------------------------------------------
 ObjectBase *Scene::findObjectByName(ObjectGroup *root, const QString &name)
 {
+    if (root->getName() == name)
+        return root;
 
     for (auto child : root->getObjects())
     {

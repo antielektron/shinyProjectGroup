@@ -21,6 +21,7 @@ struct AccessObjectPosition
     void set(const ValueType &value)
     {
         m_object->setPosition(value);
+        m_object->updateWorld();
     }
 
     ObjectType *m_object;
@@ -41,6 +42,7 @@ struct AccessObjectRotation
     void set(const ValueType &value)
     {
         m_object->setRotation(value);
+        m_object->updateWorld();
     }
 
     ObjectType *m_object;
