@@ -19,7 +19,7 @@ public:
     virtual bool isFinished(double time) = 0;
 
     // TODO evaluate wether we have to write them or not, as the will be created on the fly!?
-    virtual void writeToXml() = 0;
+    // virtual void writeToXml() = 0;
 };
 
 #endif // UNNAMED_PROJECT_GAME_LOGIC_INTERPOLATION_BASE_H

@@ -7,6 +7,8 @@
 #include "GameLogic/Actions/MultiplyAttributeAction.h"
 #include "GameLogic/Actions/DivideAttributeAction.h"
 
+#include "GameLogic/Actions/ObjectAnimationAction.h"
+
 template <typename ...Args>
 struct CreateActionHelper {};
 
@@ -81,7 +83,14 @@ typedef CreateActionHelper<
         MultiplyAttributeAction<double>,
 
         DivideAttributeAction<int>,
-        DivideAttributeAction<double>
+        DivideAttributeAction<double>,
+
+        ObjectAnimationAction<AccessObjectPosition>,
+        ObjectAnimationAction<AccessObjectRotation>,
+
+        ObjectAnimationAction<AccessObjectAmbientColor>,
+        ObjectAnimationAction<AccessObjectDiffuseColor>,
+        ObjectAnimationAction<AccessObjectSpecularColor>
         > HelperType;
 
 std::unique_ptr<ActionBase> Factory::createActionFromType(GlobalState *state, const QString &type)

@@ -17,16 +17,17 @@
 
 class ObjectBase;
 class Scene;
+class IObjectBaseObserver;
 
 class AnimationBase
 {
 public:
     // TODO consider constructor with domElement
     // AnimatorBase(Scene *scene, const QDomElement &domElement);
-    AnimationBase(ObjectBase *object, Scene *scene, std::unique_ptr<InterpolationBase> interpolation);
+    AnimationBase(Scene *scene, std::unique_ptr<InterpolationBase> interpolation);
     virtual ~AnimationBase();
 
-    virtual void tick(float currentTime) = 0;
+    virtual void tick(float time, IObjectBaseObserver *observer) = 0;
 
     virtual QString type() = 0;
 
@@ -38,10 +39,7 @@ public:
     // TODO reset/instant finish/leave as is
     void cancelAnimation();
 
-    ObjectBase *getObject();
-
 protected:
-    ObjectBase *m_object;
     Scene *m_scene;
 
     std::unique_ptr<InterpolationBase> m_interpolation;

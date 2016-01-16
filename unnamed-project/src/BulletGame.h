@@ -11,7 +11,7 @@
 #include <QMatrix3x3>
 
 #include "IGame.h"
-#include "IObjectBaseObserver.h"
+#include "Scene/IObjectBaseObserver.h"
 
 class Scene;
 class Object;

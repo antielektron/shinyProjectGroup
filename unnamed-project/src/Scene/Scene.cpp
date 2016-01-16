@@ -665,17 +665,15 @@ void Scene::deleteAnimation(AnimationBase *animation)
 }
 
 //------------------------------------------------------------------------------
-void Scene::performAnimations(IObjectBaseObserver *listener)
+void Scene::performAnimations(float time, IObjectBaseObserver *listener)
 {
+    // TODO move this to global state maybe..
+    m_globalState->setTime(time);
     // TODO
     for (const auto &animation : m_animations)
     {
         // TODO what happens if the animation deletes itself and invalidates the animators list?!
-        animation->tick(0);
-        if (listener)
-        {
-            listener->notify(animation->getObject());
-        }
+        animation->tick(time, listener);
     }
 }
 

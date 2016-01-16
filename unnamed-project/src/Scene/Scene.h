@@ -77,7 +77,7 @@ public:
     void addAnimation(std::unique_ptr<AnimationBase> animation);
     void deleteAnimation(AnimationBase *animation);
 
-    void performAnimations(IObjectBaseObserver *listener = nullptr);
+    void performAnimations(float time, IObjectBaseObserver *listener = nullptr);
     void cancelAllAnimations();
 
     typedef std::vector<std::unique_ptr<AnimationBase>>::const_iterator AnimationIterator;

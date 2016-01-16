@@ -52,10 +52,16 @@ public:
 
     void triggerEvent(const QString &name);
 
+    // TODO remove, ugly workaround!!!!!!!!!!!!!!!
+    void setTime(float time);
+    float getTime();
+
 protected:
     void initializeExternalAttributes();
 
     Scene *m_scene;
+
+    float m_time;
 
     std::map<QString, QVariant> m_attributes;
 

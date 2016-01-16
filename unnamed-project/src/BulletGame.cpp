@@ -50,9 +50,12 @@ void BulletGame::tick(float dt)
     // update time in globalState:
     // TODO provide player position + time in "external attribute"
 
+    // TODO count time
+    float time = 0;
+
     // run Animataions and run handle game logic events:
     m_scene->getGlobalState()->triggerEvent("tick");
-    m_scene->performAnimations(this);
+    m_scene->performAnimations(time, this);
 
     // TODO check if we clicked anything!
 

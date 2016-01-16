@@ -125,3 +125,15 @@ void GlobalState::initializeExternalAttributes()
     // QVector3D playerPosition(0, 0, 0);
     // setValue(KEY_ATTRIBUTE_PLAYER, QVariant(playerPosition));
 }
+
+//------------------------------------------------------------------------------
+void GlobalState::setTime(float time)
+{
+    m_time = time;
+}
+
+//------------------------------------------------------------------------------
+float GlobalState::getTime()
+{
+    return m_time;
+}
