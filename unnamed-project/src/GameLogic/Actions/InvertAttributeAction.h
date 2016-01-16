@@ -4,8 +4,8 @@
 #include <QDomElement>
 
 #include "GameLogic/Actions/ActionBase.h"
-#include "GameLogic/Actions/Traits.h"
 #include "GameLogic/GlobalState.h"
+#include "GameLogic/Traits.h"
 
 template <typename T>
 class InvertAttributeAction : public ActionBase
@@ -97,7 +97,6 @@ void InvertAttributeAction<T>::writeToXml(QXmlStreamWriter &writer)
 
 namespace traits
 {
-
     template <>
     struct action_name<InvertAttributeAction<int>>
     {
@@ -115,7 +114,6 @@ namespace traits
     {
         static constexpr const char *value = "binv";
     };
-
 }
 
 

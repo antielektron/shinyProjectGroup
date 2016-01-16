@@ -11,7 +11,6 @@
 #include "SceneEditor/GlobalDetailsWidget.h"
 #include "AttributesWidget.h"
 #include "SceneEditor/GameLogic/EventsWidget.h"
-#include "SceneEditor/AnimatorsWidget.h"
 
 #include "Scene/Model.h"
 
@@ -40,7 +39,6 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     m_globalDetails = new GlobalDetailsWidget(m_game, this);
     m_attributeWidget = new AttributesWidget(m_game, this);
     m_eventsWidget = new EventsWidget(m_game, this);
-    m_animatorsWidget = new AnimatorsWidget(this);
 
     m_objectDetailsDock = new QDockWidget("Object Details", this);
     m_objectDetailsDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
@@ -66,10 +64,6 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     m_eventWidgetDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
     m_eventWidgetDock->setWidget(m_eventsWidget);
 
-    m_animatorsWidgetDock = new QDockWidget("Animators List", this);
-    m_animatorsWidgetDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
-    m_animatorsWidgetDock->setWidget(m_animatorsWidget);
-
 
     this->addDockWidget(Qt::LeftDockWidgetArea, m_objectDetailsDock);
     this->addDockWidget(Qt::RightDockWidgetArea, m_objectListDock);
@@ -77,11 +71,9 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     this->addDockWidget(Qt::LeftDockWidgetArea, m_globalDetailsDock);
     this->addDockWidget(Qt::LeftDockWidgetArea, m_attributeWidgetDock);
     this->addDockWidget(Qt::LeftDockWidgetArea, m_eventWidgetDock);
-    this->addDockWidget(Qt::LeftDockWidgetArea, m_animatorsWidgetDock);
 
     this->tabifyDockWidget(m_globalDetailsDock, m_objectDetailsDock);
     this->tabifyDockWidget(m_attributeWidgetDock, m_eventWidgetDock);
-    this->tabifyDockWidget(m_eventWidgetDock, m_animatorsWidgetDock);
 
 
     createActions();
@@ -176,20 +168,8 @@ void SceneEditorWindow::connectStuff()
     connect(m_objectList, SIGNAL(updateSceneObjectsRequest()),
             this, SLOT(onUpdateSceneObjectsRequest()));
 
-    connect(m_animatorsWidget, SIGNAL(animatorAdded(std::unique_ptr<Animator> *)),
-            m_game.get(), SLOT(addAnimator(std::unique_ptr<Animator> *)));
-
-    connect(this, SIGNAL(globalStateModified(GlobalState *)),
-            m_animatorsWidget, SLOT(onAnimatorsChanged()));
-
     connect(m_game.get(), SIGNAL(sceneChanged()),
            this, SLOT(onSceneChanged()));
-
-    connect(m_game.get(), SIGNAL(animatorsChanged()),
-            m_animatorsWidget, SLOT(onAnimatorsChanged()));
-
-    connect(m_animatorsWidget, SIGNAL(animatorDeleted(Animator *)),
-            m_game.get(), SLOT(delAnimator(Animator *)));
 
 
     //connect Actions:
@@ -268,7 +248,5 @@ void SceneEditorWindow::onUpdateSceneObjectsRequest()
 //------------------------------------------------------------------------------
 void SceneEditorWindow::onSceneChanged()
 {
-    m_animatorsWidget->setScene(m_game->getScene());
     emit globalStateModified(m_game.get()->getScene()->getGlobalState());
 }
-

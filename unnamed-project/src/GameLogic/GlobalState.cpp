@@ -1,5 +1,4 @@
 #include "GameLogic/GlobalState.h"
-#include "GameLogic/Animators/Animator.h"
 #include "GameLogic/Event.h"
 
 #include "GameLogic/GameLogicDatatypes.h"
@@ -113,15 +112,9 @@ void GlobalState::triggerEvent(const QString &name)
 }
 
 //------------------------------------------------------------------------------
-range<GlobalState::AttributesIterator> GlobalState::getAttributes()
+range<GlobalState::AttributeIterator> GlobalState::getAttributes()
 {
-    return range<AttributesIterator>(m_attributes.begin(), m_attributes.end());
-}
-
-//------------------------------------------------------------------------------
-void GlobalState::registerAnimator(const QString &watchedAttrib, Animator *anim)
-{
-    m_animatorsPerAttribute[watchedAttrib].push_back(anim);
+    return range<AttributeIterator>(m_attributes.begin(), m_attributes.end());
 }
 
 //------------------------------------------------------------------------------
@@ -133,15 +126,4 @@ void GlobalState::initializeConstantAttributes()
     // TODO store coordinates in player_x, player_y, player_z (maybe, maybe not!)
     QVector3D playerPosition(0, 0, 0);
     setValue(KEY_ATTRIBUTE_PLAYER, QVariant(playerPosition));
-}
-
-//------------------------------------------------------------------------------
-void GlobalState::notifyListeners(const QString &key)
-{
-    for (const auto &anim : m_animatorsPerAttribute[key])
-    {
-        float time = getValue(KEY_ATTRIBUTE_TIME).toFloat();
-        QVector3D vec = getValue(key).value<QVector3D>();
-        anim->onValueChanged(vec, time);
-    }
 }

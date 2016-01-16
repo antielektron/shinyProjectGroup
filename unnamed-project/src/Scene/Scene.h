@@ -23,7 +23,7 @@
 
 #include "SceneEditor/EditorObject.h"
 #include "GameLogic/GlobalState.h"
-#include "GameLogic/Animators/Animator.h"
+#include "GameLogic/Animations/AnimationBase.h"
 #include "IObjectBaseObserver.h"
 
 class Scene
@@ -50,9 +50,6 @@ public:
     void addModel(std::unique_ptr<Model> model);
     void removeModel(const std::string &modelName);
 
-    void performAnimations(IObjectBaseObserver *listener = nullptr);
-    void instantlyFinishAnimations();
-
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
 
@@ -68,8 +65,16 @@ public:
     typedef std::vector<Object *>::const_iterator ObjectIterator;
     range<ObjectIterator> getObjects();
 
-    typedef std::vector<std::unique_ptr<Animator>>::const_iterator AnimatorIterator;
-    range<AnimatorIterator> getAnimators();
+
+    void performAnimations(IObjectBaseObserver *listener = nullptr);
+    void cancelAnimations();
+
+    void addAnimation(std::unique_ptr<AnimationBase> animation);
+    void deleteAnimation(AnimationBase *animation);
+
+    typedef std::vector<std::unique_ptr<AnimationBase>>::const_iterator AnimationIterator;
+    range<AnimationIterator> getAnimations();
+
 
     range<ObjectGroup::object_iterator_type> getEditorObjects();
 
@@ -86,9 +91,6 @@ public:
     const QString &getName() const;
     const QString &getVersion() const;
     const QString &getAuthor() const;
-
-    void addAnimator(std::unique_ptr<Animator> animator);
-    void delAnimator(Animator *anim);
 
     ObjectBase *findObjectByName(ObjectGroup *root, const QString &name);
 
@@ -108,7 +110,6 @@ private:
     void writePosition(const QVector3D &position, QXmlStreamWriter &writer);
     void writeRotation(const QVector3D &rotation, QXmlStreamWriter &writer);
     void writeScaling(const QVector3D &scaling, QXmlStreamWriter &writer);
-    void writeAnimator(Animator *animation, QXmlStreamWriter &writer);
 
     void addToObjectList(ObjectGroup *group);
 
@@ -135,7 +136,7 @@ private:
 
     std::vector<Object *> m_objects;
 
-    std::vector<std::unique_ptr<Animator>> m_animators;
+    std::vector<std::unique_ptr<AnimationBase>> m_animations;
 
     // Meta information
     QString m_sceneName;

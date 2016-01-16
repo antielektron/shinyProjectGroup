@@ -6,8 +6,6 @@
 
 #include "Scene/Scene.h"
 #include "GameLogic/Event.h"
-#include "GameLogic/Animators/RotationAnimator.h"
-#include "GameLogic/Animators/PositionAnimator.h"
 
 #include "GameLogic/GameLogicDatatypes.h"
 
@@ -111,7 +109,7 @@ void Scene::loadFromFile(const QString &filename)
         }
     }
 
-    instantlyFinishAnimations();
+    cancelAnimations();
     // Apply transformations to objects
     m_rootGroup.updateWorld();
 }
@@ -279,6 +277,7 @@ void Scene::readAttributesFromDom(const QDomElement &domElem)
 //------------------------------------------------------------------------------
 void Scene::readAnimatorsFromDom(const QDomElement &domElem)
 {
+    /*
     for (auto child = domElem.firstChildElement(); !child.isNull(); child = child.nextSiblingElement())
     {
         if (child.tagName() == "Animator")
@@ -305,7 +304,7 @@ void Scene::readAnimatorsFromDom(const QDomElement &domElem)
             {
             case AnimationType::Position:
             {
-                addAnimator(std::unique_ptr<Animator>(new PositionAnimator(
+                addAnimator(std::unique_ptr<AnimatorBase>(new PositionAnimator(
                                                           object,
                                                           m_globalState.get(),
                                                           key,
@@ -315,7 +314,7 @@ void Scene::readAnimatorsFromDom(const QDomElement &domElem)
             }
             case AnimationType::Rotation:
             {
-                addAnimator(std::unique_ptr<Animator>(new RotationAnimator(
+                addAnimator(std::unique_ptr<AnimatorBase>(new RotationAnimator(
                                                           object,
                                                           m_globalState.get(),
                                                           key,
@@ -338,6 +337,7 @@ void Scene::readAnimatorsFromDom(const QDomElement &domElem)
             << std::endl;
         }
     }
+     */
 }
 
 //------------------------------------------------------------------------------
@@ -478,9 +478,9 @@ void Scene::saveToFile(const QString &filename)
     // Animators:
     xmlWriter.writeStartElement("Animators");
 
-    for (const auto &anim : m_animators)
+    for (const auto &anim : m_animations)
     {
-        writeAnimator(anim.get(), xmlWriter);
+        // TODO
     }
 
     xmlWriter.writeEndElement();
@@ -569,24 +569,6 @@ void Scene::writeScaling(const QVector3D &pos, QXmlStreamWriter &writer)
 }
 
 //------------------------------------------------------------------------------
-void Scene::writeAnimator(Animator *animation, QXmlStreamWriter &writer)
-{
-    writer.writeStartElement("Animator");
-
-    writer.writeAttribute("type", animationToQString.at(animation->getAnimationType()));
-    writer.writeAttribute("time", QString::number(animation->getAnimationTime()));
-
-    writer.writeAttribute("interpolation", interpolationToQString.at(
-                              animation->getInterpolationType()));
-    writer.writeAttribute("key", animation->getAttributeKey());
-
-    writer.writeAttribute("object", animation->getObject()->getName());
-
-    writer.writeEndElement();
-
-}
-
-//------------------------------------------------------------------------------
 void Scene::setCameraView(const QMatrix4x4 &camera)
 {
     m_camera = camera;
@@ -627,10 +609,10 @@ void Scene::removeModel(const std::string &modelName)
 //------------------------------------------------------------------------------
 void Scene::performAnimations(IObjectBaseObserver *listener)
 {
-    float curTime = m_globalState->getValue(KEY_ATTRIBUTE_TIME).toFloat();
-    for (const auto &anim : this->getAnimators())
+    // TODO
+    for (const auto &anim : this->getAnimations())
     {
-        anim->tick(curTime);
+        anim->tick(0);
         if (listener)
         {
             listener->notify(anim->getObject());
@@ -639,11 +621,11 @@ void Scene::performAnimations(IObjectBaseObserver *listener)
 }
 
 //------------------------------------------------------------------------------
-void Scene::instantlyFinishAnimations()
+void Scene::cancelAnimations()
 {
-    for (auto const &anim : this->getAnimators())
+    for (auto const &animation : this->getAnimations())
     {
-        anim->instantlyFinishCurrentAnimation();
+        animation->cancelAnimation();
     }
 }
 
@@ -696,9 +678,9 @@ range<Scene::ObjectIterator> Scene::getObjects()
 }
 
 //------------------------------------------------------------------------------
-range<Scene::AnimatorIterator> Scene::getAnimators()
+range<Scene::AnimationIterator> Scene::getAnimations()
 {
-    return range<AnimatorIterator>(m_animators.cbegin(), m_animators.cend());
+    return createRange(m_animations.cbegin(), m_animations.cend());
 }
 
 //------------------------------------------------------------------------------
@@ -843,19 +825,19 @@ const QString &Scene::getAuthor() const
 }
 
 //------------------------------------------------------------------------------
-void Scene::addAnimator(std::unique_ptr<Animator> animator)
+void Scene::addAnimation(std::unique_ptr<AnimationBase> animation)
 {
-    m_animators.push_back(std::move(animator));
+    m_animations.push_back(std::move(animation));
 }
 
 //------------------------------------------------------------------------------
-void Scene::delAnimator(Animator *anim)
+void Scene::deleteAnimation(AnimationBase *animation)
 {
-    for (auto it = m_animators.begin(); it != m_animators.end(); it++)
+    for (auto it = m_animations.begin(); it != m_animations.end(); it++)
     {
-        if (it->get() == anim)
+        if (it->get() == animation)
         {
-            m_animators.erase(it);
+            m_animations.erase(it);
             break;
         }
     }

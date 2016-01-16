@@ -1,16 +1,18 @@
-#ifndef GLOBALSTATE_H
-#define GLOBALSTATE_H
+#ifndef UNNAMED_PROJECT_GAME_LOGIC_GLOBAL_STATE_H
+#define UNNAMED_PROJECT_GAME_LOGIC_GLOBAL_STATE_H
+
+#include <memory>
 
 #include <map>
 #include <vector>
 #include <QString>
 #include <QVariant>
-#include <memory>
+#include <QVector3D>
+
 #include "smartiterator.h"
 #include "GameLogic/Preconditions/PreconditionBase.h"
 #include "GameLogic/Actions/ActionBase.h"
 
-class Animator;
 class Event;
 class Scene;
 
@@ -20,6 +22,7 @@ public:
     GlobalState(Scene *scene);
     ~GlobalState();
 
+    // clear?
     void init();
 
     Scene *getScene();
@@ -35,11 +38,9 @@ public:
     void setValue(const QString &key, const QVariant &value);
     void removeValue(const QString &key);
 
-    typedef std::map<QString, QVariant>::iterator AttributesIterator;
+    typedef std::map<QString, QVariant>::iterator AttributeIterator;
 
-    range<AttributesIterator> getAttributes();
-
-    void registerAnimator(const QString &watchedAttrib, Animator *anim);
+    range<AttributeIterator> getAttributes();
 
 
     typedef std::vector<std::unique_ptr<Event>>::iterator EventIterator;
@@ -53,14 +54,10 @@ public:
 
 protected:
     void initializeConstantAttributes();
-    void notifyListeners(const QString &key);
 
     Scene *m_scene;
 
     std::map<QString, QVariant> m_attributes;
-    std::map<QString, std::vector<Animator *>> m_animatorsPerAttribute;
-
-    std::vector<QString> m_notifierList;
 
     std::vector<std::unique_ptr<Event>> m_events;
 
@@ -68,4 +65,4 @@ protected:
     std::map<QString, QVariant> m_stashedAttributes;
 };
 
-#endif // GLOBALSTATE_H
+#endif // UNNAMED_PROJECT_GAME_LOGIC_GLOBAL_STATE_H

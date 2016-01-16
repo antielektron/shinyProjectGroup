@@ -2,7 +2,7 @@
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_IS_EQUAL_PRECONDITION_H
 
 #include "GameLogic/Preconditions/BinaryPreconditionBase.h"
-#include "GameLogic/Preconditions/Traits.h"
+#include "GameLogic/Traits.h"
 
 template <typename T>
 class IsEqualPrecondition : public BinaryPreconditionBase<T>

@@ -5,7 +5,7 @@
 #include <QDomElement>
 
 #include "GameLogic/Preconditions/PreconditionBase.h"
-#include "GameLogic/Preconditions/Traits.h"
+#include "GameLogic/Traits.h"
 
 class GlobalState;
 

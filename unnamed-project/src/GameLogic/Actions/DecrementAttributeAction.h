@@ -2,7 +2,7 @@
 #define UNNAMED_PROJECT_GAME_LOGIC_ACTIONS_DECREMENT_ATTRIBUTE_ACTION_H
 
 #include "GameLogic/Actions/ArithmeticActionBase.h"
-#include "GameLogic/Actions/Traits.h"
+#include "GameLogic/Traits.h"
 
 template <typename T>
 class DecrementAttributeAction : public ArithmeticActionBase<T>
@@ -61,7 +61,6 @@ QString DecrementAttributeAction<T>::type()
 
 namespace traits
 {
-
     template <>
     struct action_name<DecrementAttributeAction<int>>
     {
@@ -73,7 +72,6 @@ namespace traits
     {
         static constexpr const char *value = "fdec";
     };
-
 }
 
 

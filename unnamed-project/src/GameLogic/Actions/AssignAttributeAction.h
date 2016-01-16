@@ -2,7 +2,7 @@
 #define UNNAMED_PROJECT_GAME_LOGIC_ACTIONS_ASSIGN_ATTRIBUTE_ACTION_H
 
 #include "GameLogic/Actions/ArithmeticActionBase.h"
-#include "GameLogic/Actions/Traits.h"
+#include "GameLogic/Traits.h"
 
 template <typename T>
 class AssignAttributeAction : public ArithmeticActionBase<T>
@@ -58,7 +58,6 @@ QString AssignAttributeAction<T>::type()
 
 namespace traits
 {
-
     template <>
     struct action_name<AssignAttributeAction<int>>
     {
@@ -76,7 +75,6 @@ namespace traits
     {
     static constexpr const char *value = "bmov";
     };
-
 }
 
 

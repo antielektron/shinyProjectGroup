@@ -86,9 +86,6 @@ private:
     QDockWidget *m_eventWidgetDock;
     EventsWidget *m_eventsWidget;
 
-    QDockWidget *m_animatorsWidgetDock;
-    AnimatorsWidget *m_animatorsWidget;
-
     std::shared_ptr<SceneEditorGame> m_game;
 
     Model *m_currentModel;

@@ -307,7 +307,7 @@ void SceneEditorGame::runLogic()
 {
     if (!m_logicRunning)
     {
-        m_scene->instantlyFinishAnimations();
+        m_scene->cancelAnimations();
         m_scene->getGlobalState()->stash();
         m_logicRunning = true;
         m_logicPaused = false;
@@ -376,16 +376,16 @@ void SceneEditorGame::notifyEventChanged()
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::addAnimator(std::unique_ptr<Animator> animator)
+void SceneEditorGame::addAnimation(std::unique_ptr<AnimationBase> animation)
 {
-    m_scene->addAnimator(std::move(animator));
+    m_scene->addAnimation(std::move(animation));
     emit animatorsChanged();
 }
 
 //------------------------------------------------------------------------------
-void SceneEditorGame::deleteAnimator(Animator *animator)
+void SceneEditorGame::deleteAnimation(AnimationBase *animation)
 {
-    m_scene->delAnimator(animator);
+    m_scene->deleteAnimation(animation);
     emit animatorsChanged();
 }
 

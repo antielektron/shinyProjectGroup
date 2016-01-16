@@ -58,8 +58,8 @@ public:
 	void deleteEvent(GlobalState::EventIterator iterator);
 	void notifyEventChanged();
 
-	void addAnimator(std::unique_ptr<Animator> animator);
-	void deleteAnimator(Animator *animator);
+	void addAnimation(std::unique_ptr<AnimationBase> animator);
+	void deleteAnimation(AnimationBase *animation);
 
 public slots:
     void runLogic();
