@@ -24,27 +24,40 @@
 #define KEYSTR_PROGRAM_SHADOW  "Shadow"
 #define KEYSTR_PROGRAM_COPY    "Copy"
 
-
-enum class ShaderType
+const std::map<QOpenGLShader::ShaderTypeBit, std::string> shaderTypeToString =
 {
-    Fragment,
-    Vertex,
-    Geometry
+    { QOpenGLShader::KEY_SHADER_FRAGMENT, TOSTR(KEY_SHADER_FRAGMENT) },
+    { QOpenGLShader::KEY_SHADER_VERTEX, TOSTR(KEY_SHADER_VERTEX) },
+    { QOpenGLShader::KEY_SHADER_GEOMETRY, TOSTR(KEY_SHADER_GEOMETRY) }
 };
 
-const std::map<ShaderType, std::string> shaderTypeToString =
+const std::map<std::string, QOpenGLShader::ShaderTypeBit> stringToShaderType =
 {
-    { ShaderType::KEY_SHADER_FRAGMENT, TOSTR(KEY_SHADER_FRAGMENT) },
-    { ShaderType::KEY_SHADER_VERTEX, TOSTR(KEY_SHADER_VERTEX) },
-    { ShaderType::KEY_SHADER_GEOMETRY, TOSTR(KEY_SHADER_GEOMETRY) }
+    { TOSTR(KEY_SHADER_FRAGMENT), QOpenGLShader::KEY_SHADER_FRAGMENT },
+    { TOSTR(KEY_SHADER_VERTEX), QOpenGLShader::KEY_SHADER_VERTEX },
+    { TOSTR(KEY_SHADER_GEOMETRY), QOpenGLShader::KEY_SHADER_GEOMETRY }
 };
 
-const std::map<std::string, ShaderType> stringToShaderType =
+namespace std
 {
-    { TOSTR(KEY_SHADER_FRAGMENT), ShaderType::KEY_SHADER_FRAGMENT },
-    { TOSTR(KEY_SHADER_VERTEX), ShaderType::KEY_SHADER_VERTEX },
-    { TOSTR(KEY_SHADER_GEOMETRY), ShaderType::KEY_SHADER_GEOMETRY }
-};
+    template<>
+    struct less<std::pair<std::string, QOpenGLShader::ShaderTypeBit>>
+    {
+        typedef std::pair<std::string, QOpenGLShader::ShaderTypeBit> type;
+
+        bool operator () (const type &lhs, const type &rhs)
+        {
+            if (lhs.first == rhs.first)
+            {
+                return lhs.second < rhs.second;
+            }
+            else
+            {
+                return lhs.first < rhs.first;
+            }
+        }
+    };
+}
 
 class Renderer : public IRenderer
 {
@@ -55,14 +68,41 @@ public:
     virtual void initialize() override;
     virtual void render(GLuint fbo, Scene *scene) override;
     virtual void resize(int width, int height) override;
+
+    //DEPRECATED
     virtual ShaderErrorType createShaderProgram(const std::string &vs, const std::string &fs) override;
-    virtual std::string &getVertexShader() override;
-    virtual std::string &getFragmentShader() override;
 
-    typedef std::pair<std::string, ShaderType> ShaderSourcesKeyType;
-    typedef std::vector<std::pair<ShaderType, std::string>> ShaderSourcesType;
+    typedef std::pair<std::string, QOpenGLShader::ShaderTypeBit> ShaderSourcesKeyType;
+    typedef std::vector<std::pair<std::string, QOpenGLShader::ShaderTypeBit>> ShaderSourcesType;
 
-    void createProgram(const std::string &program, const ShaderSourcesType &sources);
+    /**
+     * @brief setShaderSource   add or replace a shader
+     * @param shaderSrc         shader's code
+     * @param progName          name of the corresponding program
+     * @param type              shader's type
+     */
+    void setShaderSource(const std::string &shaderSrc,
+                   const std::string &progName,
+                   QOpenGLShader::ShaderTypeBit type);
+
+    /**
+     * @brief createProgram creates an openGlProgram from given shaders
+     * @param program name of the Program
+     * @return
+     */
+    ShaderErrorType createProgram(const std::string &program);
+
+    /**
+     * @brief updateShader  update a shader and update (= recreate) the corresponding
+     *                      program
+     * @param shaderSrc     new shader Source
+     * @param progName      name of the program to update
+     * @param shaderType    shader's type
+     * @return
+     */
+    ShaderErrorType updateShader(const std::string &shaderSrc,
+                                 const std::string &progName,
+                                 QOpenGLShader::ShaderTypeBit shaderType);
 
 private:
     void rotateVectorToVector(const QVector3D &source, const QVector3D &destination, QMatrix4x4 &matrix);
@@ -116,10 +156,11 @@ private:
 
     // map for shader programs:
     std::map<std::string, std::unique_ptr<QOpenGLShaderProgram>> m_programs;
-    std::unordered_map<ShaderSourcesKeyType, std::string> m_sources;
+    std::map<ShaderSourcesKeyType, std::string> m_sources;
 
     // uniforms and attrib locations:
-    std::map<std::string, std::pair<int *, std::string>> m_uniformKeys;
+    std::map<std::string, std::vector< std::pair<GLuint *, const char *>>> m_uniformLocs;
+    std::map<std::string, std::vector< std::pair<GLuint, const char *>>> m_attribLocs;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H

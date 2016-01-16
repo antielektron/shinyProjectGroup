@@ -25,6 +25,8 @@ Renderer::Renderer() :
 {
 }
 
+//------------------------------------------------------------------------------
+
 Renderer::~Renderer()
 {
     // Delete the manually created objects!
@@ -33,6 +35,8 @@ Renderer::~Renderer()
     glDeleteTextures(1, &m_normalTexture);
     glDeleteRenderbuffers(1, &m_renderDepthBuffer);
 }
+
+//------------------------------------------------------------------------------
 
 ShaderErrorType Renderer::createShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource)
 {
@@ -79,16 +83,6 @@ ShaderErrorType Renderer::createShaderProgram(const std::string &vertexShaderSou
     m_program->release();
 
     return ShaderErrorType::NoError;
-}
-
-std::string &Renderer::getVertexShader()
-{
-    return m_currentVertexShader;
-}
-
-std::string &Renderer::getFragmentShader()
-{
-    return m_currentFragmentShader;
 }
 
 void Renderer::createComposeProgram()
@@ -226,6 +220,38 @@ void Renderer::initialize()
 {
     // initializeOpenGLFunctions();
     glClearColor(0, 0, 0, 1);
+
+    // set shaders:
+    // default program:
+    setShaderSource(loadTextFile("shaders/vertex.glsl"),
+                    KEYSTR_PROGRAM_DEFAULT,
+                    QOpenGLShader::Vertex);
+    setShaderSource(loadTextFile("shaders/fragment.glsl"),
+                    KEYSTR_PROGRAM_DEFAULT,
+                    QOpenGLShader::Fragment);
+    // shadow map program
+    setShaderSource(loadTextFile("shaders/vertex_shadowmap.glsl"),
+                    KEYSTR_PROGRAM_SHADOW,
+                    QOpenGLShader::Vertex);
+    setShaderSource(loadTextFile("shaders/geometry_shadowmap.glsl"),
+                    KEYSTR_PROGRAM_SHADOW,
+                    QOpenGLShader::Geometry);
+    setShaderSource(loadTextFile("shaders/fragment_shadowmap.glsl"),
+                    KEYSTR_PROGRAM_SHADOW,
+                    QOpenGLShader::Fragment);
+    // compose program:
+    setShaderSource(loadTextFile("shaders/vertex_copy.glsl"),
+                    KEYSTR_PROGRAM_COPY,
+                    QOpenGLShader::Vertex);
+    setShaderSource(loadTextFile("shaders/fragment_copy.glsl"),
+                    KEYSTR_PROGRAM_COPY,
+                    QOpenGLShader::Fragment);
+
+    // generate attrib and uniform locations
+    // default:
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                std::make_pair(&m_modelViewMatrixLoc, "modelViewMatrix"));
+
 
     createShaderProgram(
                 loadTextFile("shaders/vertex.glsl"),
