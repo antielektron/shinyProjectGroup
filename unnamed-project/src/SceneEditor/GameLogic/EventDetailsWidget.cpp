@@ -152,6 +152,7 @@ void EventDetailsWidget::onEventsChanged()
     // NOTE: global state has to exist at this point!
 
     m_nameEdit->setText(m_event->getName());
+    m_descriptionEdit->setText(m_event->getDescription());
 
     m_actions->clear();
     m_preconditions->clear();

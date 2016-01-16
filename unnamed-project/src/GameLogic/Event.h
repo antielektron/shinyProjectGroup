@@ -26,7 +26,7 @@ public:
     void writeToXml(QXmlStreamWriter &writer);
 
     // evaluate logic
-    void triger();
+    bool triger();
 
     void setName(const QString &name);
     const QString &getName();

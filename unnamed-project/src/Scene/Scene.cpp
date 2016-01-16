@@ -669,8 +669,14 @@ void Scene::performAnimations(float time, IObjectBaseObserver *listener)
 {
     // TODO move this to global state maybe..
     m_globalState->setTime(time);
+
+    typedef smart_iterator<std::vector<std::unique_ptr<AnimationBase>>::iterator> Iterator;
+    std::vector<AnimationBase *> weakAnimations;
+
+    std::copy(Iterator(m_animations.begin()), Iterator(m_animations.end()), std::back_inserter(weakAnimations));
+
     // TODO
-    for (const auto &animation : m_animations)
+    for (const auto &animation : weakAnimations)
     {
         // TODO what happens if the animation deletes itself and invalidates the animators list?!
         animation->tick(time, listener);
@@ -680,6 +686,7 @@ void Scene::performAnimations(float time, IObjectBaseObserver *listener)
 //------------------------------------------------------------------------------
 void Scene::cancelAllAnimations()
 {
+    // TODO first make a weak copy list
     for (auto const &animation : this->getAnimations())
     {
         // TODO what happens if the animation deletes itself and invalidates the animators list?!

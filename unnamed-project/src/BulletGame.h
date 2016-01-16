@@ -51,6 +51,9 @@ private:
     float m_rotX;
     float m_rotY;
 
+    // TODO move
+    float m_time;
+
     std::unique_ptr<btDefaultCollisionConfiguration> m_collisionConfiguration;
     std::unique_ptr<btCollisionDispatcher> m_dispatcher;
     std::unique_ptr<btBroadphaseInterface> m_broadphase; // TODO what's this

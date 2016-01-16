@@ -40,6 +40,9 @@ void ObjectAnimation<T>::tick(float time, IObjectBaseObserver *observer)
     this->m_access.set(currentValue);
 
     observer->notify(this->m_object);
+
+    if (this->m_interpolation->isFinished(time))
+        this->m_scene->deleteAnimation(this);
 }
 
 //------------------------------------------------------------------------------

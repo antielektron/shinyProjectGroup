@@ -4,6 +4,8 @@
 #include "SceneEditor/GameLogic/InvertAttributeActionWidget.h"
 #include "SceneEditor/GameLogic/ArithmeticActionWidget.h"
 
+#include "SceneEditor/GameLogic/ObjectAnimationActionWidget.h"
+
 #include "GameLogic/Actions/InvertAttributeAction.h"
 #include "GameLogic/Actions/AssignAttributeAction.h"
 #include "GameLogic/Actions/IncrementAttributeAction.h"
@@ -35,6 +37,14 @@ struct InvertAttributeActionMap
 {
     typedef Action ActionType;
     typedef InvertAttributeActionWidget<typename Action::ValueType> WidgetType;
+};
+
+// for our object animation actions..
+template <typename Action>
+struct ObjectAnimationActionMap
+{
+    typedef Action ActionType;
+    typedef ObjectAnimationActionWidget<typename Action::AccessType> WidgetType;
 };
 
 template <typename ...Args>
@@ -87,7 +97,13 @@ typedef CreateActionDetailsWidgetHelper<
         ArithmeticActionMap<MultiplyAttributeAction<double>>,
 
         ArithmeticActionMap<DivideAttributeAction<int>>,
-        ArithmeticActionMap<DivideAttributeAction<double>>
+        ArithmeticActionMap<DivideAttributeAction<double>>,
+
+        ObjectAnimationActionMap<ObjectAnimationAction<AccessObjectPosition>>,
+        ObjectAnimationActionMap<ObjectAnimationAction<AccessObjectRotation>>,
+        ObjectAnimationActionMap<ObjectAnimationAction<AccessObjectAmbientColor>>,
+        ObjectAnimationActionMap<ObjectAnimationAction<AccessObjectDiffuseColor>>,
+        ObjectAnimationActionMap<ObjectAnimationAction<AccessObjectSpecularColor>>
 > HelperType;
 
 QWidget *Factory::createActionDetailsWidget(std::shared_ptr<SceneEditorGame> game, ActionBase *action, QWidget *parent)

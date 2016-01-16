@@ -13,6 +13,8 @@ template <typename Access>
 class ObjectAnimationAction : public ValueAnimationAction<Access>
 {
 public:
+    typedef Access AccessType;
+
     ObjectAnimationAction(GlobalState *state);
     ObjectAnimationAction(GlobalState *state, const QDomElement &domElement);
 

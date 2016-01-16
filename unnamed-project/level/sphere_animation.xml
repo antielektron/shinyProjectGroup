@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene name="Shiny Scene" version="42" author="Norby">
+    <Models>
+        <Model name="floor" path="models/floor.obj"/>
+        <Model name="octonorm" path="models/octonorm.obj"/>
+        <Model name="sink" path="models/sink.obj"/>
+        <Model name="sphere" path="models/sphere.obj"/>
+        <Model name="suzanne" path="models/suzanne.obj"/>
+    </Models>
+    <Objects>
+        <ObjectGroup name="group">
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="octonorm" model="octonorm" interactionEvent="">
+                <Position x="3" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+                <AmbientColor x="0.4" y="0.4" z="0.4"/>
+            </Object>
+        </ObjectGroup>
+        <Object name="suzanne" model="suzanne" interactionEvent="">
+            <Position x="-3" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="sphere" model="sphere" interactionEvent="sphere clicked">
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="floor" model="floor" interactionEvent="">
+            <Position x="0" y="-3" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="sink" model="sink" interactionEvent="">
+            <Position x="-7" y="-3" z="-7"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+    </Objects>
+    <Attributes/>
+    <Events>
+        <Event name="sphere clicked" description="activate sphere">
+            <Precondition type="beq" lhs="[active]" rhs="0"/>
+            <Action type="bmov" lhs="active" rhs="1"/>
+            <Action type="animdiffusecolor" x="0.5" y="0" z="0" duration="1" object="sphere"/>
+            <Action type="animambientcolor" x="0.4" y="0" z="0" duration="1" object="sphere"/>
+        </Event>
+        <Event name="sphere clicked" description="deactivate sphere">
+            <Precondition type="beq" lhs="[active]" rhs="1"/>
+            <Action type="bmov" lhs="active" rhs="0"/>
+            <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.5" duration="1" object="sphere"/>
+            <Action type="animambientcolor" x="0.4" y="0.4" z="0.4" duration="1" object="sphere"/>
+        </Event>
+    </Events>
+    <Animators/>
+    <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
+    <Player x="0" y="0" z="0"/>
+</Scene>

@@ -10,6 +10,11 @@ InterpolationForgotName::~InterpolationForgotName()
 
 double InterpolationForgotName::evaluate(double time)
 {
+    if (time > m_endTime)
+        return 1.;
+    else if (time < m_startTime)
+        return 0.;
+
     double x = (time - m_startTime) / (m_endTime - m_startTime);
 
     return (3. - 2. * x) * x * x;
@@ -17,6 +22,9 @@ double InterpolationForgotName::evaluate(double time)
 
 double InterpolationForgotName::evaluateGradient(double time)
 {
+    if (time > m_endTime || time < m_startTime)
+        return 0.;
+
     double x = (time - m_startTime) / (m_endTime - m_startTime);
     double dx = 1. / (m_endTime - m_startTime);
 

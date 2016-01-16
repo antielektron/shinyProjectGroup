@@ -18,12 +18,6 @@ AnimationBase::~AnimationBase()
 }
 
 //------------------------------------------------------------------------------
-bool AnimationBase::isFinished()
-{
-    return m_finished;
-}
-
-//------------------------------------------------------------------------------
 void AnimationBase::cancelAnimation()
 {
     // just set the interpolated value to the end value,
@@ -32,4 +26,5 @@ void AnimationBase::cancelAnimation()
 
     // TODO update object
     // TODO remove animation!
+    assert(false);
 }

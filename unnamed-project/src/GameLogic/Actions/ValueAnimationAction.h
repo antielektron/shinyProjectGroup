@@ -18,6 +18,8 @@ template <typename Access>
 class ValueAnimationAction : public ActionBase
 {
 public:
+    typedef Access AccessType;
+
     ValueAnimationAction(GlobalState *state);
     ValueAnimationAction(GlobalState *state, const QDomElement &domElement);
 

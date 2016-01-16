@@ -61,13 +61,13 @@ void Event::writeToXml(QXmlStreamWriter &writer)
     writer.writeEndElement();
 }
 
-void Event::triger()
+bool Event::triger()
 {
     for (auto &condition : m_preconditions)
     {
         if (!condition->evaluateCondition())
         {
-            return;
+            return false;
         }
     }
 
@@ -75,6 +75,7 @@ void Event::triger()
     {
         action->performAction();
     }
+    return true;
 }
 
 void Event::setName(const QString &name)

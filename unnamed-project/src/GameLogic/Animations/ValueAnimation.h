@@ -40,6 +40,9 @@ void ValueAnimation<T>::tick(float time, IObjectBaseObserver *observer)
     auto currentValue = m_interpolatedValue.interpolatedValue(time);
 
     m_access.set(currentValue);
+
+    if (this->m_interpolation->isFinished(time))
+        this->m_scene->deleteAnimation(this);
 }
 
 //------------------------------------------------------------------------------

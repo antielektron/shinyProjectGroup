@@ -19,7 +19,8 @@
 BulletGame::BulletGame(const QString &scenefile) :
         m_scenefile(scenefile),
         m_rotX(0.f),
-        m_rotY(0.f)
+        m_rotY(0.f),
+        m_time(0.f)
 {
 }
 
@@ -51,11 +52,12 @@ void BulletGame::tick(float dt)
     // TODO provide player position + time in "external attribute"
 
     // TODO count time
-    float time = 0;
+    m_time += dt;
+    m_scene->getGlobalState()->setTime(m_time);
 
     // run Animataions and run handle game logic events:
     m_scene->getGlobalState()->triggerEvent("tick");
-    m_scene->performAnimations(time, this);
+    m_scene->performAnimations(m_time, this);
 
     // TODO check if we clicked anything!
 

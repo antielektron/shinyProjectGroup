@@ -59,4 +59,14 @@ range<Iterator> createRange(Iterator begin, Iterator end)
     return range<Iterator>(begin, end);
 }
 
+namespace std
+{
+    template <typename Iterator>
+    struct iterator_traits<smart_iterator<Iterator>>
+    {
+        typedef typename smart_iterator<Iterator>::value_type value_type;
+        typedef output_iterator_tag iterator_category;
+    };
+}
+
 #endif // UNNAMED_PROJECT_SMARTITERATOR_H

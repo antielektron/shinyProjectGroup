@@ -33,9 +33,6 @@ public:
 
     // virtual void writeToXml(QXmlStreamWriter &writer) = 0;
 
-    // does this make sense, animation should delete itself when done!
-    bool isFinished();
-
     // TODO reset/instant finish/leave as is
     void cancelAnimation();
 
@@ -43,7 +40,6 @@ protected:
     Scene *m_scene;
 
     std::unique_ptr<InterpolationBase> m_interpolation;
-    bool m_finished;
 };
 
 #endif // UNNAMED_PROJECT_GAME_LOGIC_ANIMATIONS_ANIMATION_BASE_H

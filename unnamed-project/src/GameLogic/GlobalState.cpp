@@ -104,7 +104,9 @@ void GlobalState::triggerEvent(const QString &name)
     {
         if (event->getName() == name)
         {
-            event->triger();
+            // only execute one event!
+            if (event->triger())
+                break;
         }
     }
 }
