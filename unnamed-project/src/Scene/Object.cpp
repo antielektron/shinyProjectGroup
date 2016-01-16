@@ -3,37 +3,26 @@
 #include "Scene/Model.h"
 
 Object::Object(Model *model) :
-    m_model(model),
-    m_color(1., 1., 1.)
+    m_model(model)
 {
-    m_specularAmount = 0.5;
-    m_diffuseAmount = 0.5; //0.4;
-    m_ambientAmount = 0.4;
+    m_specularColor = QVector3D(0.5, 0.5, 0.5);
+    m_diffuseColor = QVector3D(0.5, 0.5, 0.5); //0.4;
+    m_ambientColor = QVector3D(0.4, 0.4, 0.4);
 }
 
-void Object::setColor(const QVector3D &color)
+void Object::setDiffuseColor(const QVector3D &diffuse)
 {
-    m_color = color;
+    this->m_diffuseColor = diffuse;
 }
 
-QVector3D &Object::getColor()
+void Object::setSpecularColor(const QVector3D &specular)
 {
-    return m_color;
+    this->m_specularColor = specular;
 }
 
-void Object::setDiffuseAmount(float diff)
+void Object::setAmbientColor(const QVector3D &ambient)
 {
-    this->m_diffuseAmount = diff;
-}
-
-void Object::setSpecularAmount(float specular)
-{
-    this->m_specularAmount = specular;
-}
-
-void Object::setAmbientAmount(float ambient)
-{
-    this->m_ambientAmount = ambient;
+    this->m_ambientColor = ambient;
 }
 
 Model *Object::getModel()
@@ -46,20 +35,20 @@ void Object::setModel(Model *model)
     m_model = model;
 }
 
-float Object::getDiffuseAmount()
+QVector3D &Object::getDiffuseColor()
 {
-    return m_diffuseAmount;
+    return m_diffuseColor;
 }
 
-float Object::getSpecularAmount()
+QVector3D &Object::getSpecularColor()
 {
-    return m_specularAmount;
+    return m_specularColor;
 }
 
 
-float Object::getAmbientAmount()
+QVector3D &Object::getAmbientColor()
 {
-    return m_ambientAmount;
+    return m_ambientColor;
 }
 
 ObjectType Object::getObjectType()
