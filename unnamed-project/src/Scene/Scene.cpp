@@ -7,8 +7,6 @@
 #include "Scene/Scene.h"
 #include "GameLogic/Event.h"
 
-#include "GameLogic/GameLogicDatatypes.h"
-
 //------------------------------------------------------------------------------
 Scene::Scene()
 {

@@ -1,8 +1,6 @@
 #include "GameLogic/GlobalState.h"
 #include "GameLogic/Event.h"
 
-#include "GameLogic/GameLogicDatatypes.h"
-
 #include <iostream>
 
 //------------------------------------------------------------------------------
@@ -22,7 +20,7 @@ GlobalState::~GlobalState()
 void GlobalState::init()
 {
     m_attributes.clear();
-    initializeConstantAttributes();
+    initializeExternalAttributes();
 }
 
 //------------------------------------------------------------------------------
@@ -118,12 +116,12 @@ range<GlobalState::AttributeIterator> GlobalState::getAttributes()
 }
 
 //------------------------------------------------------------------------------
-void GlobalState::initializeConstantAttributes()
+void GlobalState::initializeExternalAttributes()
 {
     // TODO check what we need!
-    setValue(KEY_ATTRIBUTE_TIME, QVariant(0.0f));
+    // setValue(KEY_ATTRIBUTE_TIME, QVariant(0.0f));
 
     // TODO store coordinates in player_x, player_y, player_z (maybe, maybe not!)
-    QVector3D playerPosition(0, 0, 0);
-    setValue(KEY_ATTRIBUTE_PLAYER, QVariant(playerPosition));
+    // QVector3D playerPosition(0, 0, 0);
+    // setValue(KEY_ATTRIBUTE_PLAYER, QVariant(playerPosition));
 }

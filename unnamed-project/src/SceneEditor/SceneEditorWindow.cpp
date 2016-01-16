@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QAction>
 #include <QFileDialog>
+#include <QScrollArea>
 
 #include "SceneEditor/SceneEditorGame.h"
 #include "SceneEditor/ObjectDetailsWidget.h"
@@ -40,9 +41,12 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
     m_attributeWidget = new AttributesWidget(m_game, this);
     m_eventsWidget = new EventsWidget(m_game, this);
 
+    QScrollArea *objectDetailsScrollArea = new QScrollArea();
+    objectDetailsScrollArea->setWidget(m_objectDetails);
+
     m_objectDetailsDock = new QDockWidget("Object Details", this);
     m_objectDetailsDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);
-    m_objectDetailsDock->setWidget(m_objectDetails);
+    m_objectDetailsDock->setWidget(objectDetailsScrollArea);
 
     m_objectListDock = new QDockWidget("Object List", this);
     m_objectListDock->setFeatures(QDockWidget::DockWidgetFloatable | QDockWidget::DockWidgetMovable);

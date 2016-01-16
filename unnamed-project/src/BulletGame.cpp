@@ -5,8 +5,6 @@
 #include "Scene/Scene.h"
 #include "KeyManager.h"
 
-#include "GameLogic/GameLogicDatatypes.h"
-
 #include <iostream>
 
 /*
@@ -50,8 +48,7 @@ void BulletGame::tick(float dt)
     handleInput(dt);
 
     // update time in globalState:
-    float oldTime = m_scene->getGlobalState()->getValue(KEY_ATTRIBUTE_TIME).toFloat();
-    m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_TIME, QVariant(oldTime + dt));
+    // TODO provide player position + time in "external attribute"
 
     // run Animataions and run handle game logic events:
     m_scene->getGlobalState()->triggerEvent("tick");
@@ -222,7 +219,12 @@ void BulletGame::performInteraction()
     {
         auto object = (Object *)callback.m_collisionObject->getUserPointer();
 
-        // TODO trigger event
+        auto event = object->getInteractionEvent();
+        if (!event.isEmpty())
+        {
+            // Trigger the event associated to the object
+            m_scene->getGlobalState()->triggerEvent(event);
+        }
     }
 }
 

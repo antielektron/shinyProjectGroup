@@ -7,7 +7,6 @@
 #include "Scene/Scene.h"
 #include "KeyManager.h"
 #include "Scene/Model.h"
-#include "GameLogic/GameLogicDatatypes.h"
 
 class ObjectBase;
 class ObjectGroup;

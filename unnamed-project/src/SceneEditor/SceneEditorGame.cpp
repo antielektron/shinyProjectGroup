@@ -58,14 +58,7 @@ void SceneEditorGame::tick(float dt)
     m_deltaTime = dt;
     m_time += m_deltaTime;
 
-    // update time in globalState:
-    if (m_logicRunning && !m_logicPaused)
-    {
-        float oldTime = m_scene->getGlobalState()->getValue(KEY_ATTRIBUTE_TIME).toFloat();
-        m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_TIME,
-                                            QVariant(oldTime + dt));
-    }
-    // TODO: write player position in audomad!!!
+    // TODO provide player position + time in "external fields"
 
     // run animataions and run handle game logic events
     if (m_logicRunning && !m_logicPaused)

@@ -53,7 +53,7 @@ public:
     void triggerEvent(const QString &name);
 
 protected:
-    void initializeConstantAttributes();
+    void initializeExternalAttributes();
 
     Scene *m_scene;
 

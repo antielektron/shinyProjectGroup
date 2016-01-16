@@ -7,6 +7,7 @@
 #include <QDoubleSpinBox>
 #include <QComboBox>
 #include <QPushButton>
+#include <QLineEdit>
 
 #include <QFormLayout>
 
@@ -31,6 +32,9 @@ public slots:
     void applyValues();
 
 private:
+    void generateWidgets();
+    void connectStuff();
+
     void updateCurrentObject(Object *object);
     void updateCurrentObjectGroup(ObjectGroup *objectGroup);
     void updateCurrentObjectBase(ObjectBase *object);
@@ -43,6 +47,8 @@ private:
 
     QComboBox *m_modelSelection;
 
+    QLineEdit *m_interactionEvent;
+
     QDoubleSpinBox *m_posX;
     QDoubleSpinBox *m_posY;
     QDoubleSpinBox *m_posZ;
@@ -54,6 +60,18 @@ private:
     QDoubleSpinBox *m_scaleX;
     QDoubleSpinBox *m_scaleY;
     QDoubleSpinBox *m_scaleZ;
+
+    QDoubleSpinBox *m_ambientRed;
+    QDoubleSpinBox *m_ambientGreen;
+    QDoubleSpinBox *m_ambientBlue;
+
+    QDoubleSpinBox *m_diffuseRed;
+    QDoubleSpinBox *m_diffuseGreen;
+    QDoubleSpinBox *m_diffuseBlue;
+
+    QDoubleSpinBox *m_specularRed;
+    QDoubleSpinBox *m_specularGreen;
+    QDoubleSpinBox *m_specularBlue;
 
     QFormLayout *m_layout;
 
