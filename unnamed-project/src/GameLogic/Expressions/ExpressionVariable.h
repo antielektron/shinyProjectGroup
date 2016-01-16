@@ -13,7 +13,7 @@ public:
 
     virtual T evaluate() override
     {
-        m_globalState->getValue(m_key).value<T>();
+        return m_globalState->getValue(m_key).value<T>();
     }
 
     virtual QString string()

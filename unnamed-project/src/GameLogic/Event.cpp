@@ -119,10 +119,10 @@ void Event::removeAction(ActionIterator iterator)
 
 range<Event::PreconditionIterator> Event::getPreconditions()
 {
-    createRange(m_preconditions.begin(), m_preconditions.end());
+    return createRange(m_preconditions.begin(), m_preconditions.end());
 }
 
 range<Event::ActionIterator> Event::getActions()
 {
-    createRange(m_actions.begin(), m_actions.end());
+    return createRange(m_actions.begin(), m_actions.end());
 }

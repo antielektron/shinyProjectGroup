@@ -1,5 +1,6 @@
 #include "GameLogic/Interpolation/InterpolationSin.h"
 
+#define _USE_MATH_DEFINES
 #include <algorithm>
 
 InterpolationSin::InterpolationSin(double startTime, double endTime) :

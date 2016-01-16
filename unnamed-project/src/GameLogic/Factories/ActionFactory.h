@@ -2,6 +2,7 @@
 #define UNNAMED_PROJECT_GAME_LOGIC_FACTORIES_ACTION_FACTORY_H
 
 #include <memory>
+#include <vector>
 #include <QString>
 #include <QDomElement>
 
