@@ -16,27 +16,40 @@
         <Model name="tunnel2" path="models/tunnel2.obj"/>
     </Models>
     <Objects>
-        <Object name="floor2" model="floor2" x="0" y="0" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="tunnel2" model="tunnel2" x="0" y="0" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="floor2" model="floor2" x="0" y="29" z="-75.2" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="cathedral001" model="cathedral001" x="0" y="29" z="-80" rx="0" ry="90" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="menger" model="menger" x="28.1" y="29" z="-106.5" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="mengerplat" model="mengerplat" x="26.2" y="38.2" z="-95.4" rx="0" ry="6.3" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="mengerplat2" model="mengerplat" x="28.9" y="37.1" z="-89.8" rx="0" ry="-8.9" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="mengerplat3" model="mengerplat" x="24.8" y="38.4" z="-83.4" rx="0" ry="-16.4" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="cathedraAltar001" model="cathedraAltar001" x="0.2" y="29" z="-79.3" rx="0" ry="90.1" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="octonorm" model="octonorm" x="-1.8" y="32.9" z="-84" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="meditationchamberFinal" model="meditationchamberFinal" x="0" y="0" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="floor2" model="floor2"/>
+        <Object name="tunnel2" model="tunnel2"/>
+        <Object name="floor2" model="floor2">
+            <Position x="0" y="29" z="-75.2"/>
+        </Object>
+        <Object name="cathedral001" model="cathedral001">
+            <Position x="0" y="29" z="-80"/>
+            <Rotation x="0" y="90" z="0"/>
+        </Object>
+        <Object name="menger" model="menger">
+            <Position x="28.1" y="29" z="-106.5"/>
+        </Object>
+        <Object name="mengerplat" model="mengerplat">
+            <Position x="26.2" y="38.2" z="-95.4"/>
+            <Rotation x="0" y="6.3" z="0"/>
+        </Object>
+        <Object name="mengerplat2" model="mengerplat">
+            <Position x="28.9" y="37.1" z="-89.8"/>
+            <Rotation x="0" y="-8.9" z="0"/>
+        </Object>
+        <Object name="mengerplat3" model="mengerplat">
+            <Position x="24.8" y="38.4" z="-83.4"/>
+            <Rotation x="0" y="-16.4" z="0"/>
+        </Object>
+        <Object name="cathedraAltar001" model="cathedraAltar001">
+            <Position x="0.2" y="29" z="-79.3"/>
+            <Rotation x="0" y="90.1" z="0"/>
+        </Object>
+        <Object name="octonorm" model="octonorm">
+            <Position x="-1.8" y="32.9" z="-84"/>
+        </Object>
+        <Object name="meditationchamberFinal" model="meditationchamberFinal"/>
     </Objects>
-    <Attributes>
-        <Attribute key="DELTA_TIME" type="float" value="0"/>
-        <Attribute key="FALSE" type="bool" value="false"/>
-        <Attribute key="PLAYER_POSITION" type="vector" x="0" y="0" z="0"/>
-        <Attribute key="TIME" type="float" value="0"/>
-        <Attribute key="TRUE" type="bool" value="true"/>
-    </Attributes>
     <Events/>
-    <Animators/>
     <DirectionalLight x="-1.7486e-15" y="17.1" z="-4.5" r="0.2" g="0" b="0"/>
     <Player x="0" y="0" z="0"/>
 </Scene>

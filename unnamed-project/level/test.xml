@@ -8,13 +8,23 @@
         <Model name="sink" path="models/sink.obj"/>
     </Models>
     <Objects>
-        <ObjectGroup name="group" x="0" y="0" z="0">
-            <Object name="octonorm" model="octonorm" x="3" y="0" z="0"/>
+        <ObjectGroup name="group">
+            <Object name="octonorm" model="octonorm">
+                <Position x="3" y="0" z="0"/>
+            </Object>
         </ObjectGroup>
-        <Object name="suzanne" model="suzanne" x="-3" y="0" z="0"/>
-        <Object name="sphere" model="sphere" x="0" y="0" z="0"/>
-        <Object name="floor" model="floor" x="0" y="-3" z="0" sx="1" sz="1"/>
-        <Object name="sink" model="sink" x="-7" y="-3" z="-7" sx="1" sz="1"/>
+        <Object name="suzanne" model="suzanne">
+            <Position x="-3" y="0" z="0"/>
+        </Object>
+        <Object name="sphere" model="sphere">
+            <Position x="0" y="0" z="0"/>
+        </Object>
+        <Object name="floor" model="floor">
+            <Position x="0" y="-3" z="0"/>
+        </Object>
+        <Object name="sink" model="sink">
+            <Position x="-7" y="-3" z="-7"/>
+        </Object>
     </Objects>
     <DirectionalLight x=".3" y="1" z=".3" r="1" g="1" b="1"/>
     <Player x="0" y="0" z="0"/>

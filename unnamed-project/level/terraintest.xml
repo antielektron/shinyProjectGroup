@@ -9,9 +9,16 @@
         <Model name="terraintest" path="models/terraintest.obj"/>
     </Models>
     <Objects>
-        <Object name="terraintest" model="terraintest" x="0" y="-5" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="suzanne" model="suzanne" x="14.2" y="0.8" z="6.3" rx="0" ry="190" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="sphere" model="sphere" x="0" y="7.5" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="terraintest" model="terraintest">
+            <Position x="0" y="-5" z="0"/>
+        </Object>
+        <Object name="suzanne" model="suzanne">
+            <Position x="14.2" y="0.8" z="6.3"/>
+            <Rotation x="0" y="190" z="0"/>
+        </Object>
+        <Object name="sphere" model="sphere">
+            <Position x="0" y="7.5" z="0"/>
+        </Object>
     </Objects>
     <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
     <Player x="0" y="0" z="0"/>
