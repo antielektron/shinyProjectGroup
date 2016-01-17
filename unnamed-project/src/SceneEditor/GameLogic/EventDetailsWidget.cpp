@@ -233,9 +233,21 @@ void EventDetailsWidget::onMoveActionDownClicked()
     int row = m_actions->currentRow();
     if (row < m_actions->count()-1)
     {
+        auto otherItem = m_actions->item(row+1);
+        // Remove item from list in order to insert it again
         auto item = m_actions->takeItem(row);
         m_actions->insertItem(row+1, item);
         m_actions->setCurrentItem(item);
+
+        auto &first = m_actionsMap[item];
+        auto &second = m_actionsMap[otherItem];
+
+        // swap assignment item->action
+        std::swap(first, second);
+        // swap order in event itself
+        std::swap(*first, *second);
+
+        // NOTE swapping silently
     }
 }
 
@@ -245,9 +257,21 @@ void EventDetailsWidget::onMoveActionUpClicked()
     int row = m_actions->currentRow();
     if (row > 0)
     {
+        auto otherItem = m_actions->item(row-1);
+        // Remove item from list in order to insert it again
         auto item = m_actions->takeItem(row);
         m_actions->insertItem(row-1, item);
         m_actions->setCurrentItem(item);
+
+        auto &first = m_actionsMap[item];
+        auto &second = m_actionsMap[otherItem];
+
+        // swap assignment item->action
+        std::swap(first, second);
+        // swap order in event itself
+        std::swap(*first, *second);
+
+        // NOTE swapping silently
     }
 }
 
@@ -302,9 +326,21 @@ void EventDetailsWidget::onMovePreconditionDownClicked()
     int row = m_preconditions->currentRow();
     if (row < m_preconditions->count()-1)
     {
+        auto otherItem = m_preconditions->item(row+1);
+        // Remove item from list in order to insert it again
         auto item = m_preconditions->takeItem(row);
         m_preconditions->insertItem(row+1, item);
         m_preconditions->setCurrentItem(item);
+
+        auto &first = m_preconditionsMap[item];
+        auto &second = m_preconditionsMap[otherItem];
+
+        // swap assignment item->action
+        std::swap(first, second);
+        // swap order in event itself
+        std::swap(*first, *second);
+
+        // NOTE swapping silently
     }
 }
 
@@ -314,9 +350,21 @@ void EventDetailsWidget::onMovePreconditionUpClicked()
     int row = m_preconditions->currentRow();
     if (row > 0)
     {
+        auto otherItem = m_preconditions->item(row-1);
+        // Remove item from list in order to insert it again
         auto item = m_preconditions->takeItem(row);
         m_preconditions->insertItem(row-1, item);
         m_preconditions->setCurrentItem(item);
+
+        auto &first = m_preconditionsMap[item];
+        auto &second = m_preconditionsMap[otherItem];
+
+        // swap assignment item->action
+        std::swap(first, second);
+        // swap order in event itself
+        std::swap(*first, *second);
+
+        // NOTE swapping silently
     }
 }
 
