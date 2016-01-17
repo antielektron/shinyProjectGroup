@@ -29,6 +29,57 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
 
     m_game = std::make_shared<SceneEditorGame>();
 
+    generateWidgets();
+
+    createActions();
+    createToolbar();
+
+    connectStuff();
+}
+
+//------------------------------------------------------------------------------
+SceneEditorWindow::SceneEditorWindow(const QString &scenefile, QWidget *parent) : QMainWindow(parent)
+{
+    this->setMinimumSize(1024, 700);
+
+    m_currentModel = nullptr;
+
+    m_game = std::make_shared<SceneEditorGame>(scenefile);
+
+    generateWidgets();
+
+    createActions();
+    createToolbar();
+
+    connectStuff();
+}
+
+//------------------------------------------------------------------------------
+SceneEditorWindow::~SceneEditorWindow()
+{
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorWindow::makeGlWidgetCurrent()
+{
+    m_glWidget->makeCurrent();
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorWindow::doneGlWidgetCurrent()
+{
+    m_glWidget->doneCurrent();
+}
+
+//------------------------------------------------------------------------------
+Model *SceneEditorWindow::getCurrentModel()
+{
+    return m_currentModel;
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorWindow::generateWidgets()
+{
     // QObjects free their children, when freed
     m_glWidget = new OpenGLWidget(m_game, this);
 
@@ -78,35 +129,6 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
 
     this->tabifyDockWidget(m_globalDetailsDock, m_objectDetailsDock);
     this->tabifyDockWidget(m_attributeWidgetDock, m_eventWidgetDock);
-
-
-    createActions();
-    createToolbar();
-
-    connectStuff();
-}
-
-//------------------------------------------------------------------------------
-SceneEditorWindow::~SceneEditorWindow()
-{
-}
-
-//------------------------------------------------------------------------------
-void SceneEditorWindow::makeGlWidgetCurrent()
-{
-    m_glWidget->makeCurrent();
-}
-
-//------------------------------------------------------------------------------
-void SceneEditorWindow::doneGlWidgetCurrent()
-{
-    m_glWidget->doneCurrent();
-}
-
-//------------------------------------------------------------------------------
-Model *SceneEditorWindow::getCurrentModel()
-{
-    return m_currentModel;
 }
 
 //------------------------------------------------------------------------------

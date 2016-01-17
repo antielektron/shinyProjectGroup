@@ -7,7 +7,17 @@
 
 SceneEditorGame::SceneEditorGame() : 
 		QObject(nullptr), 
-		m_currentObject(nullptr)
+		m_currentObject(nullptr),
+        m_scenefile("level/test.xml")
+{
+    m_logicRunning = false;
+    m_logicPaused = false;
+}
+
+SceneEditorGame::SceneEditorGame(const QString &scenefile) :
+        QObject(nullptr),
+        m_currentObject(nullptr),
+        m_scenefile(scenefile)
 {
     m_logicRunning = false;
     m_logicPaused = false;
@@ -19,7 +29,7 @@ void SceneEditorGame::initialize()
 	IGame::initialize();
 
     // Load a test level by default or empty scene
-    reset(std::unique_ptr<Scene>(new Scene("level/test.xml")));
+    reset(std::unique_ptr<Scene>(new Scene(m_scenefile)));
 }
 
 void SceneEditorGame::reset(std::unique_ptr<Scene> scene)

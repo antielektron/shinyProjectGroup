@@ -18,6 +18,7 @@ class SceneEditorGame : public QObject, public IGame
     Q_OBJECT
 public:
     SceneEditorGame();
+	SceneEditorGame(const QString &scenefile);
     virtual ~SceneEditorGame() {}
 
     // OpenGL might not be ready, while the constructor was called!
@@ -80,6 +81,8 @@ Q_SIGNALS:
 private:
     void createIndicatorObject();
 
+	// scene file only used for first initialization
+	QString m_scenefile;
     std::unique_ptr<Scene> m_scene;
 
     float m_time;

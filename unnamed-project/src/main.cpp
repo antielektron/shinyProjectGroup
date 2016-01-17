@@ -37,8 +37,14 @@ int main(int argc, char **argv)
     parser.addOption(bulletGameOption);
 #endif // HAVE_BULLET
 
+    QCommandLineOption levelFileOption("level", "Specify level file to use", "file", "level/sphere_animation.xml");
+    parser.addOption(levelFileOption);
+
     parser.addHelpOption();
     parser.process(app);
+
+    // Check if a level was specified, otherwise use default
+    QString levelFile = parser.value(levelFileOption);
 
     if (parser.isSet(shaderEditorOption) || parser.isSet(shaderEditorOption2))
     {
@@ -49,7 +55,7 @@ int main(int argc, char **argv)
     }
     else if (parser.isSet(sceneEditorOption))
     {
-        SceneEditorWindow sceneEditor;
+        SceneEditorWindow sceneEditor(levelFile);
         sceneEditor.show();
 
         return app.exec();
@@ -58,8 +64,7 @@ int main(int argc, char **argv)
     else if (parser.isSet(bulletGameOption))
     {
         // TODO have window (with debug ui)
-        // TODO add command line argument for level file to use!
-        OpenGLWidget widget(std::make_shared<BulletGame>("level/sphere_animation.xml"));
+        OpenGLWidget widget(std::make_shared<BulletGame>(levelFile));
         widget.show();
         return app.exec();
     }

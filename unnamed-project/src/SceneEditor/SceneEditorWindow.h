@@ -32,6 +32,7 @@ class SceneEditorWindow : public QMainWindow
     Q_OBJECT
 public:
     SceneEditorWindow(QWidget *parent = 0);
+    SceneEditorWindow(const QString &scenefile, QWidget *parent = 0);
     virtual ~SceneEditorWindow();
     void makeGlWidgetCurrent();
     void doneGlWidgetCurrent();
@@ -53,6 +54,7 @@ signals:
     void globalStateModified(GlobalState *globalState);
 
 private:
+    void generateWidgets();
     void connectStuff();
     void createActions();
     void createToolbar();
