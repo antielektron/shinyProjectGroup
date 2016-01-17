@@ -1,109 +1,160 @@
 #include <iostream>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QFile>
+#include <QByteArray>
+#include <QMessageBox>
 
 #include "ShaderEditor/ShaderEditorWidget.h"
 
 const QColor ShaderEditorWidget::allFineColor = QColor::fromRgb(210,255,210);
 const QColor ShaderEditorWidget::errorColor = QColor::fromRgb(255,210,210);
 
-//=============================================================================
-
-ShaderEditorWidget::ShaderEditorWidget(IRenderer *renderer, QWidget *parent):
-    QDockWidget(parent),
-    m_renderer(renderer)
+//------------------------------------------------------------------------------
+ShaderEditorWidget::ShaderEditorWidget(QWidget *parent,
+                                       QOpenGLShader::ShaderTypeBit type,
+                                       const QString &progName) :
+    QDockWidget(parent)
 {
     m_multiWidget = new QWidget(this);
 
     m_layout = new QVBoxLayout(m_multiWidget);
-    m_vsEditor = new CodeEditor(m_multiWidget);
-    m_fsEditor = new CodeEditor(m_multiWidget);
+    m_editor = new CodeEditor(m_multiWidget);
 
+    m_applyButton = new QPushButton(this);
+    m_saveButton = new QPushButton(this);
+    m_loadButton = new QPushButton(this);
 
-    m_layout->addWidget(m_vsEditor);
-    m_layout->addWidget(m_fsEditor);
+    m_applyButton->setText("apply Shader");
+    m_saveButton->setText("save Shader");
+    m_loadButton->setText("load Shader");
+
+    m_layout->addWidget(m_editor);
+    m_layout->addWidget(m_applyButton);
+    m_layout->addWidget(m_saveButton);
+    m_layout->addWidget(m_loadButton);
 
     m_multiWidget->setLayout(m_layout);
 
     this->setWidget(m_multiWidget);
 
     //set fancy highlighter:
-    m_highlighterVS = new GLSLHighlighter(m_vsEditor->document());
-    m_highlighterFS = new GLSLHighlighter(m_fsEditor->document());
+    m_glslHighlighter = new GLSLHighlighter(m_editor->document());
 
+    this->setFeatures(QDockWidget::DockWidgetMovable
+                      | QDockWidget::DockWidgetFloatable);
 
+    m_shaderType = type;
+    m_progName = progName;
+    setShaderName(type, progName);
 
-    m_vsEditor->setPlainText("//vertexShader");
-    m_fsEditor->setPlainText("//fragmentShader");
-
-    m_vsEditor->setToolTip("Vertex Shader");
-    m_fsEditor->setToolTip("Fragment Shader");
-
-    this->setFeatures(QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetFloatable);
-    this->setWindowTitle("Shader Editor");
+    m_hasChanged = false;
 
 }
 
-//=============================================================================
-
+//------------------------------------------------------------------------------
 ShaderEditorWidget::~ShaderEditorWidget()
 {
     //nothing to do here!
 }
 
-//=============================================================================
-
-void ShaderEditorWidget::createShaderProgram()
+//------------------------------------------------------------------------------
+void ShaderEditorWidget::setShaderName(QOpenGLShader::ShaderTypeBit type,
+                                       const QString &progName)
 {
-    auto errCode = m_renderer->createShaderProgram(
-                m_vsEditor->toPlainText().toStdString(),
-                m_fsEditor->toPlainText().toStdString());
-    switch (errCode)
+    this->setWindowTitle(progName + QString::fromStdString(
+                             shaderTypeToString.at(type)) + " shader");
+}
+
+//------------------------------------------------------------------------------
+void ShaderEditorWidget::connectStuff()
+{
+    connect(m_editor, SIGNAL(textChanged()), this, SLOT(onUserChangedText()));
+}
+
+//------------------------------------------------------------------------------
+void ShaderEditorWidget::onShaderChanged(const QString &code)
+{
+    m_editor->setText(code);
+}
+
+//------------------------------------------------------------------------------
+void ShaderEditorWidget::onUpdateRequest()
+{
+    if (m_hasChanged)
     {
-    case ShaderErrorType::NoError:
-    {
-        QPalette p = m_vsEditor->palette();
-        p.setColor(QPalette::Base, allFineColor);
-        m_vsEditor->setPalette(p);
-        m_fsEditor->setPalette(p);
-        break;
-    }
-    case ShaderErrorType::VertexShaderError:
-    {
-        QPalette p = m_vsEditor->palette();
-        p.setColor(QPalette::Base, errorColor);
-        m_vsEditor->setPalette(p);
-        break;
-    }
-    case ShaderErrorType::FragmentShaderError:
-    {
-        QPalette p = m_fsEditor->palette();
-        p.setColor(QPalette::Base, errorColor);
-        m_fsEditor->setPalette(p);
-        break;
-    }
-    case ShaderErrorType::LinkingError:
-    {
-        std::cout << "LinkingError" << std::endl;
-        //TODO: status bar text
-    }
-    default:
-    {
-        //TODO: status bar text
-        QPalette p = m_vsEditor->palette();
-        p.setColor(QPalette::Base, errorColor);
-        m_vsEditor->setPalette(p);
-        m_fsEditor->setPalette(p);
-        break;
-    }
+        emit codeChanged(m_editor->toPlainText(), m_shaderType, m_progName);
+        m_hasChanged = false;
     }
 }
 
-//=============================================================================
-
-void ShaderEditorWidget::updateShaderFromRenderer()
+//------------------------------------------------------------------------------
+void ShaderEditorWidget::onUserChangedText()
 {
-    std::string vs = m_renderer->getVertexShader();
-    std::string fs = m_renderer->getFragmentShader();
+    m_hasChanged = true;
+}
 
-    m_vsEditor->setPlainText(QString::fromStdString(vs));
-    m_fsEditor->setPlainText(QString::fromStdString(fs));
+//------------------------------------------------------------------------------
+void ShaderEditorWidget::onApplyClicked()
+{
+    if (m_hasChanged)
+    {
+        emit codeChanged(m_editor->toPlainText(), m_shaderType, m_progName);
+        m_hasChanged = false;
+    }
+}
+
+//------------------------------------------------------------------------------
+void ShaderEditorWidget::onSaveClicked()
+{
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    tr("Save Shader"),
+                                                    ".",
+                                                    tr("GLSL files (*.glsl)"));
+
+    if (filename.length() > 0)
+    {
+        QFile file(filename);
+        file.open(QIODevice::WriteOnly | QIODevice::Text);
+        if (!file.isOpen())
+        {
+            QMessageBox::critical(this,
+                                  "ERROR",
+                                  QString("could not open file ") + filename);
+            file.close(); //?
+            return;
+        }
+        QTextStream stream(&file);
+        stream << m_editor->toPlainText();
+        file.close();
+    }
+}
+
+//------------------------------------------------------------------------------
+void ShaderEditorWidget::onLoadClicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("Load Shader"),
+                                                    ".",
+                                                    tr("GLSL files (*.glsl)"));
+
+    if (filename.length() > 0)
+    {
+        QFile file(filename);
+        file.open(QIODevice::ReadOnly | QIODevice::Text);
+        if (!file.isOpen())
+        {
+            QMessageBox::critical(this,
+                                  "ERROR",
+                                  QString("could not open file ") + filename);
+            file.close(); //?
+            return;
+        }
+        QString content(file.readAll());
+        m_editor->setPlainText(content);
+
+        // force renderer update
+        m_hasChanged = true;
+        onApplyClicked();
+    }
 }

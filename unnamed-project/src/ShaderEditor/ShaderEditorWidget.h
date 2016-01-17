@@ -5,6 +5,7 @@
 
 #include <QDockWidget>
 #include <QVBoxLayout>
+#include <QPushButton>
 #include <QColor>
 
 #include "ShaderEditor/CodeEditor.h"
@@ -17,27 +18,73 @@ class ShaderEditorWidget : public QDockWidget
 {
     Q_OBJECT
 public:
-    ShaderEditorWidget(IRenderer *renderer, QWidget *parent = nullptr);
+    ShaderEditorWidget(QWidget *parent,
+                       QOpenGLShader::ShaderTypeBit type,
+                       const QString &progName);
     virtual ~ShaderEditorWidget();
 
 protected:
     QVBoxLayout *m_layout;
-    CodeEditor *m_vsEditor;
-    CodeEditor *m_fsEditor;
+    CodeEditor *m_editor;
 
-    GLSLHighlighter *m_highlighterVS;
-    GLSLHighlighter *m_highlighterFS;
+    GLSLHighlighter *m_glslHighlighter;
 
     QWidget *m_multiWidget;
+
+    QPushButton *m_applyButton;
+    QPushButton *m_saveButton;
+    QPushButton *m_loadButton;
 
     static const QColor errorColor;
     static const QColor allFineColor;
 
-    IRenderer *m_renderer;
+    bool m_hasChanged;
+
+    QOpenGLShader::ShaderTypeBit m_shaderType;
+    QString m_progName;
+
+    void setShaderName(QOpenGLShader::ShaderTypeBit type,
+                       const QString &progName);
+    void connectStuff();
 
 public slots:
-    void createShaderProgram();
-    void updateShaderFromRenderer();
+
+    /**
+     * @brief onShaderChanged   notify editor if code is changed not by itself
+     *                          (mainly used to initialize default shaders)
+     * @param code              new shader code
+     */
+    void onShaderChanged(const QString &code);
+
+    /**
+     * @brief onUpdateRequest   ask whether changes were made since the last
+     *                          request (will emit
+     *                          ShaderEditorWidget::codeChanged in this case)
+     */
+    void onUpdateRequest();
+
+protected slots:
+    /**
+     * @brief onUserChangedText slot for codeEditor
+     */
+    void onUserChangedText();
+
+    void onApplyClicked();
+
+    void onSaveClicked();
+
+    void onLoadClicked();
+
+signals:
+    /**
+     * @brief codeChanged   signal will be emitted if apply button is clicked
+     *                      or by onUpdateRequest
+     * @param code          new shader code
+     */
+    void codeChanged(const QString &code,
+                     QOpenGLShader::ShaderTypeBit type,
+                     const QString &progName);
+
 };
 
 #endif // UNNAMED_PROJECT_SHADER_EDITOR_SHADER_EDITOR_WIDGET_H

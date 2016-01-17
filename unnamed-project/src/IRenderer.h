@@ -7,6 +7,27 @@
 
 #include "utility.h"
 
+#define STRINGIZE(s) #s
+#define TOSTR(s) STRINGIZE(s)
+
+#define KEY_SHADER_FRAGMENT Fragment
+#define KEY_SHADER_VERTEX Vertex
+#define KEY_SHADER_GEOMETRY Geometry
+
+const std::map<QOpenGLShader::ShaderTypeBit, std::string> shaderTypeToString =
+{
+    { QOpenGLShader::KEY_SHADER_FRAGMENT, TOSTR(KEY_SHADER_FRAGMENT) },
+    { QOpenGLShader::KEY_SHADER_VERTEX, TOSTR(KEY_SHADER_VERTEX) },
+    { QOpenGLShader::KEY_SHADER_GEOMETRY, TOSTR(KEY_SHADER_GEOMETRY) }
+};
+
+const std::map<std::string, QOpenGLShader::ShaderTypeBit> stringToShaderType =
+{
+    { TOSTR(KEY_SHADER_FRAGMENT), QOpenGLShader::KEY_SHADER_FRAGMENT },
+    { TOSTR(KEY_SHADER_VERTEX), QOpenGLShader::KEY_SHADER_VERTEX },
+    { TOSTR(KEY_SHADER_GEOMETRY), QOpenGLShader::KEY_SHADER_GEOMETRY }
+};
+
 class Scene;
 
 class IRenderer

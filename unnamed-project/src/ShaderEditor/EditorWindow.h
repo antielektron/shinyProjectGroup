@@ -7,10 +7,32 @@
 #include <QToolBar>
 #include <QAction>
 #include <QLabel>
+#include <map>
 
 #include "OpenGLWidget.h"
 #include "ShaderEditor/ShaderEditorWidget.h"
 #include "ShaderEditor/ObjectToolbox.h"
+
+namespace std
+{
+    template<>
+    struct less<std::pair<std::string, QOpenGLShader::ShaderTypeBit>>
+    {
+        typedef std::pair<std::string, QOpenGLShader::ShaderTypeBit> type;
+
+        bool operator () (const type &lhs, const type &rhs)
+        {
+            if (lhs.first == rhs.first)
+            {
+                return lhs.second < rhs.second;
+            }
+            else
+            {
+                return lhs.first < rhs.first;
+            }
+        }
+    };
+}
 
 class EditorWindow : public QMainWindow
 {
@@ -19,28 +41,23 @@ public:
     EditorWindow(OpenGLWidget* widget, QWidget *parent = nullptr);
     ~EditorWindow();
 
+protected slots:
+    void onGlInit();
+    void onShaderChanged(const QString &src,
+                         QOpenGLShader::ShaderTypeBit type,
+                         const QString &prog);
+
+signals:
+    void updateRequest();
+
 protected:
-    void createActions();
-    void createToolbar();
-    void createStatusbar();
     void createDocks();
 
-    QToolBar *m_toolbar;
     OpenGLWidget* m_glWidget;
 
-    QAction *m_saveScene;
-    QAction *m_loadScene;
-    QAction *m_newScene;
-    QAction *m_updateShader;
-    QStatusBar *m_statusBar;
-    QLabel *m_fpsLabel;
-    ShaderEditorWidget *m_shaderEditorWidget;
-    ObjectToolbox *m_objectToolbox;
+    std::map<IRenderer::ShaderSourcesKeyType,
+             ShaderEditorWidget*> m_shaderEditorMap;
 
-protected slots:
-    void loadScene();
-    void saveScene();
-    void newScene();
 
 };
 

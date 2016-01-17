@@ -12,31 +12,10 @@
 #include "IRenderer.h"
 #include "Scene/Scene.h"
 
-#define STRINGIZE(s) #s
-#define TOSTR(s) STRINGIZE(s)
-
-#define KEY_SHADER_FRAGMENT Fragment
-#define KEY_SHADER_VERTEX Vertex
-#define KEY_SHADER_GEOMETRY Geometry
-
 #define KEYSTR_PROGRAM_DEFAULT "Default"
 #define KEYSTR_PROGRAM_COMPOSE "Compose"
 #define KEYSTR_PROGRAM_SHADOW  "Shadow"
 #define KEYSTR_PROGRAM_COPY    "Copy"
-
-const std::map<QOpenGLShader::ShaderTypeBit, std::string> shaderTypeToString =
-{
-    { QOpenGLShader::KEY_SHADER_FRAGMENT, TOSTR(KEY_SHADER_FRAGMENT) },
-    { QOpenGLShader::KEY_SHADER_VERTEX, TOSTR(KEY_SHADER_VERTEX) },
-    { QOpenGLShader::KEY_SHADER_GEOMETRY, TOSTR(KEY_SHADER_GEOMETRY) }
-};
-
-const std::map<std::string, QOpenGLShader::ShaderTypeBit> stringToShaderType =
-{
-    { TOSTR(KEY_SHADER_FRAGMENT), QOpenGLShader::KEY_SHADER_FRAGMENT },
-    { TOSTR(KEY_SHADER_VERTEX), QOpenGLShader::KEY_SHADER_VERTEX },
-    { TOSTR(KEY_SHADER_GEOMETRY), QOpenGLShader::KEY_SHADER_GEOMETRY }
-};
 
 namespace std
 {
@@ -101,7 +80,9 @@ public:
 
 
 private:
-    void rotateVectorToVector(const QVector3D &source, const QVector3D &destination, QMatrix4x4 &matrix);
+    void rotateVectorToVector(const QVector3D &source,
+                              const QVector3D &destination,
+                              QMatrix4x4 &matrix);
 
     GLsizei m_width;
     GLsizei m_height;
@@ -109,10 +90,6 @@ private:
     GLsizei m_shadowMapSize;
     GLsizei m_cascades;
 
-    void createComposeProgram();
-    void createShadowMapProgram();
-
-    std::unique_ptr<QOpenGLShaderProgram> m_program;
     int m_modelViewMatrixLoc;
     int m_projectionMatrixLoc;
     int m_cascadeViewMatrixLoc;
@@ -125,7 +102,6 @@ private:
     int m_shadowMapSamplerLoc;
 
     // ShadowMap Shader
-    QOpenGLShaderProgram m_shadowMapProgram;
     int m_shadowMapWorldMatrixLoc;
     int m_shadowMapCascadeViewMatrixLoc;
 
@@ -134,11 +110,9 @@ private:
     GLuint m_shadowMapDepthBuffer;
 
     // Compose Shader
-    QOpenGLShaderProgram m_composeProgram;
     int m_composeSamplerLoc;
 
     // Copy Shader for texture arrays
-    QOpenGLShaderProgram m_copyArrayProgram;
     int m_copyArraySamplerLoc;
     int m_copyArrayLayerLoc;
 
@@ -155,8 +129,11 @@ private:
     std::map<ShaderSourcesKeyType, std::string> m_sources;
 
     // uniforms and attrib locations:
-    std::map<std::string, std::vector< std::pair<int *, const char *>>> m_uniformLocs;
-    std::map<std::string, std::vector< std::pair<int, const char *>>> m_attribLocs;
+    std::map<std::string, std::vector< std::pair<int *, const char *>>>
+        m_uniformLocs;
+
+    std::map<std::string, std::vector< std::pair<int, const char *>>>
+        m_attribLocs;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H
