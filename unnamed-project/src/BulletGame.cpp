@@ -19,7 +19,8 @@
 BulletGame::BulletGame(const QString &scenefile) :
         m_scenefile(scenefile),
         m_rotX(0.f),
-        m_rotY(0.f)
+        m_rotY(0.f),
+        m_time(0.f)
 {
 }
 
@@ -48,19 +49,17 @@ void BulletGame::tick(float dt)
     handleInput(dt);
 
     // update time in globalState:
-    float oldTime = m_scene->getGlobalState()->getValue(KEY_ATTRIBUTE_TIME).toFloat();
-    m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_TIME,
-                                        QVariant(oldTime + dt),
-                                        AttributeDatatype::Float);
+    // TODO provide player position + time in "external attribute"
 
-    m_scene->getGlobalState()->setValue(KEY_ATTRIBUTE_DELTA_TIME,
-                                        QVariant(dt),
-                                        AttributeDatatype::Float);
+    // TODO count time
+    m_time += dt;
+    m_scene->getGlobalState()->setTime(m_time);
 
     // run Animataions and run handle game logic events:
-    m_scene->performEvents();
-    m_scene->performAnimations(this);
+    m_scene->getGlobalState()->triggerEvent("tick");
+    m_scene->performAnimations(m_time, this);
 
+    // TODO check if we clicked anything!
 
     m_bulletWorld->stepSimulation(dt);
 
@@ -76,6 +75,11 @@ void BulletGame::handleInput(float deltaTime)
     m_keyManager->tick();
 
     float speed = 10.0f;
+
+    if (m_keyManager->isKeyPressed(Qt::Key_F))
+    {
+        performInteraction();
+    }
 
     if (m_keyManager->shouldCatchMouse())
     {
@@ -149,7 +153,8 @@ void BulletGame::handleInput(float deltaTime)
     m_playerBody->applyCentralForce(toBulletVector3(worldVelocity));
 
     // TODO modify camera!
-    m_position = toQVector3D(m_playerBody->getWorldTransform() * btVector3(0., 0., 0.));
+    // NOTE: camera not at center of player!
+    m_position = toQVector3D(m_playerBody->getWorldTransform() * btVector3(0., 1.8/2.-0.2, 0.));
     updateCamera();
 
     // Start/Stop catching mouse
@@ -188,11 +193,44 @@ void BulletGame::updateBulletGeometry(ObjectBase *obj)
     }
     else
     {
-        Object *object = static_cast<Object *>(obj);
+        auto object = static_cast<Object *>(obj);
+        auto body = static_cast<btRigidBody *>(object->getUserPointer());
+
         btTransform transformation;
         transformation.setFromOpenGLMatrix(object->getWorld().constData());
-        m_bodies[obj]->setWorldTransform(transformation);
+        body->setWorldTransform(transformation);
 
+    }
+}
+
+void BulletGame::performInteraction()
+{
+    QMatrix4x4 xRotation;
+    xRotation.rotate(m_rotX, 1, 0, 0);
+    QMatrix4x4 yRotation;
+    yRotation.rotate(m_rotY, 0, 1, 0);
+    QMatrix4x4 rotation = xRotation * yRotation;
+
+    // TODO adjust range!!
+
+    btVector3 start = toBulletVector3(m_position);
+    btVector3 end = toBulletVector3(m_position + QVector3D(rotation.transposed() * QVector4D(0, 0, -100, 0.)));
+
+    btCollisionWorld::ClosestRayResultCallback callback(start, end);
+
+    // Perform raycast
+    m_bulletWorld->rayTest(start, end, callback);
+
+    if(callback.hasHit())
+    {
+        auto object = (Object *)callback.m_collisionObject->getUserPointer();
+
+        auto event = object->getInteractionEvent();
+        if (!event.isEmpty())
+        {
+            // Trigger the event associated to the object
+            m_scene->getGlobalState()->triggerEvent(event);
+        }
     }
 }
 
@@ -260,7 +298,9 @@ void BulletGame::loadScene(const QString &filename)
         btRigidBody *body = new btRigidBody(0, nullptr, it->second, btVector3(0, 0, 0)); // No inertia
         body->setWorldTransform(transformation);
 
-        m_bodies[object] = body;
+        // link body and object together!
+        body->setUserPointer(object);
+        object->setUserPointer(body);
 
         m_bulletWorld->addRigidBody(body);
     }
@@ -272,20 +312,26 @@ void BulletGame::loadScene(const QString &filename)
     transform.setIdentity();
     transform.setOrigin(btVector3(0, 5, 2));
 
-    btSphereShape *sphere = new btSphereShape(1);
-    sphere->calculateLocalInertia(mass, inertia);
+    float radius = 0.4;
+    float height = 1.8;
+    auto *playerShape = new btCapsuleShape(radius, height-2*radius);
+    playerShape->calculateLocalInertia(mass, inertia);
 
     btDefaultMotionState *motionState = new btDefaultMotionState(transform);
-    m_playerBody.reset(new btRigidBody(mass, motionState, sphere, inertia));
+    m_playerBody.reset(new btRigidBody(mass, motionState, playerShape, inertia));
     m_playerBody->setActivationState(DISABLE_DEACTIVATION);
+
+    m_playerBody->setAngularFactor(0);
+
     m_bulletWorld->addRigidBody(m_playerBody.get());
 
+    // Use constraint to lock the rotation of the player body.
     btTransform tr;
     tr.setIdentity();
+    /*
     auto *springConstraint = new btGeneric6DofSpringConstraint(*m_playerBody, tr, false);
 
     btScalar springRange(7.f);
-
     springConstraint->setLinearUpperLimit(springRange * btVector3(1., 1., 1.));
     springConstraint->setLinearLowerLimit(-springRange * btVector3(1., 1., 1.));
 
@@ -299,8 +345,8 @@ void BulletGame::loadScene(const QString &filename)
         springConstraint->setStiffness(i, 4); // period 1 sec for !kG body
         springConstraint->setDamping(i, 1.00f); // add some damping
     }
-
-    //m_bulletWorld->addConstraint(springConstraint, false);
+    m_bulletWorld->addConstraint(springConstraint, false);
+    */
 }
 
 #endif // HAVE_BULLET

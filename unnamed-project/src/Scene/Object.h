@@ -12,13 +12,19 @@ class Object : public ObjectBase
 public:
     Object(Model *model);
 
-    void setSpecularAmount(float specular);
-    void setDiffuseAmount(float diffuse);
-    void setAmbientAmount(float ambient);
+    void setSpecularColor(const QVector3D &specular);
+    void setDiffuseColor(const QVector3D &diffuse);
+    void setAmbientColor(const QVector3D &ambient);
 
-    float getSpecularAmount();
-    float getDiffuseAmount();
-    float getAmbientAmount();
+    QVector3D &getSpecularColor();
+    QVector3D &getDiffuseColor();
+    QVector3D &getAmbientColor();
+
+    void setUserPointer(void *userPointer);
+    void *getUserPointer();
+
+    void setInteractionEvent(const QString &interactionEvent);
+    const QString &getInteractionEvent();
 
     virtual ObjectType getObjectType();
 
@@ -29,10 +35,12 @@ private:
     // model not owned
     Model *m_model;
 
-    // TODO color
-    float specularAmount;
-    float diffuseAmount;
-    float ambientAmount;
+    QVector3D m_specularColor;
+    QVector3D m_diffuseColor;
+    QVector3D m_ambientColor;
+
+    void *m_userPointer;
+    QString m_interactionEvent;
 
     // TODO material information
 };

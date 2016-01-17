@@ -17,38 +17,33 @@ class ObjectListWidget : public QWidget
 {
     Q_OBJECT
 public:
-    ObjectListWidget(std::shared_ptr<SceneEditorGame>, SceneEditorWindow *parent);
+    ObjectListWidget(std::shared_ptr<SceneEditorGame> game, SceneEditorWindow *parent);
     virtual ~ObjectListWidget();
 
 public slots:
-
-    void updateModelTree();
-
     /**
      * will be triggered, if the corresponding treeview item is clicked
      * @param index corresponding Tree Model index
      */
-    void setCurrentObject(const QModelIndex &index);
+    void onTreeViewClicked(const QModelIndex &index);
 
     void onAddObjectClick();
     void onAddGroupClick();
     void onRemoveClick();
 
-signals:
-    void updateSceneObjectsRequest();
+    void onObjectsChanged();
+    void onCurrentObjectChanged();
 
 private:
-
     void connectStuff();
 
+    // TODO use QTreeWidget!
     QTreeView *m_treeView;
     TreeModel *m_treeModel;
 
     QPushButton *m_addObject;
     QPushButton *m_addGroup;
     QPushButton *m_remove;
-
-    ObjectBase *m_currentObject;
 
     // TODO buttons for adding/removing and moving objects!
 

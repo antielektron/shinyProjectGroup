@@ -1,47 +1,68 @@
 #ifndef UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_IS_GREATER_PRECONDITION_H
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_IS_GREATER_PRECONDITION_H
 
-#include <QString>
-
 #include "GameLogic/Preconditions/BinaryPreconditionBase.h"
-#include "GameLogic/GlobalState.h"
+#include "GameLogic/Traits.h"
 
 template <typename T>
-class IsGreaterPrecondition : public BinaryPreconditionBase
+class IsGreaterPrecondition : public BinaryPreconditionBase<T>
 {
 public:
-    IsGreaterPrecondition(GlobalState *state,const QString &fieldA, const QString &fieldB);
+    IsGreaterPrecondition() = default;
+    IsGreaterPrecondition(GlobalState *state, const QDomElement &domElement);
+    IsGreaterPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB);
     virtual ~IsGreaterPrecondition() {};
 
     virtual bool evaluateCondition() override;
 
-    virtual QString toQString() override;
+    virtual QString type() override;
+
+protected:
+    using BinaryPreconditionBase<T>::m_exprA;
+    using BinaryPreconditionBase<T>::m_exprB;
 };
 
 
 //------------------------------------------------------------------------------
 template <typename T>
-IsGreaterPrecondition<T>::IsGreaterPrecondition(GlobalState *globalState, const QString &fieldA, const QString &fieldB) :
-        BinaryPreconditionBase(globalState, fieldA, fieldB)
-{
-    // nothing to do here...
-}
+IsGreaterPrecondition<T>::IsGreaterPrecondition(GlobalState *state, const QDomElement &domElement) :
+        BinaryPreconditionBase<T>(state, domElement)
+{}
+
+//------------------------------------------------------------------------------
+template <typename T>
+IsGreaterPrecondition<T>::IsGreaterPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB) :
+        BinaryPreconditionBase<T>(std::move(exprA), std::move(exprB))
+{}
 
 //------------------------------------------------------------------------------
 template <typename T>
 bool IsGreaterPrecondition<T>::evaluateCondition()
 {
-    const T &a = m_globalState->getValue(m_fieldA).value<T>();
-    const T &b = m_globalState->getValue(m_fieldB).value<T>();
-
-    return a > b;
+    return m_exprA->evaluate() > m_exprB->evaluate();
 }
 
 //------------------------------------------------------------------------------
 template <typename T>
-QString IsGreaterPrecondition<T>::toQString()
+QString IsGreaterPrecondition<T>::type()
 {
-    return m_fieldA + ">" + m_fieldA;
+    return QString(traits::precondition_name<IsGreaterPrecondition<T>>::value());
+}
+
+
+namespace traits
+{
+    template <>
+    struct precondition_name<IsGreaterPrecondition<int>>
+    {
+        static const char *value() { return "igreater"; }
+    };
+
+    template <>
+    struct precondition_name<IsGreaterPrecondition<double>>
+    {
+        static const char *value() { return "fgreater"; }
+    };
 }
 
 

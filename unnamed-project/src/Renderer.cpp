@@ -436,12 +436,13 @@ void Renderer::render(GLuint fbo, Scene *scene)
     };
 
     // Transform corners into light view space
-    mathUtility::transformVectors(screenToLightTransformation, minCorners);
-    mathUtility::transformVectors(screenToLightTransformation, maxCorners);
+    MathUtility::transformVectors(screenToLightTransformation, minCorners);
+    MathUtility::transformVectors(screenToLightTransformation, maxCorners);
 
     // Transform corners into light view space
-    mathUtility::transformVectors(scene->getCameraProjection().inverted(),
+    MathUtility::transformVectors(scene->getCameraProjection().inverted(),
                                   nearFarCorners);
+
     // NOTE: z values are inverted! multiply by -1
     float nearPlane = -nearFarCorners[0].z();
     float farPlane = -nearFarCorners[1].z();
@@ -504,8 +505,8 @@ void Renderer::render(GLuint fbo, Scene *scene)
         QVector2D minCorner2D;
         float frustumRotationAngle;
 
-        mathUtility::getConvexHull(corners2D, hull2D);
-        mathUtility::getMinimalBoundingBox(hull2D,
+        MathUtility::getConvexHull(corners2D, hull2D);
+        MathUtility::getMinimalBoundingBox(hull2D,
                                            minCorner2D,
                                            maxCorner2D,
                                            frustumRotationAngle);
@@ -588,13 +589,12 @@ void Renderer::render(GLuint fbo, Scene *scene)
     for (auto &object : scene->getObjects())
     {
         auto cameraModelView = scene->getCameraView() * object->getWorld();
-        // auto lightModelView = lightView * object->getWorld(); // TODO
 
-        defaultProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        // m_program->setUniformValue(m_lightViewMatrixLoc, lightModelView);
-        defaultProgram->setUniformValue(m_specularColorLoc, object->getSpecularAmount() * QVector3D(1., 1., 1.));
-        defaultProgram->setUniformValue(m_diffuseColorLoc, object->getDiffuseAmount() * QVector3D(1., 1., 1.));
-        defaultProgram->setUniformValue(m_ambientColorLoc, object->getAmbientAmount() * QVector3D(1., 1., 1.));
+
+        m_program->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+        m_program->setUniformValue(m_specularColorLoc, object->getSpecularColor());
+        m_program->setUniformValue(m_diffuseColorLoc, object->getDiffuseColor());
+        m_program->setUniformValue(m_ambientColorLoc, object->getAmbientColor());
 
         object->getModel()->draw();
     }
@@ -608,13 +608,11 @@ void Renderer::render(GLuint fbo, Scene *scene)
         }
 
         auto cameraModelView = scene->getCameraView() * editorObject->getWorld();
-        // auto lightModelView = lightView * editorObject->getWorld(); // TODO
 
-        defaultProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        // m_program->setUniformValue(m_lightViewMatrixLoc, lightModelView);
-        defaultProgram->setUniformValue(m_specularColorLoc, editorObject->getSpecularAmount() * QVector3D(1., 1., 1.));
-        defaultProgram->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseAmount() * QVector3D(1., 1., 1.));
-        defaultProgram->setUniformValue(m_ambientColorLoc, editorObject->getAmbientAmount() * QVector3D(1., 1., 1.));
+        m_program->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+        m_program->setUniformValue(m_specularColorLoc, editorObject->getSpecularColor());
+        m_program->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseColor());
+        m_program->setUniformValue(m_ambientColorLoc, editorObject->getAmbientColor());
 
         editorObject->getModel()->draw();
     }

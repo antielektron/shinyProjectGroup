@@ -14,21 +14,41 @@
         <Model name="suzanne" path="models/suzanne.obj"/>
     </Models>
     <Objects>
-        <Object name="floor2" model="floor2" x="0" y="0" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="cathedraAltar001" model="cathedraAltar001" x="0" y="0" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="cathedral001" model="cathedral001" x="0" y="0" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="octonorm" model="octonorm" x="4.2" y="3.6" z="-1.9" rx="0" ry="-90" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="floor2" model="floor2" x="-8.3" y="0" z="63.9" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="cathedral002" model="cathedral001" x="21.5" y="0" z="-3.6" rx="0" ry="180" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="cathedraAltar002" model="cathedraAltar001" x="12.8" y="0" z="0" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="menger" model="menger" x="14.1" y="-0.1" z="31.7" rx="0" ry="20" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="mengerplat" model="mengerplat" x="4.2" y="8.6" z="32.2" rx="0" ry="0" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="mengerplat2" model="mengerplat" x="0.6" y="7.2" z="30" rx="0" ry="-20.1" rz="0" sx="1" sy="1" sz="1"/>
-        <Object name="mengerplat3" model="mengerplat" x="-2.4" y="8.2" z="25.5" rx="0" ry="29" rz="0" sx="1" sy="1" sz="1"/>
+        <Object name="floor2" model="floor2"/>
+        <Object name="cathedraAltar001" model="cathedraAltar001"/>
+        <Object name="cathedral001" model="cathedral001"/>
+        <Object name="octonorm" model="octonorm">
+            <Position x="4.2" y="3.6" z="-1.9"/>
+            <Rotation x="0" y="-90" z="0"/>
+        </Object>
+        <Object name="floor2" model="floor2">
+            <Position x="-8.3" y="0" z="63.9"/>
+        </Object>
+        <Object name="cathedral002" model="cathedral001">
+            <Position x="21.5" y="0" z="-3.6"/>
+            <Rotation x="0" y="180" z="0"/>
+        </Object>
+        <Object name="cathedraAltar002" model="cathedraAltar001">
+            <Position x="12.8" y="0" z="0"/>
+        </Object>
+        <Object name="menger" model="menger">
+            <Position x="14.1" y="-0.1" z="31.7"/>
+            <Rotation x="0" y="20" z="0"/>
+        </Object>
+        <Object name="mengerplat" model="mengerplat">
+            <Position x="4.2" y="8.6" z="32.2"/>
+        </Object>
+        <Object name="mengerplat2" model="mengerplat">
+            <Position x="0.6" y="7.2" z="30"/>
+            <Rotation x="0" y="-20.1" z="0"/>
+        </Object>
+        <Object name="mengerplat3" model="mengerplat">
+            <Position x="-2.4" y="8.2" z="25.5"/>
+            <Rotation x="0" y="29" z="0"/>
+        </Object>
     </Objects>
     <Events/>
     <Attributes/>
-    <Animators/>
     <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
     <Player x="0" y="0" z="0"/>
 </Scene>

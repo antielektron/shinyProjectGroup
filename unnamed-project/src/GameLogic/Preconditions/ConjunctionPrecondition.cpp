@@ -1,11 +1,13 @@
-#include <sstream>
-
 #include "GameLogic/Preconditions/ConjunctionPrecondition.h"
-#include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
-ConjunctionPrecondition::ConjunctionPrecondition(GlobalState *state) :
-    BooleanPreconditionBase(state)
+ConjunctionPrecondition::ConjunctionPrecondition()
+{
+}
+
+//------------------------------------------------------------------------------
+ConjunctionPrecondition::ConjunctionPrecondition(GlobalState *state, const QDomElement &domElement) :
+        BooleanPreconditionBase(state,domElement)
 {
 }
 
@@ -27,16 +29,7 @@ bool ConjunctionPrecondition::evaluateCondition()
 }
 
 //------------------------------------------------------------------------------
-QString ConjunctionPrecondition::toQString()
+QString ConjunctionPrecondition::type()
 {
-    QString result;
-
-    for (auto it = m_conditions.begin(); it != m_conditions.end(); it++)
-    {
-        if (it != m_conditions.begin())
-            result += "&";
-        result += "(" + (*it)->toQString() + ")";
-    }
-
-    return result;
+    return traits::precondition_name<ConjunctionPrecondition>::value();
 }

@@ -1,10 +1,14 @@
 #include "GameLogic/Preconditions/BooleanPreconditionBase.h"
-#include "GameLogic/GlobalState.h"
 
 //------------------------------------------------------------------------------
-BooleanPreconditionBase::BooleanPreconditionBase(GlobalState *state) :
-        PreconditionBase(state)
+BooleanPreconditionBase::BooleanPreconditionBase()
 {}
+
+//------------------------------------------------------------------------------
+BooleanPreconditionBase::BooleanPreconditionBase(GlobalState *state, const QDomElement &domElement)
+{
+    // TODO iterate over children, use factory!
+}
 
 //------------------------------------------------------------------------------
 void BooleanPreconditionBase::addCondition(std::unique_ptr<PreconditionBase> condition)
@@ -16,4 +20,34 @@ void BooleanPreconditionBase::addCondition(std::unique_ptr<PreconditionBase> con
 void BooleanPreconditionBase::removeCondition(size_t i)
 {
     m_conditions.erase(m_conditions.begin()+i);
+}
+
+//------------------------------------------------------------------------------
+QString BooleanPreconditionBase::string()
+{
+    QString result;
+    QString opName = this->type();
+
+    for (auto it = m_conditions.begin(); it != m_conditions.end(); it++)
+    {
+        if (it != m_conditions.begin())
+            result += opName;
+        result += "(" + (*it)->string() + ")";
+    }
+
+    return result;
+}
+
+//------------------------------------------------------------------------------
+void BooleanPreconditionBase::writeToXml(QXmlStreamWriter &writer)
+{
+    writer.writeStartElement("Precondtion");
+    writer.writeAttribute("type", this->type());
+
+    for (auto &condition : m_conditions)
+    {
+        condition->writeToXml(writer);
+    }
+
+    writer.writeEndElement();
 }

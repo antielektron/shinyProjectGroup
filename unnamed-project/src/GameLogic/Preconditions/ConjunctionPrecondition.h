@@ -2,16 +2,33 @@
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_CONJUNCTION_PRECONDITION_H
 
 #include "GameLogic/Preconditions/BooleanPreconditionBase.h"
+#include "GameLogic/Traits.h"
+
+class GlobalState;
 
 class ConjunctionPrecondition : public BooleanPreconditionBase
 {
 public:
-    ConjunctionPrecondition(GlobalState *state);
+    ConjunctionPrecondition();
+    ConjunctionPrecondition(GlobalState *state, const QDomElement &domElement);
     virtual ~ConjunctionPrecondition();
 
     virtual bool evaluateCondition() override;
 
-    virtual QString toQString() override;
+    virtual QString type() override;
 };
+
+
+namespace traits
+{
+
+    template <>
+    struct precondition_name<ConjunctionPrecondition>
+    {
+        static const char *value() { return "and"; }
+    };
+
+}
+
 
 #endif // UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_CONJUNCTION_PRECONDITION_H

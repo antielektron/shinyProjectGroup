@@ -11,11 +11,26 @@
 ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
 {
     m_objectPropertiesLocked = false;
+    m_currentObject = nullptr;
 
+    generateWidgets();
+    connectStuff();
+}
+
+//------------------------------------------------------------------------------
+void ObjectDetailsWidget::generateWidgets()
+{
     m_layout =  new QFormLayout(this);
+    this->setLayout(m_layout);
+
+    m_name = new QLineEdit(this);
+    m_layout->addRow("Name", m_name);
 
     m_modelSelection = new QComboBox(this);
     m_layout->addRow("Model", m_modelSelection);
+
+    m_interactionEvent = new QLineEdit(this);
+    m_layout->addRow("Interaction Event", m_interactionEvent);
 
     m_posX = createNumericField("X");
     m_posY = createNumericField("Y");
@@ -25,17 +40,30 @@ ObjectDetailsWidget::ObjectDetailsWidget(std::shared_ptr<SceneEditorGame> game, 
     m_rotPitch = createNumericField("Pitch");
     m_rotRoll = createNumericField("Roll");
 
-    m_scaleX = createNumericField("scale x");
-    m_scaleY = createNumericField("scale y");
-    m_scaleZ = createNumericField("scale z");
+    m_scaleX = createNumericField("Scale X");
+    m_scaleY = createNumericField("Scale Y");
+    m_scaleZ = createNumericField("Scale Z");
 
+    m_ambientRed = createNumericField("Ambient Red");
+    m_ambientGreen = createNumericField("Ambient Green");
+    m_ambientBlue = createNumericField("Ambient Blue");
+
+    m_diffuseRed = createNumericField("Diffuse Red");
+    m_diffuseGreen = createNumericField("Diffuse Green");
+    m_diffuseBlue = createNumericField("Diffuse Blue");
+
+    m_specularRed = createNumericField("Specular Red");
+    m_specularGreen = createNumericField("Specular Green");
+    m_specularBlue = createNumericField("Specular Blue");
+}
+
+//------------------------------------------------------------------------------
+void ObjectDetailsWidget::connectStuff()
+{
+    connect(m_name, SIGNAL(editingFinished()), this, SLOT(applyValues()));
     connect(m_modelSelection, SIGNAL(currentTextChanged(QString)), this, SLOT(applyValues()));
-
-    // Material?
-
-    this->setLayout(m_layout);
-
-    m_currentObject = nullptr;
+    connect(m_interactionEvent, SIGNAL(editingFinished()), this, SLOT(applyValues()));
+    // TODO connect to game autonomiously!
 }
 
 //------------------------------------------------------------------------------
@@ -141,6 +169,33 @@ void ObjectDetailsWidget::updateCurrentObject(Object *object)
                 QString::fromStdString(object->getModel()->getName()));
     m_modelSelection->setCurrentIndex(index);
 
+    m_interactionEvent->setEnabled(true);
+    m_interactionEvent->setText(object->getInteractionEvent());
+
+    m_ambientRed->setEnabled(true);
+    m_ambientGreen->setEnabled(true);
+    m_ambientBlue->setEnabled(true);
+
+    m_diffuseRed->setEnabled(true);
+    m_diffuseGreen->setEnabled(true);
+    m_diffuseBlue->setEnabled(true);
+
+    m_specularRed->setEnabled(true);
+    m_specularGreen->setEnabled(true);
+    m_specularBlue->setEnabled(true);
+
+    m_ambientRed->setValue(object->getAmbientColor().x());
+    m_ambientGreen->setValue(object->getAmbientColor().y());
+    m_ambientBlue->setValue(object->getAmbientColor().z());
+
+    m_diffuseRed->setValue(object->getDiffuseColor().x());
+    m_diffuseGreen->setValue(object->getDiffuseColor().y());
+    m_diffuseBlue->setValue(object->getDiffuseColor().z());
+
+    m_specularRed->setValue(object->getSpecularColor().x());
+    m_specularGreen->setValue(object->getSpecularColor().y());
+    m_specularBlue->setValue(object->getSpecularColor().z());
+
     updateCurrentObjectBase(object);
 }
 
@@ -148,12 +203,30 @@ void ObjectDetailsWidget::updateCurrentObject(Object *object)
 void ObjectDetailsWidget::updateCurrentObjectGroup(ObjectGroup *objectGroup)
 {
     m_modelSelection->setEnabled(false);
+
+    m_interactionEvent->setEnabled(false);
+
+    m_ambientRed->setEnabled(false);
+    m_ambientGreen->setEnabled(false);
+    m_ambientBlue->setEnabled(false);
+
+    m_diffuseRed->setEnabled(false);
+    m_diffuseGreen->setEnabled(false);
+    m_diffuseBlue->setEnabled(false);
+
+    m_specularRed->setEnabled(false);
+    m_specularGreen->setEnabled(false);
+    m_specularBlue->setEnabled(false);
+
+
     updateCurrentObjectBase(objectGroup);
 }
 
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::updateCurrentObjectBase(ObjectBase *object)
 {
+    m_name->setText(object->getName());
+
     m_posX->setValue(object->getPosition().x());
     m_posY->setValue(object->getPosition().y());
     m_posZ->setValue(object->getPosition().z());
@@ -170,14 +243,34 @@ void ObjectDetailsWidget::updateCurrentObjectBase(ObjectBase *object)
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::applyCurrentObject(Object *object)
 {
-    object->setModel(m_game->getScene()->getModel(
-                         m_modelSelection->currentText().toStdString()));
+    if (m_objectPropertiesLocked)
+        return;
+
+    object->setModel(m_game->getScene()->getModel(m_modelSelection->currentText().toStdString()));
+
+    object->setInteractionEvent(m_interactionEvent->text());
+
+    object->getAmbientColor().setX((float)m_ambientRed->value());
+    object->getAmbientColor().setY((float)m_ambientGreen->value());
+    object->getAmbientColor().setZ((float)m_ambientBlue->value());
+
+    object->getDiffuseColor().setX((float)m_diffuseRed->value());
+    object->getDiffuseColor().setY((float)m_diffuseGreen->value());
+    object->getDiffuseColor().setZ((float)m_diffuseBlue->value());
+
+    object->getSpecularColor().setX((float)m_specularRed->value());
+    object->getSpecularColor().setY((float)m_specularGreen->value());
+    object->getSpecularColor().setZ((float)m_specularBlue->value());
+
     applyCurrentObjectBase(object);
 }
 
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::applyCurrentObjectGroup(ObjectGroup *objectGroup)
 {
+    if (m_objectPropertiesLocked)
+        return;
+
     applyCurrentObjectBase(objectGroup);
 }
 
@@ -185,9 +278,10 @@ void ObjectDetailsWidget::applyCurrentObjectGroup(ObjectGroup *objectGroup)
 void ObjectDetailsWidget::applyCurrentObjectBase(ObjectBase *object)
 {
     if (m_objectPropertiesLocked)
-    {
         return;
-    }
+
+    object->setName(m_name->text());
+
     object->getPosition().setX((float)m_posX->value());
     object->getPosition().setY((float)m_posY->value());
     object->getPosition().setZ((float)m_posZ->value());

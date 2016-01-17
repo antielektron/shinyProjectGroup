@@ -3,26 +3,27 @@
 #include "Scene/Model.h"
 
 Object::Object(Model *model) :
-    m_model(model)
+    m_model(model),
+    m_userPointer(nullptr)
 {
-    specularAmount = 0.5;
-    diffuseAmount = 0.5; //0.4;
-    ambientAmount = 0.4;
+    m_specularColor = QVector3D(0.5, 0.5, 0.5);
+    m_diffuseColor = QVector3D(0.5, 0.5, 0.5); //0.4;
+    m_ambientColor = QVector3D(0.4, 0.4, 0.4);
 }
 
-void Object::setDiffuseAmount(float diff)
+void Object::setDiffuseColor(const QVector3D &diffuse)
 {
-    this->diffuseAmount = diff;
+    this->m_diffuseColor = diffuse;
 }
 
-void Object::setSpecularAmount(float specular)
+void Object::setSpecularColor(const QVector3D &specular)
 {
-    this->specularAmount = specular;
+    this->m_specularColor = specular;
 }
 
-void Object::setAmbientAmount(float ambient)
+void Object::setAmbientColor(const QVector3D &ambient)
 {
-    this->ambientAmount = ambient;
+    this->m_ambientColor = ambient;
 }
 
 Model *Object::getModel()
@@ -35,23 +36,43 @@ void Object::setModel(Model *model)
     m_model = model;
 }
 
-float Object::getDiffuseAmount()
+QVector3D &Object::getDiffuseColor()
 {
-    return diffuseAmount;
+    return m_diffuseColor;
 }
 
-float Object::getSpecularAmount()
+QVector3D &Object::getSpecularColor()
 {
-    return specularAmount;
+    return m_specularColor;
 }
 
 
-float Object::getAmbientAmount()
+QVector3D &Object::getAmbientColor()
 {
-    return ambientAmount;
+    return m_ambientColor;
 }
 
 ObjectType Object::getObjectType()
 {
     return ObjectType::Object;
+}
+
+void Object::setUserPointer(void *userPointer)
+{
+    m_userPointer = userPointer;
+}
+
+void *Object::getUserPointer()
+{
+    return m_userPointer;
+}
+
+void Object::setInteractionEvent(const QString &interactionEvent)
+{
+    m_interactionEvent = interactionEvent;
+}
+
+const QString &Object::getInteractionEvent()
+{
+    return m_interactionEvent;
 }

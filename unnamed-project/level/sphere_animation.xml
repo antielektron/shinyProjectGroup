@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene name="Shiny Scene" version="42" author="Norby">
+    <Models>
+        <Model name="bucket" path="models/bucket.obj"/>
+        <Model name="floor" path="models/floor.obj"/>
+        <Model name="octonorm" path="models/octonorm.obj"/>
+        <Model name="sink" path="models/sink.obj"/>
+        <Model name="sphere" path="models/sphere.obj"/>
+        <Model name="suzanne" path="models/suzanne.obj"/>
+    </Models>
+    <Objects>
+        <ObjectGroup name="group">
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="octonorm1" model="octonorm" interactionEvent="octo1">
+                <Position x="2.5" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+                <AmbientColor x="0.4" y="0.4" z="0.4"/>
+            </Object>
+            <Object name="octonorm2" model="octonorm" interactionEvent="octo2">
+                <Position x="5" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+                <AmbientColor x="0.4" y="0.4" z="0.4"/>
+            </Object>
+        </ObjectGroup>
+        <Object name="suzanne" model="suzanne" interactionEvent="suzanne clicked">
+            <Position x="-3" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="sphere" model="sphere" interactionEvent="sphere clicked">
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="floor" model="floor" interactionEvent="">
+            <Position x="0" y="-3" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="sink" model="sink" interactionEvent="">
+            <Position x="-7" y="-3" z="-7"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="bucket" model="bucket" interactionEvent="">
+            <Position x="0" y="-3" z="-3.4"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="bucket2" model="bucket" interactionEvent="">
+            <Position x="0" y="2.8" z="-3.4"/>
+            <Rotation x="180" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+    </Objects>
+    <Attributes/>
+    <Events>
+        <Event name="sphere clicked" description="activate sphere">
+            <Precondition type="beq" lhs="[active]" rhs="0"/>
+            <Action type="bmov" lhs="active" rhs="1"/>
+            <Action type="animdiffusecolor" x="0.5" y="0" z="0" object="sphere">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+            <Action type="animambientcolor" x="0.4" y="0" z="0" object="sphere">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+        </Event>
+        <Event name="sphere clicked" description="deactivate sphere">
+            <Precondition type="beq" lhs="[active]" rhs="1"/>
+            <Action type="bmov" lhs="active" rhs="0"/>
+            <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.5" object="sphere">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+            <Action type="animambientcolor" x="0.4" y="0.4" z="0.4" object="sphere">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+        </Event>
+        <Event name="octo1" description="linear">
+            <Action type="iadd" lhs="rot1" rhs="360"/>
+            <Action type="animrot" x="0" y="[rot1]" z="0" object="octonorm1">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+        </Event>
+        <Event name="octo2" description="sinus">
+            <Action type="iadd" lhs="rot2" rhs="360"/>
+            <Action type="animrot" x="0" y="[rot2]" z="0" object="octonorm2">
+                <Interpolation type="sinus" duration="1"/>
+            </Action>
+        </Event>
+        <Event name="suzanne clicked" description="activate">
+            <Precondition type="beq" lhs="[suzanne]" rhs="0"/>
+            <Action type="bmov" lhs="suzanne" rhs="1"/>
+            <Action type="animlightdir" x="-1" y="1" z="-1">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+        </Event>
+        <Event name="suzanne clicked" description="deactivate">
+            <Precondition type="beq" lhs="[suzanne]" rhs="1"/>
+            <Action type="bmov" lhs="suzanne" rhs="0"/>
+            <Action type="animlightdir" x="1" y="1" z="1">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+        </Event>
+    </Events>
+    <Animators/>
+    <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
+    <Player x="0" y="0" z="0"/>
+</Scene>

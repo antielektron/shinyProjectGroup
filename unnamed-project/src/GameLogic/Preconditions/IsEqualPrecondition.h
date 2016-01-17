@@ -1,47 +1,74 @@
 #ifndef UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_IS_EQUAL_PRECONDITION_H
 #define UNNAMED_PROJECT_GAME_LOGIC_PRECONDITIONS_IS_EQUAL_PRECONDITION_H
 
-#include <QString>
-
 #include "GameLogic/Preconditions/BinaryPreconditionBase.h"
-#include "GameLogic/GlobalState.h"
+#include "GameLogic/Traits.h"
 
 template <typename T>
-class IsEqualPrecondition : public BinaryPreconditionBase
+class IsEqualPrecondition : public BinaryPreconditionBase<T>
 {
 public:
-    IsEqualPrecondition(GlobalState *state,const QString &objA, const QString &objB);
+    IsEqualPrecondition() = default;
+    IsEqualPrecondition(GlobalState *state, const QDomElement &domElement);
+    IsEqualPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB);
     virtual ~IsEqualPrecondition() {};
 
     virtual bool evaluateCondition() override;
 
-    virtual QString toQString() override;
+    virtual QString type() override;
+
+protected:
+    using BinaryPreconditionBase<T>::m_exprA;
+    using BinaryPreconditionBase<T>::m_exprB;
 };
 
 
 //------------------------------------------------------------------------------
 template <typename T>
-IsEqualPrecondition<T>::IsEqualPrecondition(GlobalState *globalState, const QString &fieldA, const QString &fieldB) :
-        BinaryPreconditionBase(globalState, fieldA, fieldB)
-{
-    // nothing to do here...
-}
+IsEqualPrecondition<T>::IsEqualPrecondition(GlobalState *state, const QDomElement &domElement) :
+        BinaryPreconditionBase<T>(state, domElement)
+{}
+
+//------------------------------------------------------------------------------
+template <typename T>
+IsEqualPrecondition<T>::IsEqualPrecondition(std::unique_ptr<Expression<T>> exprA, std::unique_ptr<Expression<T>> exprB) :
+        BinaryPreconditionBase<T>(std::move(exprA), std::move(exprB))
+{}
 
 //------------------------------------------------------------------------------
 template <typename T>
 bool IsEqualPrecondition<T>::evaluateCondition()
 {
-    const T &a = m_globalState->getValue(m_fieldA).value<T>();
-    const T &b = m_globalState->getValue(m_fieldB).value<T>();
-
-    return a == b;
+    return m_exprA->evaluate() == m_exprB->evaluate();
 }
 
 //------------------------------------------------------------------------------
 template <typename T>
-QString IsEqualPrecondition<T>::toQString()
+QString IsEqualPrecondition<T>::type()
 {
-    return m_fieldA + "=" + m_fieldA;
+    return QString(traits::precondition_name<IsEqualPrecondition<T>>::value());
+}
+
+
+namespace traits
+{
+    template <>
+    struct precondition_name<IsEqualPrecondition<int>>
+    {
+        static const char *value() { return "ieq"; }
+    };
+
+    template <>
+    struct precondition_name<IsEqualPrecondition<double>>
+    {
+        static const char *value() { return "feq"; }
+    };
+
+    template <>
+    struct precondition_name<IsEqualPrecondition<bool>>
+    {
+        static const char *value() { return "beq"; }
+    };
 }
 
 

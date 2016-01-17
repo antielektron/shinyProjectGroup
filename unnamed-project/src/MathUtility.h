@@ -7,7 +7,7 @@
 
 #define EPSILON 10e-10
 
-namespace mathUtility
+namespace MathUtility
 {
     /**
      * @brief rotatingCalipers Algorithm for creating a minimal
@@ -33,11 +33,6 @@ namespace mathUtility
      */
     void getConvexHull(const std::vector<QVector2D> &points,
                        std::vector<QVector2D> &hull);
-
-    inline float getScalarProduct(const QVector2D &a, const QVector2D &b)
-    {
-        return a[0] * b[0] + a[1] * b[1];
-    }
 
     inline bool isInEps(float a, float b)
     {

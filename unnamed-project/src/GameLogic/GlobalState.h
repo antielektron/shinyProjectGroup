@@ -1,32 +1,31 @@
-#ifndef GLOBALSTATE_H
-#define GLOBALSTATE_H
+#ifndef UNNAMED_PROJECT_GAME_LOGIC_GLOBAL_STATE_H
+#define UNNAMED_PROJECT_GAME_LOGIC_GLOBAL_STATE_H
+
+#include <memory>
 
 #include <map>
 #include <vector>
 #include <QString>
 #include <QVariant>
-#include <memory>
+#include <QVector3D>
+
 #include "smartiterator.h"
 #include "GameLogic/Preconditions/PreconditionBase.h"
 #include "GameLogic/Actions/ActionBase.h"
-#include "GameLogic/GameLogicDatatypes.h"
 
-class Animator;
-
+class Event;
+class Scene;
 
 class GlobalState
 {
 public:
-    GlobalState();
+    GlobalState(Scene *scene);
     ~GlobalState();
 
-    typedef std::map<QString, QVariant>::iterator AttributesIteratorType;
-    typedef std::pair<std::unique_ptr<PreconditionBase>, std::unique_ptr<ActionBase>> EventType;
-    typedef std::map<QString, EventType> EventMapType;
-    typedef EventMapType::iterator EventMapIteratorType;
-    typedef std::map<QString, AttributeDatatype> DatatypeMapType;
-
+    // clear?
     void init();
+
+    Scene *getScene();
 
     // stash current state, so we can apply it later again
     void stash();
@@ -36,51 +35,40 @@ public:
 
     const QVariant &getValue(const QString &key);
     bool existValue(const QString &key);
-    AttributeDatatype getType(const QString &key);
-
-    /**
-     * @brief setValue add or replace a value. changes will only applied
-     *        after applyBuffer() is called
-     * @param key
-     * @param value
-     * @param type
-     */
-    void setValue(const QString &key,
-                  QVariant value,
-                  AttributeDatatype type);
-
+    void setValue(const QString &key, const QVariant &value);
     void removeValue(const QString &key);
 
-    void applyBuffer();
+    typedef std::map<QString, QVariant>::iterator AttributeIterator;
 
-    const EventType &getEvent(const QString &key);
-    void setEvent(const QString &key,
-                  std::unique_ptr<PreconditionBase> precondition,
-                  std::unique_ptr<ActionBase> action);
+    range<AttributeIterator> getAttributes();
 
-    void removeEvent(const QString &eventKey);
 
-    range<AttributesIteratorType> getAttributes();
-    range<EventMapIteratorType> getEvents();
+    typedef std::vector<std::unique_ptr<Event>>::iterator EventIterator;
 
-    void registerAnimator(const QString &watchedAttrib, Animator *anim);
+    void addEvent(std::unique_ptr<Event> event);
+    void removeEvent(EventIterator iterator);
+
+    range<EventIterator> getEvents();
+
+    void triggerEvent(const QString &name);
+
+    // TODO remove, ugly workaround!!!!!!!!!!!!!!!
+    void setTime(float time);
+    float getTime();
 
 protected:
-    void initializeConstantAttributes();
-    void notifyListeners(const QString &key);
+    void initializeExternalAttributes();
+
+    Scene *m_scene;
+
+    float m_time;
 
     std::map<QString, QVariant> m_attributes;
-    std::map<QString, std::vector<Animator *>> m_animatorsPerAttribute;
-    EventMapType m_eventMap;
-    DatatypeMapType m_datatypeMap;
 
-    std::vector<std::pair<QString, QVariant>> m_attributesQueue;
-    std::vector<std::pair<QString, AttributeDatatype>> m_datatypeQueue;
-    std::vector<QString> m_notifierList;
+    std::vector<std::unique_ptr<Event>> m_events;
 
     // stash:
     std::map<QString, QVariant> m_stashedAttributes;
-    DatatypeMapType m_stashedDatatypeMap;
 };
 
-#endif // GLOBALSTATE_H
+#endif // UNNAMED_PROJECT_GAME_LOGIC_GLOBAL_STATE_H

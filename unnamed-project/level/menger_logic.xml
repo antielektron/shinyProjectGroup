@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene name="Shiny Scene" version="42" author="Norby">
+    <Models>
+        <Model name="floor" path="models/floor.obj"/>
+        <Model name="menger" path="models/menger.obj"/>
+        <Model name="mengerplat" path="models/mengerplat.obj"/>
+        <Model name="octonorm" path="models/octonorm.obj"/>
+        <Model name="sink" path="models/sink.obj"/>
+        <Model name="sphere" path="models/sphere.obj"/>
+        <Model name="suzanne" path="models/suzanne.obj"/>
+    </Models>
+    <Objects>
+        <ObjectGroup name="platform">
+            <Position x="-1" y="2.9" z="10.9"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="mengerplat" model="mengerplat" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+                <AmbientColor x="0.4" y="0.4" z="0.4"/>
+            </Object>
+            <Object name="button" model="sphere" interactionEvent="green">
+                <Position x="-3" y="0.5" z="1"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0" y="0.5" z="0"/>
+                <AmbientColor x="0" y="0.4" z="0"/>
+            </Object>
+            <Object name="sphere" model="sphere" interactionEvent="red">
+                <Position x="-3" y="0.5" z="-1"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.6" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.5" y="0" z="0"/>
+                <AmbientColor x="0.4" y="0" z="0"/>
+            </Object>
+        </ObjectGroup>
+        <Object name="menger" model="menger" interactionEvent="">
+            <Position x="0" y="-3" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="octonorm" model="octonorm" interactionEvent="">
+            <Position x="-3.6" y="7.6" z="0"/>
+            <Rotation x="0" y="50" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+    </Objects>
+    <Attributes>
+        <Attribute key="plat_x" type="float" value="-1"/>
+        <Attribute key="plat_y" type="float" value="2.9"/>
+        <Attribute key="plat_z" type="float" value="10.9"/>
+    </Attributes>
+    <Events>
+        <Event name="red" description="move up">
+            <Precondition type="iless" lhs="[counter]" rhs="6"/>
+            <Action type="fadd" lhs="plat_y" rhs="2"/>
+            <Action type="animpos" x="[plat_x]" y="[plat_y]" z="[plat_z]" duration="1" object="platform"/>
+            <Action type="iadd" lhs="counter" rhs="1"/>
+        </Event>
+        <Event name="green" description="move down">
+            <Precondition type="fgreater" lhs="[plat_y]" rhs="0"/>
+            <Precondition type="iless" lhs="[counter]" rhs="6"/>
+            <Action type="fdec" lhs="plat_y" rhs="2"/>
+            <Action type="animpos" x="[plat_x]" y="[plat_y]" z="[plat_z]" duration="1" object="platform"/>
+            <Action type="iadd" lhs="counter" rhs="1"/>
+        </Event>
+        <Event name="tick" description="wait..">
+            <Precondition type="ieq" lhs="[counter]" rhs="6"/>
+            <Precondition type="fless" lhs="[delay]" rhs="4"/>
+            <Action type="fadd" lhs="delay" rhs="0.016"/>
+        </Event>
+        <Event name="tick" description="boom">
+            <Precondition type="ieq" lhs="[counter]" rhs="6"/>
+            <Action type="imov" lhs="counter" rhs="7"/>
+            <Action type="fmov" lhs="duration" rhs="0.07"/>
+            <Action type="fadd" lhs="plat_y" rhs="5"/>
+            <Action type="fmul" lhs="duration" rhs="[plat_y]"/>
+            <Action type="fmov" lhs="plat_y" rhs="-5"/>
+            <Action type="animpos" x="[plat_x]" y="[plat_y]" z="[plat_z]" duration="[duration]" object="platform"/>
+        </Event>
+    </Events>
+    <Animators/>
+    <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
+    <Player x="0" y="0" z="0"/>
+</Scene>

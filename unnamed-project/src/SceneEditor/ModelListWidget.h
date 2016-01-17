@@ -22,20 +22,18 @@ public:
     virtual ~ModelListWidget();
 
 public slots:
-    void updateModelList();
-    void onListClick(QModelIndex index);
-    void onRemoveClick();
-    void onAddClick();
+    void onCurrentItemChanged(QListWidgetItem *current, QListWidgetItem *previous);
+    void onRemoveClicked();
+    void onAddClicked();
 
-signals:
-    void currentModelChanged(QString currentModel);
+    void onModelsChanged();
+    void onCurrentModelChanged();
 
 private:
     void connectStuff();
 
     QListWidget *m_listView;
-
-    QString m_currentModel;
+    std::map<std::string, QListWidgetItem *> m_modelNameMap;
 
     QPushButton *m_add;
     QPushButton *m_remove;
@@ -43,8 +41,7 @@ private:
     std::shared_ptr<SceneEditorGame> m_game;
     SceneEditorWindow *m_parent;
 
-
-
+    bool m_modelsLocked;
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_MODEL_LIST_WIDGET_H

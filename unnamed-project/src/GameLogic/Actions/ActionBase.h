@@ -2,30 +2,21 @@
 #define UNNAMED_PROJET_GAME_LOGIC_ACTIONS_ACTION_BASE_H
 
 #include <QString>
-
-enum class ActionType
-{
-    FlipBoolean,
-    CopyAttribute,
-    ArithmeticalAction
-};
-
-class GlobalState;
+#include <QXmlStreamWriter>
 
 class ActionBase
 {
 public:
-    ActionBase(GlobalState *globalState);
-    virtual ~ActionBase();
+    ActionBase() {}
+    virtual ~ActionBase() {}
 
     virtual void performAction() = 0;
 
-    virtual ActionType getActionType() = 0;
+    virtual QString string() = 0;
 
-    virtual QString getDataType() = 0;
+    virtual QString type() = 0;
 
-protected:
-    GlobalState *m_globalState;
+    virtual void writeToXml(QXmlStreamWriter &writer) = 0;
 };
 
 #endif // UNNAMED_PROJET_GAME_LOGIC_ACTIONS_ACTION_BASE_H

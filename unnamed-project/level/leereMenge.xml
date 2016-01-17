@@ -9,14 +9,7 @@
     </Models>
     <Objects/>
     <Events/>
-    <Attributes>
-        <Attribute key="DELTA_TIME" type="float" value="0"/>
-        <Attribute key="FALSE" type="bool" value="false"/>
-        <Attribute key="PLAYER_POSITION" type="vector" x="0" y="0" z="0"/>
-        <Attribute key="TIME" type="float" value="0"/>
-        <Attribute key="TRUE" type="bool" value="true"/>
-    </Attributes>
-    <Animators/>
+    <Attributes/>
     <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
     <Player x="0" y="0" z="0"/>
 </Scene>
