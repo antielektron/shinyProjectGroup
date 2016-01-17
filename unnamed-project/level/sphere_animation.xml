@@ -30,7 +30,7 @@
                 <AmbientColor x="0.4" y="0.4" z="0.4"/>
             </Object>
         </ObjectGroup>
-        <Object name="suzanne" model="suzanne" interactionEvent="">
+        <Object name="suzanne" model="suzanne" interactionEvent="suzanne clicked">
             <Position x="-3" y="0" z="0"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -111,6 +111,20 @@
             <Action type="iadd" lhs="rot2" rhs="360"/>
             <Action type="animrot" x="0" y="[rot2]" z="0" object="octonorm2">
                 <Interpolation type="sinus" duration="1"/>
+            </Action>
+        </Event>
+        <Event name="suzanne clicked" description="activate">
+            <Precondition type="beq" lhs="[suzanne]" rhs="0"/>
+            <Action type="bmov" lhs="suzanne" rhs="1"/>
+            <Action type="animlightdir" x="-1" y="1" z="-1">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+        </Event>
+        <Event name="suzanne clicked" description="deactivate">
+            <Precondition type="beq" lhs="[suzanne]" rhs="1"/>
+            <Action type="bmov" lhs="suzanne" rhs="0"/>
+            <Action type="animlightdir" x="1" y="1" z="1">
+                <Interpolation type="linear" duration="1"/>
             </Action>
         </Event>
     </Events>

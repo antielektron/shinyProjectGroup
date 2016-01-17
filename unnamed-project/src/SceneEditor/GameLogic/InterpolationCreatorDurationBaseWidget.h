@@ -13,6 +13,7 @@ class SceneEditorGame;
 
 class InterpolationCreatorDurationBaseWidget : public QWidget
 {
+    Q_OBJECT
 public:
     InterpolationCreatorDurationBaseWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent = nullptr);
     virtual ~InterpolationCreatorDurationBaseWidget() {}

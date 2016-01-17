@@ -8,6 +8,7 @@
 #include "GameLogic/Actions/DivideAttributeAction.h"
 
 #include "GameLogic/Actions/ObjectAnimationAction.h"
+#include "GameLogic/Actions/SceneAnimationAction.h"
 
 template <typename ...Args>
 struct CreateActionHelper {};
@@ -90,8 +91,12 @@ typedef CreateActionHelper<
 
         ObjectAnimationAction<AccessObjectAmbientColor>,
         ObjectAnimationAction<AccessObjectDiffuseColor>,
-        ObjectAnimationAction<AccessObjectSpecularColor>
-        > HelperType;
+        ObjectAnimationAction<AccessObjectSpecularColor>,
+
+        SceneAnimationAction<AccessLightColor>,
+        SceneAnimationAction<AccessLightDirection>
+
+> HelperType;
 
 std::unique_ptr<ActionBase> Factory::createActionFromType(GlobalState *state, const QString &type)
 {

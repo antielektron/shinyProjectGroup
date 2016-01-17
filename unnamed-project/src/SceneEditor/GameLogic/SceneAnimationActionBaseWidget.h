@@ -1,5 +1,5 @@
-#ifndef UNNAMED_PROJECT_SCENE_EDITOR_GAME_LOGIC_OBJECT_ANIMATION_ACTION_BASE_WIDGET_H
-#define UNNAMED_PROJECT_SCENE_EDITOR_GAME_LOGIC_OBJECT_ANIMATION_ACTION_BASE_WIDGET_H
+#ifndef UNNAMED_PROJECT_SCENE_EDITOR_GAME_LOGIC_SCENE_ANIMATION_ACTION_BASE_WIDGET_H
+#define UNNAMED_PROJECT_SCENE_EDITOR_GAME_LOGIC_SCENE_ANIMATION_ACTION_BASE_WIDGET_H
 
 #include <memory>
 
@@ -12,12 +12,12 @@
 
 class SceneEditorGame;
 
-class ObjectAnimationActionBaseWidget : public QWidget
+class SceneAnimationActionBaseWidget : public QWidget
 {
     Q_OBJECT
 public:
-    ObjectAnimationActionBaseWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent = nullptr);
-    virtual ~ObjectAnimationActionBaseWidget();
+    SceneAnimationActionBaseWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent = nullptr);
+    virtual ~SceneAnimationActionBaseWidget();
 
 protected slots:
     virtual void onApplyClicked() = 0;
@@ -35,8 +35,6 @@ protected:
     QFormLayout *m_layout;
 
     QLabel *m_type;
-
-    QLineEdit *m_name;
 
     // TODO retrieve labels in template class via traits!
     QLineEdit *m_exprX;

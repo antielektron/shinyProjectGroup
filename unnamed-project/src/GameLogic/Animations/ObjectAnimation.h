@@ -17,8 +17,6 @@ public:
 
     virtual void tick(float time, IObjectBaseObserver *observer) override;
 
-    virtual QString type() override;
-
 protected:
     ObjectBase *m_object;
 };
@@ -43,15 +41,6 @@ void ObjectAnimation<T>::tick(float time, IObjectBaseObserver *observer)
 
     if (this->m_interpolation->isFinished(time))
         this->m_scene->deleteAnimation(this);
-}
-
-//------------------------------------------------------------------------------
-template <typename T>
-QString ObjectAnimation<T>::type()
-{
-    // TODO
-    return QString();
-    // return traits::animation_name<T>::value();
 }
 
 

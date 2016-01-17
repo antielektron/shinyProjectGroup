@@ -5,6 +5,7 @@
 #include "SceneEditor/GameLogic/ArithmeticActionWidget.h"
 
 #include "SceneEditor/GameLogic/ObjectAnimationActionWidget.h"
+#include "SceneEditor/GameLogic/SceneAnimationActionWidget.h"
 
 #include "GameLogic/Actions/InvertAttributeAction.h"
 #include "GameLogic/Actions/AssignAttributeAction.h"
@@ -40,11 +41,19 @@ struct InvertAttributeActionMap
 };
 
 // for our object animation actions..
-template <typename Action>
+template <typename Access>
 struct ObjectAnimationActionMap
 {
-    typedef Action ActionType;
-    typedef ObjectAnimationActionWidget<typename Action::AccessType> WidgetType;
+    typedef ObjectAnimationAction<Access> ActionType;
+    typedef ObjectAnimationActionWidget<Access> WidgetType;
+};
+
+// for our scene animation actions..
+template <typename Access>
+struct SceneAnimationActionMap
+{
+    typedef SceneAnimationAction<Access> ActionType;
+    typedef SceneAnimationActionWidget<Access> WidgetType;
 };
 
 template <typename ...Args>
@@ -99,11 +108,14 @@ typedef CreateActionDetailsWidgetHelper<
         ArithmeticActionMap<DivideAttributeAction<int>>,
         ArithmeticActionMap<DivideAttributeAction<double>>,
 
-        ObjectAnimationActionMap<ObjectAnimationAction<AccessObjectPosition>>,
-        ObjectAnimationActionMap<ObjectAnimationAction<AccessObjectRotation>>,
-        ObjectAnimationActionMap<ObjectAnimationAction<AccessObjectAmbientColor>>,
-        ObjectAnimationActionMap<ObjectAnimationAction<AccessObjectDiffuseColor>>,
-        ObjectAnimationActionMap<ObjectAnimationAction<AccessObjectSpecularColor>>
+        ObjectAnimationActionMap<AccessObjectPosition>,
+        ObjectAnimationActionMap<AccessObjectRotation>,
+        ObjectAnimationActionMap<AccessObjectAmbientColor>,
+        ObjectAnimationActionMap<AccessObjectDiffuseColor>,
+        ObjectAnimationActionMap<AccessObjectSpecularColor>,
+
+        SceneAnimationActionMap<AccessLightDirection>,
+        SceneAnimationActionMap<AccessLightColor>
 > HelperType;
 
 QWidget *Factory::createActionDetailsWidget(std::shared_ptr<SceneEditorGame> game, ActionBase *action, QWidget *parent)

@@ -17,8 +17,6 @@ public:
 
     virtual void tick(float time, IObjectBaseObserver *observer) override;
 
-    virtual QString type() override;
-
 protected:
     AccessType m_access;
     InterpolatedValue<ValueType> m_interpolatedValue;
@@ -45,14 +43,5 @@ void ValueAnimation<T>::tick(float time, IObjectBaseObserver *observer)
         this->m_scene->deleteAnimation(this);
 }
 
-//------------------------------------------------------------------------------
-template <typename T>
-QString ValueAnimation<T>::type()
-{
-    // TODO
-    return QString();
-    // return traits::animation_name<T>::value();
-}
 
-
-#endif // UNNAMED_PROJECT_GAME_LOGIC_ANIMATIONS_OBJECT_ANIMATION_H
+#endif // UNNAMED_PROJECT_GAME_LOGIC_ANIMATIONS_VALUE_ANIMATION_H

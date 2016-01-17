@@ -29,8 +29,6 @@ public:
 
     virtual void tick(float time, IObjectBaseObserver *observer) = 0;
 
-    virtual QString type() = 0;
-
     // virtual void writeToXml(QXmlStreamWriter &writer) = 0;
 
     // TODO reset/instant finish/leave as is
