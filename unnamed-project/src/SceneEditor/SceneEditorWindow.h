@@ -34,24 +34,14 @@ public:
     SceneEditorWindow(QWidget *parent = 0);
     SceneEditorWindow(const QString &scenefile, QWidget *parent = 0);
     virtual ~SceneEditorWindow();
+
     void makeGlWidgetCurrent();
     void doneGlWidgetCurrent();
-    Model *getCurrentModel();
 
 protected slots:
     void loadScene();
     void saveScene();
     void newScene();
-    void onCurrentModelChanged(QString);
-
-    // will be called if the scene has to rebuild
-    // it's vector of objects
-    void onUpdateSceneObjectsRequest();
-
-    void onSceneChanged();
-
-signals:
-    void globalStateModified(GlobalState *globalState);
 
 private:
     void generateWidgets();
@@ -89,9 +79,6 @@ private:
     EventsWidget *m_eventsWidget;
 
     std::shared_ptr<SceneEditorGame> m_game;
-
-    Model *m_currentModel;
-
 };
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_WINDOW_H

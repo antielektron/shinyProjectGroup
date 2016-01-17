@@ -25,8 +25,6 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
 {
     this->setMinimumSize(1024, 700);
 
-    m_currentModel = nullptr;
-
     m_game = std::make_shared<SceneEditorGame>();
 
     generateWidgets();
@@ -41,8 +39,6 @@ SceneEditorWindow::SceneEditorWindow(QWidget *parent) : QMainWindow(parent)
 SceneEditorWindow::SceneEditorWindow(const QString &scenefile, QWidget *parent) : QMainWindow(parent)
 {
     this->setMinimumSize(1024, 700);
-
-    m_currentModel = nullptr;
 
     m_game = std::make_shared<SceneEditorGame>(scenefile);
 
@@ -69,12 +65,6 @@ void SceneEditorWindow::makeGlWidgetCurrent()
 void SceneEditorWindow::doneGlWidgetCurrent()
 {
     m_glWidget->doneCurrent();
-}
-
-//------------------------------------------------------------------------------
-Model *SceneEditorWindow::getCurrentModel()
-{
-    return m_currentModel;
 }
 
 //------------------------------------------------------------------------------
@@ -185,19 +175,6 @@ void SceneEditorWindow::connectStuff()
     connect(m_game.get(), SIGNAL(currentObjectChanged()),
             m_objectDetails, SLOT(currentObjectChanged()));
 
-    connect(m_game.get(), SIGNAL(objectsChanged()),
-            m_objectList, SLOT(updateModelTree()));
-
-    connect(m_modelList, SIGNAL(currentModelChanged(QString)),
-            this, SLOT(onCurrentModelChanged(QString)));
-
-    connect(m_objectList, SIGNAL(updateSceneObjectsRequest()),
-            this, SLOT(onUpdateSceneObjectsRequest()));
-
-    connect(m_game.get(), SIGNAL(sceneChanged()),
-           this, SLOT(onSceneChanged()));
-
-
     //connect Actions:
     connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
     connect(m_saveScene, SIGNAL(triggered()), this, SLOT(saveScene()));
@@ -256,23 +233,4 @@ void SceneEditorWindow::newScene()
     // the projection matrix
     m_game->resize(m_glWidget->geometry().width(),
                        m_glWidget->geometry().height());
-}
-
-//------------------------------------------------------------------------------
-void SceneEditorWindow::onCurrentModelChanged(QString model)
-{
-    //TODO: maybe error handling?
-    m_currentModel = m_game->getModelByName(model.toStdString());
-}
-
-//------------------------------------------------------------------------------
-void SceneEditorWindow::onUpdateSceneObjectsRequest()
-{
-    m_game->getScene()->updateObjectList();
-}
-
-//------------------------------------------------------------------------------
-void SceneEditorWindow::onSceneChanged()
-{
-    emit globalStateModified(m_game.get()->getScene()->getGlobalState());
 }

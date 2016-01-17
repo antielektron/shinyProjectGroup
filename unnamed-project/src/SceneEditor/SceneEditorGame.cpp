@@ -275,10 +275,28 @@ void SceneEditorGame::addModel(std::unique_ptr<Model> model)
     emit modelsChanged();
 }
 
-void SceneEditorGame::removeModel(const std::string &modelName)
+
+const std::string &SceneEditorGame::getCurrentModel()
 {
-    m_scene->removeModel(modelName);
+    return m_currentModelName;
+}
+
+void SceneEditorGame::setCurrentModel(const std::string &modelName)
+{
+    m_currentModelName = modelName;
+    emit currentModelChanged();
+}
+
+void SceneEditorGame::removeCurrentModel()
+{
+    if (m_currentModelName.empty())
+        return;
+
+    m_scene->removeModel(m_currentModelName);
+    m_currentModelName = "";
     emit modelsChanged();
+    // a change in models implies a possible change in current model
+    // emit currentModelChanged();
 }
 
 Object *SceneEditorGame::createObject(const std::string &modelName, ObjectGroup *parent)

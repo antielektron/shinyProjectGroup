@@ -11,7 +11,8 @@
 ModelListWidget::ModelListWidget(std::shared_ptr<SceneEditorGame> game, SceneEditorWindow *parent) :
     QWidget(parent),
     m_game(game),
-    m_parent(parent)
+    m_parent(parent),
+    m_modelsLocked(false)
 {
     this->setLayout(new QVBoxLayout(this));
 
@@ -29,56 +30,51 @@ ModelListWidget::ModelListWidget(std::shared_ptr<SceneEditorGame> game, SceneEdi
     m_remove = new QPushButton("Remove Model", container);
     container->layout()->addWidget(m_remove);
 
-    updateModelList();
-
     connectStuff();
 
+    onModelsChanged();
 }
-//------------------------------------------------------------------------------
 
+//------------------------------------------------------------------------------
 ModelListWidget::~ModelListWidget()
-{
+{}
 
+//------------------------------------------------------------------------------
+void ModelListWidget::connectStuff()
+{
+    connect(m_add, SIGNAL(clicked()), this, SLOT(onAddClicked()));
+    connect(m_remove, SIGNAL(clicked()), this, SLOT(onRemoveClicked()));
+    connect(m_listView, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
+            this, SLOT(onCurrentItemChanged(QListWidgetItem *, QListWidgetItem *)));
+
+    // connect to game
+    connect(m_game.get(), SIGNAL(currentModelChanged()), this, SLOT(onCurrentModelChanged()));
+    connect(m_game.get(), SIGNAL(modelsChanged()), this, SLOT(onModelsChanged()));
+    connect(m_game.get(), SIGNAL(sceneChanged()), this, SLOT(onModelsChanged()));
 }
 
 //------------------------------------------------------------------------------
-void ModelListWidget::updateModelList()
+void ModelListWidget::onCurrentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
 {
-
-    m_listView->clear();
-    Scene *scene = m_game->getScene();
-
-    if (scene)
+    if (current)
     {
-        for (auto &model : scene->getModels())
-        {
-            m_listView->addItem(QString::fromStdString(model.first));
-        }
+        QString currentModel = current->text();
+        m_game->setCurrentModel(currentModel.toStdString());
     }
 }
 
 //------------------------------------------------------------------------------
-void ModelListWidget::onListClick(QModelIndex index)
+void ModelListWidget::onRemoveClicked()
 {
-    if (index.isValid())
-    {
-        m_currentModel = m_listView->model()->data(index).toString();
-        //DEBUG:
-        std::cout << "selected Model changed to: " << m_currentModel.toStdString()
-                  << std::endl;
+    auto currentModelName = m_game->getCurrentModel();
 
-        emit currentModelChanged(m_currentModel);
-    }
-}
+    if (currentModelName.empty())
+        return;
 
-//------------------------------------------------------------------------------
-void ModelListWidget::onRemoveClick()
-{
     // test if model is used:
-    std::string modelName = m_currentModel.toStdString();
     for (Object *objects : m_game->getScene()->getObjects())
     {
-        if (objects->getModel()->getName() == modelName)
+        if (objects->getModel()->getName() == currentModelName)
         {
             QMessageBox::information(this,
                                      "Error",
@@ -87,15 +83,14 @@ void ModelListWidget::onRemoveClick()
         }
     }
 
-    m_game->removeModel(modelName);
-    emit currentModelChanged(QString("")); // empty model String results in nullptr
+    m_game->removeCurrentModel();
 }
 
 //------------------------------------------------------------------------------
-void ModelListWidget::onAddClick()
+void ModelListWidget::onAddClicked()
 {
     QString filename = QFileDialog::getOpenFileName(this,
-                                                    tr("open Model"),
+                                                    tr("Open Model"),
                                                     ".",
                                                     tr("obj Files (*.obj)"));
 
@@ -112,14 +107,33 @@ void ModelListWidget::onAddClick()
 }
 
 //------------------------------------------------------------------------------
-void ModelListWidget::connectStuff()
+void ModelListWidget::onModelsChanged()
 {
-    connect(m_add, SIGNAL(clicked()),
-            this, SLOT(onAddClick()));
-    connect(m_remove, SIGNAL(clicked()),
-            this, SLOT(onRemoveClick()));
-    connect(m_game.get(),SIGNAL(modelsChanged()),
-            this, SLOT(updateModelList()));
-    connect(m_listView, SIGNAL(clicked(QModelIndex)),
-            this, SLOT(onListClick(QModelIndex)));
+    m_listView->clear();
+    m_modelNameMap.clear();
+
+    Scene *scene = m_game->getScene();
+
+    if (scene)
+    {
+        for (auto &model : scene->getModels())
+        {
+            auto item = new QListWidgetItem(QString::fromStdString(model.first));
+            m_modelNameMap[model.first] = item;
+            m_listView->addItem(item);
+        }
+        // TODO select current model
+    }
+
+    // select the correct model..
+    onCurrentModelChanged();
 }
+
+//------------------------------------------------------------------------------
+void ModelListWidget::onCurrentModelChanged()
+{
+    // update selection
+    auto &currentModelName = m_game->getCurrentModel();
+    m_listView->setCurrentItem(m_modelNameMap[currentModelName]);
+}
+

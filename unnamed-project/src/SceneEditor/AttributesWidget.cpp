@@ -42,10 +42,6 @@ void AttributesWidget::connectStuff()
 {
     connect(m_addValue, SIGNAL(clicked()), this, SLOT(onAddValueClicked()));
     connect(m_deleteValue, SIGNAL(clicked()), this, SLOT(onDeleteValueClicked()));
-
-    // connect to game!
-    connect(m_game.get(), SIGNAL(attributesChanged()), this, SLOT(onAttributesChanged()));
-    connect(m_game.get(), SIGNAL(sceneChanged()), this, SLOT(onAttributesChanged()));
 }
 
 //------------------------------------------------------------------------------

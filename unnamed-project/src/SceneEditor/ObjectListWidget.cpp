@@ -37,10 +37,10 @@ ObjectListWidget::ObjectListWidget(std::shared_ptr<SceneEditorGame> game, SceneE
 
     //fill Tree widget with data:
     m_treeModel = nullptr;
-    updateModelTree();
 
     connectStuff();
 
+    onObjectsChanged();
 }
 
 //------------------------------------------------------------------------------
@@ -49,30 +49,29 @@ ObjectListWidget::~ObjectListWidget()
 }
 
 //------------------------------------------------------------------------------
-void ObjectListWidget::updateModelTree()
+void ObjectListWidget::connectStuff()
 {
-    if (m_game->isInitialized())
-    {
-        ObjectGroup *root = m_game->getRootObject();
-        assert(root);
-        m_treeModel = new TreeModel(root, this);
-        m_treeView->setModel(m_treeModel);
-    }
-    else
-    {
-        //TODO: maybe a default root?
-    }
+    connect(m_treeView, SIGNAL(clicked(const QModelIndex &)),
+            this, SLOT(onTreeViewClicked(const QModelIndex &)));
+    connect(m_addObject, SIGNAL(clicked()), this, SLOT(onAddObjectClick()));
+    connect(m_addGroup, SIGNAL(clicked()), this, SLOT(onAddGroupClick()));
+    connect(m_remove, SIGNAL(clicked()), this, SLOT(onRemoveClick()));
+
+    // Connect to game
+    connect(m_game.get(), SIGNAL(currentObjectChanged()), this, SLOT(onCurrentObjectChanged()));
+    connect(m_game.get(), SIGNAL(objectsChanged()), this, SLOT(onObjectsChanged()));
+    connect(m_game.get(), SIGNAL(sceneChanged()), this, SLOT(onObjectsChanged()));
 }
 
 //------------------------------------------------------------------------------
-void ObjectListWidget::setCurrentObject(const QModelIndex &index)
+void ObjectListWidget::onTreeViewClicked(const QModelIndex &index)
 {
-    m_currentObject = m_treeModel->getGameObject(index);
-    m_game->notifyCurrentObjectChanged(m_currentObject);
+    auto currentObject = m_treeModel->getGameObject(index);
+    m_game->notifyCurrentObjectChanged(currentObject);
 
     //debug output
     std::cout << "Current Object changed to: "
-              << m_currentObject->getName().toStdString()
+              << currentObject->getName().toStdString()
               << std::endl;
 }
 
@@ -80,9 +79,9 @@ void ObjectListWidget::setCurrentObject(const QModelIndex &index)
 void ObjectListWidget::onAddObjectClick()
 {
     // get current Model from parent:
-    Model *model = m_parent->getCurrentModel();
+    auto currentModelName = m_game->getCurrentModel();
 
-    if (!model)
+    if (currentModelName.empty())
     {
         QMessageBox::information(this,
                                  "error while creating object",
@@ -97,29 +96,21 @@ void ObjectListWidget::onAddObjectClick()
                                   "Create object",
                                   "Object name:",
                                   QLineEdit::Normal,
-                                  QString::fromStdString(model->getName()),
+                                  QString::fromStdString(currentModelName),
                                   &ok);
 
     if (ok)
     {
-        ObjectGroup *parent = nullptr;
+        auto *currentObject = m_game->getCurrentObject();
+        ObjectGroup *parent = dynamic_cast<ObjectGroup *>(currentObject);
 
-        // check if selected object is an objectGroup.
-        // in this case we create the object as it's child
-        if (m_currentObject && m_currentObject->getObjectType() == ObjectType::ObjectGroup)
-        {
-            parent = static_cast<ObjectGroup *>(m_currentObject);
-        }
-
-        m_game->createObject(model->getName(), parent)->setName(objectName);
-        updateModelTree();
+        m_game->createObject(currentModelName, parent)->setName(objectName);
     }
 }
 
 //------------------------------------------------------------------------------
 void ObjectListWidget::onAddGroupClick()
 {
-
     // get new object name by user:
     bool ok;
     QString groupName =
@@ -127,50 +118,47 @@ void ObjectListWidget::onAddGroupClick()
                                   "Create object",
                                   "Object name:",
                                   QLineEdit::Normal,
-                                  "new Object Group",
+                                  "New Object Group",
                                   &ok);
 
     if (ok)
     {
-        ObjectGroup *parent = nullptr;
-
         // check if selected object is an objectGroup.
         // in this case we create the object as it's child
-        if (m_currentObject)
-        {
-            if (m_currentObject->getObjectType() == ObjectType::ObjectGroup)
-            {
-                // downcasting ObjectBase to ObjectGroup
-                parent = static_cast<ObjectGroup *>(m_currentObject);
-            }
-        }
-        m_game->createObjectGroup(groupName.toStdString(),parent);
-        updateModelTree();
+
+        auto *currentObject = m_game->getCurrentObject();
+        ObjectGroup *parent = dynamic_cast<ObjectGroup *>(currentObject);
+
+        m_game->createObjectGroup(groupName.toStdString(), parent);
     }
 }
 
 //------------------------------------------------------------------------------
 void ObjectListWidget::onRemoveClick()
 {
-    if (m_currentObject)
+    m_game->removeCurrentObject();
+}
+
+//------------------------------------------------------------------------------
+void ObjectListWidget::onObjectsChanged()
+{
+    if (m_game->isInitialized())
     {
-        m_game->removeCurrentObject();
-        m_currentObject = nullptr;
-        updateModelTree();
-        emit updateSceneObjectsRequest();
+        ObjectGroup *root = m_game->getRootObject();
+        assert(root);
+        m_treeModel = new TreeModel(root, this);
+        m_treeView->setModel(m_treeModel);
+
+        onCurrentObjectChanged();
+    }
+    else
+    {
+        //TODO: maybe a default root?
     }
 }
 
 //------------------------------------------------------------------------------
-void ObjectListWidget::connectStuff()
+void ObjectListWidget::onCurrentObjectChanged()
 {
-    connect(m_treeView, SIGNAL(clicked(QModelIndex)),
-            this, SLOT(setCurrentObject(QModelIndex)));
-    connect(m_addObject, SIGNAL(clicked()),
-            this, SLOT(onAddObjectClick()));
-    connect(m_addGroup, SIGNAL(clicked()),
-            this, SLOT(onAddGroupClick()));
-    connect(m_remove, SIGNAL(clicked()),
-            this, SLOT(onRemoveClick()));
+    // TODO update selection!
 }
-

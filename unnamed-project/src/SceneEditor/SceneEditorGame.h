@@ -34,16 +34,20 @@ public:
 	ObjectGroup *getRootObject();
     ObjectBase *getCurrentObject();
 
+
+	void addModel(std::unique_ptr<Model> model);
     Model *getModelByName(const std::string &modelName);
 
-    void addModel(std::unique_ptr<Model> model);
-    void removeModel(const std::string &modelName);
+	const std::string &getCurrentModel();
+	void setCurrentModel(const std::string &modelName);
+    void removeCurrentModel();
 
-	void notifyCurrentObjectChanged(ObjectBase *object);
-	void removeCurrentObject();
 
     Object *createObject(const std::string &modelName, ObjectGroup *parent = nullptr);
     ObjectGroup *createObjectGroup(const std::string &name, ObjectGroup *parent = nullptr);
+
+	void notifyCurrentObjectChanged(ObjectBase *object);
+	void removeCurrentObject();
 
 
 	void addAttribute(const QString &key, const QVariant &value);
@@ -65,10 +69,11 @@ public slots:
     void stopLogic();
     void togglePauseLogic();
 
-Q_SIGNALS:
+signals:
     void currentObjectChanged();
-    void modelsChanged();
+    void currentModelChanged();
     void objectsChanged();
+    void modelsChanged();
 	void sceneChanged(); // emited when "global information" has changed
 
     void attributesChanged();
@@ -92,6 +97,7 @@ private:
     float m_deltaTime;
 
     ObjectBase *m_currentObject;
+	std::string m_currentModelName;
 
 	QVector3D m_position;
 
