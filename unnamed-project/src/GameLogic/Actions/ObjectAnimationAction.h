@@ -56,11 +56,10 @@ void ObjectAnimationAction<Access>::performAction()
 {
     QVector3D dest(this->m_exprX->evaluate(), this->m_exprY->evaluate(), this->m_exprZ->evaluate());
 
-    auto duration = this->m_duration->evaluate();
     // TODO find start from scene or so!
     double start = this->m_scene->getGlobalState()->getTime();
     // TODO find interpolation from factory?
-    auto interpolation = std::unique_ptr<InterpolationBase>(new InterpolationLinear(start, start+duration));
+    auto interpolation = this->m_interpolationCreator->createInterpolation(start);
 
     auto object = static_cast<typename Access::ObjectType *>(this->m_scene->findObjectByName(this->m_scene->getSceneRoot(), this->m_objectName));
     if (!object)
@@ -98,9 +97,9 @@ void ObjectAnimationAction<Access>::writeToXml(QXmlStreamWriter &writer)
     writer.writeAttribute("y", this->m_exprY->string());
     writer.writeAttribute("z", this->m_exprZ->string());
 
-    writer.writeAttribute("duration", this->m_duration->string());
-
     writer.writeAttribute("object", this->m_objectName);
+
+    this->m_interpolationCreator->writeToXml(writer);
 
     writer.writeEndElement();
 }

@@ -1,7 +1,6 @@
 #include "SceneEditor/GameLogic/ObjectAnimationActionBaseWidget.h"
 #include "SceneEditor/SceneEditorGame.h"
-
-#include <QBoxLayout>
+#include "GameLogic/Factories/InterpolationCreatorFactory.h"
 
 ObjectAnimationActionBaseWidget::ObjectAnimationActionBaseWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) :
         QWidget(parent),
@@ -34,8 +33,20 @@ void ObjectAnimationActionBaseWidget::generateWidgets()
     m_exprZ = new QLineEdit(this);
     m_layout->addRow("Expression Z", m_exprZ);
 
-    m_duration = new QLineEdit(this);
-    m_layout->addRow("Duration", m_duration);
+    m_interpolationType = new QComboBox(this);
+    m_layout->addRow("Interpolation Type", m_interpolationType);
+
+    // Fill list here, so that no on change events get triggered!
+    std::vector<QString> interpolationTypes = Factory::getKnownInterpolationCreatorTypes();
+
+    m_interpolationType->clear();
+    for (auto &type : interpolationTypes)
+    {
+        m_interpolationType->addItem(type);
+    }
+
+    m_editInterpolation = new QPushButton("Edit Interpolation", this);
+    m_layout->addRow(m_editInterpolation);
 
     m_apply = new QPushButton("Apply", this);
     m_layout->addRow(m_apply);
@@ -44,6 +55,8 @@ void ObjectAnimationActionBaseWidget::generateWidgets()
 void ObjectAnimationActionBaseWidget::connectStuff()
 {
     connect(m_apply, SIGNAL(clicked()), this, SLOT(onApplyClicked()));
+    connect(m_editInterpolation, SIGNAL(clicked()), this, SLOT(onEditInterpolationClicked()));
+    connect(m_interpolationType, SIGNAL(currentTextChanged(QString)), this, SLOT(onInterpolationTypeChanged()));
 
     // connect to game (close on any change)
     connect(m_game.get(), SIGNAL(eventsChanged()), this, SLOT(close()));

@@ -13,8 +13,16 @@
             <Position x="0" y="0" z="0"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
-            <Object name="octonorm" model="octonorm" interactionEvent="">
-                <Position x="3" y="0" z="0"/>
+            <Object name="octonorm1" model="octonorm" interactionEvent="octo1">
+                <Position x="2.5" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+                <AmbientColor x="0.4" y="0.4" z="0.4"/>
+            </Object>
+            <Object name="octonorm2" model="octonorm" interactionEvent="octo2">
+                <Position x="5" y="0" z="0"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="0.5" y="0.5" z="0.5"/>
@@ -76,14 +84,34 @@
         <Event name="sphere clicked" description="activate sphere">
             <Precondition type="beq" lhs="[active]" rhs="0"/>
             <Action type="bmov" lhs="active" rhs="1"/>
-            <Action type="animdiffusecolor" x="0.5" y="0" z="0" duration="1" object="sphere"/>
-            <Action type="animambientcolor" x="0.4" y="0" z="0" duration="1" object="sphere"/>
+            <Action type="animdiffusecolor" x="0.5" y="0" z="0" object="sphere">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+            <Action type="animambientcolor" x="0.4" y="0" z="0" object="sphere">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
         </Event>
         <Event name="sphere clicked" description="deactivate sphere">
             <Precondition type="beq" lhs="[active]" rhs="1"/>
             <Action type="bmov" lhs="active" rhs="0"/>
-            <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.5" duration="1" object="sphere"/>
-            <Action type="animambientcolor" x="0.4" y="0.4" z="0.4" duration="1" object="sphere"/>
+            <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.5" object="sphere">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+            <Action type="animambientcolor" x="0.4" y="0.4" z="0.4" object="sphere">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+        </Event>
+        <Event name="octo1" description="linear">
+            <Action type="iadd" lhs="rot1" rhs="360"/>
+            <Action type="animrot" x="0" y="[rot1]" z="0" object="octonorm1">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+        </Event>
+        <Event name="octo2" description="sinus">
+            <Action type="iadd" lhs="rot2" rhs="360"/>
+            <Action type="animrot" x="0" y="[rot2]" z="0" object="octonorm2">
+                <Interpolation type="sinus" duration="1"/>
+            </Action>
         </Event>
     </Events>
     <Animators/>

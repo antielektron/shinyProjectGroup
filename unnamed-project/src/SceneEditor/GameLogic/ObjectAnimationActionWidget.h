@@ -7,6 +7,7 @@
 #include "SceneEditor/SceneEditorGame.h"
 #include "GameLogic/Actions/ObjectAnimationAction.h"
 #include "GameLogic/Factories/ExpressionFactory.h"
+#include "SceneEditor/Factories/InterpolationCreatorDetailsWidgetFactory.h"
 
 template <typename Access>
 class ObjectAnimationActionWidget : public ObjectAnimationActionBaseWidget
@@ -19,6 +20,8 @@ public:
 
 protected:
     virtual void onApplyClicked() override;
+    virtual void onInterpolationTypeChanged() override;
+    virtual void onEditInterpolationClicked() override;
 
 private:
     ActionType *m_action;
@@ -37,7 +40,7 @@ ObjectAnimationActionWidget<Access>::ObjectAnimationActionWidget(std::shared_ptr
     m_exprY->setText(m_action->getExprY()->string());
     m_exprZ->setText(m_action->getExprZ()->string());
 
-    m_duration->setText(m_action->getDuration()->string());
+    m_interpolationType->setCurrentText(m_action->getInterpolationCreator()->type());
 }
 
 template <typename Access>
@@ -54,10 +57,23 @@ void ObjectAnimationActionWidget<Access>::onApplyClicked()
     auto exprZ = Factory::createExpressionFromString<double>(m_game->getGlobalState(), m_exprZ->text());
     m_action->setExprZ(std::move(exprZ));
 
-    auto duration = Factory::createExpressionFromString<double>(m_game->getGlobalState(), m_duration->text());
-    m_action->setDuration(std::move(duration));
-
     m_game->notifyEventChanged();
 }
+
+template <typename Access>
+void ObjectAnimationActionWidget<Access>::onInterpolationTypeChanged()
+{
+    auto type = m_interpolationType->currentText();
+    m_action->setInterpolationCreator(Factory::createInterpolationCreatorFromType(type));
+    // NOTE: Silently changing this!
+}
+
+template <typename Access>
+void ObjectAnimationActionWidget<Access>::onEditInterpolationClicked()
+{
+    auto widget = Factory::createInterpolationCreatorDetailsWidget(m_game, m_action->getInterpolationCreator(), nullptr);
+    widget->show();
+}
+
 
 #endif // UNNAMED_PROJECT_SCENE_EDITOR_GAME_LOGIC_OBJECT_ANIMATION_ACTION_WIDGET_H

@@ -8,6 +8,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QFormLayout>
+#include <QComboBox>
 
 class SceneEditorGame;
 
@@ -20,6 +21,8 @@ public:
 
 protected slots:
     virtual void onApplyClicked() = 0;
+    virtual void onInterpolationTypeChanged() = 0;
+    virtual void onEditInterpolationClicked() = 0;
 
 protected:
     virtual void closeEvent(QCloseEvent *event) override;
@@ -40,7 +43,9 @@ protected:
     QLineEdit *m_exprY;
     QLineEdit *m_exprZ;
 
-    QLineEdit *m_duration;
+    QComboBox *m_interpolationType;
+
+    QPushButton *m_editInterpolation;
 
     QPushButton *m_apply;
 };
