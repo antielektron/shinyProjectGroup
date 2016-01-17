@@ -45,6 +45,8 @@ private:
 
     void fillModelSelection();
 
+    QLineEdit *m_name;
+
     QComboBox *m_modelSelection;
 
     QLineEdit *m_interactionEvent;

@@ -23,6 +23,9 @@ void ObjectDetailsWidget::generateWidgets()
     m_layout =  new QFormLayout(this);
     this->setLayout(m_layout);
 
+    m_name = new QLineEdit(this);
+    m_layout->addRow("Name", m_name);
+
     m_modelSelection = new QComboBox(this);
     m_layout->addRow("Model", m_modelSelection);
 
@@ -57,6 +60,7 @@ void ObjectDetailsWidget::generateWidgets()
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::connectStuff()
 {
+    connect(m_name, SIGNAL(editingFinished()), this, SLOT(applyValues()));
     connect(m_modelSelection, SIGNAL(currentTextChanged(QString)), this, SLOT(applyValues()));
     connect(m_interactionEvent, SIGNAL(editingFinished()), this, SLOT(applyValues()));
     // TODO connect to game autonomiously!
@@ -221,6 +225,8 @@ void ObjectDetailsWidget::updateCurrentObjectGroup(ObjectGroup *objectGroup)
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::updateCurrentObjectBase(ObjectBase *object)
 {
+    m_name->setText(object->getName());
+
     m_posX->setValue(object->getPosition().x());
     m_posY->setValue(object->getPosition().y());
     m_posZ->setValue(object->getPosition().z());
@@ -273,6 +279,8 @@ void ObjectDetailsWidget::applyCurrentObjectBase(ObjectBase *object)
 {
     if (m_objectPropertiesLocked)
         return;
+
+    object->setName(m_name->text());
 
     object->getPosition().setX((float)m_posX->value());
     object->getPosition().setY((float)m_posY->value());
