@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     parser.addOption(bulletGameOption);
 #endif // HAVE_BULLET
 
-    QCommandLineOption levelFileOption("level", "Specify level file to use", "file", "level/sphere_animation.xml");
+    QCommandLineOption levelFileOption("level", "Specify level file to use", "file", "level/sphere_animation2.xml");
     parser.addOption(levelFileOption);
 
     parser.addHelpOption();
