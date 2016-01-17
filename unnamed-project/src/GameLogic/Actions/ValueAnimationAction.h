@@ -5,14 +5,15 @@
 
 #include "GameLogic/Actions/ActionBase.h"
 #include "GameLogic/Expressions/ExpressionConstant.h"
+#include "GameLogic/InterpolationCreator/InterpolationCreatorDuration.h"
 #include "GameLogic/Animations/ValueAnimation.h"
 #include "GameLogic/Animations/Access.h"
 #include "GameLogic/Traits.h"
 
+#include "GameLogic/Factories/InterpolationCreatorFactory.h"
+
 #include "GameLogic/GlobalState.h"
 #include "Scene/Scene.h"
-
-#include "GameLogic/Interpolation/InterpolationLinear.h"
 
 template <typename Access>
 class ValueAnimationAction : public ActionBase
@@ -27,13 +28,13 @@ public:
     inline void setExprY(std::unique_ptr<Expression<double>> expr) { m_exprY = std::move(expr); }
     inline void setExprZ(std::unique_ptr<Expression<double>> expr) { m_exprZ = std::move(expr); }
 
-    inline void setDuration(std::unique_ptr<Expression<double>> expr) { m_duration = std::move(expr); }
+    inline void setInterpolationCreator(std::unique_ptr<InterpolationCreatorBase> interpolationCreator) { m_interpolationCreator = std::move(interpolationCreator); }
 
     inline Expression<double> *getExprX() { return m_exprX.get(); }
     inline Expression<double> *getExprY() { return m_exprY.get(); }
     inline Expression<double> *getExprZ() { return m_exprZ.get(); }
 
-    inline Expression<double> *getDuration() { return m_duration.get(); }
+    inline InterpolationCreatorBase *getInterpolationCreator() { return m_interpolationCreator.get(); }
 
 protected:
     Scene *m_scene;
@@ -42,7 +43,7 @@ protected:
     std::unique_ptr<Expression<double>> m_exprY;
     std::unique_ptr<Expression<double>> m_exprZ;
 
-    std::unique_ptr<Expression<double>> m_duration;
+    std::unique_ptr<InterpolationCreatorBase> m_interpolationCreator;
 };
 
 
@@ -53,7 +54,7 @@ ValueAnimationAction<Access>::ValueAnimationAction(GlobalState *state) :
         m_exprX(new ExpressionConstant<double>()),
         m_exprY(new ExpressionConstant<double>()),
         m_exprZ(new ExpressionConstant<double>()),
-        m_duration(new ExpressionConstant<double>())
+        m_interpolationCreator(new InterpolationCreatorDuration<InterpolationLinear>())
 {}
 
 //------------------------------------------------------------------------------
@@ -70,8 +71,22 @@ ValueAnimationAction<Access>::ValueAnimationAction(GlobalState *state, const QDo
     QString z = domElement.attribute("z");
     m_exprZ = Factory::createExpressionFromString<double>(state, z);
 
-    QString duration = domElement.attribute("duration");
-    m_duration = Factory::createExpressionFromString<double>(state, duration);
+    for (auto child = domElement.firstChildElement(); !child.isNull(); child = child.nextSiblingElement())
+    {
+        if (child.tagName() == "Interpolation")
+        {
+            m_interpolationCreator = Factory::createInterpolationCreatorFromDomElement(state, child);
+            break; // only one interpolation
+        }
+    }
+
+    if (!m_interpolationCreator)
+    {
+        // LEGACY!
+        QString durationText = domElement.attribute("duration");
+        auto duration = Factory::createExpressionFromString<double>(state, durationText);
+        m_interpolationCreator.reset(new InterpolationCreatorDuration<InterpolationLinear>(std::move(duration)));
+    }
 }
 
 

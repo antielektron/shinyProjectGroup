@@ -21,6 +21,12 @@ namespace traits
         static_assert(sizeof(T) == 0, "This type is not a precondition");
     };
 
+    template <typename T>
+    struct interpolation_name
+    {
+        static_assert(sizeof(T) == 0, "This type is not an interpolation (creator)");
+    };
+
 }
 
 #endif // UNNAMED_PROJECT_GAME_LOGIC_TRAITS_H
