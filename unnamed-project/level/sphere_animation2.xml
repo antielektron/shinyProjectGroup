@@ -12,7 +12,7 @@
             <Position x="0" y="0" z="0"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
-            <Object name="octonorm" model="octonorm" interactionEvent="">
+            <Object name="octonorm" model="octonorm" interactionEvent="octonorm clicked">
                 <Position x="3" y="0" z="0"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
@@ -68,17 +68,17 @@
             <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.5" duration="1" object="sphere"/>
             <Action type="animambientcolor" x="0.4" y="0.4" z="0.4" duration="1" object="sphere"/>
         </Event>
-        <Event name="suzanne clicked" description="activate szuanne">
+        <Event name="octonorm clicked" description="activate octonorm">
             <Precondition type="beq" lhs="[active]" rhs="0"/>
             <Action type="bmov" lhs="active" rhs="1"/>
-            <Action type="animspecularcolor" x="0.4" y="0" z="0" duration="1" object="szuanne"/>
-            <Action type="animdiffusecolor" x="0.5" y="0" z="0" duration="1" object="szuanne"/>
+            <Action type="animspecularcolor" x="0" y="0.4" z="0.4" duration="1" object="octonorm"/>
+            <Action type="animdiffusecolor" x="0" y="0.4" z="0.5" duration="1" object="octonorm"/>
         </Event>
-        <Event name="suzanne clicked" description="deactivate szuanne">
+        <Event name="octonorm clicked" description="deactivate octonorm">
             <Precondition type="beq" lhs="[active]" rhs="1"/>
             <Action type="bmov" lhs="active" rhs="0"/>
-            <Action type="animspecularcolor" x="0.4" y="0.4" z="0.4" duration="1" object="szuanne"/>
-            <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.5" duration="1" object="szuanne"/>
+            <Action type="animspecularcolor" x="0.4" y="0.4" z="0.4" duration="1" object="octonorm"/>
+            <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.5" duration="1" object="octonorm"/>
         </Event>
     </Events>
     <Animators/>
