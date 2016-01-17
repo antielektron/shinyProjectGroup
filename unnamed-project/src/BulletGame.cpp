@@ -153,7 +153,8 @@ void BulletGame::handleInput(float deltaTime)
     m_playerBody->applyCentralForce(toBulletVector3(worldVelocity));
 
     // TODO modify camera!
-    m_position = toQVector3D(m_playerBody->getWorldTransform() * btVector3(0., 0., 0.));
+    // NOTE: camera not at center of player!
+    m_position = toQVector3D(m_playerBody->getWorldTransform() * btVector3(0., 1.8/2.-0.2, 0.));
     updateCamera();
 
     // Start/Stop catching mouse
@@ -311,20 +312,26 @@ void BulletGame::loadScene(const QString &filename)
     transform.setIdentity();
     transform.setOrigin(btVector3(0, 5, 2));
 
-    btSphereShape *sphere = new btSphereShape(1);
-    sphere->calculateLocalInertia(mass, inertia);
+    float radius = 0.4;
+    float height = 1.8;
+    auto *playerShape = new btCapsuleShape(radius, height-2*radius);
+    playerShape->calculateLocalInertia(mass, inertia);
 
     btDefaultMotionState *motionState = new btDefaultMotionState(transform);
-    m_playerBody.reset(new btRigidBody(mass, motionState, sphere, inertia));
+    m_playerBody.reset(new btRigidBody(mass, motionState, playerShape, inertia));
     m_playerBody->setActivationState(DISABLE_DEACTIVATION);
+
+    m_playerBody->setAngularFactor(0);
+
     m_bulletWorld->addRigidBody(m_playerBody.get());
 
+    // Use constraint to lock the rotation of the player body.
     btTransform tr;
     tr.setIdentity();
+    /*
     auto *springConstraint = new btGeneric6DofSpringConstraint(*m_playerBody, tr, false);
 
     btScalar springRange(7.f);
-
     springConstraint->setLinearUpperLimit(springRange * btVector3(1., 1., 1.));
     springConstraint->setLinearLowerLimit(-springRange * btVector3(1., 1., 1.));
 
@@ -338,8 +345,8 @@ void BulletGame::loadScene(const QString &filename)
         springConstraint->setStiffness(i, 4); // period 1 sec for !kG body
         springConstraint->setDamping(i, 1.00f); // add some damping
     }
-
-    //m_bulletWorld->addConstraint(springConstraint, false);
+    m_bulletWorld->addConstraint(springConstraint, false);
+    */
 }
 
 #endif // HAVE_BULLET

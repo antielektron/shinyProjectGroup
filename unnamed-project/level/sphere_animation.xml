@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scene name="Shiny Scene" version="42" author="Norby">
     <Models>
+        <Model name="bucket" path="models/bucket.obj"/>
         <Model name="floor" path="models/floor.obj"/>
         <Model name="octonorm" path="models/octonorm.obj"/>
         <Model name="sink" path="models/sink.obj"/>
@@ -48,6 +49,22 @@
         <Object name="sink" model="sink" interactionEvent="">
             <Position x="-7" y="-3" z="-7"/>
             <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="bucket" model="bucket" interactionEvent="">
+            <Position x="0" y="-3" z="-3.4"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+        <Object name="bucket2" model="bucket" interactionEvent="">
+            <Position x="0" y="2.8" z="-3.4"/>
+            <Rotation x="180" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="0.5" y="0.5" z="0.5"/>
             <DiffuseColor x="0.5" y="0.5" z="0.5"/>
