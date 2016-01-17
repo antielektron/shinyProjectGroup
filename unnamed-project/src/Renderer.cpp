@@ -37,153 +37,206 @@ Renderer::~Renderer()
 }
 
 //------------------------------------------------------------------------------
-
-ShaderErrorType Renderer::createShaderProgram(const std::string &vertexShaderSource, const std::string &fragmentShaderSource)
+void Renderer::setShaderSource(const std::string &shaderSrc,
+                               const std::string &progName,
+                               QOpenGLShader::ShaderTypeBit type)
 {
+    m_sources[std::make_pair(progName, type)] = shaderSrc;
+}
+
+//------------------------------------------------------------------------------
+ShaderErrorType Renderer::createProgram(const std::string &program)
+{
+    // check whether there are sources for given program
+    auto vertexShaderIt = m_sources.find(
+                              std::make_pair(program, QOpenGLShader::Vertex));
+    auto fragmentShaderIt = m_sources.find(
+                                std::make_pair(program, QOpenGLShader::Fragment));
+    auto geometryShaderIt = m_sources.find(
+                                std::make_pair(program, QOpenGLShader::Geometry));
+
+    if (vertexShaderIt == m_sources.end() || fragmentShaderIt == m_sources.end())
+    {
+        return ShaderErrorType::MissingSourcesError;
+    }
+
+    // create new Program
     std::unique_ptr<QOpenGLShaderProgram> prog(new QOpenGLShaderProgram());
 
-    if (!prog->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource.c_str()))
+    // append cached vertex and fragment shader code
+    if (!prog->addShaderFromSourceCode(QOpenGLShader::Vertex,
+                                       vertexShaderIt->second.c_str()))
     {
         std::cerr << "could not load vertex shader" << std::endl;
         return ShaderErrorType::VertexShaderError;
     }
-    if (!prog->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource.c_str()))
+    if (!prog->addShaderFromSourceCode(QOpenGLShader::Fragment,
+                                       fragmentShaderIt->second.c_str()))
     {
         std::cerr << "could not load fragment shader" << std::endl;
         return ShaderErrorType::FragmentShaderError;
     }
-    prog->bindAttributeLocation("v_position", 0);
-    prog->bindAttributeLocation("v_normal", 1);
 
+    // append cached geometry shader, if there is one
+    if (geometryShaderIt != m_sources.end())
+    {
+        if (!prog->addShaderFromSourceCode(QOpenGLShader::Geometry,
+                                           geometryShaderIt->second.c_str()))
+        {
+            std::cerr << "could not load geometry shader" << std::endl;
+            return ShaderErrorType::GeometryShaderError;
+        }
+    }
+
+    // bind cached attribute locations
+    for( const auto &v : m_attribLocs[program])
+    {
+        prog->bindAttributeLocation(v.second, v.first);
+    }
+
+    // link program
     if (!prog->link())
     {
         std::cerr << "could not link shader program" << std::endl;
         return ShaderErrorType::LinkingError;
     }
 
-    m_program = std::move(prog);
-    m_currentVertexShader = vertexShaderSource;
-    m_currentFragmentShader = fragmentShaderSource;
+    // no errors so far, finally move program to our programs map
+    QOpenGLShaderProgram *pProg = prog.get();
+    m_programs[program] = std::move(prog);
 
-    m_program->bind();
-    m_modelViewMatrixLoc = m_program->uniformLocation("modelViewMatrix");
-    m_projectionMatrixLoc = m_program->uniformLocation("projectionMatrix");
-    m_cascadeViewMatrixLoc = m_program->uniformLocation("cascadeViewMatrix");
-    m_cascadeFarLoc = m_program->uniformLocation("cascadeFar");
-
-    m_lightDirectionLoc = m_program->uniformLocation("lightDirection");
-    m_lightColorLoc = m_program->uniformLocation("lightColor");
-
-    m_specularColorLoc = m_program->uniformLocation("specularColor");
-    m_diffuseColorLoc = m_program->uniformLocation("diffuseColor");
-    m_ambientColorLoc = m_program->uniformLocation("ambientColor");
-
-    m_shadowMapSamplerLoc = m_program->uniformLocation("shadowMapSampler");
-
-    m_program->release();
-
+    // get uniform locations:
+    pProg->bind();
+    for (const auto &v : m_uniformLocs[program])
+    {
+        *(v.first) = pProg->uniformLocation(v.second);
+    }
+    pProg->release();
     return ShaderErrorType::NoError;
 }
 
-void Renderer::createComposeProgram()
+//------------------------------------------------------------------------------
+void Renderer::getPrograms(std::vector<std::string> &progs)
 {
-    if (!m_composeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "shaders/vertex_copy.glsl"))
+    // just in case...
+    progs.clear();
+    for (const auto &pair : m_programs)
     {
-        throw std::runtime_error("could not load vertex shader");
+        progs.push_back(pair.first);
     }
-    if (!m_composeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "shaders/fragment_copy.glsl"))
-    {
-        throw std::runtime_error("could not load fragment shader");
-    }
-    m_composeProgram.bindAttributeLocation("v_position", 0);
-
-    if (!m_composeProgram.link())
-    {
-        throw std::runtime_error("could not link shader program");
-    }
-
-    m_composeProgram.bind();
-
-    m_composeSamplerLoc = m_composeProgram.uniformLocation("sampler");
-
-    m_composeProgram.release();
-
-
-    // CopyArrayProgram
-    if (!m_copyArrayProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "shaders/vertex_copy.glsl"))
-    {
-        throw std::runtime_error("could not load vertex shader");
-    }
-    if (!m_copyArrayProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "shaders/fragment_copy_array.glsl"))
-    {
-        throw std::runtime_error("could not load fragment shader");
-    }
-    m_copyArrayProgram.bindAttributeLocation("v_position", 0);
-
-    if (!m_copyArrayProgram.link())
-    {
-        throw std::runtime_error("could not link shader program");
-    }
-
-    m_copyArrayProgram.bind();
-
-    m_copyArraySamplerLoc = m_copyArrayProgram.uniformLocation("sampler");
-    m_copyArrayLayerLoc = m_copyArrayProgram.uniformLocation("layer");
-
-    m_copyArrayProgram.release();
-
-
-
-    // Create quad
-    m_quadVao.create();
-    QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
-
-    float vertices[] = {
-            0, 0,
-            1, 0,
-            1, 1,
-            0, 1
-    };
-
-    // Setup our vertex buffer object.
-    m_quadVbo.create();
-    m_quadVbo.bind();
-    m_quadVbo.allocate(vertices, 4*2*sizeof(float));
-
-    // Store the vertex attribute bindings for the program.
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
-    m_quadVbo.release();
 }
 
-void Renderer::createShadowMapProgram()
+//------------------------------------------------------------------------------
+void Renderer::getShadersForProgram(const std::string &progName,
+                                    ShaderSourcesType &shaders)
 {
-    if (!m_shadowMapProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, "shaders/vertex_shadowmap.glsl"))
+    for (const auto &pair : m_sources)
     {
-        throw std::runtime_error("could not load vertex shader");
+        if (pair.first.first == progName)
+        {
+            shaders.push_back(std::make_pair(pair.first.second, pair.second));
+            // ^ don't get confused!
+        }
     }
-    if (!m_shadowMapProgram.addShaderFromSourceFile(QOpenGLShader::Geometry, "shaders/geometry_shadowmap.glsl"))
-    {
-        throw std::runtime_error("could not load geometry shader");
-    }
-    if (!m_shadowMapProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, "shaders/fragment_shadowmap.glsl"))
-    {
-        throw std::runtime_error("could not load fragment shader");
-    }
-    m_shadowMapProgram.bindAttributeLocation("v_position", 0);
+}
 
-    if (!m_shadowMapProgram.link())
-    {
-        throw std::runtime_error("could not link shader program");
-    }
+//------------------------------------------------------------------------------
+void Renderer::initialize()
+{
+    // initializeOpenGLFunctions();
+    glClearColor(0, 0, 0, 1);
 
-    m_shadowMapProgram.bind();
+    // set shaders:
+    // default program:
+    setShaderSource(loadTextFile("shaders/vertex.glsl"),
+                    KEYSTR_PROGRAM_DEFAULT,
+                    QOpenGLShader::Vertex);
+    setShaderSource(loadTextFile("shaders/fragment.glsl"),
+                    KEYSTR_PROGRAM_DEFAULT,
+                    QOpenGLShader::Fragment);
+    // shadow map program
+    setShaderSource(loadTextFile("shaders/vertex_shadowmap.glsl"),
+                    KEYSTR_PROGRAM_SHADOW,
+                    QOpenGLShader::Vertex);
+    setShaderSource(loadTextFile("shaders/geometry_shadowmap.glsl"),
+                    KEYSTR_PROGRAM_SHADOW,
+                    QOpenGLShader::Geometry);
+    setShaderSource(loadTextFile("shaders/fragment_shadowmap.glsl"),
+                    KEYSTR_PROGRAM_SHADOW,
+                    QOpenGLShader::Fragment);
+    // compose program:
+    setShaderSource(loadTextFile("shaders/vertex_copy.glsl"),
+                    KEYSTR_PROGRAM_COMPOSE,
+                    QOpenGLShader::Vertex);
+    setShaderSource(loadTextFile("shaders/fragment_copy.glsl"),
+                    KEYSTR_PROGRAM_COMPOSE,
+                    QOpenGLShader::Fragment);
+    // copy
+    setShaderSource(loadTextFile("shaders/vertex_copy.glsl"),
+                    KEYSTR_PROGRAM_COPY,
+                    QOpenGLShader::Vertex);
+    setShaderSource(loadTextFile("shaders/fragment_copy_array.glsl"),
+                    KEYSTR_PROGRAM_COPY,
+                    QOpenGLShader::Fragment);
 
-    m_shadowMapCascadeViewMatrixLoc = m_shadowMapProgram.uniformLocation("cascadeViewMatrix");
-    m_shadowMapWorldMatrixLoc = m_shadowMapProgram.uniformLocation("worldMatrix");
+    // generate attrib and uniform locations
+    // default:
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                std::make_pair(&m_modelViewMatrixLoc, "modelViewMatrix"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                std::make_pair(&m_projectionMatrixLoc, "projectionMatrix"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_cascadeViewMatrixLoc, "cascadeViewMatrix"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_cascadeFarLoc, "cascadeFar"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_lightDirectionLoc, "lightDirection"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_lightColorLoc, "lightColor"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_specularColorLoc, "specularColor"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_diffuseColorLoc, "diffuseColor"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_ambientColorLoc, "ambientColor"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_shadowMapSamplerLoc, "shadowMapSampler"));
 
-    m_shadowMapProgram.release();
+    m_attribLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                std::make_pair(0, "v_position"));
+    m_attribLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                std::make_pair(1, "v_normal"));
 
+    // shadow map:
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_shadowMapCascadeViewMatrixLoc, "cascadeViewMatrix"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                        std::make_pair(&m_shadowMapWorldMatrixLoc, "worldMatrix"));
+
+    // compose
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_composeSamplerLoc, "sampler"));
+    m_attribLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                std::make_pair(0, "v_position"));
+
+    // copy
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_copyArraySamplerLoc, "sampler"));
+    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                    std::make_pair(&m_copyArrayLayerLoc, "layer"));
+    m_attribLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+                std::make_pair(0, "v_position"));
+
+    // create Programs:
+    createProgram(KEYSTR_PROGRAM_DEFAULT);
+    createProgram(KEYSTR_PROGRAM_SHADOW);
+    createProgram(KEYSTR_PROGRAM_COMPOSE);
+    createProgram(KEYSTR_PROGRAM_COPY);
+
+    // make stuff
+    // --> default program (nothing to do) <------------------------------------
+
+    // --> shadow map program <-------------------------------------------------
     // Create ShadowMap
     m_shadowMapSize = 2048;
     m_cascades = 4;
@@ -214,51 +267,30 @@ void Renderer::createShadowMapProgram()
     glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_shadowMapDepthBuffer, 0);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_shadowMapTexture, 0);
-}
 
-void Renderer::initialize()
-{
-    // initializeOpenGLFunctions();
-    glClearColor(0, 0, 0, 1);
+    // --> compose Program <----------------------------------------------------
+    // Create quad
+    m_quadVao.create();
+    QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
 
-    // set shaders:
-    // default program:
-    setShaderSource(loadTextFile("shaders/vertex.glsl"),
-                    KEYSTR_PROGRAM_DEFAULT,
-                    QOpenGLShader::Vertex);
-    setShaderSource(loadTextFile("shaders/fragment.glsl"),
-                    KEYSTR_PROGRAM_DEFAULT,
-                    QOpenGLShader::Fragment);
-    // shadow map program
-    setShaderSource(loadTextFile("shaders/vertex_shadowmap.glsl"),
-                    KEYSTR_PROGRAM_SHADOW,
-                    QOpenGLShader::Vertex);
-    setShaderSource(loadTextFile("shaders/geometry_shadowmap.glsl"),
-                    KEYSTR_PROGRAM_SHADOW,
-                    QOpenGLShader::Geometry);
-    setShaderSource(loadTextFile("shaders/fragment_shadowmap.glsl"),
-                    KEYSTR_PROGRAM_SHADOW,
-                    QOpenGLShader::Fragment);
-    // compose program:
-    setShaderSource(loadTextFile("shaders/vertex_copy.glsl"),
-                    KEYSTR_PROGRAM_COPY,
-                    QOpenGLShader::Vertex);
-    setShaderSource(loadTextFile("shaders/fragment_copy.glsl"),
-                    KEYSTR_PROGRAM_COPY,
-                    QOpenGLShader::Fragment);
+    float vertices[] = {
+            0, 0,
+            1, 0,
+            1, 1,
+            0, 1
+    };
 
-    // generate attrib and uniform locations
-    // default:
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
-                std::make_pair(&m_modelViewMatrixLoc, "modelViewMatrix"));
+    // Setup our vertex buffer object.
+    m_quadVbo.create();
+    m_quadVbo.bind();
+    m_quadVbo.allocate(vertices, 4*2*sizeof(float));
+
+    // Store the vertex attribute bindings for the program.
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
+    m_quadVbo.release();
 
 
-    createShaderProgram(
-                loadTextFile("shaders/vertex.glsl"),
-                loadTextFile("shaders/fragment.glsl"));
-
-    createShadowMapProgram();
-    createComposeProgram();
 }
 
 void Renderer::rotateVectorToVector(const QVector3D &source, const QVector3D &destination, QMatrix4x4 &matrix)

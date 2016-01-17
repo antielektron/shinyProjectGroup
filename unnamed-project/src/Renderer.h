@@ -69,40 +69,36 @@ public:
     virtual void render(GLuint fbo, Scene *scene) override;
     virtual void resize(int width, int height) override;
 
-    //DEPRECATED
-    virtual ShaderErrorType createShaderProgram(const std::string &vs, const std::string &fs) override;
-
-    typedef std::pair<std::string, QOpenGLShader::ShaderTypeBit> ShaderSourcesKeyType;
-    typedef std::vector<std::pair<std::string, QOpenGLShader::ShaderTypeBit>> ShaderSourcesType;
-
     /**
      * @brief setShaderSource   add or replace a shader
      * @param shaderSrc         shader's code
      * @param progName          name of the corresponding program
      * @param type              shader's type
      */
-    void setShaderSource(const std::string &shaderSrc,
+    virtual void setShaderSource(const std::string &shaderSrc,
                    const std::string &progName,
-                   QOpenGLShader::ShaderTypeBit type);
+                   QOpenGLShader::ShaderTypeBit type) override;
 
     /**
      * @brief createProgram creates an openGlProgram from given shaders
      * @param program name of the Program
      * @return
      */
-    ShaderErrorType createProgram(const std::string &program);
+    virtual ShaderErrorType createProgram(const std::string &program) override;
 
     /**
-     * @brief updateShader  update a shader and update (= recreate) the corresponding
-     *                      program
-     * @param shaderSrc     new shader Source
-     * @param progName      name of the program to update
-     * @param shaderType    shader's type
-     * @return
+     * @brief getPrograms   append a list of available programs to 'progs'
+     * @param progs
      */
-    ShaderErrorType updateShader(const std::string &shaderSrc,
-                                 const std::string &progName,
-                                 QOpenGLShader::ShaderTypeBit shaderType);
+    virtual void getPrograms(std::vector<std::string> &progs) override;
+
+    /**
+     * @brief getShadersForProgram  append available shaders for 'progName' to 'shaders'
+     * @param shaders
+     */
+    virtual void getShadersForProgram(const std::string &progName,
+                              ShaderSourcesType &shaders) override;
+
 
 private:
     void rotateVectorToVector(const QVector3D &source, const QVector3D &destination, QMatrix4x4 &matrix);
@@ -159,8 +155,8 @@ private:
     std::map<ShaderSourcesKeyType, std::string> m_sources;
 
     // uniforms and attrib locations:
-    std::map<std::string, std::vector< std::pair<GLuint *, const char *>>> m_uniformLocs;
-    std::map<std::string, std::vector< std::pair<GLuint, const char *>>> m_attribLocs;
+    std::map<std::string, std::vector< std::pair<int *, const char *>>> m_uniformLocs;
+    std::map<std::string, std::vector< std::pair<int, const char *>>> m_attribLocs;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H

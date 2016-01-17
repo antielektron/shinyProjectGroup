@@ -5,8 +5,10 @@
 
 enum class ShaderErrorType {
     NoError,
+    MissingSourcesError,
     VertexShaderError,
     FragmentShaderError,
+    GeometryShaderError,
     LinkingError,
     UndefinedError //when this happens, little cute kittens are dying...
 };
