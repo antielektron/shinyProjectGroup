@@ -6,9 +6,9 @@ Object::Object(Model *model) :
     m_model(model),
     m_userPointer(nullptr)
 {
-    m_specularColor = QVector3D(0.5, 0.5, 0.5);
-    m_diffuseColor = QVector3D(0.5, 0.5, 0.5); //0.4;
-    m_ambientColor = QVector3D(0.4, 0.4, 0.4);
+    m_specularColor = QVector3D(1, 1, 1);
+    m_diffuseColor = QVector3D(0.9, 0.9, 0.9); //0.4;
+    m_ambientColor = QVector3D(0.7, 0.7, 0.7);
 }
 
 void Object::setDiffuseColor(const QVector3D &diffuse)
