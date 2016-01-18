@@ -26,7 +26,7 @@ public:
     void setInteractionEvent(const QString &interactionEvent);
     const QString &getInteractionEvent();
 
-    virtual ObjectType getObjectType();
+    virtual ObjectType getObjectType() override;
 
     Model *getModel();
     void setModel(Model *model);

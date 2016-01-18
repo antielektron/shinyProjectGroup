@@ -18,7 +18,7 @@ public:
     void removeObject(Object *object);
     void removeObjectGroup(ObjectGroup *group);
 
-    virtual ObjectType getObjectType();
+    virtual ObjectType getObjectType() override;
 
     virtual void updateWorld() override;
 
