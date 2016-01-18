@@ -131,9 +131,9 @@ void main()
 
     float specularTerm = cooktorranceTerm(v, n, l);
 
-    float shadowTerm = simpleShadowTerm();
+    float shadowTerm = 1;//simpleShadowTerm();
 
-    fragColor = vec4(clamp(shadowTerm * (specularTerm * specularColor + diffuseTerm * diffuseColor) + ambientColor, 0., 1.), gl_FragCoord.z*gl_FragCoord.w);
+    fragColor = vec4(clamp(shadowTerm * (specularTerm * specularColor + diffuseTerm * diffuseColor) + ambientColor, 0., 1.), 1.);
 
         /*
     int index = getCascade();

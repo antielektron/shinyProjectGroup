@@ -215,6 +215,8 @@ void Renderer::initialize()
 
     // compose
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
+                std::make_pair(&m_projectionMatrixLocCompose, "projectionMatrix"));
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                     std::make_pair(&m_composeSamplerLoc, "sampler"));
     m_attribLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                 std::make_pair(0, "v_position"));
@@ -643,6 +645,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     glActiveTexture(GL_TEXTURE0);
     composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
+    composeProgram->setUniformValue(m_projectionMatrixLocCompose, scene->getCameraProjection());
 
     glBindTexture(GL_TEXTURE_2D, m_renderTexture);
     glDrawArrays(GL_QUADS, 0, 4);

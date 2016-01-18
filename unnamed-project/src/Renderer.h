@@ -92,6 +92,7 @@ private:
 
     int m_modelViewMatrixLoc;
     int m_projectionMatrixLoc;
+    int m_projectionMatrixLocCompose;
     int m_cascadeViewMatrixLoc;
     int m_cascadeFarLoc;
     int m_lightDirectionLoc;
