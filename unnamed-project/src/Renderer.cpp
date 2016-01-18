@@ -208,23 +208,23 @@ void Renderer::initialize()
                 std::make_pair(1, "v_normal"));
 
     // shadow map:
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_SHADOW].push_back(
                     std::make_pair(&m_shadowMapCascadeViewMatrixLoc, "cascadeViewMatrix"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_SHADOW].push_back(
                         std::make_pair(&m_shadowMapWorldMatrixLoc, "worldMatrix"));
 
     // compose
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                     std::make_pair(&m_composeSamplerLoc, "sampler"));
-    m_attribLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_attribLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                 std::make_pair(0, "v_position"));
 
     // copy
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(
                     std::make_pair(&m_copyArraySamplerLoc, "sampler"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(
                     std::make_pair(&m_copyArrayLayerLoc, "layer"));
-    m_attribLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(
                 std::make_pair(0, "v_position"));
 
     // create Programs:
