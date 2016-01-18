@@ -13,10 +13,10 @@ public:
 
     virtual T evaluate() override
     {
-        return m_globalState->getValue(m_key).value<T>();
+        return m_globalState->getValue(m_key).template value<T>();
     }
 
-    virtual QString string()
+    virtual QString string() override
     {
         return QString("[") + m_key + "]";
     }
