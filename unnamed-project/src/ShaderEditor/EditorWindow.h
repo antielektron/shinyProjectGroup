@@ -41,11 +41,11 @@ public:
     EditorWindow(OpenGLWidget* widget, QWidget *parent = nullptr);
     ~EditorWindow();
 
-protected slots:
+public slots:
     void onGlInit();
-    void onShaderChanged(const QString &src,
+    void onShaderChanged(const QString & src,
                          QOpenGLShader::ShaderTypeBit type,
-                         const QString &prog);
+                         const QString &progName);
 
 signals:
     void updateRequest();

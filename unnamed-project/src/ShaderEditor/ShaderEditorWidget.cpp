@@ -42,7 +42,8 @@ ShaderEditorWidget::ShaderEditorWidget(QWidget *parent,
     m_glslHighlighter = new GLSLHighlighter(m_editor->document());
 
     this->setFeatures(QDockWidget::DockWidgetMovable
-                      | QDockWidget::DockWidgetFloatable);
+                      | QDockWidget::DockWidgetFloatable
+                      | QDockWidget::DockWidgetClosable);
 
     m_shaderType = type;
     m_progName = progName;
@@ -50,12 +51,22 @@ ShaderEditorWidget::ShaderEditorWidget(QWidget *parent,
 
     m_hasChanged = false;
 
+    connectStuff();
+
 }
 
 //------------------------------------------------------------------------------
 ShaderEditorWidget::~ShaderEditorWidget()
 {
     //nothing to do here!
+}
+
+//------------------------------------------------------------------------------
+void ShaderEditorWidget::setColor(const QColor &color)
+{
+    QPalette p = m_editor->palette();
+    p.setColor(QPalette::Base, color);
+    m_editor->setPalette(p);
 }
 
 //------------------------------------------------------------------------------
@@ -70,6 +81,9 @@ void ShaderEditorWidget::setShaderName(QOpenGLShader::ShaderTypeBit type,
 void ShaderEditorWidget::connectStuff()
 {
     connect(m_editor, SIGNAL(textChanged()), this, SLOT(onUserChangedText()));
+    connect(m_applyButton,SIGNAL(clicked()), this, SLOT(onApplyClicked()));
+    connect(m_saveButton, SIGNAL(clicked()), this, SLOT(onSaveClicked()));
+    connect(m_loadButton, SIGNAL(clicked()), this, SLOT(onLoadClicked()));
 }
 
 //------------------------------------------------------------------------------

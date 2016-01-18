@@ -2,6 +2,7 @@
 #include <QCommandLineParser>
 
 #include <memory>
+#include <QFileDialog>
 
 #include "OpenGLWidget.h"
 #include "PrimitiveGame.h"
@@ -25,9 +26,7 @@ int main(int argc, char **argv)
     parser.addVersionOption();
 
     QCommandLineOption shaderEditorOption("shader", "Start the shader editor");
-    QCommandLineOption shaderEditorOption2("e", "Start the shader editor");
     parser.addOption(shaderEditorOption);
-    parser.addOption(shaderEditorOption2);
 
     QCommandLineOption sceneEditorOption("scene", "Start the scene editor");
     parser.addOption(sceneEditorOption);
@@ -43,17 +42,21 @@ int main(int argc, char **argv)
     parser.addHelpOption();
     parser.process(app);
 
-    // Check if a level was specified, otherwise use default
-    QString levelFile = parser.value(levelFileOption);
+    QString levelFile;
 
-    if (parser.isSet(shaderEditorOption) || parser.isSet(shaderEditorOption2))
+    if (parser.isSet(levelFileOption))
     {
-        EditorWindow editorWindow(new OpenGLWidget(std::make_shared<PrimitiveGame>()));
-        editorWindow.show();
-
-        return app.exec();
+        levelFile = parser.value(levelFileOption);
     }
-    else if (parser.isSet(sceneEditorOption))
+    else
+    {
+        levelFile = QFileDialog::getOpenFileName(nullptr,
+                                                 "Load Level",
+                                                 ".",
+                                                 "xml files (*.xml)");
+    }
+
+    if (parser.isSet(sceneEditorOption))
     {
         SceneEditorWindow sceneEditor(levelFile);
         sceneEditor.show();
@@ -63,18 +66,40 @@ int main(int argc, char **argv)
 #ifdef HAVE_BULLET
     else if (parser.isSet(bulletGameOption))
     {
-        // TODO have window (with debug ui)
-        OpenGLWidget widget(std::make_shared<BulletGame>(levelFile));
-        widget.show();
-        return app.exec();
+        if (parser.isSet(shaderEditorOption))
+        {
+            EditorWindow editorWindow(
+                        new OpenGLWidget(std::make_shared<BulletGame>(levelFile)));
+            editorWindow.show();
+
+            return app.exec();
+        }
+        else
+        {
+            // TODO have window (with debug ui)
+            OpenGLWidget widget(std::make_shared<BulletGame>(levelFile));
+            widget.show();
+            return app.exec();
+        }
     }
 #endif // HAVE_BULLET
     else
     {
-        // Start the regular primitive game ..
-        OpenGLWidget widget(std::make_shared<PrimitiveGame>());
-        widget.show();
+        if (parser.isSet(shaderEditorOption))
+        {
+            EditorWindow editorWindow(
+                        new OpenGLWidget(std::make_shared<PrimitiveGame>()));
+            editorWindow.show();
 
-        return app.exec();
+            return app.exec();
+        }
+        else
+        {
+            // Start the regular primitive game ..
+            OpenGLWidget widget(std::make_shared<PrimitiveGame>());
+            widget.show();
+
+            return app.exec();
+        }
     }
 }

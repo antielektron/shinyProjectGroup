@@ -17,6 +17,7 @@ EditorWindow::EditorWindow(OpenGLWidget* widget, QWidget *parent) :
 
     connect(m_glWidget, SIGNAL(glInitEvent()),this, SLOT(onGlInit()));
 
+    setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::VerticalTabs);
     setMinimumWidth(800);
     setMinimumHeight(600);
 }
@@ -52,12 +53,12 @@ void EditorWindow::createDocks()
 
             editorWidget->onShaderChanged(QString::fromStdString(pair.second));
 
-            connect(editorWidget, SIGNAL(codeChanged(const QString &code,
-                                                     QOpenGLShader::ShaderTypeBit type,
-                                                     const QString &progName)),
-                    this, SLOT(onShaderChanged(const QString &src,
-                                               QOpenGlShader::ShaderTypeBit type,
-                                               const QString &progName)));
+            connect(editorWidget, SIGNAL(codeChanged(const QString &,
+                                                     QOpenGLShader::ShaderTypeBit,
+                                                     const QString &)),
+                    this, SLOT(onShaderChanged(const QString &,
+                                               QOpenGLShader::ShaderTypeBit,
+                                               const QString &)));
 
             connect(this, SIGNAL(updateRequest()),
                     editorWidget, SLOT(onUpdateRequest()));
@@ -84,12 +85,23 @@ void EditorWindow::onGlInit()
 //------------------------------------------------------------------------------
 void EditorWindow::onShaderChanged(const QString &src,
                                    QOpenGLShader::ShaderTypeBit type,
-                                   const QString &prog)
+                                   const QString &progName)
 {
     m_glWidget->getRenderer()->setShaderSource(src.toStdString(),
-                                               prog.toStdString(),
+                                               progName.toStdString(),
                                                type);
-    m_glWidget->getRenderer()->createProgram(prog.toStdString());
+    auto res = m_glWidget->getRenderer()->createProgram(progName.toStdString());
+
+    if (res == ShaderErrorType::NoError)
+    {
+        m_shaderEditorMap[std::make_pair(progName.toStdString(), type)]->setColor(
+                    ShaderEditorWidget::allFineColor);
+    }
+    else
+    {
+        m_shaderEditorMap[std::make_pair(progName.toStdString(), type)]->setColor(
+                    ShaderEditorWidget::errorColor);
+    }
 }
 
 

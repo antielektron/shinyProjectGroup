@@ -102,6 +102,8 @@ void OpenGLWidget::initializeGL()
 
     // auto version = context()->format().version();
     // std::cout << "Using OpenGL Version " << version.first << "." << version.second << std::endl;
+
+    emit glInitEvent();
 }
 
 void OpenGLWidget::paintGL()

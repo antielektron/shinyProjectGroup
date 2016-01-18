@@ -57,6 +57,9 @@ private:
     std::chrono::system_clock::time_point start;
     size_t frame_count;
 
+signals:
+    void glInitEvent();
+
 };
 
 #endif // UNNAMED_PROJECT_OPENGLWIDGET_H

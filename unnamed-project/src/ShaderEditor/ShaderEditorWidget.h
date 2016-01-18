@@ -23,6 +23,11 @@ public:
                        const QString &progName);
     virtual ~ShaderEditorWidget();
 
+    void setColor(const QColor &color);
+
+    static const QColor errorColor;
+    static const QColor allFineColor;
+
 protected:
     QVBoxLayout *m_layout;
     CodeEditor *m_editor;
@@ -34,9 +39,6 @@ protected:
     QPushButton *m_applyButton;
     QPushButton *m_saveButton;
     QPushButton *m_loadButton;
-
-    static const QColor errorColor;
-    static const QColor allFineColor;
 
     bool m_hasChanged;
 
