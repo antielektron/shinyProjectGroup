@@ -40,7 +40,7 @@ float get_k(float z)
 	// physically not correct
 	vec4 e = vec4(1.0, 0., z, 1.);
 	e = projectionMatrix * e;
-	return 1./(z+4.);
+	return 1 / (z*10 + 4);
 }
 
 // weight function (calculates how much of the sphere is filled
@@ -78,7 +78,7 @@ float get_dr(vec2 unitPos, vec2 pPos, float p_z)
 	}	
 	
 	
-	return (p_z - texture2D(sampler, screenSpaceUnitPos).a) / k;
+	return (- p_z + (1 - texture2D(sampler, screenSpaceUnitPos).a)) / k;
 }
 
 float z_s(vec2 unitPos)
@@ -96,7 +96,7 @@ float lineSampling(int nSamples)
 {
 	float sumSamples = 0.;
 	float sumVolume = 0.;
-	float z = texture2D(sampler, uv).a;
+	float z = 1 - texture2D(sampler, uv).a;
 	for (int i = 0; i < nSamples; i++)
 	{
 		// get a random angle and radius for sample point on the
@@ -114,13 +114,48 @@ float lineSampling(int nSamples)
 	return sumSamples / sumVolume;
 }
 
+
+// debug stuff:
+bool isInCenterEpsilonArea(vec2 centerPoint)
+{
+	float zCenter = 1 - texture2D(sampler, centerPoint).a;
+	float k = get_k(zCenter);
+	
+	float dx = uv.x - centerPoint.x;
+	float dy = uv.y - centerPoint.y;
+	
+	return (dx * dx + dy * dy) < (k * k); 
+}
+
 void main()
 {
-	float z = (texture2D(sampler, uv).a);
 	vec3 defaultColor = texture2D(sampler, uv).xyz;
 	vec3 voColor = lineSampling(samples) * vec3(1.,1.,1.);
 	vec3 mixedColor = voShadingAmount * voColor
 	                + dfShadingAmount * defaultColor;
+	
+	vec2 center = vec2(0.5,0.5);
+	
+	if (isInCenterEpsilonArea(center))
+	{
+		mixedColor.z *= 2 ;
+		mixedColor.x *= 0.5;
+		mixedColor.y *= 0.5;
+	}
+	
+	if ( pow(uv.x - 0.5,2) < 10e-7)
+	{
+	    mixedColor.x = 1.;
+		mixedColor.y = 0;
+		mixedColor.z = 0;
+	}
+	if (pow(uv.y - 0.5,2) < 10e-7)
+	{
+		mixedColor.x = 1.;
+		mixedColor.y = 0;
+		mixedColor.z = 0;		
+		
+	}
 	
     outputColor = vec4(mixedColor, 1.);
 }
