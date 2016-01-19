@@ -40,7 +40,7 @@ float get_k(float z)
 	// physically not correct
 	vec4 e = vec4(1.0, 0., z, 1.);
 	e = projectionMatrix * e;
-	return 1 / (z*10 + 4);
+	return 1 / (exp(z*z * 3) - 1 + 4);
 }
 
 // weight function (calculates how much of the sphere is filled
