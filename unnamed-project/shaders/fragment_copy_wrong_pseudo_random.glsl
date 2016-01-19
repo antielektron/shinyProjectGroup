@@ -76,7 +76,8 @@ float z_s(vec2 unitPos)
 float sampleLineStep(vec2 unitPos, vec2 pPos, float p_z)
 {
 	float zs = z_s(unitPos);
-	return max(min(zs, get_dr(unitPos, pPos, p_z)) + zs, 0) / (2. * zs); 	
+	float a = max(min(zs, get_dr(unitPos, pPos, p_z)) + zs, 0) / (2. * zs); 	
+	return a > 0.5 ? 1 : 0;
 }
 
 float lineSampling(int nSamples)
