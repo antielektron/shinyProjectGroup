@@ -8,8 +8,14 @@ uniform float time;
 
 out vec4 outputColor;
 
+int samples = 10; //TODO, pass through shader
 const float PI = 3.1415926536;
 const float eps = 10e-8;
+
+// factors to (linear) merge default shading
+// and volumetric obscurance 
+const float voShadingAmount = 0.7;
+const float dfShadingAmount = 0.3;
 
 // misc:
 
@@ -28,8 +34,6 @@ float rand(float a)
 
 // stuff for line sampling:
 
-int samples = 10; //TODO, pass through shader
-
 // very stupid perspective scaling approximation function:
 float get_k(float z)
 {
@@ -37,6 +41,15 @@ float get_k(float z)
 	vec4 e = vec4(1.0, 0., z, 1.);
 	e = projectionMatrix * e;
 	return 1./(z+4.);
+}
+
+// weight function (calculates how much of the sphere is filled
+// by a corresponding line sample
+float get_w(float radius)
+{
+    // trivial solution, just calculate the line length:
+    // (= pythagoras)
+    return sqrt(1 - pow(radius,2));
 }
 
 float get_dr(vec2 unitPos, vec2 pPos, float p_z)
@@ -76,12 +89,13 @@ float z_s(vec2 unitPos)
 float sampleLineStep(vec2 unitPos, vec2 pPos, float p_z)
 {
 	float zs = z_s(unitPos);
-	return max(min(zs, get_dr(unitPos, pPos, p_z)) + zs, 0) / (2. * zs); 	
+	return max(min(zs, get_dr(unitPos, pPos, p_z)) + zs, 0) / (1 * zs); 	
 }
 
 float lineSampling(int nSamples)
 {
-	float sum = 0.;
+	float sumSamples = 0.;
+	float sumVolume = 0.;
 	float z = texture2D(sampler, uv).a;
 	for (int i = 0; i < nSamples; i++)
 	{
@@ -90,16 +104,23 @@ float lineSampling(int nSamples)
 		float radius = rand(z);
 		float angle = rand(z) * 2 * PI;
 		
+		// weight samples:
+		float w = get_w(radius);
+		
 		vec2 samplePoint = vec2(cos(angle) * radius,sin(angle) * radius);
-		sum += sampleLineStep(samplePoint, uv, z);
+		sumSamples += w * sampleLineStep(samplePoint, uv, z);
+		sumVolume += w;
 	}
-	return sum / float(nSamples);
+	return sumSamples / sumVolume;
 }
 
 void main()
 {
 	float z = (texture2D(sampler, uv).a);
-	float obscuranceFactor = lineSampling(samples);
-	vec4 color = vec4(texture2D(sampler, uv).xyz , 2 * obscuranceFactor);
-    outputColor = color;
+	vec3 defaultColor = texture2D(sampler, uv).xyz;
+	vec3 voColor = lineSampling(samples) * vec3(1.,1.,1.);
+	vec3 mixedColor = voShadingAmount * voColor
+	                + dfShadingAmount * defaultColor;
+	
+    outputColor = vec4(mixedColor, 1.);
 }
