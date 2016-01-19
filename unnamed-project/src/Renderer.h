@@ -78,6 +78,10 @@ public:
     virtual void getShadersForProgram(const std::string &progName,
                               ShaderSourcesType &shaders) override;
 
+    virtual void resumeRendering() override;
+
+    virtual void pauseRendering() override;
+
 
 private:
     void rotateVectorToVector(const QVector3D &source,
@@ -135,6 +139,9 @@ private:
 
     std::map<std::string, std::vector< std::pair<int, const char *>>>
         m_attribLocs;
+
+    // boolean for checking if we're in rendering or pause mode:
+    bool m_renderingPaused;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H

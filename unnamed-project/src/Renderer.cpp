@@ -21,7 +21,8 @@ Renderer::Renderer() :
     m_renderFrameBuffer(0),
     m_renderTexture(0),
     m_normalTexture(0),
-    m_renderDepthBuffer(0)
+    m_renderDepthBuffer(0),
+    m_renderingPaused(false)
 {
 }
 
@@ -138,6 +139,18 @@ void Renderer::getShadersForProgram(const std::string &progName,
             // ^ don't get confused!
         }
     }
+}
+
+//------------------------------------------------------------------------------
+void Renderer::resumeRendering()
+{
+    m_renderingPaused = false;
+}
+
+//------------------------------------------------------------------------------
+void Renderer::pauseRendering()
+{
+    m_renderingPaused = true;
 }
 
 //------------------------------------------------------------------------------
@@ -308,6 +321,10 @@ void Renderer::rotateVectorToVector(const QVector3D &source,
 
 void Renderer::render(GLuint fbo, Scene *scene)
 {
+    if (m_renderingPaused)
+    {
+        return;
+    }
 
     QOpenGLShaderProgram *shadowMapProgram
             = m_programs[KEYSTR_PROGRAM_SHADOW].get();

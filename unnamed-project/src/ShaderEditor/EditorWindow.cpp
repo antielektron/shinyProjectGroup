@@ -15,11 +15,13 @@ EditorWindow::EditorWindow(OpenGLWidget* widget, QWidget *parent) :
     setCentralWidget(m_glWidget);
     m_glWidget->setFocus();
 
-    connect(m_glWidget, SIGNAL(glInitEvent()),this, SLOT(onGlInit()));
-
     setDockOptions(QMainWindow::AnimatedDocks | QMainWindow::VerticalTabs);
     setMinimumWidth(800);
     setMinimumHeight(600);
+
+    createActions();
+    createToolbar();
+    connectStuff();
 }
 
 //------------------------------------------------------------------------------
@@ -77,9 +79,53 @@ void EditorWindow::createDocks()
 }
 
 //------------------------------------------------------------------------------
+void EditorWindow::createActions()
+{
+    QStyle *style = QApplication::style();
+    m_pauseRenderingAction = new QAction(style->standardIcon(QStyle::SP_MediaPause),
+                                         "pause rendering",
+                                         this);
+    m_resumeRenderingAction = new QAction(style->standardIcon(QStyle::SP_MediaPlay),
+                                          "resume rendering",
+                                          this);
+}
+
+//------------------------------------------------------------------------------
+void EditorWindow::createToolbar()
+{
+    m_toolbar = addToolBar("Toolbar");
+    m_toolbar->setMovable(true);
+    m_toolbar->addAction(m_pauseRenderingAction);
+    m_toolbar->addAction(m_resumeRenderingAction);
+}
+
+//------------------------------------------------------------------------------
+void EditorWindow::connectStuff()
+{
+    connect(m_glWidget, SIGNAL(glInitEvent()),this, SLOT(onGlInit()));
+
+    connect(m_pauseRenderingAction, SIGNAL(triggered()),
+            this, SLOT(onPauseRenderingClicked()));
+    connect(m_resumeRenderingAction, SIGNAL(triggered()),
+            this, SLOT(onResumeRenderingClicked()));
+}
+
+//------------------------------------------------------------------------------
 void EditorWindow::onGlInit()
 {
     createDocks();
+}
+
+//------------------------------------------------------------------------------
+void EditorWindow::onPauseRenderingClicked()
+{
+    m_glWidget->getRenderer()->pauseRendering();
+}
+
+//------------------------------------------------------------------------------
+void EditorWindow::onResumeRenderingClicked()
+{
+    m_glWidget->getRenderer()->resumeRendering();
 }
 
 //------------------------------------------------------------------------------

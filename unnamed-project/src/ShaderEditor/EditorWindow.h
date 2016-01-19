@@ -47,13 +47,23 @@ public slots:
                          QOpenGLShader::ShaderTypeBit type,
                          const QString &progName);
 
+    void onPauseRenderingClicked();
+    void onResumeRenderingClicked();
+
 signals:
     void updateRequest();
 
 protected:
     void createDocks();
+    void createActions();
+    void createToolbar();
+    void connectStuff();
 
-    OpenGLWidget* m_glWidget;
+    OpenGLWidget *m_glWidget;
+
+    QToolBar    *m_toolbar;
+    QAction     *m_pauseRenderingAction;
+    QAction     *m_resumeRenderingAction;
 
     std::map<IRenderer::ShaderSourcesKeyType,
              ShaderEditorWidget*> m_shaderEditorMap;

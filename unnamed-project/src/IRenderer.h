@@ -73,6 +73,10 @@ public:
     virtual void getShadersForProgram(const std::string &progName,
                               ShaderSourcesType &shaders) = 0;
 
+    virtual void resumeRendering() = 0;
+
+    virtual void pauseRendering() = 0;
+
 };
 
 #endif // UNNAMED_PROJECT_IRENDERER_H
