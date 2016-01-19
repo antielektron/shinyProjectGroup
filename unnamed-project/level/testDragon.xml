@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene name="Shiny Scene" version="42" author="Norby">
+    <Models>
+        <Model name="cathedraAltar001" path="models/cathedraAltar001.obj"/>
+        <Model name="dragon" path="models/dragon.obj"/>
+        <Model name="floor" path="models/floor.obj"/>
+    </Models>
+    <Objects>
+        <ObjectGroup name="dragonGroup">
+            <Position x="1.6" y="-2.8" z="-2"/>
+            <Rotation x="0" y="90" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="altar" model="cathedraAltar001" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+        </ObjectGroup>
+        <Object name="floor" model="floor" interactionEvent="">
+            <Position x="0" y="-3" z="-1.8"/>
+            <Rotation x="0" y="0.1" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="wall" model="floor" interactionEvent="">
+            <Position x="0" y="0" z="-9.8"/>
+            <Rotation x="90" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="dragon" model="dragon" interactionEvent="">
+            <Position x="0.2" y="-0.2" z="-6.2"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="0.4" y="0.4" z="0.4"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+    </Objects>
+    <Attributes/>
+    <Events/>
+    <Animators/>
+    <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
+    <Player x="0" y="0" z="0"/>
+</Scene>
