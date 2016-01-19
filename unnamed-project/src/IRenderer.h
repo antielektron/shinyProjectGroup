@@ -77,6 +77,8 @@ public:
 
     virtual void pauseRendering() = 0;
 
+    virtual void requestSingleFrameRendering() = 0;
+
 };
 
 #endif // UNNAMED_PROJECT_IRENDERER_H

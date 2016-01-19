@@ -49,6 +49,7 @@ public slots:
 
     void onPauseRenderingClicked();
     void onResumeRenderingClicked();
+    void onSingleFrameRequestedClicked();
 
 signals:
     void updateRequest();
@@ -64,6 +65,7 @@ protected:
     QToolBar    *m_toolbar;
     QAction     *m_pauseRenderingAction;
     QAction     *m_resumeRenderingAction;
+    QAction     *m_requestSingleFrameAction;
 
     std::map<IRenderer::ShaderSourcesKeyType,
              ShaderEditorWidget*> m_shaderEditorMap;

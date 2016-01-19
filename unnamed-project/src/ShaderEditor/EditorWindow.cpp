@@ -88,6 +88,9 @@ void EditorWindow::createActions()
     m_resumeRenderingAction = new QAction(style->standardIcon(QStyle::SP_MediaPlay),
                                           "resume rendering",
                                           this);
+    m_requestSingleFrameAction = new QAction(style->standardIcon(QStyle::SP_MediaSkipForward),
+                                             "render Single Frame",
+                                             this);
 }
 
 //------------------------------------------------------------------------------
@@ -97,6 +100,7 @@ void EditorWindow::createToolbar()
     m_toolbar->setMovable(true);
     m_toolbar->addAction(m_pauseRenderingAction);
     m_toolbar->addAction(m_resumeRenderingAction);
+    m_toolbar->addAction(m_requestSingleFrameAction);
 }
 
 //------------------------------------------------------------------------------
@@ -108,6 +112,8 @@ void EditorWindow::connectStuff()
             this, SLOT(onPauseRenderingClicked()));
     connect(m_resumeRenderingAction, SIGNAL(triggered()),
             this, SLOT(onResumeRenderingClicked()));
+    connect(m_requestSingleFrameAction, SIGNAL(triggered()),
+            this, SLOT(onSingleFrameRequestedClicked()));
 }
 
 //------------------------------------------------------------------------------
@@ -129,6 +135,12 @@ void EditorWindow::onResumeRenderingClicked()
 }
 
 //------------------------------------------------------------------------------
+void EditorWindow::onSingleFrameRequestedClicked()
+{
+    m_glWidget->getRenderer()->requestSingleFrameRendering();
+}
+
+//------------------------------------------------------------------------------
 void EditorWindow::onShaderChanged(const QString &src,
                                    QOpenGLShader::ShaderTypeBit type,
                                    const QString &progName)
@@ -142,6 +154,9 @@ void EditorWindow::onShaderChanged(const QString &src,
     {
         m_shaderEditorMap[std::make_pair(progName.toStdString(), type)]->setColor(
                     ShaderEditorWidget::allFineColor);
+
+        // just in case rendering is paused: update one frame to see changes
+        onSingleFrameRequestedClicked();
     }
     else
     {

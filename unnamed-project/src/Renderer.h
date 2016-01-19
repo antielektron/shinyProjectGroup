@@ -82,6 +82,8 @@ public:
 
     virtual void pauseRendering() override;
 
+    virtual void requestSingleFrameRendering() override;
+
 
 private:
     void rotateVectorToVector(const QVector3D &source,
@@ -142,6 +144,7 @@ private:
 
     // boolean for checking if we're in rendering or pause mode:
     bool m_renderingPaused;
+    bool m_singleFrameRenderingRequested;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H
