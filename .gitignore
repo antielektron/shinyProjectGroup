@@ -9,3 +9,4 @@ build/
 *.user
 build-unnamed-project-Desktop-Release/
 build-unnamed-project-Desktop-Debug/
+doxygen/
