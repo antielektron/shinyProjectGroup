@@ -168,63 +168,63 @@ void Renderer::initialize()
 
     // set shaders:
     // default program:
-    setShaderSource(loadTextFile("shaders/vertex.glsl"),
-                    KEYSTR_PROGRAM_DEFAULT,
+    setShaderSource(loadTextFile("shaders/render_vertex.glsl"),
+                    KEYSTR_PROGRAM_RENDER,
                     QOpenGLShader::Vertex);
-    setShaderSource(loadTextFile("shaders/fragment.glsl"),
-                    KEYSTR_PROGRAM_DEFAULT,
+    setShaderSource(loadTextFile("shaders/render_fragment.glsl"),
+                    KEYSTR_PROGRAM_RENDER,
                     QOpenGLShader::Fragment);
     // shadow map program
-    setShaderSource(loadTextFile("shaders/vertex_shadowmap.glsl"),
+    setShaderSource(loadTextFile("shaders/shadowmap_vertex.glsl"),
                     KEYSTR_PROGRAM_SHADOW,
                     QOpenGLShader::Vertex);
-    setShaderSource(loadTextFile("shaders/geometry_shadowmap.glsl"),
+    setShaderSource(loadTextFile("shaders/shadowmap_geometry.glsl"),
                     KEYSTR_PROGRAM_SHADOW,
                     QOpenGLShader::Geometry);
-    setShaderSource(loadTextFile("shaders/fragment_shadowmap.glsl"),
+    setShaderSource(loadTextFile("shaders/shadowmap_fragment.glsl"),
                     KEYSTR_PROGRAM_SHADOW,
                     QOpenGLShader::Fragment);
     // compose program:
-    setShaderSource(loadTextFile("shaders/vertex_copy.glsl"),
+    setShaderSource(loadTextFile("shaders/copy_vertex.glsl"),
                     KEYSTR_PROGRAM_COMPOSE,
                     QOpenGLShader::Vertex);
-    setShaderSource(loadTextFile("shaders/fragment_copy.glsl"),
+    setShaderSource(loadTextFile("shaders/copy_fragment.glsl"),
                     KEYSTR_PROGRAM_COMPOSE,
                     QOpenGLShader::Fragment);
     // copy
-    setShaderSource(loadTextFile("shaders/vertex_copy.glsl"),
+    setShaderSource(loadTextFile("shaders/copy_vertex.glsl"),
                     KEYSTR_PROGRAM_COPY,
                     QOpenGLShader::Vertex);
-    setShaderSource(loadTextFile("shaders/fragment_copy_array.glsl"),
+    setShaderSource(loadTextFile("shaders/fragment_array_copy.glsl"),
                     KEYSTR_PROGRAM_COPY,
                     QOpenGLShader::Fragment);
 
     // generate attrib and uniform locations
     // default:
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
                 std::make_pair(&m_modelViewMatrixLoc, "modelViewMatrix"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
                 std::make_pair(&m_projectionMatrixLoc, "projectionMatrix"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
                     std::make_pair(&m_cascadeViewMatrixLoc, "cascadeViewMatrix"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
                     std::make_pair(&m_cascadeFarLoc, "cascadeFar"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
                     std::make_pair(&m_lightDirectionLoc, "lightDirection"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
                     std::make_pair(&m_lightColorLoc, "lightColor"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
                     std::make_pair(&m_specularColorLoc, "specularColor"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
                     std::make_pair(&m_diffuseColorLoc, "diffuseColor"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
                     std::make_pair(&m_ambientColorLoc, "ambientColor"));
-    m_uniformLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
                     std::make_pair(&m_shadowMapSamplerLoc, "shadowMapSampler"));
 
-    m_attribLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_attribLocs[KEYSTR_PROGRAM_RENDER].push_back(
                 std::make_pair(0, "v_position"));
-    m_attribLocs[KEYSTR_PROGRAM_DEFAULT].push_back(
+    m_attribLocs[KEYSTR_PROGRAM_RENDER].push_back(
                 std::make_pair(1, "v_normal"));
 
     // shadow map:
@@ -250,7 +250,7 @@ void Renderer::initialize()
                 std::make_pair(0, "v_position"));
 
     // create Programs:
-    createProgram(KEYSTR_PROGRAM_DEFAULT);
+    createProgram(KEYSTR_PROGRAM_RENDER);
     createProgram(KEYSTR_PROGRAM_SHADOW);
     createProgram(KEYSTR_PROGRAM_COMPOSE);
     createProgram(KEYSTR_PROGRAM_COPY);
@@ -260,7 +260,7 @@ void Renderer::initialize()
 
     // --> shadow map program <-------------------------------------------------
     // Create ShadowMap
-    m_shadowMapSize = 2048;
+    m_shadowMapSize = 1024;
     m_cascades = 4;
 
     // TODO don't render to texture but reuse depth buffer!!!
@@ -311,8 +311,6 @@ void Renderer::initialize()
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), 0);
     m_quadVbo.release();
-
-
 }
 
 void Renderer::rotateVectorToVector(const QVector3D &source,
@@ -340,7 +338,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *shadowMapProgram
             = m_programs[KEYSTR_PROGRAM_SHADOW].get();
     QOpenGLShaderProgram *defaultProgram
-            = m_programs[KEYSTR_PROGRAM_DEFAULT].get();
+            = m_programs[KEYSTR_PROGRAM_RENDER].get();
     QOpenGLShaderProgram *composeProgram
             = m_programs[KEYSTR_PROGRAM_COMPOSE].get();
     QOpenGLShaderProgram *copyProgram
@@ -761,10 +759,10 @@ void Renderer::resize(int width, int height)
     glGenFramebuffers(1, &m_renderFrameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderDepthBuffer);
+
     // Set "renderTexture" as our colour attachement #0
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_renderTexture, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_normalTexture, 0);
-
     // Set the list of draw buffers.
     GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, attachments);

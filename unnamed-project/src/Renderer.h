@@ -12,7 +12,7 @@
 #include "IRenderer.h"
 #include "Scene/Scene.h"
 
-#define KEYSTR_PROGRAM_DEFAULT "Default"
+#define KEYSTR_PROGRAM_RENDER "Render"
 #define KEYSTR_PROGRAM_COMPOSE "Compose"
 #define KEYSTR_PROGRAM_SHADOW  "Shadow"
 #define KEYSTR_PROGRAM_COPY    "Copy"
@@ -136,11 +136,9 @@ private:
     std::map<ShaderSourcesKeyType, std::string> m_sources;
 
     // uniforms and attrib locations:
-    std::map<std::string, std::vector< std::pair<int *, const char *>>>
-        m_uniformLocs;
+    std::map<std::string, std::vector< std::pair<int *, const char *>>> m_uniformLocs;
 
-    std::map<std::string, std::vector< std::pair<int, const char *>>>
-        m_attribLocs;
+    std::map<std::string, std::vector< std::pair<int, const char *>>> m_attribLocs;
 
     // boolean for checking if we're in rendering or pause mode:
     bool m_renderingPaused;
