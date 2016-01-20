@@ -612,6 +612,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     defaultProgram->setUniformValue(m_lightColorLoc, scene->getLightColor());
 
     // Bind shadow map
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapTexture);
     defaultProgram->setUniformValue(m_shadowMapSamplerLoc, 0);
 
@@ -672,10 +673,8 @@ void Renderer::render(GLuint fbo, Scene *scene)
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
 
 
-    glActiveTexture(GL_TEXTURE0);
     composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
 
-    glActiveTexture(GL_TEXTURE1);
     composeProgram->setUniformValue(m_composeOvSamplerLoc, 1);
     composeProgram->setUniformValue(m_projectionMatrixLocCompose, scene->getCameraProjection());
 
