@@ -672,15 +672,17 @@ void Renderer::render(GLuint fbo, Scene *scene)
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
 
 
+    glActiveTexture(GL_TEXTURE0);
     composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
 
+    glActiveTexture(GL_TEXTURE1);
     composeProgram->setUniformValue(m_composeOvSamplerLoc, 1);
     composeProgram->setUniformValue(m_projectionMatrixLocCompose, scene->getCameraProjection());
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderTexture);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+    glBindTexture(GL_TEXTURE_2D, m_normalTexture);
     glDrawArrays(GL_QUADS, 0, 4);
 
 
