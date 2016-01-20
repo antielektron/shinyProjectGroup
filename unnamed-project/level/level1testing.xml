@@ -31,7 +31,7 @@
             <DiffuseColor x="0.5" y="0.5" z="0.5"/>
             <AmbientColor x="0.4" y="0.4" z="0.4"/>
         </Object>
-        <Object name="meditatipnchamberDiamant" model="meditatipnchamberDiamant" interactionEvent="">
+        <Object name="meditatipnchamberDiamant" model="meditatipnchamberDiamant" interactionEvent="diamant clicked">
             <Position x="0" y="0" z="0"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -55,13 +55,70 @@
             <DiffuseColor x="0.5" y="0.5" z="0.5"/>
             <AmbientColor x="0.4" y="0.4" z="0.4"/>
         </Object>
+        <Object name="floor3" model="floor2" interactionEvent="">
+            <Position x="0" y="12.7" z="-73.5"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="menger" model="menger" interactionEvent="menger clicked">
+            <Position x="10.7" y="12.5" z="-80"/>
+            <Rotation x="0" y="11.1" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
     </Objects>
     <Attributes>
         <Attribute key="plat_x" type="float" value="-1"/>
         <Attribute key="plat_y" type="float" value="2.9"/>
         <Attribute key="plat_z" type="float" value="10.9"/>
     </Attributes>
-    <Events/>
+    <Events>
+        <Event name="menger clicked" description="active">
+            <Precondition type="ieq" lhs="[activated]" rhs="0"/>
+            <Action type="imov" lhs="activated" rhs="1"/>
+            <Action type="animambientcolor" x="0" y="0.4" z="0" object="menger">
+                <Interpolation type="sinus" duration="2"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0" y="0.5" z="0" object="menger">
+                <Interpolation type="forgot name" duration="3"/>
+            </Action>
+        </Event>
+        <Event name="menger clicked" description="deactivated">
+            <Precondition type="ieq" lhs="[activated]" rhs="1"/>
+            <Action type="imov" lhs="activated" rhs="0"/>
+            <Action type="animambientcolor" x="0.4" y="0.4" z="0.4" object="menger">
+                <Interpolation type="linear" duration="4"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.5" object="menger">
+                <Interpolation type="linear" duration="3"/>
+            </Action>
+        </Event>
+        <Event name="diamant clicked" description="active">
+            <Precondition type="ieq" lhs="[activated]" rhs="0"/>
+            <Action type="imov" lhs="activated" rhs="1"/>
+            <Action type="animpos" x="0" y="0.5" z="0" object="meditatipnchamberDiamant">
+                <Interpolation type="sinus" duration="1"/>
+            </Action>
+            <Action type="animambientcolor" x="0.4" y="0" z="0" object="meditatipnchamberDiamant">
+                <Interpolation type="forgot name" duration="2"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0" y="0.4" z="0" object="meditatipnchamberDiamant">
+                <Interpolation type="forgot name" duration="2"/>
+            </Action>
+        </Event>
+        <Event name="diamant clicked" description="deactivated">
+            <Precondition type="ieq" lhs="[activated]" rhs="1"/>
+            <Action type="imov" lhs="activated" rhs="0"/>
+            <Action type="animpos" x="0" y="0" z="0" object="meditatipnchamberDiamant">
+                <Interpolation type="linear" duration="1"/>
+            </Action>
+        </Event>
+    </Events>
     <Animators/>
     <DirectionalLight x="-2.77556e-17" y="2.6" z="-5.9" r="0" g="0" b="0"/>
     <Player x="0" y="0" z="0"/>
