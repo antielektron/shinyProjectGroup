@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <string>
 
-#include "IRenderer.h"
+#include "RendererBase.h"
 #include "Scene/Scene.h"
 
 #define KEYSTR_PROGRAM_RENDER "Render"
@@ -38,7 +38,7 @@ namespace std
     };
 }
 
-class Renderer : public IRenderer
+class Renderer : public RendererBase
 {
 public:
     Renderer();

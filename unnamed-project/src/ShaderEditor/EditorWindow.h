@@ -50,6 +50,8 @@ public slots:
     void onPauseRenderingClicked();
     void onResumeRenderingClicked();
     void onSingleFrameRequestedClicked();
+    void onLoadShaderConfigClicked();
+    void onSaveShaderConfigClicked();
 
 signals:
     void updateRequest();
@@ -66,8 +68,10 @@ protected:
     QAction     *m_pauseRenderingAction;
     QAction     *m_resumeRenderingAction;
     QAction     *m_requestSingleFrameAction;
+    QAction     *m_saveShaderConfig;
+    QAction     *m_loadShaderConfig;
 
-    std::map<IRenderer::ShaderSourcesKeyType,
+    std::map<RendererBase::ShaderSourcesKeyType,
              ShaderEditorWidget*> m_shaderEditorMap;
 
 

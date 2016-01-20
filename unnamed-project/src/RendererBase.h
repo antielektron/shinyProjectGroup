@@ -1,5 +1,5 @@
-#ifndef UNNAMED_PROJECT_IRENDERER_H
-#define UNNAMED_PROJECT_IRENDERER_H
+#ifndef UNNAMED_PROJECT_RENDERER_BASE_H
+#define UNNAMED_PROJECT_RENDERER_BASE_H
 
 #include <GL/glew.h>
 #include <string>
@@ -33,14 +33,19 @@ const std::map<std::string, QOpenGLShader::ShaderTypeBit> stringToShaderType =
 
 class Scene;
 
-class IRenderer
+class RendererBase
 {
 public:
-    virtual ~IRenderer() = default; // better than inline implementation!
+
+    virtual ~RendererBase() = default; // better than inline implementation!
                                     // (vtable will not be emmited)
 
     typedef std::pair<std::string, QOpenGLShader::ShaderTypeBit> ShaderSourcesKeyType;
     typedef std::vector<std::pair<QOpenGLShader::ShaderTypeBit, std::string>> ShaderSourcesType;
+
+    // loading an saving configurations:
+    void saveConfiguration(const std::string &filename);
+    void loadConfiguration(const std::string &filename);
 
     // OpenGL might not be ready, while the constructor was called!
     virtual void initialize() = 0;
@@ -84,4 +89,4 @@ public:
 
 };
 
-#endif // UNNAMED_PROJECT_IRENDERER_H
+#endif // UNNAMED_PROJECT_RENDERER_BASE_H

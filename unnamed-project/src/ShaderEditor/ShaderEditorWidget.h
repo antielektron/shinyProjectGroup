@@ -12,7 +12,7 @@
 #include "ShaderEditor/GLSLHighlighter.h"
 
 #include "utility.h"
-#include "IRenderer.h"
+#include "RendererBase.h"
 
 class ShaderEditorWidget : public QDockWidget
 {

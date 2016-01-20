@@ -61,12 +61,12 @@ void OpenGLWidget::setGame(std::shared_ptr<IGame> game)
     }
 }
 
-void OpenGLWidget::setRenderer(std::unique_ptr<IRenderer> renderer)
+void OpenGLWidget::setRenderer(std::unique_ptr<RendererBase> renderer)
 {
     m_renderer = std::move(renderer);
 }
 
-IRenderer *OpenGLWidget::getRenderer()
+RendererBase *OpenGLWidget::getRenderer()
 {
     return m_renderer.get();
 }
