@@ -238,6 +238,8 @@ void Renderer::initialize()
                 std::make_pair(&m_projectionMatrixLocCompose, "projectionMatrix"));
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                     std::make_pair(&m_composeSamplerLoc, "sampler"));
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
+                    std::make_pair(&m_composeOvSamplerLoc, "ovSampler"));
     m_attribLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                 std::make_pair(0, "v_position"));
 
@@ -669,10 +671,15 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
 
-    glActiveTexture(GL_TEXTURE0);
+
     composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
+
+    composeProgram->setUniformValue(m_composeOvSamplerLoc, 1);
     composeProgram->setUniformValue(m_projectionMatrixLocCompose, scene->getCameraProjection());
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_renderTexture);
     glDrawArrays(GL_QUADS, 0, 4);
 
@@ -742,7 +749,7 @@ void Renderer::resize(int width, int height)
     glGenTextures(1, &m_normalTexture);
     glBindTexture(GL_TEXTURE_2D, m_normalTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_width, m_height, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
     // Poor filtering. Needed!
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

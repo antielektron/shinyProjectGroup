@@ -118,6 +118,7 @@ private:
 
     // Compose Shader
     int m_composeSamplerLoc;
+    int m_composeOvSamplerLoc;
 
     // Copy Shader for texture arrays
     int m_copyArraySamplerLoc;
