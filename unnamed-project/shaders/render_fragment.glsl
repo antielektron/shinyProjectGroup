@@ -133,7 +133,9 @@ void main()
 
     float shadowTerm = simpleShadowTerm();
 
-    fragColor = vec4(clamp(shadowTerm * (specularTerm * specularColor + diffuseTerm * diffuseColor) + ambientColor, 0., 1.), gl_FragCoord.z*gl_FragCoord.w);
+    vec3 shadedColor = clamp(specularTerm * specularColor + diffuseTerm * diffuseColor, 0., 1.);
+
+    fragColor = vec4(clamp(shadowTerm * (shadedColor) + ambientColor, 0., 1.), gl_FragCoord.z*gl_FragCoord.w);
 
         /*
     int index = getCascade();

@@ -132,9 +132,7 @@ bool isInCenterEpsilonArea(vec2 centerPoint)
 void main()
 {
 	vec3 defaultColor = texture2D(sampler, uv).xyz;
-	vec3 voColor = lineSampling(samples) * vec3(1.,1.,1.);
-	vec3 mixedColor = voShadingAmount * voColor
-	                + dfShadingAmount * defaultColor;
+	vec3 mixedColor = lineSampling(samples) * defaultColor;
 	
 	// DEBUG
 	/*

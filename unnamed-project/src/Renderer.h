@@ -16,6 +16,8 @@
 #define KEYSTR_PROGRAM_COMPOSE "Compose"
 #define KEYSTR_PROGRAM_SHADOW  "Shadow"
 #define KEYSTR_PROGRAM_COPY    "Copy"
+#define KEYSTR_PROGRAM_HORIZONTAL_GAUSS "Horizontal Gauss"
+#define KEYSTR_PROGRAM_VERTICAL_GAUSS "Vertical Gauss"
 
 namespace std
 {
@@ -123,6 +125,15 @@ private:
     int m_copyArraySamplerLoc;
     int m_copyArrayLayerLoc;
 
+    // vertical gauss
+    int m_verticalGaussSourceLoc;
+    int m_verticalGaussFilteredLoc;
+
+    // horizontal gauss
+    int m_horizontalGaussSourceLoc;
+    int m_horizontalGaussFilteredLoc;
+
+
     QOpenGLVertexArrayObject m_quadVao;
     QOpenGLBuffer m_quadVbo;
 
@@ -130,6 +141,8 @@ private:
     GLuint m_renderTexture;
     GLuint m_normalTexture;
     GLuint m_renderDepthBuffer;
+
+    GLuint m_tempTexture;
 
     // map for shader programs:
     std::map<std::string, std::unique_ptr<QOpenGLShaderProgram>> m_programs;
