@@ -8,6 +8,7 @@
 #include <cmath>
 #include <QtGui/qopenglframebufferobject.h>
 #include <vector>
+#include <chrono>
 
 #include "Renderer.h"
 #include "Scene/Scene.h"
@@ -703,22 +704,40 @@ void Renderer::render(GLuint fbo, Scene *scene)
     GLint windowTexture;
     glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);
 
+    // glMemoryBarrier(GL_ALL_BARRIER_BITS);
+    // auto start = std::chrono::system_clock::now();
+
+    // for (int i = 0; i < 20; i++)
+    // {
+
     verticalGaussProgram->bind();
 
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, windowTexture);
     glBindImageTexture(0, windowTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, m_renderTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
     glDispatchCompute(m_width/8, m_height/8, 1);
 
     verticalGaussProgram->release();
 
-
     horizontalGaussProgram->bind();
 
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, m_renderTexture);
     glBindImageTexture(0, m_renderTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, windowTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
     glDispatchCompute(m_width/8, m_height/8, 1);
 
     horizontalGaussProgram->release();
+
+    // }
+
+    // glMemoryBarrier(GL_ALL_BARRIER_BITS);
+    // auto end = std::chrono::system_clock::now();
+
+    // auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    // static long avg_duration = 0; avg_duration = (50*avg_duration + duration.count()) / 51;
+    // std::cout << avg_duration << std::endl;
 
     /*
     copyProgram->bind();
@@ -764,9 +783,8 @@ void Renderer::resize(int width, int height)
     glBindTexture(GL_TEXTURE_2D, m_renderTexture);
     // Give an empty image to OpenGL ( the last "0" )
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    // Poor filtering. Needed!
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
 
 
