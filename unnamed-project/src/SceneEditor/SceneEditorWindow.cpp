@@ -169,12 +169,6 @@ void SceneEditorWindow::createToolbar()
 //------------------------------------------------------------------------------
 void SceneEditorWindow::connectStuff()
 {
-    connect(m_game.get(), SIGNAL(modelsChanged()),
-            m_objectDetails, SLOT(modelsChanged()));
-
-    connect(m_game.get(), SIGNAL(currentObjectChanged()),
-            m_objectDetails, SLOT(currentObjectChanged()));
-
     //connect Actions:
     connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
     connect(m_saveScene, SIGNAL(triggered()), this, SLOT(saveScene()));

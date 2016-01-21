@@ -63,7 +63,12 @@ void ObjectDetailsWidget::connectStuff()
     connect(m_name, SIGNAL(editingFinished()), this, SLOT(applyValues()));
     connect(m_modelSelection, SIGNAL(currentTextChanged(QString)), this, SLOT(applyValues()));
     connect(m_interactionEvent, SIGNAL(editingFinished()), this, SLOT(applyValues()));
-    // TODO connect to game autonomiously!
+
+    // connect to game autonomiously!
+    connect(m_game.get(), SIGNAL(modelsChanged()), this, SLOT(modelsChanged()));
+    connect(m_game.get(), SIGNAL(currentObjectChanged()), this, SLOT(currentObjectChanged()));
+    connect(m_game.get(), SIGNAL(objectsChanged()), this, SLOT(currentObjectChanged()));
+
 }
 
 //------------------------------------------------------------------------------
