@@ -16,6 +16,7 @@
 #define KEYSTR_PROGRAM_COMPOSE "Compose"
 #define KEYSTR_PROGRAM_SHADOW  "Shadow"
 #define KEYSTR_PROGRAM_COPY    "Copy"
+#define KEYSTR_PROGRAM_REDUCE   "Reduce"
 
 namespace std
 {
@@ -96,6 +97,7 @@ private:
     GLsizei m_shadowMapSize;
     GLsizei m_cascades;
 
+    // Render Shader
     int m_modelViewMatrixLoc;
     int m_projectionMatrixLoc;
     int m_projectionMatrixLocCompose;

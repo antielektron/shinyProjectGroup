@@ -199,6 +199,10 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_COPY,
                     QOpenGLShader::Fragment);
 
+    setShaderSource(loadTextFile("shaders/reduce_min_max_compute.glsl"),
+                    KEYSTR_PROGRAM_REDUCE,
+                    QOpenGLShader::Compute);
+
     // generate attrib and uniform locations
     // default:
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
@@ -256,6 +260,7 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_SHADOW);
     createProgram(KEYSTR_PROGRAM_COMPOSE);
     createProgram(KEYSTR_PROGRAM_COPY);
+    createProgram(KEYSTR_PROGRAM_REDUCE);
 
     // make stuff
     // --> default program (nothing to do) <------------------------------------
@@ -337,92 +342,11 @@ void Renderer::render(GLuint fbo, Scene *scene)
         m_singleFrameRenderingRequested = false;
     }
 
-    QOpenGLShaderProgram *shadowMapProgram
-            = m_programs[KEYSTR_PROGRAM_SHADOW].get();
-    QOpenGLShaderProgram *defaultProgram
-            = m_programs[KEYSTR_PROGRAM_RENDER].get();
-    QOpenGLShaderProgram *composeProgram
-            = m_programs[KEYSTR_PROGRAM_COMPOSE].get();
-    QOpenGLShaderProgram *copyProgram
-            = m_programs[KEYSTR_PROGRAM_COPY].get();
-
-    /*
-
-    CULLING snipet
-
-    // normals after projection
-    QVector4D normals[4] = {
-            {-1., 0., 0., -1.},
-            { 1., 0., 0., -1.},
-            { 0., 1., 0., -1.},
-            { 0.,-1., 0., -1.},
-    };
-    // n*x <= 0 iff x in view frustum
-
-    QVector4D normalsWorld[4];
-    for (int i = 0; i < 4; i++)
-        normalsWorld[i] = viewProjection.transposed() * normals[i];
-
-    float nearZ = 1000., farZ = 0.;
-
-    // TODO compute view frustum (in world coordinates) nonononono (pseudo infinite far plane is not such a good idea..)
-    for (auto &object : scene->getObjects())
-    {
-        auto minCorner = object->getModel()->getMinCorner();
-        auto maxCorner = object->getModel()->getMaxCorner();
-
-        // TODO consider hyperplanes
-        QMatrix4x4 transformation = viewProjection * object->getWorld();
-        QVector4D corners[8];
-        QVector4D cornersWorld[8];
-        for (int i = 0; i < 8; i++)
-        {
-            auto inputCorner = QVector4D(i & 1 ? minCorner[0] : maxCorner[0],
-                                         i & 2 ? minCorner[1] : maxCorner[1],
-                                         i & 4 ? minCorner[2] : maxCorner[2], 1.);
-            corners[i] = transformation * inputCorner;
-            cornersWorld[i] = object->getWorld() * inputCorner;
-        }
-
-        bool visible = true;
-        // see out-codes
-        for (int i = 0; i < 4; i++)
-        {
-            bool violated = true;
-            for (int j = 0; j < 8; j++)
-            {
-                float f1 = QVector4D::dotProduct(normals[i], corners[j]);
-                float f2 = QVector4D::dotProduct(normalsWorld[i], cornersWorld[j]);
-
-                if (f1 <= 0.) // not violated
-                {
-                    violated = false;
-                    break;
-                }
-            }
-
-            if (violated)
-            {
-                visible = false;
-                break;
-            }
-        }
-
-        if (visible)
-        {
-            // TODO extend view frustum Z
-            for (int i = 0; i < 8; i++)
-            {
-                if (corners[i].z() < nearZ)
-                    nearZ = corners[i].z();
-                if (corners[i].z() > farZ);
-                    farZ = corners[i].z();
-            }
-        }
-    }
-
-    */
-
+    QOpenGLShaderProgram *shadowMapProgram = m_programs[KEYSTR_PROGRAM_SHADOW].get();
+    QOpenGLShaderProgram *defaultProgram = m_programs[KEYSTR_PROGRAM_RENDER].get();
+    QOpenGLShaderProgram *composeProgram = m_programs[KEYSTR_PROGRAM_COMPOSE].get();
+    QOpenGLShaderProgram *reduceProgram = m_programs[KEYSTR_PROGRAM_REDUCE].get();
+    // QOpenGLShaderProgram *copyProgram = m_programs[KEYSTR_PROGRAM_COPY].get();
 
     // Input: lightDirection, cameraProjection, cameraView, frustum
     // Output: lightProjection
