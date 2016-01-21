@@ -128,6 +128,9 @@ private:
     int m_copyArraySamplerLoc;
     int m_copyArrayLayerLoc;
 
+    // Reduce
+    int m_reduceInverseProjectionMatrixLoc;
+
     // vertical gauss
     int m_verticalGaussSourceLoc;
     int m_verticalGaussFilteredLoc;

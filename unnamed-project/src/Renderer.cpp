@@ -35,7 +35,7 @@ Renderer::~Renderer()
     glDeleteFramebuffers(1, &m_renderFrameBuffer);
     glDeleteTextures(1, &m_renderTexture);
     glDeleteTextures(1, &m_normalTexture);
-    glDeleteRenderbuffers(1, &m_renderDepthBuffer);
+    glDeleteTextures(1, &m_renderDepthBuffer);
 }
 
 //------------------------------------------------------------------------------
@@ -261,6 +261,8 @@ void Renderer::initialize()
     m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(
                 std::make_pair(0, "v_position"));
 
+    m_uniformLocs[KEYSTR_PROGRAM_REDUCE].emplace_back(&m_reduceInverseProjectionMatrixLoc, "inverseProjectionMatrix");
+
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussSourceLoc, "sourceImage");
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussFilteredLoc, "filteredImage");
 
@@ -271,7 +273,7 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_RENDER);
     createProgram(KEYSTR_PROGRAM_SHADOW);
     createProgram(KEYSTR_PROGRAM_COMPOSE);
-    createProgram(KEYSTR_PROGRAM_COPY);
+    // createProgram(KEYSTR_PROGRAM_COPY);
     createProgram(KEYSTR_PROGRAM_REDUCE);
     createProgram(KEYSTR_PROGRAM_HORIZONTAL_GAUSS);
     createProgram(KEYSTR_PROGRAM_VERTICAL_GAUSS);
@@ -640,6 +642,23 @@ void Renderer::render(GLuint fbo, Scene *scene)
     GLint windowTexture;
     glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);
 
+    reduceProgram->bind();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+
+    reduceProgram->setUniformValue(0, 0);
+    // glBindImageTexture(0, m_renderDepthBuffer, 0, GL_FALSE, 0, GL_READ_ONLY, GL_DEPTH_COMPONENT16);
+    glBindImageTexture(1, windowTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+    QMatrix4x4 inverseProjection = scene->getCameraProjection().inverted();
+    reduceProgram->setUniformValue(m_reduceInverseProjectionMatrixLoc, inverseProjection);
+
+    glDispatchCompute(m_width/8, m_height/8, 1);
+
+    reduceProgram->release();
+
+    /*
     verticalGaussProgram->bind();
 
     glBindImageTexture(0, windowTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
@@ -656,6 +675,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     glDispatchCompute(m_width/8, m_height/8, 1);
 
     horizontalGaussProgram->release();
+    */
 
     /*
     copyProgram->bind();
