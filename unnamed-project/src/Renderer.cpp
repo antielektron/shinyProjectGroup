@@ -196,7 +196,11 @@ void Renderer::initialize()
                     QOpenGLShader::Fragment);
 
     // Reduce shader
-    setShaderSource(loadTextFile("shaders/reduce_min_max_compute.glsl"),
+    setShaderSource(loadTextFile("shaders/reduce/reduce_sampler.glsl"),
+                    KEYSTR_PROGRAM_REDUCE_SAMPLER,
+                    QOpenGLShader::Compute);
+
+    setShaderSource(loadTextFile("shaders/reduce/reduce_compute.glsl"),
                     KEYSTR_PROGRAM_REDUCE,
                     QOpenGLShader::Compute);
 
@@ -261,8 +265,6 @@ void Renderer::initialize()
     m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(
                 std::make_pair(0, "v_position"));
 
-    m_uniformLocs[KEYSTR_PROGRAM_REDUCE].emplace_back(&m_reduceInverseProjectionMatrixLoc, "inverseProjectionMatrix");
-
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussSourceLoc, "sourceImage");
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussFilteredLoc, "filteredImage");
 
@@ -274,6 +276,7 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_SHADOW);
     createProgram(KEYSTR_PROGRAM_COMPOSE);
     // createProgram(KEYSTR_PROGRAM_COPY);
+    createProgram(KEYSTR_PROGRAM_REDUCE_SAMPLER);
     createProgram(KEYSTR_PROGRAM_REDUCE);
     createProgram(KEYSTR_PROGRAM_HORIZONTAL_GAUSS);
     createProgram(KEYSTR_PROGRAM_VERTICAL_GAUSS);
@@ -361,6 +364,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *shadowMapProgram = m_programs[KEYSTR_PROGRAM_SHADOW].get();
     QOpenGLShaderProgram *defaultProgram = m_programs[KEYSTR_PROGRAM_RENDER].get();
     QOpenGLShaderProgram *composeProgram = m_programs[KEYSTR_PROGRAM_COMPOSE].get();
+    QOpenGLShaderProgram *reduceStartProgram = m_programs[KEYSTR_PROGRAM_REDUCE_SAMPLER].get();
     QOpenGLShaderProgram *reduceProgram = m_programs[KEYSTR_PROGRAM_REDUCE].get();
     // QOpenGLShaderProgram *copyProgram = m_programs[KEYSTR_PROGRAM_COPY].get();
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
@@ -612,8 +616,6 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     composeProgram->bind();
 
-    QOpenGLVertexArrayObject::Binder vaoBinder(&m_quadVao);
-
 
     composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
 
@@ -624,8 +626,10 @@ void Renderer::render(GLuint fbo, Scene *scene)
     glBindTexture(GL_TEXTURE_2D, m_renderTexture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_normalTexture);
-    glDrawArrays(GL_QUADS, 0, 4);
 
+    m_quadVao.bind();
+    glDrawArrays(GL_QUADS, 0, 4);
+    m_quadVao.release();
 
     /*
     glViewport(0, 0, m_width/4, m_height/4);
@@ -639,26 +643,82 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     composeProgram->release();
 
-    GLint windowTexture;
-    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);
 
-    reduceProgram->bind();
+
+    // Reduce ..
+    GLsizei prevWidth = m_width;
+    GLsizei prevHeight = m_height;
+
+    reduceStartProgram->bind();
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
 
-    reduceProgram->setUniformValue(0, 0);
-    // glBindImageTexture(0, m_renderDepthBuffer, 0, GL_FALSE, 0, GL_READ_ONLY, GL_DEPTH_COMPONENT16);
-    glBindImageTexture(1, windowTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
-    QMatrix4x4 inverseProjection = scene->getCameraProjection().inverted();
-    reduceProgram->setUniformValue(m_reduceInverseProjectionMatrixLoc, inverseProjection);
+    // round up
+    prevWidth = (prevWidth+1) / 2;
+    prevHeight = (prevHeight+1) / 2;
 
-    glDispatchCompute(m_width/8, m_height/8, 1);
+    // TODO round up
+    glDispatchCompute(prevWidth / 8 + 1, prevHeight / 8 + 1, 1);
+
+    reduceStartProgram->release();
+
+    reduceProgram->bind();
+
+    for (int i = 1; i < m_depthReduceTextures.size(); i++)
+    {
+        glBindImageTexture(0, m_depthReduceTextures[i-1], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
+        glBindImageTexture(1, m_depthReduceTextures[i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
+
+        // round up
+        prevWidth = (prevWidth+1) / 2;
+        prevHeight = (prevHeight+1) / 2;
+
+        // TODO round up
+        glDispatchCompute(prevWidth / 8 + 1, prevHeight / 8 + 1, 1);
+    }
 
     reduceProgram->release();
 
+
+    // TODO check last texture for values..
+    std::vector<std::pair<float, float>> reducedDepthPixels;
+    reducedDepthPixels.resize(prevWidth*prevHeight);
+
+    glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures.back());
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RG, GL_FLOAT, reducedDepthPixels.data());
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    auto inverseProjection = scene->getCameraProjection().inverted();
+
+    float minDepth = 1;
+    float maxDepth = 0;
+
+    for (auto &p : reducedDepthPixels)
+    {
+        if (minDepth > p.first)
+            minDepth = p.first;
+        if (maxDepth < p.second)
+            maxDepth = p.second;
+    }
+
+    auto minOutput = inverseProjection * QVector4D(0., 0., minDepth*2 - 1, 1.);
+    minOutput /= -minOutput.w();
+
+    auto maxOutput = inverseProjection * QVector4D(0., 0., maxDepth*2 - 1, 1.);
+    maxOutput /= -maxOutput.w();
+
+    float nearPlane2 = minOutput.z();
+    float farPlane2 = maxOutput.z();
+
+    std::cout << nearPlane2 << " " << farPlane2 << std::endl;
+
     /*
+    GLint windowTexture;
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);
+
     verticalGaussProgram->bind();
 
     glBindImageTexture(0, windowTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
@@ -715,6 +775,7 @@ void Renderer::resize(int width, int height)
     glDeleteTextures(1, &m_normalTexture);
     glDeleteTextures(1, &m_renderDepthBuffer);
     glDeleteTextures(1, &m_tempTexture);
+    glDeleteTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
 
     // Create render texture
     glGenTextures(1, &m_renderTexture);
@@ -756,6 +817,8 @@ void Renderer::resize(int width, int height)
     // Poor filtering. Needed!
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glBindTexture(GL_TEXTURE_2D, 0);
 
 
@@ -771,4 +834,29 @@ void Renderer::resize(int width, int height)
     // Set the list of draw buffers.
     GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, attachments);
+
+
+    // Create reduce textures!
+    auto n = std::ceil(std::log2(std::min(m_width, m_height)));
+    m_depthReduceTextures.resize(n);
+    glGenTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
+
+    GLsizei prevWidth = m_width;
+    GLsizei prevHeight = m_height;
+
+    for (int i = 0; i < n; i++)
+    {
+        // round up
+        prevWidth = (prevWidth+1) / 2;
+        prevHeight = (prevHeight+1) / 2;
+
+        std::cout << i << ": " << prevWidth << " " << prevHeight << std::endl;
+
+        glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, prevWidth, prevHeight, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
+        // No filtering required
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }

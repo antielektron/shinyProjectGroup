@@ -116,7 +116,7 @@ void OpenGLWidget::paintGL()
 
     if (start < std::chrono::system_clock::now())
     {
-        std::cout << frame_count << " fps" << std::endl;
+        // std::cout << frame_count << " fps" << std::endl;
         frame_count = 0;
         start += std::chrono::seconds(1);
     }

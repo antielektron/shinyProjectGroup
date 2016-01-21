@@ -17,6 +17,7 @@
 #define KEYSTR_PROGRAM_SHADOW  "Shadow"
 #define KEYSTR_PROGRAM_COPY    "Copy"
 #define KEYSTR_PROGRAM_REDUCE   "Reduce"
+#define KEYSTR_PROGRAM_REDUCE_SAMPLER "Reduce from DepthBuffer"
 #define KEYSTR_PROGRAM_HORIZONTAL_GAUSS "Horizontal Gauss"
 #define KEYSTR_PROGRAM_VERTICAL_GAUSS "Vertical Gauss"
 
@@ -129,7 +130,8 @@ private:
     int m_copyArrayLayerLoc;
 
     // Reduce
-    int m_reduceInverseProjectionMatrixLoc;
+    // int m_reduceInverseProjectionMatrixLoc;
+    std::vector<GLuint> m_depthReduceTextures;
 
     // vertical gauss
     int m_verticalGaussSourceLoc;
