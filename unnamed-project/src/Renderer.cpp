@@ -733,7 +733,7 @@ void Renderer::resize(int width, int height)
     glDeleteFramebuffers(1, &m_renderFrameBuffer);
     glDeleteTextures(1, &m_renderTexture);
     glDeleteTextures(1, &m_normalTexture);
-    glDeleteRenderbuffers(1, &m_renderDepthBuffer);
+    glDeleteTextures(1, &m_renderDepthBuffer);
 
     // Create render texture
     glGenTextures(1, &m_renderTexture);
@@ -758,15 +758,21 @@ void Renderer::resize(int width, int height)
 
 
     // Create depth buffer!
-    glGenRenderbuffers(1, &m_renderDepthBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_renderDepthBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    glGenTextures(1, &m_renderDepthBuffer);
+    glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+    // Give an empty image to OpenGL ( the last "0" )
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
+    // Poor filtering. Needed!
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
 
     // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
     glGenFramebuffers(1, &m_renderFrameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderDepthBuffer);
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_renderDepthBuffer, 0);
 
     // Set "renderTexture" as our colour attachement #0
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_renderTexture, 0);
