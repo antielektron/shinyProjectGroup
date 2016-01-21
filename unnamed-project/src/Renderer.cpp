@@ -50,48 +50,43 @@ void Renderer::setShaderSource(const std::string &shaderSrc,
 ShaderErrorType Renderer::createProgram(const std::string &program)
 {
     // check whether there are sources for given program
-    auto vertexShaderIt = m_sources.find(
-                              std::make_pair(program, QOpenGLShader::Vertex));
-    auto fragmentShaderIt = m_sources.find(
-                                std::make_pair(program, QOpenGLShader::Fragment));
-    auto geometryShaderIt = m_sources.find(
-                                std::make_pair(program, QOpenGLShader::Geometry));
-
-    if (vertexShaderIt == m_sources.end() || fragmentShaderIt == m_sources.end())
-    {
-        return ShaderErrorType::MissingSourcesError;
-    }
+    auto vertexShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Vertex));
+    auto fragmentShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Fragment));
+    auto geometryShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Geometry));
+    auto computeShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Compute));
 
     // create new Program
     std::unique_ptr<QOpenGLShaderProgram> prog(new QOpenGLShaderProgram());
 
     // append cached vertex and fragment shader code
-    if (!prog->addShaderFromSourceCode(QOpenGLShader::Vertex,
-                                       vertexShaderIt->second.c_str()))
+    if (vertexShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderIt->second.c_str()))
     {
         std::cerr << "could not load vertex shader" << std::endl;
         return ShaderErrorType::VertexShaderError;
     }
-    if (!prog->addShaderFromSourceCode(QOpenGLShader::Fragment,
-                                       fragmentShaderIt->second.c_str()))
+
+    // append cached geometry shader, if there is one
+    if (geometryShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Geometry, geometryShaderIt->second.c_str()))
+    {
+        std::cerr << "could not load geometry shader" << std::endl;
+        return ShaderErrorType::GeometryShaderError;
+    }
+
+    if (fragmentShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderIt->second.c_str()))
     {
         std::cerr << "could not load fragment shader" << std::endl;
         return ShaderErrorType::FragmentShaderError;
     }
 
-    // append cached geometry shader, if there is one
-    if (geometryShaderIt != m_sources.end())
+    // set compute shader if there is one
+    if (computeShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Compute, computeShaderIt->second.c_str()))
     {
-        if (!prog->addShaderFromSourceCode(QOpenGLShader::Geometry,
-                                           geometryShaderIt->second.c_str()))
-        {
-            std::cerr << "could not load geometry shader" << std::endl;
-            return ShaderErrorType::GeometryShaderError;
-        }
+        std::cerr << "could not load compute shader" << std::endl;
+        return ShaderErrorType::GeometryShaderError; // TODO
     }
 
     // bind cached attribute locations
-    for( const auto &v : m_attribLocs[program])
+    for(const auto &v : m_attribLocs[program])
     {
         prog->bindAttributeLocation(v.second, v.first);
     }
@@ -114,6 +109,7 @@ ShaderErrorType Renderer::createProgram(const std::string &program)
         *(v.first) = pProg->uniformLocation(v.second);
     }
     pProg->release();
+
     return ShaderErrorType::NoError;
 }
 
@@ -199,8 +195,18 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_COPY,
                     QOpenGLShader::Fragment);
 
+    // Reduce shader
     setShaderSource(loadTextFile("shaders/reduce_min_max_compute.glsl"),
                     KEYSTR_PROGRAM_REDUCE,
+                    QOpenGLShader::Compute);
+
+    // Gauss Filter shaders
+    setShaderSource(loadTextFile("shaders/vertical_gauss_compute.glsl"),
+                    KEYSTR_PROGRAM_VERTICAL_GAUSS,
+                    QOpenGLShader::Compute);
+
+    setShaderSource(loadTextFile("shaders/horizontal_gauss_compute.glsl"),
+                    KEYSTR_PROGRAM_HORIZONTAL_GAUSS,
                     QOpenGLShader::Compute);
 
     // generate attrib and uniform locations
@@ -255,12 +261,20 @@ void Renderer::initialize()
     m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(
                 std::make_pair(0, "v_position"));
 
+    m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussSourceLoc, "sourceImage");
+    m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussFilteredLoc, "filteredImage");
+
+    m_uniformLocs[KEYSTR_PROGRAM_VERTICAL_GAUSS].emplace_back(&m_verticalGaussSourceLoc, "sourceImage");
+    m_uniformLocs[KEYSTR_PROGRAM_VERTICAL_GAUSS].emplace_back(&m_verticalGaussFilteredLoc, "filteredImage");
+
     // create Programs:
     createProgram(KEYSTR_PROGRAM_RENDER);
     createProgram(KEYSTR_PROGRAM_SHADOW);
     createProgram(KEYSTR_PROGRAM_COMPOSE);
     createProgram(KEYSTR_PROGRAM_COPY);
     createProgram(KEYSTR_PROGRAM_REDUCE);
+    createProgram(KEYSTR_PROGRAM_HORIZONTAL_GAUSS);
+    createProgram(KEYSTR_PROGRAM_VERTICAL_GAUSS);
 
     // make stuff
     // --> default program (nothing to do) <------------------------------------
@@ -347,6 +361,8 @@ void Renderer::render(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *composeProgram = m_programs[KEYSTR_PROGRAM_COMPOSE].get();
     QOpenGLShaderProgram *reduceProgram = m_programs[KEYSTR_PROGRAM_REDUCE].get();
     // QOpenGLShaderProgram *copyProgram = m_programs[KEYSTR_PROGRAM_COPY].get();
+    QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
+    QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
 
     // Input: lightDirection, cameraProjection, cameraView, frustum
     // Output: lightProjection
@@ -621,6 +637,26 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     composeProgram->release();
 
+    GLint windowTexture;
+    glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);
+
+    verticalGaussProgram->bind();
+
+    glBindImageTexture(0, windowTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(1, m_renderTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glDispatchCompute(m_width/8, m_height/8, 1);
+
+    verticalGaussProgram->release();
+
+
+    horizontalGaussProgram->bind();
+
+    glBindImageTexture(0, m_renderTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(1, windowTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glDispatchCompute(m_width/8, m_height/8, 1);
+
+    horizontalGaussProgram->release();
+
     /*
     copyProgram->bind();
 
@@ -658,6 +694,7 @@ void Renderer::resize(int width, int height)
     glDeleteTextures(1, &m_renderTexture);
     glDeleteTextures(1, &m_normalTexture);
     glDeleteTextures(1, &m_renderDepthBuffer);
+    glDeleteTextures(1, &m_tempTexture);
 
     // Create render texture
     glGenTextures(1, &m_renderTexture);
@@ -673,6 +710,16 @@ void Renderer::resize(int width, int height)
     // Create normal texture
     glGenTextures(1, &m_normalTexture);
     glBindTexture(GL_TEXTURE_2D, m_normalTexture);
+    // Give an empty image to OpenGL ( the last "0" )
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    // Poor filtering. Needed!
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Create TEMP
+    glGenTextures(1, &m_tempTexture);
+    glBindTexture(GL_TEXTURE_2D, m_tempTexture);
     // Give an empty image to OpenGL ( the last "0" )
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_width, m_height, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
     // Poor filtering. Needed!
