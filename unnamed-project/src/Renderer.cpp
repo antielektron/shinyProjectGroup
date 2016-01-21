@@ -8,6 +8,7 @@
 #include <cmath>
 #include <QtGui/qopenglframebufferobject.h>
 #include <vector>
+#include <chrono>
 
 #include "Renderer.h"
 #include "Scene/Scene.h"
@@ -644,6 +645,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     composeProgram->release();
 
 
+    auto start = std::chrono::system_clock::now();
 
     // Reduce ..
     GLsizei prevWidth = m_width;
@@ -682,6 +684,9 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     reduceProgram->release();
 
+    glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+    auto end = std::chrono::system_clock::now();
 
     // TODO check last texture for values..
     std::vector<std::pair<float, float>> reducedDepthPixels;
@@ -690,6 +695,11 @@ void Renderer::render(GLuint fbo, Scene *scene)
     glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures.back());
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RG, GL_FLOAT, reducedDepthPixels.data());
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    auto end2 = std::chrono::system_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "\t";
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(end2 - start).count() << std::endl;
+
 
     auto inverseProjection = scene->getCameraProjection().inverted();
 
@@ -713,7 +723,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     float nearPlane2 = minOutput.z();
     float farPlane2 = maxOutput.z();
 
-    std::cout << nearPlane2 << " " << farPlane2 << std::endl;
+    // std::cout << nearPlane2 << " " << farPlane2 << std::endl;
 
     /*
     GLint windowTexture;
