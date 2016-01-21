@@ -132,6 +132,7 @@ private:
     // Reduce
     // int m_reduceInverseProjectionMatrixLoc;
     std::vector<GLuint> m_depthReduceTextures;
+    GLsizei m_reduceLastTextureSize;
 
     // vertical gauss
     int m_verticalGaussSourceLoc;

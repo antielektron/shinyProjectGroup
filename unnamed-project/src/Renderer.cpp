@@ -381,18 +381,41 @@ void Renderer::render(GLuint fbo, Scene *scene)
                          lightViewRotation);
 
     // Compute viewFrustum of camera in light view
+    auto inverseCameraProjection = scene->getCameraProjection().inverted();
     auto inverseCameraTransformation = (scene->getCameraProjection() *
                                         scene->getCameraView()).inverted();
     auto screenToLightTransformation = lightViewRotation *
                                        inverseCameraTransformation;
 
     // Corners of slices
-    std::vector<std::vector<QVector3D>> sliceCorners(
-                static_cast<size_t>(m_cascades)+1);
+    std::vector<std::vector<QVector3D>> sliceCorners(static_cast<size_t>(m_cascades)+1);
 
     // Compute these values, they will be given to the gpu!
     std::vector<QMatrix4x4> cascadeViews;
     std::vector<float> cascadeFars;
+
+
+    // Compute actual near and far plane!
+
+    // Check last texture for values..
+    std::vector<std::pair<float, float>> reducedDepthPixels;
+    reducedDepthPixels.resize(m_reduceLastTextureSize);
+
+    glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures.back());
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_RG, GL_FLOAT, reducedDepthPixels.data());
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    float minDepth = 1;
+    float maxDepth = 0;
+
+    for (auto &p : reducedDepthPixels)
+    {
+        if (minDepth > p.first)
+            minDepth = p.first;
+        if (maxDepth < p.second)
+            maxDepth = p.second;
+    }
+
 
     QVector3D minCorners[] = {
             { -1, -1, -1 },
@@ -407,9 +430,14 @@ void Renderer::render(GLuint fbo, Scene *scene)
             {  1,  1,  1 }
     };
 
-    QVector3D nearFarCorners[] = {
+    QVector3D frustumNearFarCorners[] = {
             { 0, 0, -1 },
             { 0, 0,  1 }
+    };
+
+    QVector3D actualNearFarCorners[] = {
+            { 0, 0, minDepth*2 - 1 },
+            { 0, 0, maxDepth*2 - 1 },
     };
 
     // Transform corners into light view space
@@ -417,22 +445,25 @@ void Renderer::render(GLuint fbo, Scene *scene)
     MathUtility::transformVectors(screenToLightTransformation, maxCorners);
 
     // Transform corners into light view space
-    MathUtility::transformVectors(scene->getCameraProjection().inverted(),
-                                  nearFarCorners);
+    MathUtility::transformVectors(inverseCameraProjection, frustumNearFarCorners);
+    MathUtility::transformVectors(inverseCameraProjection, actualNearFarCorners);
 
     // NOTE: z values are inverted! multiply by -1
-    float nearPlane = -nearFarCorners[0].z();
-    float farPlane = -nearFarCorners[1].z();
+    float projectionNearPlane = -frustumNearFarCorners[0].z();
+    float projectionFarPlane = -frustumNearFarCorners[1].z();
+
+    float actualNearPlane = -actualNearFarCorners[0].z();
+    float actualFarPlane = -actualNearFarCorners[1].z();
 
     // Coefficient for combining uniform and logarithmic results
-    float lambdaUniLog = 0.5f;
+    float lambdaUniLog = 0.3f;
 
     // Interpolate corners in light view space, not screen space
     for (size_t i = 0; i <= static_cast<size_t>(m_cascades); i++)
     {
-        float cUni = nearPlane + (farPlane - nearPlane) * i / m_cascades;
-        float cLog = nearPlane * std::pow(farPlane / nearPlane,
-                                          static_cast<float>(i) / m_cascades); // COMPLEX!
+        // interpolate between actual near/far planes
+        float cUni = actualNearPlane + (actualFarPlane - actualNearPlane) * i / m_cascades;
+        float cLog = actualNearPlane * std::pow(actualFarPlane / actualNearPlane, static_cast<float>(i) / m_cascades); // COMPLEX!
 
         // combine cLog and cUni
         float currentZ = lambdaUniLog * cUni + (1 - lambdaUniLog) * cLog;
@@ -441,12 +472,12 @@ void Renderer::render(GLuint fbo, Scene *scene)
             cascadeFars.push_back(currentZ);
 
         // Coefficient for affine combination of frustum corners
-        float coeff = (currentZ - nearPlane) / (farPlane - nearPlane);
+        // NOTE: use projection near/far plane
+        float coeff = (currentZ - projectionNearPlane) / (projectionFarPlane - projectionNearPlane);
 
         for (size_t j = 0; j < 4; j++)
         {
-            sliceCorners[i].push_back((1 - coeff) * minCorners[j]
-                                      + coeff * maxCorners[j]);
+            sliceCorners[i].push_back((1 - coeff) * minCorners[j] + coeff * maxCorners[j]);
         }
     }
 
@@ -645,9 +676,8 @@ void Renderer::render(GLuint fbo, Scene *scene)
     composeProgram->release();
 
 
-    auto start = std::chrono::system_clock::now();
 
-    // Reduce ..
+    // Invoke reduce ...
     GLsizei prevWidth = m_width;
     GLsizei prevHeight = m_height;
 
@@ -662,8 +692,8 @@ void Renderer::render(GLuint fbo, Scene *scene)
     prevWidth = (prevWidth+1) / 2;
     prevHeight = (prevHeight+1) / 2;
 
-    // TODO round up
-    glDispatchCompute(prevWidth / 8 + 1, prevHeight / 8 + 1, 1);
+    // round up
+    glDispatchCompute((prevWidth - 1) / 8 + 1, (prevHeight - 1) / 8 + 1, 1);
 
     reduceStartProgram->release();
 
@@ -678,52 +708,11 @@ void Renderer::render(GLuint fbo, Scene *scene)
         prevWidth = (prevWidth+1) / 2;
         prevHeight = (prevHeight+1) / 2;
 
-        // TODO round up
-        glDispatchCompute(prevWidth / 8 + 1, prevHeight / 8 + 1, 1);
+        // round up
+        glDispatchCompute((prevWidth - 1) / 8 + 1, (prevHeight - 1) / 8 + 1, 1);
     }
 
     reduceProgram->release();
-
-    glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-    auto end = std::chrono::system_clock::now();
-
-    // TODO check last texture for values..
-    std::vector<std::pair<float, float>> reducedDepthPixels;
-    reducedDepthPixels.resize(prevWidth*prevHeight);
-
-    glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures.back());
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RG, GL_FLOAT, reducedDepthPixels.data());
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    auto end2 = std::chrono::system_clock::now();
-    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "\t";
-    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(end2 - start).count() << std::endl;
-
-
-    auto inverseProjection = scene->getCameraProjection().inverted();
-
-    float minDepth = 1;
-    float maxDepth = 0;
-
-    for (auto &p : reducedDepthPixels)
-    {
-        if (minDepth > p.first)
-            minDepth = p.first;
-        if (maxDepth < p.second)
-            maxDepth = p.second;
-    }
-
-    auto minOutput = inverseProjection * QVector4D(0., 0., minDepth*2 - 1, 1.);
-    minOutput /= -minOutput.w();
-
-    auto maxOutput = inverseProjection * QVector4D(0., 0., maxDepth*2 - 1, 1.);
-    maxOutput /= -maxOutput.w();
-
-    float nearPlane2 = minOutput.z();
-    float farPlane2 = maxOutput.z();
-
-    // std::cout << nearPlane2 << " " << farPlane2 << std::endl;
 
     /*
     GLint windowTexture;
@@ -869,4 +858,5 @@ void Renderer::resize(int width, int height)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+    m_reduceLastTextureSize = prevWidth * prevHeight;
 }
