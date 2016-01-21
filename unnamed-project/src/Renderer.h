@@ -16,6 +16,10 @@
 #define KEYSTR_PROGRAM_COMPOSE "Compose"
 #define KEYSTR_PROGRAM_SHADOW  "Shadow"
 #define KEYSTR_PROGRAM_COPY    "Copy"
+#define KEYSTR_PROGRAM_REDUCE   "Reduce"
+#define KEYSTR_PROGRAM_REDUCE_SAMPLER "Reduce from DepthBuffer"
+#define KEYSTR_PROGRAM_HORIZONTAL_GAUSS "Horizontal Gauss"
+#define KEYSTR_PROGRAM_VERTICAL_GAUSS "Vertical Gauss"
 
 namespace std
 {
@@ -96,6 +100,7 @@ private:
     GLsizei m_shadowMapSize;
     GLsizei m_cascades;
 
+    // Render Shader
     int m_modelViewMatrixLoc;
     int m_projectionMatrixLoc;
     int m_projectionMatrixLocCompose;
@@ -124,6 +129,20 @@ private:
     int m_copyArraySamplerLoc;
     int m_copyArrayLayerLoc;
 
+    // Reduce
+    // int m_reduceInverseProjectionMatrixLoc;
+    std::vector<GLuint> m_depthReduceTextures;
+    GLsizei m_reduceLastTextureSize;
+
+    // vertical gauss
+    int m_verticalGaussSourceLoc;
+    int m_verticalGaussFilteredLoc;
+
+    // horizontal gauss
+    int m_horizontalGaussSourceLoc;
+    int m_horizontalGaussFilteredLoc;
+
+
     QOpenGLVertexArrayObject m_quadVao;
     QOpenGLBuffer m_quadVbo;
 
@@ -131,6 +150,8 @@ private:
     GLuint m_renderTexture;
     GLuint m_normalTexture;
     GLuint m_renderDepthBuffer;
+
+    GLuint m_tempTexture;
 
     // map for shader programs:
     std::map<std::string, std::unique_ptr<QOpenGLShaderProgram>> m_programs;
