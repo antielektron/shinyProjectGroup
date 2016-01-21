@@ -255,7 +255,9 @@ void SceneEditorGame::removeCurrentObject()
 	if (m_currentObject)
 	{
 		m_currentObject->destroy();
-        notifyCurrentObjectChanged(nullptr);
+        m_scene->updateObjectList();
+        m_currentObject = nullptr;
+        emit objectsChanged();
 	}
 }
 
