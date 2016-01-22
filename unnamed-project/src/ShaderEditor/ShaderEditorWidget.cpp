@@ -133,6 +133,7 @@ void ShaderEditorWidget::onActionToggled()
     if (m_action->isChecked())
     {
         this->setHidden(false);
+        this->raise();
     }
     else
     {
@@ -185,7 +186,9 @@ void ShaderEditorWidget::onSaveClicked()
         stream << m_editor->toPlainText();
         file.close();
 
-        m_lastFilename = filename;
+        QString relativePath = QDir::current().relativeFilePath(filename);
+        m_lastFilename = relativePath;
+        emit filenameChanged(relativePath, m_shaderType, m_progName);
 
         m_isSaved = true;
         this->setTitleBarWidget(new QLabel(m_shaderName, this));
@@ -221,7 +224,9 @@ void ShaderEditorWidget::onLoadClicked()
         m_isSaved = true;
         this->setTitleBarWidget(new QLabel(m_shaderName, this));
 
-        m_lastFilename = filename;
+        QString relativePath = QDir::current().relativeFilePath(filename);
+        m_lastFilename = relativePath;
+        emit filenameChanged(relativePath, m_shaderType, m_progName);
 
         m_action->setText(m_shaderName);
         onApplyClicked();

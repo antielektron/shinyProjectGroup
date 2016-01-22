@@ -194,6 +194,7 @@ void EditorWindow::onFilenameChanged(const QString &filename,
                                      QOpenGLShader::ShaderTypeBit type,
                                      const QString &progName)
 {
+    std::cout << "set filepath: " << filename.toStdString() << std::endl;
     m_glWidget->getRenderer()->setShaderFilepath(filename.toStdString(),
                                                  progName.toStdString(),
                                                  type);
