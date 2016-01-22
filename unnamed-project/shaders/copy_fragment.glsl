@@ -4,18 +4,19 @@ in vec2 uv;
 uniform mat4 projectionMatrix;
 
 uniform sampler2D sampler;
-uniform float time;
+uniform sampler2D ovSampler;
+//uniform float time;
 
 out vec4 outputColor;
 
-int samples = 10; //TODO, pass through shader
+const int samples = 10; //TODO, pass through shader
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
 // factors to (linear) merge default shading
 // and volumetric obscurance 
-const float voShadingAmount = 0.5;
-const float dfShadingAmount = 0.5;
+const float voShadingAmount = 1.;
+const float dfShadingAmount = 1.;
 
 // misc:
 
@@ -40,6 +41,7 @@ float get_k(float z)
 	// physically not correct
 	vec4 e = vec4(1.0, 0., z, 1.);
 	e = projectionMatrix * e;
+	
 	return 1 / (exp(z*z * 3) - 1 + 4);
 }
 
@@ -78,7 +80,7 @@ float get_dr(vec2 unitPos, vec2 pPos, float p_z)
 	}	
 	
 	
-	return (- p_z + (1 - texture2D(sampler, screenSpaceUnitPos).a)) / k;
+	return (- p_z + (1 - texture2D(ovSampler, screenSpaceUnitPos).x)) / k;
 }
 
 float z_s(vec2 unitPos)
@@ -96,7 +98,7 @@ float lineSampling(int nSamples)
 {
 	float sumSamples = 0.;
 	float sumVolume = 0.;
-	float z = 1 - texture2D(sampler, uv).a;
+	float z = 1 - texture2D(ovSampler, uv).x;
 	for (int i = 0; i < nSamples; i++)
 	{
 		// get a random angle and radius for sample point on the
@@ -116,10 +118,10 @@ float lineSampling(int nSamples)
 
 
 // debug stuff:
-/*
+
 bool isInCenterEpsilonArea(vec2 centerPoint)
 {
-	float zCenter = 1 - texture2D(sampler, centerPoint).a;
+	float zCenter = 1 - texture2D(ovSampler, centerPoint).x;
 	float k = get_k(zCenter);
 	
 	float dx = uv.x - centerPoint.x;
@@ -127,17 +129,22 @@ bool isInCenterEpsilonArea(vec2 centerPoint)
 	
 	return (dx * dx + dy * dy) < (k * k); 
 }
-*/
+
 
 void main()
 {
-	vec3 defaultColor = texture2D(sampler, uv).xyz;
+	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
 	vec3 mixedColor = lineSampling(samples) * defaultColor;
-	
+
+/*
+	float depth = texture2D(ovSampler, uv).x;
+	vec4 result = inverse(projectionMatrix) * vec4(0, 0, depth, 1);
+	vec3 mixedColor = (result.z / -result.w) / 50. * vec3(1., 1., 1.);
+*/
 	// DEBUG
-	/*
-	vec2 center = vec2(0.5,0.5);
 	
+	vec2 center = vec2(0.5,0.5);
+	/*
 	if (isInCenterEpsilonArea(center))
 	{
 		mixedColor.z *= 2 ;
