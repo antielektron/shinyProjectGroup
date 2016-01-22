@@ -13,27 +13,6 @@
 #include "ShaderEditor/ShaderEditorWidget.h"
 #include "ShaderEditor/ObjectToolbox.h"
 
-namespace std
-{
-    template<>
-    struct less<std::pair<std::string, QOpenGLShader::ShaderTypeBit>>
-    {
-        typedef std::pair<std::string, QOpenGLShader::ShaderTypeBit> type;
-
-        bool operator () (const type &lhs, const type &rhs)
-        {
-            if (lhs.first == rhs.first)
-            {
-                return lhs.second < rhs.second;
-            }
-            else
-            {
-                return lhs.first < rhs.first;
-            }
-        }
-    };
-}
-
 class EditorWindow : public QMainWindow
 {
     Q_OBJECT

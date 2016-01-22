@@ -62,22 +62,7 @@ float get_dr(vec2 unitPos, vec2 pPos, float p_z)
 	//clip if necessary:
 	float max = 1. - eps;
 
-	if (screenSpaceUnitPos.x > max)
-	{
-	    screenSpaceUnitPos.x = max;
-	}
-	if (screenSpaceUnitPos.y > max)
-	{
-	    screenSpaceUnitPos.y = max;
-	}
-	if (screenSpaceUnitPos.x < 0)
-	{
-	    screenSpaceUnitPos.x = 0;
-	}
-	if (screenSpaceUnitPos.y < 0.)
-	{
-	    screenSpaceUnitPos.y = 0.;
-	}	
+	screenSpaceUnitPos = clamp(screenSpaceUnitPos, 0, 1 - eps);
 	
 	
 	return (- p_z + (1 - texture2D(ovSampler, screenSpaceUnitPos).x)) / k;
