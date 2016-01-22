@@ -9,7 +9,7 @@ uniform sampler2D ovSampler;
 
 out vec4 outputColor;
 
-int samples = 10; //TODO, pass through shader
+const int samples = 10; //TODO, pass through shader
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
@@ -134,8 +134,13 @@ bool isInCenterEpsilonArea(vec2 centerPoint)
 void main()
 {
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
-	vec3 mixedColor = /* lineSampling(samples) * */ defaultColor;
-	
+	vec3 mixedColor = lineSampling(samples) * defaultColor;
+
+/*
+	float depth = texture2D(ovSampler, uv).x;
+	vec4 result = inverse(projectionMatrix) * vec4(0, 0, depth, 1);
+	vec3 mixedColor = (result.z / -result.w) / 50. * vec3(1., 1., 1.);
+*/
 	// DEBUG
 	
 	vec2 center = vec2(0.5,0.5);
