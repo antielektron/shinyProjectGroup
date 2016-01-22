@@ -206,11 +206,11 @@ void Renderer::initialize()
                     QOpenGLShader::Compute);
 
     // Gauss Filter shaders
-    setShaderSource(loadTextFile("shaders/vertical_gauss_compute.glsl"),
+    setShaderSource(loadTextFile("shaders/filter/vertical_gauss.glsl"),
                     KEYSTR_PROGRAM_VERTICAL_GAUSS,
                     QOpenGLShader::Compute);
 
-    setShaderSource(loadTextFile("shaders/horizontal_gauss_compute.glsl"),
+    setShaderSource(loadTextFile("shaders/filter/horizontal_gauss.glsl"),
                     KEYSTR_PROGRAM_HORIZONTAL_GAUSS,
                     QOpenGLShader::Compute);
 
@@ -299,7 +299,7 @@ void Renderer::initialize()
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RED, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
     // Create DepthBuffer

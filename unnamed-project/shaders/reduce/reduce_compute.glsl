@@ -20,10 +20,7 @@ void main()
     ivec2 inputPos = 2 * outputPos;
 
     // d = 1 -> Background
-    vec2 depthMinMax = vec2(1, 0);
-
-    vec2 a = imageLoad(inputTex, inputPos).xy;
-    updateMinMaxDepth(depthMinMax, a);
+    vec2 depthMinMax = imageLoad(inputTex, inputPos).xy;
 
     if (inputPos.x+1 < inputSize.x)
     {
