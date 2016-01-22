@@ -48,6 +48,7 @@ void EditorWindow::createDocks()
 
         for (const auto &pair : sources)
         {
+
             ShaderEditorWidget *editorWidget
                     = new ShaderEditorWidget(this,
                                              pair.first,
@@ -66,6 +67,13 @@ void EditorWindow::createDocks()
             connect(this, SIGNAL(updateRequest()),
                     editorWidget, SLOT(onUpdateRequest()));
 
+            connect(editorWidget, SIGNAL(filenameChanged(const QString &,
+                                                         QOpenGLShader::ShaderTypeBit,
+                                                         const QString &)),
+                    this, SLOT(onFilenameChanged(const QString &,
+                                                 QOpenGLShader::ShaderTypeBit,
+                                                 const QString &)));
+
             editorWidget->setAllowedAreas(Qt::LeftDockWidgetArea
                                           | Qt::RightDockWidgetArea);
 
@@ -74,6 +82,7 @@ void EditorWindow::createDocks()
             {
                 this->tabifyDockWidget(previousWidget, editorWidget);
             }
+            m_toolbar->addAction(editorWidget->getAction());
             previousWidget = editorWidget;
         }
     }
@@ -176,8 +185,18 @@ void EditorWindow::onSaveShaderConfigClicked()
                                                     tr("xml files (*.xml)"));
     if (filename.length() > 0)
     {
-        m_glWidget->getRenderer()->loadConfiguration(filename.toStdString());
+        m_glWidget->getRenderer()->saveConfiguration(filename.toStdString());
     }
+}
+
+//------------------------------------------------------------------------------
+void EditorWindow::onFilenameChanged(const QString &filename,
+                                     QOpenGLShader::ShaderTypeBit type,
+                                     const QString &progName)
+{
+    m_glWidget->getRenderer()->setShaderFilepath(filename.toStdString(),
+                                                 progName.toStdString(),
+                                                 type);
 }
 
 //------------------------------------------------------------------------------

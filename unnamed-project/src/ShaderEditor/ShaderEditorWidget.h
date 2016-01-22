@@ -25,6 +25,10 @@ public:
 
     void setColor(const QColor &color);
 
+    QAction *getAction();
+
+    const QString &getFilename();
+
     static const QColor errorColor;
     static const QColor allFineColor;
 
@@ -40,10 +44,17 @@ protected:
     QPushButton *m_saveButton;
     QPushButton *m_loadButton;
 
+    QAction *m_action;
+
     bool m_hasChanged;
+    bool m_isSaved;
 
     QOpenGLShader::ShaderTypeBit m_shaderType;
     QString m_progName;
+
+    QString m_shaderName;
+
+    QString m_lastFilename;
 
     void setShaderName(QOpenGLShader::ShaderTypeBit type,
                        const QString &progName);
@@ -64,6 +75,8 @@ public slots:
      *                          ShaderEditorWidget::codeChanged in this case)
      */
     void onUpdateRequest();
+
+    void onActionToggled();
 
 protected slots:
     /**
@@ -86,6 +99,10 @@ signals:
     void codeChanged(const QString &code,
                      QOpenGLShader::ShaderTypeBit type,
                      const QString &progName);
+
+    void filenameChanged(const QString &filename,
+                         QOpenGLShader::ShaderTypeBit type,
+                         const QString &progName);
 
 };
 

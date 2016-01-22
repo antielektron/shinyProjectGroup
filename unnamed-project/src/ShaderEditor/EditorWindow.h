@@ -31,6 +31,9 @@ public slots:
     void onSingleFrameRequestedClicked();
     void onLoadShaderConfigClicked();
     void onSaveShaderConfigClicked();
+    void onFilenameChanged(const QString &filename,
+                           QOpenGLShader::ShaderTypeBit type,
+                           const QString &progName);
 
 signals:
     void updateRequest();
@@ -52,6 +55,8 @@ protected:
 
     std::map<RendererBase::ShaderSourcesKeyType,
              ShaderEditorWidget*> m_shaderEditorMap;
+
+    // for actions:
 
 
 };

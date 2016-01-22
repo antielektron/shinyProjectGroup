@@ -113,6 +113,10 @@ public:
                    QOpenGLShader::ShaderTypeBit type,
                    const std::string &filepath = "");
 
+    void setShaderFilepath(const std::string &filepath,
+                           const std::string &progName,
+                           QOpenGLShader::ShaderTypeBit type);
+
     /**
      * @brief getPrograms   append a list of available programs to 'progs'
      * @param progs

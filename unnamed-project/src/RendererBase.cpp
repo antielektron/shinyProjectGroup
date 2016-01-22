@@ -159,6 +159,14 @@ void RendererBase::setShaderSource(const std::string &shaderSrc,
 }
 
 //------------------------------------------------------------------------------
+void RendererBase::setShaderFilepath(const std::string &filepath,
+                                     const std::string &progName,
+                                     QOpenGLShader::ShaderTypeBit type)
+{
+    m_filenames[std::make_pair(progName, type)] = filepath;
+}
+
+//------------------------------------------------------------------------------
 ShaderErrorType RendererBase::createProgram(const std::string &program)
 {
     // check whether there are sources for given program
