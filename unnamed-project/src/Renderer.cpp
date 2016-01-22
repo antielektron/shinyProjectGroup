@@ -791,7 +791,7 @@ void Renderer::resize(int width, int height)
     glGenTextures(1, &m_normalTexture);
     glBindTexture(GL_TEXTURE_2D, m_normalTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
     // Poor filtering. Needed!
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
