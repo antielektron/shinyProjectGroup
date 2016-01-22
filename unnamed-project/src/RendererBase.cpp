@@ -1,11 +1,16 @@
 #include "RendererBase.h"
 #include <QDomElement>
 #include <QDomDocument>
+#include <QXmlStreamWriter>
+#include <QFile>
 #include <iostream>
+#include <stdexcept>
 
 #define DOM_KEY_SHADER_TYPE "type"
 #define DOM_KEY_SHADER_PROG_NAME "program"
 #define DOM_KEY_SHADER_FILE "path"
+#define DOM_KEY_SHADER_CONFIG_ROOT "shader_config"
+#define DOM_KEY_SHADER "shader"
 
 //------------------------------------------------------------------------------
 RendererBase::RendererBase()
@@ -17,13 +22,116 @@ RendererBase::RendererBase()
 //------------------------------------------------------------------------------
 void RendererBase::saveConfiguration(const std::string &filename)
 {
-    // TODO
+    //DAMN... now we have Qt dependencies in our RendererBase :(
+    QFile file(QString::fromStdString(filename));
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        throw std::runtime_error("Could not write file '" + filename+ "'");
+    }
+
+    QXmlStreamWriter xmlWriter(&file);
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.writeStartDocument();
+
+    xmlWriter.writeStartElement(DOM_KEY_SHADER_CONFIG_ROOT);
+
+    // write shader configs
+    for (const auto &entry : m_sources)
+    {
+        std::string filepath = getFilepath(entry.first.first, entry.first.second);
+        if (filepath.length() > 0)
+        {
+            xmlWriter.writeStartElement(DOM_KEY_SHADER);
+            xmlWriter.writeAttribute(DOM_KEY_SHADER_PROG_NAME,
+                                     QString::fromStdString(entry.first.first));
+            xmlWriter.writeAttribute(DOM_KEY_SHADER_TYPE,
+                                     QString::fromStdString(
+                                         shaderTypeToString.at(entry.first.second)));
+            xmlWriter.writeAttribute(DOM_KEY_SHADER_FILE,
+                                     QString::fromStdString(filepath));
+            xmlWriter.writeEndElement();
+        }
+    }
+
+    xmlWriter.writeEndElement();
+    xmlWriter.writeEndDocument();
+
+    file.close();
 }
 
 //------------------------------------------------------------------------------
 void RendererBase::loadConfiguration(const std::string &filename)
 {
-    // TODO implemntation!
+    // reset:
+    m_programs.clear();
+    m_filenames.clear();
+    m_sources.clear();
+
+    QDomDocument document;
+    QFile file(QString::fromStdString(filename));
+    if (!file.open(QIODevice::ReadOnly))
+    {
+        throw std::runtime_error("Could not open file '" + filename+ "'");
+    }
+    document.setContent(&file);
+    file.close();
+
+    // Parse header
+    QDomElement root = document.documentElement();
+    QString rootType = root.tagName();              // should be 'ShaderConfig'
+
+    // Parse xml body:
+    for (auto currentElement = root.firstChildElement();
+         !currentElement.isNull();
+         currentElement = currentElement.nextSiblingElement())
+    {
+        QString tag = currentElement.tagName();
+        std::cout << "TAG " << tag.toStdString() << std::endl;
+        if (tag != DOM_KEY_SHADER)
+        {
+            std::cout << "WARNING: unexpected tag '"
+                      << tag.toStdString()
+                      << "' in shader configuration"
+                      << std::endl;
+        }
+        else
+        {
+            QString filepath = currentElement.attribute(DOM_KEY_SHADER_FILE);
+            QString program = currentElement.attribute(DOM_KEY_SHADER_PROG_NAME);
+            QString typeStr = currentElement.attribute(DOM_KEY_SHADER_TYPE);
+
+            auto type = stringToShaderType.at(typeStr.toStdString());
+
+            // TODO: error handling
+            std::string shaderSource = loadTextFile(filepath.toStdString());
+
+            setShaderSource(shaderSource,
+                            program.toStdString(),
+                            type,
+                            filepath.toStdString());
+
+        }
+    }
+
+    // create Programs
+    for (const auto &entry : m_sources)
+    {
+        createProgram(entry.first.first);
+    }
+
+};
+
+//------------------------------------------------------------------------------
+std::string RendererBase::getFilepath(const std::string &progName,
+                                             QOpenGLShader::ShaderTypeBit type)
+{
+    auto pair = std::make_pair(progName, type);
+    auto entry = m_filenames.find(pair);
+    if (entry == m_filenames.end())
+    {
+        return "";
+    }
+    return entry->second;
 }
 
 //------------------------------------------------------------------------------
@@ -43,9 +151,11 @@ void RendererBase::render(GLuint fbo, Scene *scene)
 //------------------------------------------------------------------------------
 void RendererBase::setShaderSource(const std::string &shaderSrc,
                                const std::string &progName,
-                               QOpenGLShader::ShaderTypeBit type)
+                               QOpenGLShader::ShaderTypeBit type,
+                               const std::string &filepath)
 {
     m_sources[std::make_pair(progName, type)] = shaderSrc;
+    m_filenames[std::make_pair(progName, type)] = filepath;
 }
 
 //------------------------------------------------------------------------------

@@ -644,3 +644,4 @@ void Renderer::resize(int width, int height)
     GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, attachments);
 }
+

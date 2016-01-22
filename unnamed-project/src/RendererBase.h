@@ -68,20 +68,39 @@ public:
     typedef std::pair<std::string, QOpenGLShader::ShaderTypeBit> ShaderSourcesKeyType;
     typedef std::vector<std::pair<QOpenGLShader::ShaderTypeBit, std::string>> ShaderSourcesType;
 
-    // loading an saving configurations:
+    /**
+     * @brief save used shader to an xml file (IMPORTANT: do not forget
+     *        to specify a filename for each shader!)
+     * @param filename path where the configuration will be stored
+     */
     void saveConfiguration(const std::string &filename);
+
+    /**
+     * @brief load a shader configuration
+     * @param filename location of the configuration file
+     */
     void loadConfiguration(const std::string &filename);
 
     // OpenGL might not be ready, while the constructor was called!
     virtual void initialize() = 0;
     void render(GLuint fbo, Scene *scene);
     virtual void resize(int width, int height) = 0;
+
+    /**
+     * @brief returns the filepath for given shader
+     * @param progName program Name
+     * @param type shader type
+     * @return the corresponding filepath or empty string, if there is no one set
+     */
+    std::string getFilepath(const std::string &progName,
+                                   QOpenGLShader::ShaderTypeBit type);
+
     /**
      * @brief createProgram creates an openGlProgram from given shaders
      * @param program name of the Program
      * @return
      */
-    virtual ShaderErrorType createProgram(const std::string &program);
+    ShaderErrorType createProgram(const std::string &program);
 
     /**
      * @brief setShaderSource   add or replace a shader
@@ -89,21 +108,22 @@ public:
      * @param progName          name of the corresponding program
      * @param type              shader's type
      */
-    virtual void setShaderSource(const std::string &shaderSrc,
+    void setShaderSource(const std::string &shaderSrc,
                    const std::string &progName,
-                   QOpenGLShader::ShaderTypeBit type);
+                   QOpenGLShader::ShaderTypeBit type,
+                   const std::string &filepath = "");
 
     /**
      * @brief getPrograms   append a list of available programs to 'progs'
      * @param progs
      */
-    virtual void getPrograms(std::vector<std::string> &progs);
+    void getPrograms(std::vector<std::string> &progs);
 
     /**
      * @brief getShadersForProgram  append available shaders for 'progName' to 'shaders'
      * @param shaders
      */
-    virtual void getShadersForProgram(const std::string &progName,
+    void getShadersForProgram(const std::string &progName,
                               ShaderSourcesType &shaders);
 
     virtual void resumeRendering();
@@ -118,6 +138,7 @@ protected:
     // map for shader programs:
     std::map<std::string, std::unique_ptr<QOpenGLShaderProgram>> m_programs;
     std::map<ShaderSourcesKeyType, std::string> m_sources;
+    std::map<ShaderSourcesKeyType, std::string> m_filenames;
 
     // uniforms and attrib locations:
     std::map<std::string, std::vector< std::pair<int *, const char *>>> m_uniformLocs;

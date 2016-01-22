@@ -24,12 +24,12 @@ public:
     virtual ~Renderer();
 
     virtual void initialize() override;
-    virtual void onRenderingInternal(GLuint fbo, Scene *scene) override;
     virtual void resize(int width, int height) override;
 
 
 
-private:
+protected:
+    virtual void onRenderingInternal(GLuint fbo, Scene *scene) override;
     void rotateVectorToVector(const QVector3D &source,
                               const QVector3D &destination,
                               QMatrix4x4 &matrix);
