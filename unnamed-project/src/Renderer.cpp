@@ -714,15 +714,18 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     reduceProgram->release();
 
+
     /*
     GLint windowTexture;
     glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);
+    */
 
+    /*
     verticalGaussProgram->bind();
 
     glBindImageTexture(0, windowTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, m_renderTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
-    glDispatchCompute(m_width/8, m_height/8, 1);
+    glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
 
     verticalGaussProgram->release();
 
@@ -731,7 +734,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     glBindImageTexture(0, m_renderTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, windowTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
-    glDispatchCompute(m_width/8, m_height/8, 1);
+    glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
 
     horizontalGaussProgram->release();
     */
