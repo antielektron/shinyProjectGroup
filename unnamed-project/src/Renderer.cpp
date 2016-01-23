@@ -18,14 +18,13 @@
 #include "utility.h"
 
 
-Renderer::Renderer() :
+Renderer::Renderer() : RendererBase(),
     m_renderFrameBuffer(0),
     m_renderTexture(0),
     m_normalTexture(0),
-    m_renderDepthBuffer(0),
-    m_renderingPaused(false),
-    m_singleFrameRenderingRequested(false)
+    m_renderDepthBuffer(0)
 {
+    // nothing to do here
 }
 
 //------------------------------------------------------------------------------
@@ -37,124 +36,6 @@ Renderer::~Renderer()
     glDeleteTextures(1, &m_renderTexture);
     glDeleteTextures(1, &m_normalTexture);
     glDeleteTextures(1, &m_renderDepthBuffer);
-}
-
-//------------------------------------------------------------------------------
-void Renderer::setShaderSource(const std::string &shaderSrc,
-                               const std::string &progName,
-                               QOpenGLShader::ShaderTypeBit type)
-{
-    m_sources[std::make_pair(progName, type)] = shaderSrc;
-}
-
-//------------------------------------------------------------------------------
-ShaderErrorType Renderer::createProgram(const std::string &program)
-{
-    // check whether there are sources for given program
-    auto vertexShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Vertex));
-    auto fragmentShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Fragment));
-    auto geometryShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Geometry));
-    auto computeShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Compute));
-
-    // create new Program
-    std::unique_ptr<QOpenGLShaderProgram> prog(new QOpenGLShaderProgram());
-
-    // append cached vertex and fragment shader code
-    if (vertexShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderIt->second.c_str()))
-    {
-        std::cerr << "could not load vertex shader" << std::endl;
-        return ShaderErrorType::VertexShaderError;
-    }
-
-    // append cached geometry shader, if there is one
-    if (geometryShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Geometry, geometryShaderIt->second.c_str()))
-    {
-        std::cerr << "could not load geometry shader" << std::endl;
-        return ShaderErrorType::GeometryShaderError;
-    }
-
-    if (fragmentShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderIt->second.c_str()))
-    {
-        std::cerr << "could not load fragment shader" << std::endl;
-        return ShaderErrorType::FragmentShaderError;
-    }
-
-    // set compute shader if there is one
-    if (computeShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Compute, computeShaderIt->second.c_str()))
-    {
-        std::cerr << "could not load compute shader" << std::endl;
-        return ShaderErrorType::GeometryShaderError; // TODO
-    }
-
-    // bind cached attribute locations
-    for(const auto &v : m_attribLocs[program])
-    {
-        prog->bindAttributeLocation(v.second, v.first);
-    }
-
-    // link program
-    if (!prog->link())
-    {
-        std::cerr << "could not link shader program" << std::endl;
-        return ShaderErrorType::LinkingError;
-    }
-
-    // no errors so far, finally move program to our programs map
-    QOpenGLShaderProgram *pProg = prog.get();
-    m_programs[program] = std::move(prog);
-
-    // get uniform locations:
-    pProg->bind();
-    for (const auto &v : m_uniformLocs[program])
-    {
-        *(v.first) = pProg->uniformLocation(v.second);
-    }
-    pProg->release();
-
-    return ShaderErrorType::NoError;
-}
-
-//------------------------------------------------------------------------------
-void Renderer::getPrograms(std::vector<std::string> &progs)
-{
-    // just in case...
-    progs.clear();
-    for (const auto &pair : m_programs)
-    {
-        progs.push_back(pair.first);
-    }
-}
-
-//------------------------------------------------------------------------------
-void Renderer::getShadersForProgram(const std::string &progName,
-                                    ShaderSourcesType &shaders)
-{
-    for (const auto &pair : m_sources)
-    {
-        if (pair.first.first == progName)
-        {
-            shaders.push_back(std::make_pair(pair.first.second, pair.second));
-            // ^ don't get confused!
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-void Renderer::resumeRendering()
-{
-    m_renderingPaused = false;
-}
-
-//------------------------------------------------------------------------------
-void Renderer::pauseRendering()
-{
-    m_renderingPaused = true;
-}
-
-//------------------------------------------------------------------------------
-void Renderer::requestSingleFrameRendering()
-{
-    m_singleFrameRenderingRequested = true;
 }
 
 //------------------------------------------------------------------------------
@@ -351,16 +232,8 @@ void Renderer::rotateVectorToVector(const QVector3D &source,
     matrix.rotate(rotationAngle, rotationAxis);
 }
 
-void Renderer::render(GLuint fbo, Scene *scene)
+void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 {
-    if (m_renderingPaused && !m_singleFrameRenderingRequested)
-    {
-        return;
-    }
-    if (m_singleFrameRenderingRequested)
-    {
-        m_singleFrameRenderingRequested = false;
-    }
 
     QOpenGLShaderProgram *shadowMapProgram = m_programs[KEYSTR_PROGRAM_SHADOW].get();
     QOpenGLShaderProgram *defaultProgram = m_programs[KEYSTR_PROGRAM_RENDER].get();
@@ -370,6 +243,11 @@ void Renderer::render(GLuint fbo, Scene *scene)
     // QOpenGLShaderProgram *copyProgram = m_programs[KEYSTR_PROGRAM_COPY].get();
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
+
+    if (reduceStartProgram == nullptr)
+    {
+        std::cout << "no reduce!!!" << std::endl;
+    }
 
     // Input: lightDirection, cameraProjection, cameraView, frustum
     // Output: lightProjection
@@ -863,3 +741,4 @@ void Renderer::resize(int width, int height)
     }
     m_reduceLastTextureSize = prevWidth * prevHeight;
 }
+

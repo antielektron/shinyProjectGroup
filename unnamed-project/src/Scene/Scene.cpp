@@ -12,6 +12,7 @@ Scene::Scene()
 {
     m_rootGroup.setName("SceneRoot");
     m_globalState.reset(new GlobalState(this));
+    m_shaderConfigFile = DEFAULT_SHADER_CONFIG_FILEPATH;
 }
 
 //------------------------------------------------------------------------------
@@ -19,6 +20,7 @@ Scene::Scene(const QString &filename)
 {
     m_globalState.reset(new GlobalState(this));
     m_rootGroup.setName("SceneRoot");
+    m_shaderConfigFile = DEFAULT_SHADER_CONFIG_FILEPATH;
     loadFromFile(filename);
 }
 
@@ -98,6 +100,10 @@ void Scene::loadFromFile(const QString &filename)
                       << " x = " << pos.x()
                       << ", y = " << pos.y()
                       << ", z = " << pos.z() << std::endl;
+        }
+        else if (tag == "ShaderConfig")
+        {
+            setShaderConfigFile(currentElement.attribute("file"));
         }
         else
         {
@@ -477,6 +483,11 @@ void Scene::saveToFile(const QString &filename)
     //player:
     xmlWriter.writeStartElement("Player");
     writeVectorToXml(QVector3D(0, 0, 0), xmlWriter); //TODO
+    xmlWriter.writeEndElement();
+
+    // shader configuration
+    xmlWriter.writeStartElement("ShaderConfig");
+    xmlWriter.writeAttribute("file", getShaderConfigFile());
     xmlWriter.writeEndElement();
 
     xmlWriter.writeEndDocument();
@@ -893,4 +904,16 @@ const QString &Scene::getVersion() const
 const QString &Scene::getAuthor() const
 {
     return m_sceneAuthor;
+}
+
+//------------------------------------------------------------------------------
+void Scene::setShaderConfigFile(const QString &filepath)
+{
+    m_shaderConfigFile = filepath;
+}
+
+//------------------------------------------------------------------------------
+const QString &Scene::getShaderConfigFile()
+{
+    return m_shaderConfigFile;
 }
