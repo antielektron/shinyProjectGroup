@@ -64,8 +64,6 @@ void RendererBase::loadConfiguration(const std::string &filename)
 {
     // reset:
     m_programs.clear();
-    m_filenames.clear();
-    m_sources.clear();
 
     QDomDocument document;
     QFile file(QString::fromStdString(filename));

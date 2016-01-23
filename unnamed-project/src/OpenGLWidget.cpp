@@ -98,7 +98,13 @@ void OpenGLWidget::initializeGL()
     m_initialized = true;
 
     m_renderer->initialize();
+
     m_game->initialize();
+
+    // update shader ( results in double shader program initialization,
+    // (but the shader config can also just replace specific shaders)
+    m_renderer->loadConfiguration(
+                m_game->getScene()->getShaderConfigFile().toStdString());
 
     // auto version = context()->format().version();
     // std::cout << "Using OpenGL Version " << version.first << "." << version.second << std::endl;
