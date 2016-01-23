@@ -70,12 +70,12 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_COMPOSE,
                     QOpenGLShader::Fragment);
     // copy
-    setShaderSource(loadTextFile("shaders/copy_vertex.glsl"),
-                    KEYSTR_PROGRAM_COPY,
-                    QOpenGLShader::Vertex);
-    setShaderSource(loadTextFile("shaders/fragment_array_copy.glsl"),
-                    KEYSTR_PROGRAM_COPY,
-                    QOpenGLShader::Fragment);
+    //setShaderSource(loadTextFile("shaders/copy_vertex.glsl"),
+    //                KEYSTR_PROGRAM_COPY,
+    //                QOpenGLShader::Vertex);
+    //setShaderSource(loadTextFile("shaders/fragment_array_copy.glsl"),
+    //                KEYSTR_PROGRAM_COPY,
+    //                QOpenGLShader::Fragment);
 
     // Reduce shader
     setShaderSource(loadTextFile("shaders/reduce/reduce_sampler.glsl"),
@@ -140,12 +140,12 @@ void Renderer::initialize()
                 std::make_pair(0, "v_position"));
 
     // copy
-    m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(
-                    std::make_pair(&m_copyArraySamplerLoc, "sampler"));
-    m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(
-                    std::make_pair(&m_copyArrayLayerLoc, "layer"));
-    m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(
-                std::make_pair(0, "v_position"));
+    //m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(
+    //                std::make_pair(&m_copyArraySamplerLoc, "sampler"));
+    //m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(
+    //                std::make_pair(&m_copyArrayLayerLoc, "layer"));
+    //m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(
+    //            std::make_pair(0, "v_position"));
 
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussSourceLoc, "sourceImage");
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussFilteredLoc, "filteredImage");
