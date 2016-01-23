@@ -68,6 +68,12 @@ void SceneEditorWindow::doneGlWidgetCurrent()
 }
 
 //------------------------------------------------------------------------------
+void SceneEditorWindow::onShaderConfigurationChanged(const QString &filename)
+{
+    m_glWidget->getRenderer()->loadConfiguration(filename.toStdString());
+}
+
+//------------------------------------------------------------------------------
 void SceneEditorWindow::generateWidgets()
 {
     // QObjects free their children, when freed
@@ -182,6 +188,8 @@ void SceneEditorWindow::connectStuff()
     connect(m_play, SIGNAL(triggered()), m_game.get(), SLOT(runLogic()));
     connect(m_stop, SIGNAL(triggered()), m_game.get(), SLOT(stopLogic()));
     connect(m_pause, SIGNAL(triggered()), m_game.get(), SLOT(togglePauseLogic()));
+    connect(m_globalDetails, SIGNAL(shaderConfigurationChanged(const QString &)),
+            this, SLOT(onShaderConfigurationChanged(const QString &)));
 }
 
 //------------------------------------------------------------------------------

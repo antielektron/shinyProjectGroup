@@ -221,12 +221,13 @@ void ShaderEditorWidget::onLoadClicked()
 
         // force renderer update
         m_hasChanged = true;
-        m_isSaved = true;
-        this->setTitleBarWidget(new QLabel(m_shaderName, this));
 
         QString relativePath = QDir::current().relativeFilePath(filename);
         m_lastFilename = relativePath;
         emit filenameChanged(relativePath, m_shaderType, m_progName);
+
+        m_isSaved = true;
+        this->setTitleBarWidget(new QLabel(m_shaderName, this));
 
         m_action->setText(m_shaderName);
         onApplyClicked();

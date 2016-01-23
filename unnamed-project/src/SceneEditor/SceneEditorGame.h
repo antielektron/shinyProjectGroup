@@ -82,7 +82,6 @@ signals:
     void eventsInvalidated(); // an event got deleted (needed for closing some widgets)
 
     void animatorsChanged();
-
 private:
     void createIndicatorObject();
 
