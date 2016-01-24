@@ -244,11 +244,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
 
-    if (reduceStartProgram == nullptr)
-    {
-        std::cout << "no reduce!!!" << std::endl;
-    }
-
     // Input: lightDirection, cameraProjection, cameraView, frustum
     // Output: lightProjection
 

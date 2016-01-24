@@ -168,48 +168,43 @@ void RendererBase::setShaderFilepath(const std::string &filepath,
 ShaderErrorType RendererBase::createProgram(const std::string &program)
 {
     // check whether there are sources for given program
-    auto vertexShaderIt = m_sources.find(
-                              std::make_pair(program, QOpenGLShader::Vertex));
-    auto fragmentShaderIt = m_sources.find(
-                                std::make_pair(program, QOpenGLShader::Fragment));
-    auto geometryShaderIt = m_sources.find(
-                                std::make_pair(program, QOpenGLShader::Geometry));
-
-    if (vertexShaderIt == m_sources.end() || fragmentShaderIt == m_sources.end())
-    {
-        return ShaderErrorType::MissingSourcesError;
-    }
+    auto vertexShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Vertex));
+    auto fragmentShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Fragment));
+    auto geometryShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Geometry));
+    auto computeShaderIt = m_sources.find(std::make_pair(program, QOpenGLShader::Compute));
 
     // create new Program
     std::unique_ptr<QOpenGLShaderProgram> prog(new QOpenGLShaderProgram());
 
     // append cached vertex and fragment shader code
-    if (!prog->addShaderFromSourceCode(QOpenGLShader::Vertex,
-                                       vertexShaderIt->second.c_str()))
+    if (vertexShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderIt->second.c_str()))
     {
         std::cerr << "could not load vertex shader" << std::endl;
         return ShaderErrorType::VertexShaderError;
     }
-    if (!prog->addShaderFromSourceCode(QOpenGLShader::Fragment,
-                                       fragmentShaderIt->second.c_str()))
+
+    // append cached geometry shader, if there is one
+    if (geometryShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Geometry, geometryShaderIt->second.c_str()))
+    {
+        std::cerr << "could not load geometry shader" << std::endl;
+        return ShaderErrorType::GeometryShaderError;
+    }
+
+    if (fragmentShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderIt->second.c_str()))
     {
         std::cerr << "could not load fragment shader" << std::endl;
         return ShaderErrorType::FragmentShaderError;
     }
 
-    // append cached geometry shader, if there is one
-    if (geometryShaderIt != m_sources.end())
+    // set compute shader if there is one
+    if (computeShaderIt != m_sources.end() && !prog->addShaderFromSourceCode(QOpenGLShader::Compute, computeShaderIt->second.c_str()))
     {
-        if (!prog->addShaderFromSourceCode(QOpenGLShader::Geometry,
-                                           geometryShaderIt->second.c_str()))
-        {
-            std::cerr << "could not load geometry shader" << std::endl;
-            return ShaderErrorType::GeometryShaderError;
-        }
+        std::cerr << "could not load compute shader" << std::endl;
+        return ShaderErrorType::GeometryShaderError; // TODO
     }
 
     // bind cached attribute locations
-    for( const auto &v : m_attribLocs[program])
+    for(const auto &v : m_attribLocs[program])
     {
         prog->bindAttributeLocation(v.second, v.first);
     }
@@ -232,6 +227,7 @@ ShaderErrorType RendererBase::createProgram(const std::string &program)
         *(v.first) = pProg->uniformLocation(v.second);
     }
     pProg->release();
+
     return ShaderErrorType::NoError;
 }
 
