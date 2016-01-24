@@ -70,7 +70,7 @@
             <DiffuseColor x="0.5" y="0.5" z="0.5"/>
             <AmbientColor x="0.4" y="0.4" z="0.4"/>
         </Object>
-        <Object name="bucket2" model="bucket" interactionEvent="">
+        <Object name="bucket2" model="bucket" interactionEvent="bucket clicked">
             <Position x="0" y="2.8" z="-3.4"/>
             <Rotation x="180" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -126,6 +126,23 @@
             <Action type="animlightdir" x="1" y="1" z="1">
                 <Interpolation type="linear" duration="1"/>
             </Action>
+        </Event>
+        <Event name="bucket clicked" description="close">
+            <Precondition type="beq" lhs="[bucket_moving]" rhs="0"/>
+            <Action type="animpos" x="0" y="1" z="-3.4" object="bucket2">
+                <Interpolation type="forgot name" duration="1"/>
+            </Action>
+            <Action type="trigger" name="open bucket" delay="3"/>
+            <Action type="bmov" lhs="bucket_moving" rhs="1"/>
+        </Event>
+        <Event name="open bucket" description="">
+            <Action type="animpos" x="0" y="2.8" z="-3.4" object="bucket2">
+                <Interpolation type="forgot name" duration="1"/>
+            </Action>
+            <Action type="trigger" name="enable bucket" delay="2"/>
+        </Event>
+        <Event name="enable bucket" description="">
+            <Action type="bmov" lhs="bucket_moving" rhs="0"/>
         </Event>
     </Events>
     <Animators/>
