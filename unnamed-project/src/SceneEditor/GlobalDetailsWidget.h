@@ -40,6 +40,14 @@ private:
     QDoubleSpinBox *m_lightColorG;
     QDoubleSpinBox *m_lightColorB;
 
+    QDoubleSpinBox *m_playerPosX;
+    QDoubleSpinBox *m_playerPosY;
+    QDoubleSpinBox *m_playerPosZ;
+
+    QDoubleSpinBox *m_playerRotX;
+    QDoubleSpinBox *m_playerRotY;
+    QDoubleSpinBox *m_playerRotZ;
+
     QFormLayout *m_layout;
 
     // for file selection:

@@ -147,5 +147,8 @@
     </Events>
     <Animators/>
     <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
-    <Player x="0" y="0" z="0"/>
+    <Player>
+        <Position x="0" y="0" z="5"/>
+        <Rotation x="0" y="0" z="0"/>
+    </Player>
 </Scene>

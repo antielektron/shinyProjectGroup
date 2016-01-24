@@ -132,7 +132,8 @@ void BulletGame::handleInput(float deltaTime)
     // Reset camera
     if (m_keyManager->isKeyDown(Qt::Key_R))
     {
-        m_playerBody->getWorldTransform().setOrigin(btVector3(0, 0, 0));
+        m_playerBody->getWorldTransform().setOrigin(toBulletVector3(m_scene->getPlayerPosition()));
+        m_playerBody->setLinearVelocity(btVector3(0, 0, 0));
         m_rotX = 0;
         m_rotY = 0;
     }
@@ -310,7 +311,7 @@ void BulletGame::loadScene(const QString &filename)
     btVector3 inertia;
     btTransform transform;
     transform.setIdentity();
-    transform.setOrigin(btVector3(0, 5, 2));
+    transform.setOrigin(toBulletVector3(m_scene->getPlayerPosition()));
 
     float radius = 0.4;
     float height = 1.8;
