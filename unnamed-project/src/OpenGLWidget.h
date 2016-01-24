@@ -29,6 +29,11 @@ public:
     void setRenderer(std::unique_ptr<RendererBase> renderer);
     RendererBase* getRenderer();
 
+    float getFps();
+
+signals:
+    void fpsUpdate(float fps);
+
 public slots:
     void cleanup();
 
@@ -52,6 +57,8 @@ private:
 	std::unique_ptr<KeyManager> m_keyManager;
 
 	bool m_prevShouldCatchMouse;
+
+    float m_fps;
 
     QTimer m_timer;
     std::chrono::system_clock::time_point start;

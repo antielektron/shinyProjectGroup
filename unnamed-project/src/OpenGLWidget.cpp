@@ -71,6 +71,11 @@ RendererBase *OpenGLWidget::getRenderer()
     return m_renderer.get();
 }
 
+float OpenGLWidget::getFps()
+{
+    return m_fps;
+}
+
 void OpenGLWidget::initializeGL()
 {
     char *glVersion = (char*)glGetString(GL_VERSION);
@@ -122,7 +127,8 @@ void OpenGLWidget::paintGL()
 
     if (start < std::chrono::system_clock::now())
     {
-        // std::cout << frame_count << " fps" << std::endl;
+        m_fps = frame_count;
+        emit fpsUpdate(m_fps);
         frame_count = 0;
         start += std::chrono::seconds(1);
     }

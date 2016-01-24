@@ -35,6 +35,8 @@ public slots:
                            QOpenGLShader::ShaderTypeBit type,
                            const QString &progName);
 
+    void onFpsChanged(float fps);
+
 signals:
     void updateRequest();
 
