@@ -35,6 +35,8 @@ void BulletGame::initialize()
     IGame::initialize();
 
     loadScene(m_scenefile);
+
+    m_scene->getGlobalState()->triggerEvent("init");
 }
 
 void BulletGame::resize(int width, int height)

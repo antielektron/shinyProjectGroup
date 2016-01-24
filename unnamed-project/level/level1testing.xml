@@ -12,7 +12,6 @@
         <Model name="menger" path="models/menger.obj"/>
         <Model name="mengerplat" path="models/mengerplat.obj"/>
         <Model name="octonorm" path="models/octonorm.obj"/>
-        <Model name="sink" path="models/sink.obj"/>
         <Model name="sphere" path="models/sphere.obj"/>
         <Model name="suzanne" path="models/suzanne.obj"/>
         <Model name="tree001" path="models/tree001.obj"/>
@@ -155,6 +154,14 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.6" y="0.4" z="0.1"/>
         </Object>
+        <Object name="suzanne" model="suzanne" interactionEvent="">
+            <Position x="24" y="14" z="-72"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="0.5"/>
+            <DiffuseColor x="0.4" y="0.4" z="0.4"/>
+            <AmbientColor x="0.2" y="0.2" z="0.2"/>
+        </Object>
     </Objects>
     <Attributes>
         <Attribute key="plat_x" type="float" value="-1"/>
@@ -224,6 +231,30 @@
         </Event>
         <Event name="stop moving" description="">
             <Action type="bmov" lhs="tree_moving" rhs="0"/>
+        </Event>
+        <Event name="init" description="">
+            <Action type="trigger" name="suzanne forward" delay="0"/>
+            <Action type="fmov" lhs="suzanne_median" rhs="-61"/>
+            <Action type="fmov" lhs="suzanne_current" rhs="-72"/>
+            <Action type="fmov" lhs="suzanne_rotation" rhs="0"/>
+            <Action type="fmul" lhs="suzanne_median" rhs="2"/>
+        </Event>
+        <Event name="suzanne forward" description="">
+            <Action type="trigger" name="suzanne rotation" delay="4"/>
+            <Action type="fmul" lhs="suzanne_current" rhs="-1"/>
+            <Action type="fadd" lhs="suzanne_current" rhs="[suzanne_median]"/>
+            <Action type="animpos" x="24" y="14" z="[suzanne_current]" object="suzanne">
+                <Interpolation type="linear" duration="4"/>
+            </Action>
+        </Event>
+        <Event name="suzanne rotation" description="">
+            <Action type="trigger" name="suzanne forward" delay="0.4"/>
+            <Action type="fmov" lhs="suzanne_prev_rot" rhs="[suzanne_rotation]"/>
+            <Action type="fmov" lhs="suzanne_rotation" rhs="180"/>
+            <Action type="fdec" lhs="suzanne_rotation" rhs="[suzanne_prev_rot]"/>
+            <Action type="animrot" x="0" y="[suzanne_rotation]" z="0" object="suzanne">
+                <Interpolation type="linear" duration="0.4"/>
+            </Action>
         </Event>
     </Events>
     <Animators/>
