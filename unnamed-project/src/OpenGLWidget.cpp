@@ -18,7 +18,7 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) :
 
     // render as fast as possible!
     m_timer.setInterval(16); // ~60fps
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(nextFrame()));
     m_timer.start();
 
     start = std::chrono::system_clock::now() + std::chrono::seconds(1);
@@ -35,7 +35,7 @@ OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
 {
     // render as fast as possible!
     m_timer.setInterval(16); // ~60fps
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(nextFrame()));
     m_timer.start();
 
     start = std::chrono::system_clock::now() + std::chrono::seconds(1);
@@ -119,23 +119,6 @@ void OpenGLWidget::initializeGL()
 
 void OpenGLWidget::paintGL()
 {
-    // TODO do somewhere else!
-    if (m_keyManager->shouldCatchMouse())
-        this->setCursor(Qt::BlankCursor);
-    else
-        this->unsetCursor();
-
-    if (start < std::chrono::system_clock::now())
-    {
-        m_fps = frame_count;
-        emit fpsUpdate(m_fps);
-        frame_count = 0;
-        start += std::chrono::seconds(1);
-    }
-    frame_count++;
-
-    m_game->tick();
-
     m_renderer->render(this->defaultFramebufferObject(), m_game->getScene());
 }
 
@@ -150,6 +133,29 @@ void OpenGLWidget::cleanup()
     makeCurrent();
     // m_logoVbo.destroy();
     doneCurrent();
+}
+
+void OpenGLWidget::nextFrame()
+{
+    // TODO do somewhere else!
+    if (m_keyManager->shouldCatchMouse())
+        this->setCursor(Qt::BlankCursor);
+    else
+        this->unsetCursor();
+
+    m_game->tick();
+
+    if (start < std::chrono::system_clock::now())
+    {
+        m_fps = frame_count;
+        emit fpsUpdate(m_fps);
+        frame_count = 0;
+        start += std::chrono::seconds(1);
+    }
+    frame_count++;
+
+    // repaint using opengl
+    update();
 }
 
 void OpenGLWidget::mousePressEvent(QMouseEvent *event)
