@@ -31,6 +31,9 @@ int main(int argc, char **argv)
     QCommandLineOption sceneEditorOption("scene", "Start the scene editor");
     parser.addOption(sceneEditorOption);
 
+    QCommandLineOption fullscreenOption("fullscreen", "start game in fullscreen");
+    parser.addOption(fullscreenOption);
+
 #ifdef HAVE_BULLET
     QCommandLineOption bulletGameOption("bullet", "Start the game!");
     parser.addOption(bulletGameOption);
@@ -76,9 +79,15 @@ int main(int argc, char **argv)
         }
         else
         {
-            // TODO have window (with debug ui)
             OpenGLWidget widget(std::make_shared<BulletGame>(levelFile));
-            widget.showFullScreen();
+            if (parser.isSet(fullscreenOption))
+            {
+                widget.showFullScreen();
+            }
+
+            else{
+                widget.show();
+            }
             return app.exec();
         }
     }
