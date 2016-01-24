@@ -8,7 +8,9 @@
 #include "GameLogic/Event.h"
 
 //------------------------------------------------------------------------------
-Scene::Scene()
+Scene::Scene() :
+        m_playerPosition(0, 0, 0),
+        m_playerRotation(0, 0, 0)
 {
     m_rootGroup.setName("SceneRoot");
     m_globalState.reset(new GlobalState(this));
@@ -16,7 +18,9 @@ Scene::Scene()
 }
 
 //------------------------------------------------------------------------------
-Scene::Scene(const QString &filename)
+Scene::Scene(const QString &filename) :
+        m_playerPosition(0, 0, 0),
+        m_playerRotation(0, 0, 0)
 {
     m_globalState.reset(new GlobalState(this));
     m_rootGroup.setName("SceneRoot");
@@ -92,14 +96,10 @@ void Scene::loadFromFile(const QString &filename)
         }
         else if (tag == "Player")
         {
-            // TODO: embed "Spawn" objects into the object tree, that the "real" game can query for!
-            QVector3D pos = readVectorFromDom(currentElement);
-
-            //TODO: set camera/player Position;
-            std::cout << "TODO: set player Position to"
-                      << " x = " << pos.x()
-                      << ", y = " << pos.y()
-                      << ", z = " << pos.z() << std::endl;
+            auto position = currentElement.firstChildElement("Position");
+            m_playerPosition = readVectorFromDom(position);
+            auto rotation = currentElement.firstChildElement("Rotation");
+            m_playerRotation = readVectorFromDom(rotation);
         }
         else if (tag == "ShaderConfig")
         {
@@ -482,7 +482,12 @@ void Scene::saveToFile(const QString &filename)
 
     //player:
     xmlWriter.writeStartElement("Player");
-    writeVectorToXml(QVector3D(0, 0, 0), xmlWriter); //TODO
+    xmlWriter.writeStartElement("Position");
+    writeVectorToXml(m_playerPosition, xmlWriter);
+    xmlWriter.writeEndElement();
+    xmlWriter.writeStartElement("Rotation");
+    writeVectorToXml(m_playerRotation, xmlWriter);
+    xmlWriter.writeEndElement();
     xmlWriter.writeEndElement();
 
     // shader configuration
@@ -916,4 +921,28 @@ void Scene::setShaderConfigFile(const QString &filepath)
 const QString &Scene::getShaderConfigFile()
 {
     return m_shaderConfigFile;
+}
+
+//------------------------------------------------------------------------------
+void Scene::setPlayerPosition(const QVector3D &position)
+{
+    m_playerPosition = position;
+}
+
+//------------------------------------------------------------------------------
+QVector3D &Scene::getPlayerPosition()
+{
+    return m_playerPosition;
+}
+
+//------------------------------------------------------------------------------
+void Scene::setPlayerRotation(const QVector3D &rotation)
+{
+    m_playerRotation = rotation;
+}
+
+//------------------------------------------------------------------------------
+QVector3D &Scene::getPlayerRotation()
+{
+    return m_playerRotation;
 }
