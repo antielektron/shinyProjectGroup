@@ -10,6 +10,8 @@
 #include "GameLogic/Actions/ObjectAnimationAction.h"
 #include "GameLogic/Actions/SceneAnimationAction.h"
 
+#include "GameLogic/Actions/TriggerAction.h"
+
 template <typename ...Args>
 struct CreateActionHelper {};
 
@@ -94,7 +96,9 @@ typedef CreateActionHelper<
         ObjectAnimationAction<AccessObjectSpecularColor>,
 
         SceneAnimationAction<AccessLightColor>,
-        SceneAnimationAction<AccessLightDirection>
+        SceneAnimationAction<AccessLightDirection>,
+
+        TriggerAction
 
 > HelperType;
 

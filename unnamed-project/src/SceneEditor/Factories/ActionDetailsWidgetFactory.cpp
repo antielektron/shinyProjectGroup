@@ -7,12 +7,16 @@
 #include "SceneEditor/GameLogic/ObjectAnimationActionWidget.h"
 #include "SceneEditor/GameLogic/SceneAnimationActionWidget.h"
 
+#include "SceneEditor/GameLogic/TriggerActionWidget.h"
+
 #include "GameLogic/Actions/InvertAttributeAction.h"
 #include "GameLogic/Actions/AssignAttributeAction.h"
 #include "GameLogic/Actions/IncrementAttributeAction.h"
 #include "GameLogic/Actions/DecrementAttributeAction.h"
 #include "GameLogic/Actions/MultiplyAttributeAction.h"
 #include "GameLogic/Actions/DivideAttributeAction.h"
+
+#include "GameLogic/Actions/TriggerAction.h"
 
 #include <cassert>
 
@@ -115,7 +119,9 @@ typedef CreateActionDetailsWidgetHelper<
         ObjectAnimationActionMap<AccessObjectSpecularColor>,
 
         SceneAnimationActionMap<AccessLightDirection>,
-        SceneAnimationActionMap<AccessLightColor>
+        SceneAnimationActionMap<AccessLightColor>,
+
+        ActionMap<TriggerAction, TriggerActionWidget>
 > HelperType;
 
 QWidget *Factory::createActionDetailsWidget(std::shared_ptr<SceneEditorGame> game, ActionBase *action, QWidget *parent)
