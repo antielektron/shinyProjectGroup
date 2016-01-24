@@ -13,6 +13,8 @@ const int samples = 10; //TODO, pass through shader
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
+const float cursorSize = 0.2;
+
 // factors to (linear) merge default shading
 // and volumetric obscurance 
 const float voShadingAmount = 1.;
@@ -115,12 +117,37 @@ bool isInCenterEpsilonArea(vec2 centerPoint)
 	return (dx * dx + dy * dy) < (k * k); 
 }
 
+//cursor
+bool isCursor()
+{
+
+	float dx = (uv.x - 0.5);
+	float dy = (uv.y - 0.5);
+	float dx2 = dx * dx;
+	float dy2 = dy * dy;
+	
+	if (dx2 < 0.0001)
+	{
+		return false;
+	}
+	
+	if (dx2 + dy2 > 0.0005 && dx2 + dy2 < 0.001)
+	{
+		return true;
+	}
+	return false;
+}
+
 
 void main()
 {
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
 	vec3 mixedColor = lineSampling(samples) * defaultColor;
 
+	if (isCursor())
+	{
+		mixedColor = vec3(1.,1.,1.) - mixedColor;
+	}
 /*
 	float depth = texture2D(ovSampler, uv).x;
 	vec4 result = inverse(projectionMatrix) * vec4(0, 0, depth, 1);
@@ -128,7 +155,7 @@ void main()
 */
 	// DEBUG
 	
-	vec2 center = vec2(0.5,0.5);
+	//vec2 center = vec2(0.5,0.5);
 	/*
 	if (isInCenterEpsilonArea(center))
 	{
