@@ -225,12 +225,14 @@ void BulletGame::performInteraction()
     if(callback.hasHit())
     {
         auto object = (Object *)callback.m_collisionObject->getUserPointer();
-
-        auto event = object->getInteractionEvent();
-        if (!event.isEmpty())
+        if (object != nullptr)
         {
-            // Trigger the event associated to the object
-            m_scene->getGlobalState()->triggerEvent(event);
+            auto event = object->getInteractionEvent();
+            if (!event.isEmpty())
+            {
+                // Trigger the event associated to the object
+                m_scene->getGlobalState()->triggerEvent(event);
+            }
         }
     }
 }
