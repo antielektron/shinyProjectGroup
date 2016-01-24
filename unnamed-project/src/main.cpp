@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <QFileDialog>
+#include <QWindow>
 
 #include "OpenGLWidget.h"
 #include "PrimitiveGame.h"
@@ -34,6 +35,9 @@ int main(int argc, char **argv)
     QCommandLineOption fullscreenOption("fullscreen", "start game in fullscreen");
     parser.addOption(fullscreenOption);
 
+    QCommandLineOption screenOption("screen", "set screen for fullscreen");
+    parser.addOption(screenOption);
+
 #ifdef HAVE_BULLET
     QCommandLineOption bulletGameOption("bullet", "Start the game!");
     parser.addOption(bulletGameOption);
@@ -44,6 +48,13 @@ int main(int argc, char **argv)
 
     parser.addHelpOption();
     parser.process(app);
+
+    // get screen
+    int screen = 0;
+    if (parser.isSet(screenOption))
+    {
+        screen = parser.value(screenOption).toInt();
+    }
 
     QString levelFile;
 
@@ -80,14 +91,15 @@ int main(int argc, char **argv)
         else
         {
             OpenGLWidget widget(std::make_shared<BulletGame>(levelFile));
+
+            widget.show();
+
             if (parser.isSet(fullscreenOption))
             {
+                widget.windowHandle()->setScreen(qApp->screens()[screen]);
                 widget.showFullScreen();
             }
 
-            else{
-                widget.show();
-            }
             return app.exec();
         }
     }
