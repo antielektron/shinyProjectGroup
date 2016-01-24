@@ -186,21 +186,33 @@
         </Event>
         <Event name="leaves002 clicked" description="active">
             <Precondition type="ieq" lhs="[activated]" rhs="0"/>
+            <Precondition type="beq" lhs="[tree_moving]" rhs="0"/>
             <Action type="imov" lhs="activated" rhs="1"/>
+            <Action type="bmov" lhs="tree_moving" rhs="1"/>
             <Action type="animrot" x="0" y="360" z="0" object="leaves002">
                 <Interpolation type="linear" duration="6"/>
             </Action>
+            <Action type="trigger" name="stop moving" delay="6"/>
         </Event>
         <Event name="leaves002 clicked" description="deactivated">
             <Precondition type="ieq" lhs="[activated]" rhs="1"/>
+            <Precondition type="beq" lhs="[tree_moving]" rhs="0"/>
             <Action type="imov" lhs="activated" rhs="0"/>
+            <Action type="bmov" lhs="tree_moving" rhs="1"/>
             <Action type="animrot" x="0" y="-360" z="0" object="leaves002">
                 <Interpolation type="linear" duration="6"/>
             </Action>
+            <Action type="trigger" name="stop moving" delay="6"/>
+        </Event>
+        <Event name="stop moving" description="">
+            <Action type="bmov" lhs="tree_moving" rhs="0"/>
         </Event>
     </Events>
     <Animators/>
     <DirectionalLight x="-2.77556e-17" y="2.6" z="-5.9" r="0" g="0" b="0"/>
-    <Player x="0" y="0" z="0"/>
+    <Player>
+        <Position x="0" y="0" z="0"/>
+        <Rotation x="0" y="0" z="0"/>
+    </Player>
     <ShaderConfig file="shaders/configurations/defaultConfig.xml"/>
 </Scene>
