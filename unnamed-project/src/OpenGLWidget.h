@@ -37,6 +37,9 @@ signals:
 public slots:
     void cleanup();
 
+protected slots:
+	void nextFrame();
+
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
     void paintGL() Q_DECL_OVERRIDE;
