@@ -2,6 +2,8 @@
 
 #include "SceneEditor/SceneEditorGame.h"
 
+#include <QFileDialog>
+
 //------------------------------------------------------------------------------
 GlobalDetailsWidget::GlobalDetailsWidget(std::shared_ptr<SceneEditorGame> game, QWidget *parent) : QWidget(parent), m_game(game)
 {
@@ -17,6 +19,15 @@ GlobalDetailsWidget::GlobalDetailsWidget(std::shared_ptr<SceneEditorGame> game, 
     m_lightColorG = createNumericField("Light Green");
     m_lightColorB = createNumericField("Light Blue");
 
+    m_fileSelectionLabel = new QLabel(this);
+    m_fileSelectionLabel->setText(".");
+    m_browseButton = new QPushButton(this);
+    m_browseButton->setText("Browse");
+
+    connect(m_browseButton, SIGNAL(clicked()), this, SLOT(onBrowseTriggered()));
+    connect(m_game.get(), SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
+
+    m_layout->addRow(m_fileSelectionLabel, m_browseButton);
     this->setLayout(m_layout);
 
     // register at game (done in Window)
@@ -65,6 +76,8 @@ void GlobalDetailsWidget::updateUI()
     m_lightColorG->setValue(lightColor.y());
     m_lightColorB->setValue(lightColor.z());
 
+    m_fileSelectionLabel->setText(m_game->getScene()->getShaderConfigFile());
+
     m_propertiesLocked = false;
 }
 
@@ -72,6 +85,23 @@ void GlobalDetailsWidget::updateUI()
 void GlobalDetailsWidget::valuesChanged()
 {
     applyScene();
+}
+
+//------------------------------------------------------------------------------
+void GlobalDetailsWidget::onBrowseTriggered()
+{
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    tr("Load Shader Configuration"),
+                                                    m_fileSelectionLabel->text(),
+                                                    tr("xml files (*.xml)"));
+
+    if (filename.length() > 0)
+    {
+        QString relativePath = QDir::current().relativeFilePath(filename);
+        m_game->getScene()->setShaderConfigFile(relativePath);
+        m_fileSelectionLabel->setText(relativePath);
+        emit shaderConfigurationChanged(relativePath);
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -61,12 +61,12 @@ void OpenGLWidget::setGame(std::shared_ptr<IGame> game)
     }
 }
 
-void OpenGLWidget::setRenderer(std::unique_ptr<IRenderer> renderer)
+void OpenGLWidget::setRenderer(std::unique_ptr<RendererBase> renderer)
 {
     m_renderer = std::move(renderer);
 }
 
-IRenderer *OpenGLWidget::getRenderer()
+RendererBase *OpenGLWidget::getRenderer()
 {
     return m_renderer.get();
 }
@@ -98,7 +98,13 @@ void OpenGLWidget::initializeGL()
     m_initialized = true;
 
     m_renderer->initialize();
+
     m_game->initialize();
+
+    // update shader ( results in double shader program initialization,
+    // (but the shader config can also just replace specific shaders)
+    m_renderer->loadConfiguration(
+                m_game->getScene()->getShaderConfigFile().toStdString());
 
     // auto version = context()->format().version();
     // std::cout << "Using OpenGL Version " << version.first << "." << version.second << std::endl;

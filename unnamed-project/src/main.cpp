@@ -52,7 +52,7 @@ int main(int argc, char **argv)
     {
         levelFile = QFileDialog::getOpenFileName(nullptr,
                                                  "Load Level",
-                                                 ".",
+                                                 "./level/",
                                                  "xml files (*.xml)");
     }
 
