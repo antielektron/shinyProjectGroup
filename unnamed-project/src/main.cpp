@@ -78,7 +78,7 @@ int main(int argc, char **argv)
         {
             // TODO have window (with debug ui)
             OpenGLWidget widget(std::make_shared<BulletGame>(levelFile));
-            widget.show();
+            widget.showFullScreen();
             return app.exec();
         }
     }
