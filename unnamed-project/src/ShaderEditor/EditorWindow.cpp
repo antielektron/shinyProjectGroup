@@ -125,6 +125,7 @@ void EditorWindow::createToolbar()
 void EditorWindow::connectStuff()
 {
     connect(m_glWidget, SIGNAL(glInitEvent()),this, SLOT(onGlInit()));
+    connect(m_glWidget, SIGNAL(fpsUpdate(float)), this, SLOT(onFpsChanged(float)));
 
     connect(m_pauseRenderingAction, SIGNAL(triggered()),
             this, SLOT(onPauseRenderingClicked()));
@@ -198,6 +199,12 @@ void EditorWindow::onFilenameChanged(const QString &filename,
     m_glWidget->getRenderer()->setShaderFilepath(filename.toStdString(),
                                                  progName.toStdString(),
                                                  type);
+}
+
+//------------------------------------------------------------------------------
+void EditorWindow::onFpsChanged(float fps)
+{
+    this->statusBar()->showMessage(QString("FPS: ") + QString::number(fps));
 }
 
 //------------------------------------------------------------------------------

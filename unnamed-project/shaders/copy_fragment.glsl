@@ -13,8 +13,6 @@ const int samples = 10; //TODO, pass through shader
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
-const float cursorSize = 0.2;
-
 // factors to (linear) merge default shading
 // and volumetric obscurance 
 const float voShadingAmount = 1.;

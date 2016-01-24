@@ -4,6 +4,7 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QScrollArea>
+#include <QStatusBar>
 
 #include "SceneEditor/SceneEditorGame.h"
 #include "SceneEditor/ObjectDetailsWidget.h"
@@ -71,6 +72,12 @@ void SceneEditorWindow::doneGlWidgetCurrent()
 void SceneEditorWindow::onShaderConfigurationChanged(const QString &filename)
 {
     m_glWidget->getRenderer()->loadConfiguration(filename.toStdString());
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorWindow::onFpsChanged(float fps)
+{
+    this->statusBar()->showMessage(QString("FPS: ") + QString::number(fps));
 }
 
 //------------------------------------------------------------------------------
@@ -175,6 +182,7 @@ void SceneEditorWindow::createToolbar()
 //------------------------------------------------------------------------------
 void SceneEditorWindow::connectStuff()
 {
+    connect(m_glWidget, SIGNAL(fpsUpdate(float)), this, SLOT(onFpsChanged(float)));
     //connect Actions:
     connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
     connect(m_saveScene, SIGNAL(triggered()), this, SLOT(saveScene()));
