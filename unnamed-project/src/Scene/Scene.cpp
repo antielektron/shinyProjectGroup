@@ -14,6 +14,7 @@ Scene::Scene() :
 {
     m_rootGroup.setName("SceneRoot");
     m_globalState.reset(new GlobalState(this));
+    m_shaderConfigFile = DEFAULT_SHADER_CONFIG_FILEPATH;
 }
 
 //------------------------------------------------------------------------------
@@ -23,6 +24,7 @@ Scene::Scene(const QString &filename) :
 {
     m_globalState.reset(new GlobalState(this));
     m_rootGroup.setName("SceneRoot");
+    m_shaderConfigFile = DEFAULT_SHADER_CONFIG_FILEPATH;
     loadFromFile(filename);
 }
 
@@ -98,6 +100,10 @@ void Scene::loadFromFile(const QString &filename)
             m_playerPosition = readVectorFromDom(position);
             auto rotation = currentElement.firstChildElement("Rotation");
             m_playerRotation = readVectorFromDom(rotation);
+        }
+        else if (tag == "ShaderConfig")
+        {
+            setShaderConfigFile(currentElement.attribute("file"));
         }
         else
         {
@@ -482,6 +488,11 @@ void Scene::saveToFile(const QString &filename)
     xmlWriter.writeStartElement("Rotation");
     writeVectorToXml(m_playerRotation, xmlWriter);
     xmlWriter.writeEndElement();
+    xmlWriter.writeEndElement();
+
+    // shader configuration
+    xmlWriter.writeStartElement("ShaderConfig");
+    xmlWriter.writeAttribute("file", getShaderConfigFile());
     xmlWriter.writeEndElement();
 
     xmlWriter.writeEndDocument();
@@ -901,6 +912,18 @@ const QString &Scene::getAuthor() const
 }
 
 //------------------------------------------------------------------------------
+void Scene::setShaderConfigFile(const QString &filepath)
+{
+    m_shaderConfigFile = filepath;
+}
+
+//------------------------------------------------------------------------------
+const QString &Scene::getShaderConfigFile()
+{
+    return m_shaderConfigFile;
+}
+
+//------------------------------------------------------------------------------
 void Scene::setPlayerPosition(const QVector3D &position)
 {
     m_playerPosition = position;
@@ -911,7 +934,6 @@ QVector3D &Scene::getPlayerPosition()
 {
     return m_playerPosition;
 }
-
 
 //------------------------------------------------------------------------------
 void Scene::setPlayerRotation(const QVector3D &rotation)
