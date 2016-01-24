@@ -47,7 +47,6 @@ protected:
     // Render Shader
     int m_modelViewMatrixLoc;
     int m_projectionMatrixLoc;
-    int m_projectionMatrixLocCompose;
     int m_cascadeViewMatrixLoc;
     int m_cascadeFarLoc;
     int m_lightDirectionLoc;
@@ -68,6 +67,7 @@ protected:
     // Compose Shader
     int m_composeSamplerLoc;
     int m_composeOvSamplerLoc;
+    int m_composeProjectionMatrixLoc;
 
     // Copy Shader for texture arrays
     int m_copyArraySamplerLoc;
