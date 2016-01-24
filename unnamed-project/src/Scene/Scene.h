@@ -96,6 +96,12 @@ public:
     const QString &getVersion() const;
     const QString &getAuthor() const;
 
+    void setPlayerPosition(const QVector3D &position);
+    void setPlayerRotation(const QVector3D &rotation);
+
+    QVector3D &getPlayerPosition();
+    QVector3D &getPlayerRotation();
+
     ObjectBase *findObjectByName(ObjectGroup *root, const QString &name);
 
 private:
@@ -145,6 +151,9 @@ private:
     QString m_sceneName;
     QString m_sceneVersion;
     QString m_sceneAuthor;
+
+    QVector3D m_playerPosition;
+    QVector3D m_playerRotation;
 
     std::unique_ptr<GlobalState> m_globalState;
 };

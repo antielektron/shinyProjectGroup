@@ -17,10 +17,18 @@ GlobalDetailsWidget::GlobalDetailsWidget(std::shared_ptr<SceneEditorGame> game, 
     m_lightColorG = createNumericField("Light Green");
     m_lightColorB = createNumericField("Light Blue");
 
+    m_playerPosX = createNumericField("Player Pos. X");
+    m_playerPosY = createNumericField("Player Pos. Y");
+    m_playerPosZ = createNumericField("Player Pos. Z");
+
+    m_playerRotX = createNumericField("Player Rot. X");
+    m_playerRotY = createNumericField("Player Rot. Y");
+    m_playerRotZ = createNumericField("Player Rot. Z");
+
     this->setLayout(m_layout);
 
     // register at game (done in Window)
-    // connect(m_game.get(), SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
+    connect(m_game.get(), SIGNAL(sceneChanged()), this, SLOT(sceneChanged()));
 }
 
 //------------------------------------------------------------------------------
@@ -65,6 +73,16 @@ void GlobalDetailsWidget::updateUI()
     m_lightColorG->setValue(lightColor.y());
     m_lightColorB->setValue(lightColor.z());
 
+    auto &playerPosition = m_game->getScene()->getPlayerPosition();
+    m_playerPosX->setValue(playerPosition.x());
+    m_playerPosY->setValue(playerPosition.y());
+    m_playerPosZ->setValue(playerPosition.z());
+
+    auto &playerRotation = m_game->getScene()->getPlayerRotation();
+    m_playerRotX->setValue(playerRotation.x());
+    m_playerRotY->setValue(playerRotation.y());
+    m_playerRotZ->setValue(playerRotation.z());
+
     m_propertiesLocked = false;
 }
 
@@ -89,6 +107,16 @@ void GlobalDetailsWidget::applyScene()
     lightColor.setX((float)m_lightColorR->value());
     lightColor.setY((float)m_lightColorG->value());
     lightColor.setZ((float)m_lightColorB->value());
+
+    auto &playerPosition = m_game->getScene()->getPlayerPosition();
+    playerPosition.setX((float)m_playerPosX->value());
+    playerPosition.setY((float)m_playerPosY->value());
+    playerPosition.setZ((float)m_playerPosZ->value());
+
+    auto &playerRotation = m_game->getScene()->getPlayerRotation();
+    playerRotation.setX((float)m_playerRotX->value());
+    playerRotation.setY((float)m_playerRotY->value());
+    playerRotation.setZ((float)m_playerRotZ->value());
 
     emit m_game->sceneChanged();
 }
