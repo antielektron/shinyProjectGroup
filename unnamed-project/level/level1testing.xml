@@ -2,6 +2,8 @@
 <Scene name="Shiny Scene" version="42" author="Norby">
     <Models>
         <Model name="StairsAndTunnel" path="models/StairsAndTunnel.obj"/>
+        <Model name="bb-8-body" path="models/bb-8-body.obj"/>
+        <Model name="bb-8-head" path="models/bb-8-head.obj"/>
         <Model name="floor" path="models/floor.obj"/>
         <Model name="floor2" path="models/floor2.obj"/>
         <Model name="leaves001" path="models/leaves001.obj"/>
@@ -19,6 +21,27 @@
         <Model name="tree002" path="models/tree002.obj"/>
     </Models>
     <Objects>
+        <ObjectGroup name="bb-8">
+            <Position x="24" y="12.69" z="-72"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="bb-8.body" model="bb-8-body" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.2" y="0.2" z="0.2"/>
+                <DiffuseColor x="0.3" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.6" z="0.5"/>
+            </Object>
+            <Object name="bb-8.head" model="bb-8-head" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.2" y="0.2" z="0.2"/>
+                <DiffuseColor x="0.3" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.6" z="0.5"/>
+            </Object>
+        </ObjectGroup>
         <Object name="meditatipnchamberDownFinal" model="meditatipnchamberDownFinal" interactionEvent="">
             <Position x="0" y="0" z="0"/>
             <Rotation x="0" y="0" z="0"/>
@@ -155,6 +178,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.6" y="0.4" z="0.1"/>
         </Object>
+<<<<<<< HEAD
         <Object name="suzanne" model="suzanne" interactionEvent="">
             <Position x="24" y="14" z="-72"/>
             <Rotation x="0" y="0" z="0"/>
@@ -523,6 +547,8 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
+=======
+>>>>>>> 6a496c26a666c509ba640d9410d295052d68b226
     </Objects>
     <Attributes>
         <Attribute key="plat_x" type="float" value="-1"/>
@@ -594,26 +620,26 @@
             <Action type="bmov" lhs="tree_moving" rhs="0"/>
         </Event>
         <Event name="init" description="">
-            <Action type="trigger" name="suzanne forward" delay="0"/>
-            <Action type="fmov" lhs="suzanne_median" rhs="-61"/>
-            <Action type="fmov" lhs="suzanne_current" rhs="-72"/>
-            <Action type="fmov" lhs="suzanne_rotation" rhs="0"/>
-            <Action type="fmul" lhs="suzanne_median" rhs="2"/>
+            <Action type="trigger" name="bb-8 forward" delay="0"/>
+            <Action type="fmov" lhs="bb-8_median" rhs="-61"/>
+            <Action type="fmov" lhs="bb-8_current" rhs="-72"/>
+            <Action type="fmov" lhs="bb-8_rotation" rhs="0"/>
+            <Action type="fmul" lhs="bb-8_median" rhs="2"/>
         </Event>
-        <Event name="suzanne forward" description="">
-            <Action type="trigger" name="suzanne rotation" delay="4"/>
-            <Action type="fmul" lhs="suzanne_current" rhs="-1"/>
-            <Action type="fadd" lhs="suzanne_current" rhs="[suzanne_median]"/>
-            <Action type="animpos" x="24" y="14" z="[suzanne_current]" object="suzanne">
+        <Event name="bb-8 forward" description="">
+            <Action type="trigger" name="bb-8 rotation" delay="4"/>
+            <Action type="fmul" lhs="bb-8_current" rhs="-1"/>
+            <Action type="fadd" lhs="bb-8_current" rhs="[bb-8_median]"/>
+            <Action type="animpos" x="24" y="12.69" z="[bb-8_current]" object="bb-8">
                 <Interpolation type="linear" duration="4"/>
             </Action>
         </Event>
-        <Event name="suzanne rotation" description="">
-            <Action type="trigger" name="suzanne forward" delay="0.4"/>
-            <Action type="fmov" lhs="suzanne_prev_rot" rhs="[suzanne_rotation]"/>
-            <Action type="fmov" lhs="suzanne_rotation" rhs="180"/>
-            <Action type="fdec" lhs="suzanne_rotation" rhs="[suzanne_prev_rot]"/>
-            <Action type="animrot" x="0" y="[suzanne_rotation]" z="0" object="suzanne">
+        <Event name="bb-8 rotation" description="">
+            <Action type="trigger" name="bb-8 forward" delay="0.4"/>
+            <Action type="fmov" lhs="bb-8_prev_rot" rhs="[bb-8_rotation]"/>
+            <Action type="fmov" lhs="bb-8_rotation" rhs="180"/>
+            <Action type="fdec" lhs="bb-8_rotation" rhs="[bb-8_prev_rot]"/>
+            <Action type="animrot" x="0" y="[bb-8_rotation]" z="0" object="bb-8.head">
                 <Interpolation type="linear" duration="0.4"/>
             </Action>
         </Event>
