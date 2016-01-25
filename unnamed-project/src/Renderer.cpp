@@ -725,8 +725,6 @@ void Renderer::resize(int width, int height)
         prevWidth = (prevWidth+1) / 2;
         prevHeight = (prevHeight+1) / 2;
 
-        std::cout << i << ": " << prevWidth << " " << prevHeight << std::endl;
-
         glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, prevWidth, prevHeight, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
         // No filtering required
