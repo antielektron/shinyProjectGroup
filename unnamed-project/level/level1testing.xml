@@ -178,15 +178,6 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.6" y="0.4" z="0.1"/>
         </Object>
-<<<<<<< HEAD
-        <Object name="suzanne" model="suzanne" interactionEvent="">
-            <Position x="24" y="14" z="-72"/>
-            <Rotation x="0" y="0" z="0"/>
-            <Scaling x="1" y="1" z="1"/>
-            <SpecularColor x="0.5" y="0.5" z="0.5"/>
-            <DiffuseColor x="0.6" y="0.5" z="0.4"/>
-            <AmbientColor x="0.2" y="0.2" z="0.2"/>
-        </Object>
         <Object name="step001" model="step" interactionEvent="">
             <Position x="0" y="0.1" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
@@ -243,7 +234,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-	<Object name="step008" model="step" interactionEvent="steps clicked">
+        <Object name="step008" model="step" interactionEvent="steps clicked">
             <Position x="0" y="2.2" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -291,15 +282,15 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-	 <Object name="step014" model="step" interactionEvent="steps clicked">
-            <Position x="0" y="4.0" z="-12"/>
+        <Object name="step014" model="step" interactionEvent="steps clicked">
+            <Position x="0" y="4" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-	<Object name="step015" model="step" interactionEvent="steps clicked">
+        <Object name="step015" model="step" interactionEvent="steps clicked">
             <Position x="0" y="4.3" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -347,7 +338,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-	<Object name="step021" model="step" interactionEvent="steps clicked">
+        <Object name="step021" model="step" interactionEvent="steps clicked">
             <Position x="0" y="6.1" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -395,7 +386,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-	 <Object name="step027" model="step" interactionEvent="steps clicked">
+        <Object name="step027" model="step" interactionEvent="steps clicked">
             <Position x="0" y="7.9" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -403,7 +394,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-	<Object name="step028" model="step" interactionEvent="steps clicked">
+        <Object name="step028" model="step" interactionEvent="steps clicked">
             <Position x="0" y="8.2" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -435,7 +426,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-	 <Object name="step032" model="step" interactionEvent="steps clicked">
+        <Object name="step032" model="step" interactionEvent="steps clicked">
             <Position x="0" y="9.3" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -443,7 +434,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-	<Object name="step033" model="step" interactionEvent="steps clicked">
+        <Object name="step033" model="step" interactionEvent="steps clicked">
             <Position x="0" y="9.6" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -491,7 +482,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-	<Object name="step039" model="step" interactionEvent="steps clicked">
+        <Object name="step039" model="step" interactionEvent="steps clicked">
             <Position x="0" y="11.4" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -539,7 +530,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-	 <Object name="step045" model="step" interactionEvent="steps clicked">
+        <Object name="step045" model="step" interactionEvent="steps clicked">
             <Position x="0" y="13.2" z="-12"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -547,8 +538,6 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-=======
->>>>>>> 6a496c26a666c509ba640d9410d295052d68b226
     </Objects>
     <Attributes>
         <Attribute key="plat_x" type="float" value="-1"/>
@@ -655,16 +644,16 @@
             <Action type="animpos" x="0" y="1" z="-13.5" object="step004">
                 <Interpolation type="linear" duration="3"/>
             </Action>
-	    <Action type="animpos" x="0" y="1.3" z="-14" object="step005">
+            <Action type="animpos" x="0" y="1.3" z="-14" object="step005">
                 <Interpolation type="linear" duration="4"/>
             </Action>
-	    <Action type="animpos" x="0" y="1.6" z="-14.5" object="step006">
+            <Action type="animpos" x="0" y="1.6" z="-14.5" object="step006">
                 <Interpolation type="linear" duration="5"/>
             </Action>
-	    <Action type="animpos" x="0" y="1.9" z="-15" object="step007">
-		    <Interpolation type="linear" duration="6"/>
+            <Action type="animpos" x="0" y="1.9" z="-15" object="step007">
+                <Interpolation type="linear" duration="6"/>
             </Action>
-	    <Action type="animpos" x="0" y="2.2" z="-15.5" object="step008">
+            <Action type="animpos" x="0" y="2.2" z="-15.5" object="step008">
                 <Interpolation type="linear" duration="7"/>
             </Action>
             <Action type="animpos" x="0" y="2.5" z="-16" object="step009">
@@ -673,16 +662,16 @@
             <Action type="animpos" x="0" y="2.8" z="-16.5" object="step010">
                 <Interpolation type="linear" duration="9"/>
             </Action>
-	    <Action type="animpos" x="0" y="3.1" z="-17" object="step011">
+            <Action type="animpos" x="0" y="3.1" z="-17" object="step011">
                 <Interpolation type="linear" duration="10"/>
             </Action>
-	    <Action type="animpos" x="0" y="3.4" z="-17.5" object="step012">
+            <Action type="animpos" x="0" y="3.4" z="-17.5" object="step012">
                 <Interpolation type="linear" duration="11"/>
             </Action>
-	    <Action type="animpos" x="0" y="3.7" z="-18" object="step013">
+            <Action type="animpos" x="0" y="3.7" z="-18" object="step013">
                 <Interpolation type="linear" duration="12"/>
             </Action>
-	    <Action type="animpos" x="0" y="4" z="-18.5" object="step014">
+            <Action type="animpos" x="0" y="4" z="-18.5" object="step014">
                 <Interpolation type="linear" duration="13"/>
             </Action>
             <Action type="animpos" x="0" y="4.3" z="-19" object="step015">
@@ -691,16 +680,16 @@
             <Action type="animpos" x="0" y="4.6" z="-19.5" object="step016">
                 <Interpolation type="linear" duration="15"/>
             </Action>
-	    <Action type="animpos" x="0" y="4.9" z="-20" object="step017">
+            <Action type="animpos" x="0" y="4.9" z="-20" object="step017">
                 <Interpolation type="linear" duration="16"/>
             </Action>
-	    <Action type="animpos" x="0" y="5.2" z="-20.5" object="step018">
+            <Action type="animpos" x="0" y="5.2" z="-20.5" object="step018">
                 <Interpolation type="linear" duration="17"/>
             </Action>
-	    <Action type="animpos" x="0" y="5.5" z="-21" object="step019">
-		    <Interpolation type="linear" duration="18"/>
+            <Action type="animpos" x="0" y="5.5" z="-21" object="step019">
+                <Interpolation type="linear" duration="18"/>
             </Action>
-	    <Action type="animpos" x="0" y="5.8" z="-21.5" object="step020">
+            <Action type="animpos" x="0" y="5.8" z="-21.5" object="step020">
                 <Interpolation type="linear" duration="19"/>
             </Action>
             <Action type="animpos" x="0" y="6.1" z="-22" object="step021">
@@ -709,22 +698,22 @@
             <Action type="animpos" x="0" y="6.4" z="-22.5" object="step022">
                 <Interpolation type="linear" duration="21"/>
             </Action>
-	    <Action type="animpos" x="0" y="6.7" z="-23" object="step023">
+            <Action type="animpos" x="0" y="6.7" z="-23" object="step023">
                 <Interpolation type="linear" duration="23"/>
             </Action>
-	    <Action type="animpos" x="0" y="7" z="-23.5" object="step024">
+            <Action type="animpos" x="0" y="7" z="-23.5" object="step024">
                 <Interpolation type="linear" duration="24"/>
             </Action>
-	    <Action type="animpos" x="0" y="7.3" z="-24" object="step025">
+            <Action type="animpos" x="0" y="7.3" z="-24" object="step025">
                 <Interpolation type="linear" duration="25"/>
             </Action>
-	   <Action type="animpos" x="0" y="7.6" z="-24.5" object="step026">
+            <Action type="animpos" x="0" y="7.6" z="-24.5" object="step026">
                 <Interpolation type="linear" duration="26"/>
-            </Action> 
-	    <Action type="animpos" x="0" y="7.9" z="-25" object="step027">
+            </Action>
+            <Action type="animpos" x="0" y="7.9" z="-25" object="step027">
                 <Interpolation type="linear" duration="27"/>
             </Action>
-	    <Action type="animpos" x="0" y="8.2" z="-26.5" object="step028">
+            <Action type="animpos" x="0" y="8.2" z="-26.5" object="step028">
                 <Interpolation type="linear" duration="28"/>
             </Action>
             <Action type="animpos" x="0" y="8.5" z="-27" object="step029">
@@ -733,16 +722,16 @@
             <Action type="animpos" x="0" y="8.8" z="-27.5" object="step030">
                 <Interpolation type="linear" duration="30"/>
             </Action>
-	    <Action type="animpos" x="0" y="9.1" z="-28" object="step031">
+            <Action type="animpos" x="0" y="9.1" z="-28" object="step031">
                 <Interpolation type="linear" duration="31"/>
             </Action>
-	    <Action type="animpos" x="0" y="9.4" z="-28.5" object="step032">
+            <Action type="animpos" x="0" y="9.4" z="-28.5" object="step032">
                 <Interpolation type="linear" duration="32"/>
             </Action>
-	    <Action type="animpos" x="0" y="9.7" z="-29" object="step033">
-		    <Interpolation type="linear" duration="33"/>
+            <Action type="animpos" x="0" y="9.7" z="-29" object="step033">
+                <Interpolation type="linear" duration="33"/>
             </Action>
-	    <Action type="animpos" x="0" y="10" z="-29.5" object="step034">
+            <Action type="animpos" x="0" y="10" z="-29.5" object="step034">
                 <Interpolation type="linear" duration="34"/>
             </Action>
             <Action type="animpos" x="0" y="10.3" z="-30" object="step035">
@@ -751,16 +740,16 @@
             <Action type="animpos" x="0" y="10.6" z="-30.5" object="step036">
                 <Interpolation type="linear" duration="36"/>
             </Action>
-	    <Action type="animpos" x="0" y="10.9" z="-31" object="step037">
+            <Action type="animpos" x="0" y="10.9" z="-31" object="step037">
                 <Interpolation type="linear" duration="37"/>
             </Action>
-	    <Action type="animpos" x="0" y="11.2" z="-32.5" object="step038">
+            <Action type="animpos" x="0" y="11.2" z="-32.5" object="step038">
                 <Interpolation type="linear" duration="38"/>
             </Action>
-	    <Action type="animpos" x="0" y="11.5" z="-33" object="step039">
+            <Action type="animpos" x="0" y="11.5" z="-33" object="step039">
                 <Interpolation type="linear" duration="39"/>
             </Action>
-	    <Action type="animpos" x="0" y="11.8" z="-33.5" object="step040">
+            <Action type="animpos" x="0" y="11.8" z="-33.5" object="step040">
                 <Interpolation type="linear" duration="40"/>
             </Action>
             <Action type="animpos" x="0" y="12.1" z="-34" object="step041">
@@ -769,14 +758,14 @@
             <Action type="animpos" x="0" y="12.4" z="-35.5" object="step042">
                 <Interpolation type="linear" duration="42"/>
             </Action>
-	    <Action type="animpos" x="0" y="12.7" z="-36.5" object="step043">
+            <Action type="animpos" x="0" y="12.7" z="-36.5" object="step043">
                 <Interpolation type="linear" duration="43"/>
             </Action>
-	    <Action type="animpos" x="0" y="13" z="-37" object="step044">
+            <Action type="animpos" x="0" y="13" z="-37" object="step044">
                 <Interpolation type="linear" duration="44"/>
             </Action>
-	    <Action type="animpos" x="0" y="13.2" z="-37.5" object="step045">
-		    <Interpolation type="sinus" duration="45"/>
+            <Action type="animpos" x="0" y="13.2" z="-37.5" object="step045">
+                <Interpolation type="sinus" duration="45"/>
             </Action>
         </Event>
     </Events>
