@@ -69,6 +69,8 @@ protected:
     int m_composeOvSamplerLoc;
     int m_composeProjectionMatrixLoc;
 
+    GLuint m_screenSpaceDepthBuffer;
+
     // Copy Shader for texture arrays
     int m_copyArraySamplerLoc;
     int m_copyArrayLayerLoc;
