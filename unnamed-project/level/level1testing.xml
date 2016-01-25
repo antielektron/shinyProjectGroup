@@ -50,9 +50,9 @@
             <DiffuseColor x="0.5" y="0.5" z="0.5"/>
             <AmbientColor x="0.4" y="0.4" z="0.4"/>
         </Object>
-        <Object name="meditatipnchamberUpFinal" model="meditatipnchamberUpFinal" interactionEvent="">
-            <Position x="0" y="0" z="0"/>
-            <Rotation x="0" y="0" z="0"/>
+        <Object name="meditatipnchamberUpFinal" model="meditatipnchamberUpFinal" interactionEvent="medCham clicked">
+            <Position x="0.1" y="-3.1" z="0"/>
+            <Rotation x="0" y="-6.9" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="0.5" y="0.5" z="0.5"/>
             <DiffuseColor x="0.5" y="0.5" z="0.5"/>
@@ -92,7 +92,7 @@
         </Object>
         <Object name="menger" model="menger" interactionEvent="menger clicked">
             <Position x="10.7" y="12.5" z="-80"/>
-            <Rotation x="0" y="11.1" z="0"/>
+            <Rotation x="0" y="85.5" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -538,6 +538,14 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
+        <Object name="floor4" model="floor2" interactionEvent="">
+            <Position x="0" y="12.7" z="-73.5"/>
+            <Rotation x="180" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
     </Objects>
     <Attributes>
         <Attribute key="plat_x" type="float" value="-1"/>
@@ -632,9 +640,9 @@
                 <Interpolation type="linear" duration="0.4"/>
             </Action>
         </Event>
-        <Event name="steps clicked" description="active">
-            <Precondition type="ieq" lhs="[activated]" rhs="0"/>
-            <Action type="imov" lhs="activated" rhs="1"/>
+        <Event name="steps clicked" description="activee">
+            <Precondition type="ieq" lhs="[activatedd]" rhs="0"/>
+            <Action type="imov" lhs="activatedd" rhs="1"/>
             <Action type="animpos" x="0" y="0.4" z="-12.5" object="step002">
                 <Interpolation type="linear" duration="1"/>
             </Action>
@@ -766,6 +774,13 @@
             </Action>
             <Action type="animpos" x="0" y="13.2" z="-37.5" object="step045">
                 <Interpolation type="sinus" duration="45"/>
+            </Action>
+        </Event>
+        <Event name="medCham clicked" description="active">
+            <Precondition type="ieq" lhs="[activated]" rhs="0"/>
+            <Action type="imov" lhs="activated" rhs="1"/>
+            <Action type="animpos" x="0.1" y="3.1" z="0" object="meditatipnchamberUpFinal">
+                <Interpolation type="sinus" duration="4"/>
             </Action>
         </Event>
     </Events>
