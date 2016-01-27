@@ -573,8 +573,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
     // round up
-    prevWidth = (prevWidth-1) / 2 / 16 + 1;
-    prevHeight = (prevHeight-1) / 2 / 16 + 1;
+    prevWidth = (prevWidth-1) / 2 / 8 + 1;
+    prevHeight = (prevHeight-1) / 2 / 8 + 1;
 
     // for every new pixel spawn a thread group!
     glDispatchCompute(prevWidth, prevHeight, 1);
@@ -589,8 +589,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(1, m_depthReduceTextures[i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
         // round up
-        prevWidth = (prevWidth-1) / 2 / 16 + 1;
-        prevHeight = (prevHeight-1) / 2 / 16 + 1;
+        prevWidth = (prevWidth-1) / 2 / 8 + 1;
+        prevHeight = (prevHeight-1) / 2 / 8 + 1;
 
         // for every new pixel spawn a thread group!
         glDispatchCompute(prevWidth, prevHeight, 1);
@@ -724,7 +724,7 @@ void Renderer::resize(int width, int height)
 
 
     // Create reduce textures!
-    auto n = std::ceil(std::log(std::min(m_width, m_height)) / std::log(2.*16.));
+    auto n = std::ceil(std::log(std::min(m_width, m_height)) / std::log(2.*8.));
     m_depthReduceTextures.resize(n);
     glGenTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
 
@@ -734,8 +734,8 @@ void Renderer::resize(int width, int height)
     for (int i = 0; i < n; i++)
     {
         // round up
-        prevWidth = (prevWidth-1) / 2 / 16 + 1;
-        prevHeight = (prevHeight-1) / 2 / 16 + 1;
+        prevWidth = (prevWidth-1) / 2 / 8 + 1;
+        prevHeight = (prevHeight-1) / 2 / 8 + 1;
 
         glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, prevWidth, prevHeight, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
@@ -746,3 +746,4 @@ void Renderer::resize(int width, int height)
     }
     m_reduceLastTextureSize = prevWidth * prevHeight;
 }
+
