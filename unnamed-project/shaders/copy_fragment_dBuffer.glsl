@@ -45,7 +45,7 @@ float get_kx(float z)
 	e1 = projectionMatrix * e1;
 	e2 = projectionMatrix * e2;
 	
-	return 0.1 * (e2.x / e2.w - e1.x / e1.w);
+	return 1 * (e2.x / e2.w - e1.x / e1.w);
 }
 
 float get_ky(float z)
@@ -56,7 +56,7 @@ float get_ky(float z)
 	e1 = projectionMatrix * e1;
 	e2 = projectionMatrix * e2;
 	
-	return 0.1 * (e2.y / e2.w - e1.y / e1.w);	
+	return 1 * (e2.y / e2.w - e1.y / e1.w);	
 }
 
 // weight function (calculates how much of the sphere is filled
@@ -80,7 +80,7 @@ float get_dr(vec2 unitPos, vec2 pPos, float p_z)
 	screenSpaceUnitPos = clamp(screenSpaceUnitPos, 0, 1 - eps);
 	
 	
-	return (- p_z + (1 - texture2D(ovSampler, screenSpaceUnitPos).x)) / kx;
+	return (- p_z + (1 - texture2D(depthBuffer, screenSpaceUnitPos).x)) / kx;
 }
 
 float z_s(vec2 unitPos)
@@ -98,7 +98,7 @@ float lineSampling(int nSamples)
 {
 	float sumSamples = 0.;
 	float sumVolume = 0.;
-	float z = 1 - texture2D(ovSampler, uv).x;
+	float z = texture2D(depthBuffer, uv).x;
 	for (int i = 0; i < nSamples; i++)
 	{
 		// get a random angle and radius for sample point on the
@@ -121,7 +121,7 @@ float lineSampling(int nSamples)
 
 bool isInCenterEpsilonArea(vec2 centerPoint)
 {
-	float zCenter = 1 - texture2D(ovSampler, centerPoint).x;
+	float zCenter = 1 - texture2D(depthBuffer, centerPoint).x;
 	float kx = get_kx(zCenter);
 	float ky = get_ky(zCenter);
 	
@@ -204,4 +204,7 @@ void main()
 	*/
 	
     outputColor = vec4(mixedColor, 1.);
+    
+    // render just Depth:
+    //outputColor = vec4((texture2D(depthBuffer, uv).x) * vec3(1.,1.,1.), 1.);
 }
