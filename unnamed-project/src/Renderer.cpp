@@ -357,6 +357,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         }
     }
 
+    // TODO rotate camera Z to light X!!!
+
     // For each cascade combine two slices
     for (size_t i = 0; i < static_cast<size_t>(m_cascades); i++)
     {
