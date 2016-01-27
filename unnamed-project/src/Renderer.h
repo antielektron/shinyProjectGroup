@@ -37,6 +37,8 @@ protected:
     void rotateVectorToVector(const QVector3D &source,
                               const QVector3D &destination,
                               QMatrix4x4 &matrix);
+    void createLightViewMatrix(const QVector3D &lightDir, const QMatrix4x4 &inverseCameraView, QMatrix4x4 &matrix);
+
 
     GLsizei m_width;
     GLsizei m_height;

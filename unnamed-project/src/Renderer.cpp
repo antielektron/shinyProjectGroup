@@ -224,15 +224,32 @@ void Renderer::initialize()
     m_quadVbo.release();
 }
 
-void Renderer::rotateVectorToVector(const QVector3D &source,
-                                    const QVector3D &destination,
-                                    QMatrix4x4 &matrix)
+void Renderer::rotateVectorToVector(const QVector3D &source, const QVector3D &destination, QMatrix4x4 &matrix)
 {
     QVector3D rotationAxis = QVector3D::crossProduct(source, destination);
     float rotationAngle = std::acos(QVector3D::dotProduct(source, destination))*180.f/
                           static_cast<float>(M_PI);
 
     matrix.rotate(rotationAngle, rotationAxis);
+}
+
+void Renderer::createLightViewMatrix(const QVector3D &lightDir, const QMatrix4x4 &inverseCameraView, QMatrix4x4 &matrix)
+{
+    // Rotate light direction to z
+    QMatrix4x4 rotateLightDir;
+    rotateVectorToVector(lightDir.normalized(), QVector3D(0, 0, 1), rotateLightDir);
+
+    // Camera z in light view
+    auto cameraDirInLightView = rotateLightDir * inverseCameraView * QVector3D(0, 0, 1);
+
+    // Constrain rotation to rotation along z axis in xy plane, project to z=0 plane
+    cameraDirInLightView.setZ(0);
+
+    // Rotate cameraDir to (1, 0, 0)
+    QMatrix4x4 rotateCameraDir;
+    rotateVectorToVector(cameraDirInLightView.normalized(), QVector3D(1, 0, 0), rotateCameraDir);
+
+    matrix = rotateCameraDir * rotateLightDir;
 }
 
 void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
@@ -250,18 +267,18 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     // Input: lightDirection, cameraProjection, cameraView, frustum
     // Output: lightProjection
 
-    // Rotate light direction to z
-    QMatrix4x4 lightViewRotation;
-    rotateVectorToVector(scene->getDirectionalLightDirection().normalized(),
-                         QVector3D(0, 0, 1),
-                         lightViewRotation);
+    // Inverse of common transformations...
+    auto inverseCameraView = scene->getCameraView().inverted();
+    auto inverseCameraProjection = scene->getCameraProjection().inverted();
+    auto inverseCameraTransformation = (scene->getCameraProjection() * scene->getCameraView()).inverted();
+
+    QMatrix4x4 lightViewMatrix;
+    createLightViewMatrix(scene->getDirectionalLightDirection().normalized(), inverseCameraView, lightViewMatrix);
 
     // Compute viewFrustum of camera in light view
-    auto inverseCameraProjection = scene->getCameraProjection().inverted();
-    auto inverseCameraTransformation = (scene->getCameraProjection() *
-                                        scene->getCameraView()).inverted();
-    auto screenToLightTransformation = lightViewRotation *
-                                       inverseCameraTransformation;
+    auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
+
+    // TODO only compute AABB now.
 
     // Corners of slices
     std::vector<std::vector<QVector3D>> sliceCorners(static_cast<size_t>(m_cascades)+1);
@@ -316,6 +333,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             { 0, 0, maxDepth*2 - 1 },
     };
 
+    // TODO don't use frustum corners, but the bounding box calculated from the depth buffer
+
     // Transform corners into light view space
     MathUtility::transformVectors(screenToLightTransformation, minCorners);
     MathUtility::transformVectors(screenToLightTransformation, maxCorners);
@@ -356,8 +375,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             sliceCorners[i].push_back((1 - coeff) * minCorners[j] + coeff * maxCorners[j]);
         }
     }
-
-    // TODO rotate camera Z to light X!!!
 
     // For each cascade combine two slices
     for (size_t i = 0; i < static_cast<size_t>(m_cascades); i++)
@@ -406,7 +423,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         lightViewProjection.ortho(minCorner2D.x(), maxCorner2D.x(), minCorner2D.y(), maxCorner2D.y(), -maxZ, -minZ); // TODO find out why near/far plane are so?
 
         // NOTE: will work in view space not world space while rendering!
-        cascadeViews.push_back(lightViewProjection * lightViewRotationZ * lightViewRotation * scene->getCameraView().inverted());
+        cascadeViews.push_back(lightViewProjection * lightViewRotationZ * lightViewMatrix * scene->getCameraView().inverted());
     }
 
 
