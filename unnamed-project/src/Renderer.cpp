@@ -299,7 +299,7 @@ void Renderer::initialize()
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RED, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
     // Create DepthBuffer
@@ -394,7 +394,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     std::vector<QMatrix4x4> cascadeViews;
     std::vector<float> cascadeFars;
 
-
+/*
     // Compute actual near and far plane!
 
     // Check last texture for values..
@@ -415,7 +415,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
         if (maxDepth < p.second)
             maxDepth = p.second;
     }
-
+*/
 
     QVector3D minCorners[] = {
             { -1, -1, -1 },
@@ -436,8 +436,10 @@ void Renderer::render(GLuint fbo, Scene *scene)
     };
 
     QVector3D actualNearFarCorners[] = {
-            { 0, 0, minDepth*2 - 1 },
-            { 0, 0, maxDepth*2 - 1 },
+            { 0, 0, -1 },
+            { 0, 0,  1 }
+            //{ 0, 0, minDepth*2 - 1 },
+            //{ 0, 0, maxDepth*2 - 1 }
     };
 
     // Transform corners into light view space
@@ -675,7 +677,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
 
     composeProgram->release();
 
-
+/*
 
     // Invoke reduce ...
     GLsizei prevWidth = m_width;
@@ -713,7 +715,7 @@ void Renderer::render(GLuint fbo, Scene *scene)
     }
 
     reduceProgram->release();
-
+*/
     /*
     GLint windowTexture;
     glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);

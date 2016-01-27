@@ -10,6 +10,10 @@ void Get4MomentsOptimized(out float4 Out4MomentsOptimized,float FragmentDepth)
     Out4MomentsOptimized[0]+=0.035955884801f;
 }
 
+vec4 variable;
+float depth = 0;
+Get4MomentsOptimized(variable, depth);
+
 void SampleOptimized4MomentShadowMap(out float4 Out4Moments,
     SamplerState ShadowMapSampler,Texture2D Optimized4MomentShadowMap,
     float2 ShadowMapTexCoord)
