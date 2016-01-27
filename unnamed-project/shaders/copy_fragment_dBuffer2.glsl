@@ -41,7 +41,8 @@ float get_depth(vec2 uv)
 {
 	float z = texture2D(depthBuffer, uv).x * 2.0 - 1.0;
 	vec4 v = inverseProjectionMatrix * vec4(0.0,0.0, z, 1.0);
-	return (v.z / ((v.w) * 100.0) + 1.0);
+	//return (v.z / ((v.w) * 10.0) + 1.0);
+	return z * v.w;
 }
 
 
@@ -56,7 +57,7 @@ float get_kx(float z)
 	e1 = projectionMatrix * e1;
 	e2 = projectionMatrix * e2;
 	
-	return  1. / (0.5 * z);
+	return 1 * (e2.x / e2.w - e1.x / e1.w);
 }
 
 float get_ky(float z)
@@ -67,7 +68,7 @@ float get_ky(float z)
 	e1 = projectionMatrix * e1;
 	e2 = projectionMatrix * e2;
 	
-	return 1. / (0.5 * z);	
+	return 1 * (e2.y / e2.w - e1.y / e1.w);	
 }
 
 // weight function (calculates how much of the sphere is filled

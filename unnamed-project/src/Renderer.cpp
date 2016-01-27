@@ -133,6 +133,8 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                 std::make_pair(&m_composeProjectionMatrixLoc, "projectionMatrix"));
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
+                std::make_pair(&m_composeInverseProjectionMatrixLoc, "inverseProjectionMatrix"));
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                 std::make_pair(&m_composeDepthBufferLoc, "depthBuffer"));
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                     std::make_pair(&m_composeSamplerLoc, "sampler"));
@@ -532,6 +534,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     composeProgram->setUniformValue(m_composeOvSamplerLoc, 1);
     composeProgram->setUniformValue(m_composeDepthBufferLoc,2);
     composeProgram->setUniformValue(m_composeProjectionMatrixLoc, scene->getCameraProjection());
+    composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, inverseCameraProjection);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderTexture);
