@@ -549,9 +549,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     composeProgram->release();
 
 
-    glFinish();
-    auto start = std::chrono::system_clock::now();
-
     // Invoke reduce ...
     GLsizei prevWidth = m_width;
     GLsizei prevHeight = m_height;
@@ -588,12 +585,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     }
 
     reduceProgram->release();
-
-    glFinish();
-    auto end = std::chrono::system_clock::now();
-    m_debugSum += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
-    m_debugCount++;
-    std::cout << (double)m_debugSum/m_debugCount << std::endl;
 
     /*
     GLint windowTexture;
@@ -649,9 +640,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
 void Renderer::resize(int width, int height)
 {
-    m_debugCount = 0;
-    m_debugSum = 0;
-
     m_width = width;
     m_height = height;
 
@@ -744,4 +732,3 @@ void Renderer::resize(int width, int height)
     }
     m_reduceLastTextureSize = prevWidth * prevHeight;
 }
-
