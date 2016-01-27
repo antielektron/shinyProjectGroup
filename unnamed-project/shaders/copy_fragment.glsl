@@ -2,6 +2,7 @@
 
 in vec2 uv;
 uniform mat4 projectionMatrix;
+uniform mat4 inverseProjectionMatrix;
 
 uniform sampler2D sampler;
 uniform sampler2D ovSampler;
@@ -34,6 +35,24 @@ float rand(float a)
 	return res;
 }
 
+
+// improve depth scaling:
+float get_world_depth(vec2 uv)
+{
+	float z = texture2D(depthBuffer, uv).x * 2.0 - 1.0;
+	vec4 v = inverseProjectionMatrix * vec4(0.0,0.0, z, 1.0);	
+	return 1.0 - v.z / (v.w);
+}
+
+
+float get_depth(vec2 uv)
+{
+	float z = texture2D(depthBuffer, uv).x * 2.0 - 1.0;
+	vec4 v = inverseProjectionMatrix * vec4(0.0,0.0, z, 1.0);
+	return  (v.z / ((v.w) * 100.0) + 1.0);
+}
+
+
 // stuff for line sampling:
 
 // very stupid perspective scaling approximation function:
@@ -45,7 +64,9 @@ float get_kx(float z)
 	e1 = projectionMatrix * e1;
 	e2 = projectionMatrix * e2;
 	
+	//return 0.1;
 	return 0.1 * (e2.x / e2.w - e1.x / e1.w);
+
 }
 
 float get_ky(float z)
@@ -56,6 +77,7 @@ float get_ky(float z)
 	e1 = projectionMatrix * e1;
 	e2 = projectionMatrix * e2;
 	
+	//return 0.1;
 	return 0.1 * (e2.y / e2.w - e1.y / e1.w);	
 }
 
@@ -70,8 +92,8 @@ float get_w(float radius)
 
 float get_dr(vec2 unitPos, vec2 pPos, float p_z)
 {
-	float kx = get_kx(p_z);
-	float ky = get_ky(p_z);
+	float kx = get_kx(get_world_depth(pPos));
+	float ky = get_kx(get_world_depth(pPos));
 	vec2 scaledUnitPos = vec2(unitPos.x * kx, unitPos.y * ky);
 	vec2 screenSpaceUnitPos = scaledUnitPos + pPos;
 	//clip if necessary:
@@ -80,7 +102,7 @@ float get_dr(vec2 unitPos, vec2 pPos, float p_z)
 	screenSpaceUnitPos = clamp(screenSpaceUnitPos, 0, 1 - eps);
 	
 	
-	return (- p_z + (1 - texture2D(ovSampler, screenSpaceUnitPos).x)) / kx;
+	return (- p_z + (1 - get_depth(screenSpaceUnitPos))) / kx;
 }
 
 float z_s(vec2 unitPos)
@@ -98,13 +120,13 @@ float lineSampling(int nSamples)
 {
 	float sumSamples = 0.;
 	float sumVolume = 0.;
-	float z = 1 - texture2D(ovSampler, uv).x;
+	float z = 1.0 - get_depth(uv);
 	for (int i = 0; i < nSamples; i++)
 	{
 		// get a random angle and radius for sample point on the
 		// unit disk
-		float radius = rand(z);
-		float angle = rand(z) * 2 * PI;
+		float radius = rand(0.1);
+		float angle = rand(0.1) * 2 * PI;
 		
 		// weight samples:
 		float w = get_w(radius);
@@ -121,7 +143,7 @@ float lineSampling(int nSamples)
 
 bool isInCenterEpsilonArea(vec2 centerPoint)
 {
-	float zCenter = 1 - texture2D(ovSampler, centerPoint).x;
+	float zCenter = get_world_depth(centerPoint);
 	float kx = get_kx(zCenter);
 	float ky = get_ky(zCenter);
 	
@@ -178,12 +200,12 @@ void main()
 	vec3 mixedColor = (result.z / -result.w) / 50. * vec3(1., 1., 1.);
 */
 	// DEBUG
-	/*
+	
 	vec2 center = vec2(0.5,0.5);
 	
 	if (isInCenterEpsilonArea(center))
 	{
-		mixedColor.z *= 2 ;
+		mixedColor.z = 1. ;
 		mixedColor.x *= 0.5;
 		mixedColor.y *= 0.5;
 	}
@@ -201,7 +223,11 @@ void main()
 		mixedColor.z = 0;		
 		
 	}
-	*/
+	
 	
     outputColor = vec4(mixedColor, 1.);
+    
+    // render just Depth:
+    //float z = get_depth(uv);
+    //outputColor = vec4(1 - z * vec3(1.,1.,1.), 1.);
 }
