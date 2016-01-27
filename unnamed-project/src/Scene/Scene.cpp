@@ -62,7 +62,6 @@ void Scene::loadFromFile(const QString &filename)
     for (auto currentElement = root.firstChildElement(); !currentElement.isNull(); currentElement = currentElement.nextSiblingElement())
     {
         QString tag = currentElement.tagName();
-        std::cout << "TAG " << tag.toStdString() << std::endl;
         if (tag == "Objects")
         {
             readObjectTreeFromDom(&m_rootGroup, currentElement);
