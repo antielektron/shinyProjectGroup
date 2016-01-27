@@ -97,6 +97,9 @@ protected:
 
     GLuint m_tempTexture;
 
+    size_t m_debugSum;
+    size_t m_debugCount;
+
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H
