@@ -147,6 +147,9 @@ void Renderer::initialize()
     //m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(
     //            std::make_pair(0, "v_position"));
 
+
+    m_uniformLocs[KEYSTR_PROGRAM_REDUCE_SAMPLER].emplace_back(&m_reduceInputSizeLoc, "inputSize");
+
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussSourceLoc, "sourceImage");
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussFilteredLoc, "filteredImage");
 
@@ -549,8 +552,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     composeProgram->release();
 
 
+    /*
     glFinish();
     auto start = std::chrono::system_clock::now();
+    */
 
     // Invoke reduce ...
     GLsizei prevWidth = m_width;
@@ -560,6 +565,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+
+    reduceStartProgram->setUniformValue(m_reduceInputSizeLoc, m_width, m_height);
 
     glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
@@ -589,11 +596,13 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     reduceProgram->release();
 
+    /*
     glFinish();
     auto end = std::chrono::system_clock::now();
     m_debugSum += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
     m_debugCount++;
     std::cout << (double)m_debugSum/m_debugCount << std::endl;
+    */
 
     /*
     GLint windowTexture;
