@@ -557,8 +557,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     composeProgram->release();
 
 
-    /*
-    */
     // Invoke reduce ...
     GLsizei prevWidth = m_width;
     GLsizei prevHeight = m_height;
@@ -598,8 +596,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     reduceProgram->release();
 
-    /*
-    */
     /*
     GLint windowTexture;
     glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);

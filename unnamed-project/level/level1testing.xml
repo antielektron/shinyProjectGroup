@@ -539,7 +539,7 @@
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
         <Object name="floor4" model="floor2" interactionEvent="">
-            <Position x="0" y="12.7" z="-73.5"/>
+            <Position x="0" y="12.6" z="-73.5"/>
             <Rotation x="180" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>

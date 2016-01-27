@@ -79,15 +79,21 @@ void main()
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
+        barrier();
+
         other = sharedData[index + 16];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
+        barrier();
+
         other = sharedData[index + 8];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
+
+        barrier();
 
         other = sharedData[index + 4];
         depthMinMax.x = min(depthMinMax.x, other.x);
