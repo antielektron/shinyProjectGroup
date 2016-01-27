@@ -52,7 +52,7 @@ void main()
     uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*8;
     sharedData[index] = depthMinMax;
 
-    memoryBarrierShared();
+    barrier();
 
     vec2 other;
 
@@ -64,35 +64,35 @@ void main()
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
-    memoryBarrierShared();
+    barrier();
 
         other = sharedData[index + 16];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
-    memoryBarrierShared();
+    barrier();
 
         other = sharedData[index + 8];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
-    memoryBarrierShared();
+    barrier();
 
         other = sharedData[index + 4];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
-    memoryBarrierShared();
+    barrier();
 
         other = sharedData[index + 2];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
-    memoryBarrierShared();
+    barrier();
 
         other = sharedData[index + 1];
         depthMinMax.x = min(depthMinMax.x, other.x);
