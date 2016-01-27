@@ -75,6 +75,7 @@ protected:
 
     // Reduce
     // int m_reduceInverseProjectionMatrixLoc;
+    int m_reduceInputSizeLoc;
     std::vector<GLuint> m_depthReduceTextures;
     GLsizei m_reduceLastTextureSize;
 

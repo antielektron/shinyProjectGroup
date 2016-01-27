@@ -19,14 +19,20 @@ void computeCurrentThreadValue(out vec2 depthMinMax)
     ivec2 inputPos = 2 * ivec2(gl_GlobalInvocationID.xy);
 
     // d = 1 -> Background
-    depthMinMax = imageLoad(inputTex, inputPos).xy;
+    depthMinMax = vec2(1, 0);
 
-    if (inputPos.x+1 < inputSize.x)
+    if (inputPos.x < inputSize.x && inputPos.y < inputSize.y)
+    {
+        vec2 a = imageLoad(inputTex, inputPos).xy;
+        updateMinMaxDepth(depthMinMax, a);
+    }
+
+    if (inputPos.x+1 < inputSize.x && inputPos.y < inputSize.y)
     {
         vec2 b = imageLoad(inputTex, inputPos + ivec2(1, 0)).xy;
         updateMinMaxDepth(depthMinMax, b);
     }
-    if (inputPos.y+1 < inputSize.y)
+    if (inputPos.x < inputSize.x && inputPos.y+1 < inputSize.y)
     {
         vec2 c = imageLoad(inputTex, inputPos + ivec2(0, 1)).xy;
         updateMinMaxDepth(depthMinMax, c);
@@ -43,7 +49,6 @@ void main()
     vec2 depthMinMax;
     computeCurrentThreadValue(depthMinMax);
 
-
     uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*8;
     sharedData[index] = depthMinMax;
 
@@ -59,25 +64,35 @@ void main()
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
+    memoryBarrierShared();
+
         other = sharedData[index + 16];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
+
+    memoryBarrierShared();
 
         other = sharedData[index + 8];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
+    memoryBarrierShared();
+
         other = sharedData[index + 4];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
+    memoryBarrierShared();
+
         other = sharedData[index + 2];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
+
+    memoryBarrierShared();
 
         other = sharedData[index + 1];
         depthMinMax.x = min(depthMinMax.x, other.x);

@@ -4,6 +4,8 @@
 layout (binding = 0) uniform sampler2D inputSampler;
 layout (binding=1, rg16) writeonly uniform image2D outputTex;
 
+uniform vec2 inputSize;
+
 shared vec2 sharedData[64];
 
 layout (local_size_x = 8, local_size_y = 8) in;
@@ -24,11 +26,10 @@ void computeCurrentThreadValue(out vec2 depthMinMax)
 
     // TODO size via uniform!
     ivec2 inputPos = ivec2(gl_GlobalInvocationID.xy)*2;
-    ivec2 inputSize = imageSize(outputTex)*2*8;
 
     // Access pixels at center
-    vec2 normalizedInputPos = (vec2(inputPos) + 0.5) / vec2(inputSize);
-    vec2 inputDelta = 1 / vec2(inputSize);
+    vec2 normalizedInputPos = (vec2(inputPos) + 0.5) / inputSize;
+    vec2 inputDelta = 1 / inputSize;
 
     float a = texture2D(inputSampler, normalizedInputPos).x;
     updateMinMaxDepth(depthMinMax, a);
@@ -63,25 +64,35 @@ void main()
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
+    memoryBarrierShared();
+
         other = sharedData[index + 16];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
+
+    memoryBarrierShared();
 
         other = sharedData[index + 8];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
+    memoryBarrierShared();
+
         other = sharedData[index + 4];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
 
+    memoryBarrierShared();
+
         other = sharedData[index + 2];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
         sharedData[index] = depthMinMax;
+
+    memoryBarrierShared();
 
         other = sharedData[index + 1];
         depthMinMax.x = min(depthMinMax.x, other.x);

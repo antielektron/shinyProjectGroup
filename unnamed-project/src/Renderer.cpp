@@ -147,6 +147,9 @@ void Renderer::initialize()
     //m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(
     //            std::make_pair(0, "v_position"));
 
+
+    m_uniformLocs[KEYSTR_PROGRAM_REDUCE_SAMPLER].emplace_back(&m_reduceInputSizeLoc, "inputSize");
+
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussSourceLoc, "sourceImage");
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussFilteredLoc, "filteredImage");
 
@@ -549,6 +552,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     composeProgram->release();
 
 
+    /*
+    */
     // Invoke reduce ...
     GLsizei prevWidth = m_width;
     GLsizei prevHeight = m_height;
@@ -557,6 +562,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+
+    reduceStartProgram->setUniformValue(m_reduceInputSizeLoc, m_width, m_height);
 
     glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
@@ -586,6 +593,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     reduceProgram->release();
 
+    /*
+    */
     /*
     GLint windowTexture;
     glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);
