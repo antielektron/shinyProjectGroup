@@ -16,7 +16,7 @@ uniform mat4 cascadeViewMatrix[4];
 uniform float cascadeFar[4]; // where do the cascades end?
 
 // gl_TextureMatrix
-uniform sampler2DArray shadowMapSampler;
+uniform usampler2DArray shadowMapSampler;
 
 const float roughness = 0.1;
 const float fresnelFactor = 1.;
@@ -146,6 +146,7 @@ float computeMSMShadwowIntensity(vec4 in4Moments, float depth, float depthBias, 
     float Quotient=(Switch.x*z.z-b.x*(Switch.x+z.z)+b.y)
                   /((z.z-Switch.y)*(z.x-z.y));
     return clamp(Switch.z+Switch.w*Quotient,0,1);
+    //return in4Moments.x;
 }
 float simpleShadowTerm()
 {
@@ -154,12 +155,14 @@ float simpleShadowTerm()
 
     vec4 lightViewPosition = cascadeViewMatrix[index] * vec4(worldPosition, 1.);
     vec2 uv = vec2(lightViewPosition.xy * 0.5 + 0.5);
-    vec4 shadowMapValue = texture2DArray(shadowMapSampler, vec3(uv, index));
+    uvec4 shadowMapValueUint = texture(shadowMapSampler, vec3(uv, index));
     float depth = lightViewPosition.z*0.5 + 0.5;
-
+    vec4 shadowMapValue = vec4(shadowMapValueUint);
+    shadowMapValue = shadowMapValue/65535.0;
     vec4 shadowMapMoments;
     sampleOptimized4MomentsShadowMap(shadowMapMoments, shadowMapValue);
     return computeMSMShadwowIntensity(shadowMapMoments, depth, 0.005, 3e-5);
+    //Depth Bias Surface Acne verhindern, in Demo 0
     // Add some epsilon
     //if (depth - shadowMapDepth <= 0.005)
     //    return 1.;
@@ -181,7 +184,7 @@ void main()
     vec3 shadedColor = clamp(specularTerm * specularColor + diffuseTerm * diffuseColor, 0., 1.);
 
     fragColor = vec4(clamp(shadowTerm * (shadedColor) + ambientColor, 0., 1.), gl_FragCoord.z*gl_FragCoord.w);
-
+    //fragColor = shadowTerm;
         /*
     int index = getCascade();
     if (index == 0)

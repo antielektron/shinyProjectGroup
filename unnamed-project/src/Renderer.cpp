@@ -299,7 +299,7 @@ void Renderer::initialize()
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16UI, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA_INTEGER, GL_UNSIGNED_SHORT, 0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
     // Create DepthBuffer
