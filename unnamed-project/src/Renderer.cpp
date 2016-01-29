@@ -426,7 +426,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QVector4D maxCornersXYZ[3] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
 
     std::vector<std::array<float, 4>> reducedFrustumPixels;
-    reducedFrustumPixels.resize(((m_width-1)/2+1) * ((m_height-1)/2+1));
+    reducedFrustumPixels.resize(m_reduceLastTextureSize);
 
     for (int i = 0; i < 3; i++)
     {
@@ -451,7 +451,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
         for (auto &p : reducedFrustumPixels)
         {
-            for (int j = 0; j < 3; j++)
+            for (int j = 0; j < 4; j++)
             {
                 maxCornersXYZ[i][j] = std::max(maxCornersXYZ[i][j], p[j]);
             }
@@ -736,25 +736,31 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     std::vector<std::pair<float, QVector3D>> slices;
     slices.emplace_back(-1, QVector3D(1, 0, 0));
-    slices.emplace_back( 1, QVector3D(1, 0, 0));
+    slices.emplace_back( .99999, QVector3D(1, 0, 0));
     slices.emplace_back(minDepth*2 - 1, QVector3D(0, 1, 0));
     slices.emplace_back(maxDepth*2 - 1, QVector3D(0, 1, 0));
 
-    for (auto &corner : renderSliceCorners)
+    for (auto &entry : slices)
     {
-        for (auto &entry : slices)
+        defaultProgram->setUniformValue(m_modelViewMatrixLoc, lightViewMatrix);
+        defaultProgram->setUniformValue(m_specularColorLoc, QVector3D(0, 0, 0));
+        defaultProgram->setUniformValue(m_diffuseColorLoc, QVector3D(0, 0, 0));
+        defaultProgram->setUniformValue(m_ambientColorLoc, entry.second);
+
+        for (auto &corner : renderSliceCorners)
         {
             auto result = inverseCameraTransformation * QVector4D(corner, entry.first, 1);
             result /= result.w();
-            QMatrix4x4 world;
-            world.translate(result.toVector3D());
 
-            defaultProgram->setUniformValue(m_modelViewMatrixLoc, lightViewMatrix * world);
-            defaultProgram->setUniformValue(m_specularColorLoc, QVector3D(0, 0, 0));
-            defaultProgram->setUniformValue(m_diffuseColorLoc, QVector3D(0, 0, 0));
-            defaultProgram->setUniformValue(m_ambientColorLoc, entry.second);
+            glPointSize(5);
 
-            model->draw();
+            glBegin(GL_POINTS);
+
+            glVertex3f(result.x(), result.y(), result.z());
+
+            glEnd();
+
+            // model->draw();
         }
     }
 
@@ -766,21 +772,25 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     for (int i = 0; i < 4; i++)
     {
         QMatrix4x4 world;
-        world.translate(minCornersCascade[i]);
-        defaultProgram->setUniformValue(m_modelViewMatrixLoc, world);
-        model->draw();
-
         world.setToIdentity();
-        world.translate(maxCornersCascade[i]);
         defaultProgram->setUniformValue(m_modelViewMatrixLoc, world);
-        model->draw();
+
+        auto &minCorner = minCornersCascade[i];
+        auto &maxCorner = maxCornersCascade[i];
+
+        glBegin(GL_LINE_LOOP);
+
+        glVertex3f(minCorner.x(), minCorner.y(), 0);
+        glVertex3f(maxCorner.x(), minCorner.y(), 0);
+        glVertex3f(maxCorner.x(), maxCorner.y(), 0);
+        glVertex3f(minCorner.x(), maxCorner.y(), 0);
+
+        glEnd();
     }
-
-
+    std::cout << std::endl;
 
     // Unbind shadow map texture
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-
 
     defaultProgram->release();
 
@@ -942,7 +952,7 @@ void Renderer::resize(int width, int height)
         {
             glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures[i][j]);
             // TODO dynamic texture size!
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, (m_width-1)/2+1, (m_height-1)/2+1, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, prevWidth, prevHeight, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
             // No filtering required
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

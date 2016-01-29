@@ -100,44 +100,17 @@ void main()
     vec3 maxCorners[4];
     computeCurrentThreadValue(minCorners, maxCorners);
 
+    uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*16;
+
     // transform into texture space [0, 1]
     minCorners[0] = minCorners[0] * 0.5 + 0.5;
     minCorners[1] = minCorners[1] * 0.5 + 0.5;
     minCorners[2] = minCorners[2] * 0.5 + 0.5;
     minCorners[3] = minCorners[3] * 0.5 + 0.5;
 
-    vec4 currentMinX = vec4(minCorners[0].x, minCorners[1].x, minCorners[2].x, minCorners[3].x);
-    vec4 currentMinY = vec4(minCorners[0].y, minCorners[1].y, minCorners[2].y, minCorners[3].y);
-    vec4 currentMinZ = vec4(minCorners[0].z, minCorners[1].z, minCorners[2].z, minCorners[3].z);
-
-    maxCorners[0] = maxCorners[0] * 0.5 + 0.5;
-    maxCorners[1] = maxCorners[1] * 0.5 + 0.5;
-    maxCorners[2] = maxCorners[2] * 0.5 + 0.5;
-    maxCorners[3] = maxCorners[3] * 0.5 + 0.5;
-
-    vec4 currentMaxX = vec4(maxCorners[0].x, maxCorners[1].x, maxCorners[2].x, maxCorners[3].x);
-    vec4 currentMaxY = vec4(maxCorners[0].y, maxCorners[1].y, maxCorners[2].y, maxCorners[3].y);
-    vec4 currentMaxZ = vec4(maxCorners[0].z, maxCorners[1].z, maxCorners[2].z, maxCorners[3].z);
-
-
-    ivec2 outputPos = ivec2(gl_GlobalInvocationID.xy);
-
-    imageStore(outputMinX, outputPos, currentMinX);
-    imageStore(outputMinY, outputPos, currentMinY);
-    imageStore(outputMinZ, outputPos, currentMinZ);
-
-    imageStore(outputMaxX, outputPos, currentMaxX);
-    imageStore(outputMaxY, outputPos, currentMaxY);
-    imageStore(outputMaxZ, outputPos, currentMaxZ);
-
-/*
-    uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*16;
-
-    vec4 currentMinX, currentMinY, currentMinZ, currentMaxX, currentMaxY, currentMaxZ;
-
-    currentMinX = sharedMinX[index] = vec4(minCorners[0].x, minCorners[1].x, minCorners[2].x, minCorners[3].x);
-    currentMinY = sharedMinY[index] = vec4(minCorners[0].y, minCorners[1].y, minCorners[2].y, minCorners[3].y);
-    currentMinZ = sharedMinZ[index] = vec4(minCorners[0].z, minCorners[1].z, minCorners[2].z, minCorners[3].z);
+    vec4 currentMinX = sharedMinX[index] = vec4(minCorners[0].x, minCorners[1].x, minCorners[2].x, minCorners[3].x);
+    vec4 currentMinY = sharedMinY[index] = vec4(minCorners[0].y, minCorners[1].y, minCorners[2].y, minCorners[3].y);
+    vec4 currentMinZ = sharedMinZ[index] = vec4(minCorners[0].z, minCorners[1].z, minCorners[2].z, minCorners[3].z);
 
     // transform into texture space [0, 1]
     maxCorners[0] = maxCorners[0] * 0.5 + 0.5;
@@ -145,9 +118,9 @@ void main()
     maxCorners[2] = maxCorners[2] * 0.5 + 0.5;
     maxCorners[3] = maxCorners[3] * 0.5 + 0.5;
 
-    currentMaxX = sharedMaxX[index] = vec4(maxCorners[0].x, maxCorners[1].x, maxCorners[2].x, maxCorners[3].x);
-    currentMaxY = sharedMaxY[index] = vec4(maxCorners[0].y, maxCorners[1].y, maxCorners[2].y, maxCorners[3].y);
-    currentMaxZ = sharedMaxZ[index] = vec4(maxCorners[0].z, maxCorners[1].z, maxCorners[2].z, maxCorners[3].z);
+    vec4 currentMaxX = sharedMaxX[index] = vec4(maxCorners[0].x, maxCorners[1].x, maxCorners[2].x, maxCorners[3].x);
+    vec4 currentMaxY = sharedMaxY[index] = vec4(maxCorners[0].y, maxCorners[1].y, maxCorners[2].y, maxCorners[3].y);
+    vec4 currentMaxZ = sharedMaxZ[index] = vec4(maxCorners[0].z, maxCorners[1].z, maxCorners[2].z, maxCorners[3].z);
 
     barrier();
 
@@ -156,7 +129,6 @@ void main()
     // TODO reduce different type of values on different threads!
 
     // At least 32 threads per wrap on modern gpu's
-    // if (index < 32)
     if (index < 128)
     {
         other = sharedMinX[index + 128];
@@ -377,5 +349,39 @@ void main()
         imageStore(outputMaxY, outputPos, currentMaxY);
         imageStore(outputMaxZ, outputPos, currentMaxZ);
     }
+
+    /*
+
+    // transform into texture space [0, 1]
+    minCorners[0] = minCorners[0] * 0.5 + 0.5;
+    minCorners[1] = minCorners[1] * 0.5 + 0.5;
+    minCorners[2] = minCorners[2] * 0.5 + 0.5;
+    minCorners[3] = minCorners[3] * 0.5 + 0.5;
+
+    vec4 currentMinX = vec4(minCorners[0].x, minCorners[1].x, minCorners[2].x, minCorners[3].x);
+    vec4 currentMinY = vec4(minCorners[0].y, minCorners[1].y, minCorners[2].y, minCorners[3].y);
+    vec4 currentMinZ = vec4(minCorners[0].z, minCorners[1].z, minCorners[2].z, minCorners[3].z);
+
+    maxCorners[0] = maxCorners[0] * 0.5 + 0.5;
+    maxCorners[1] = maxCorners[1] * 0.5 + 0.5;
+    maxCorners[2] = maxCorners[2] * 0.5 + 0.5;
+    maxCorners[3] = maxCorners[3] * 0.5 + 0.5;
+
+    vec4 currentMaxX = vec4(maxCorners[0].x, maxCorners[1].x, maxCorners[2].x, maxCorners[3].x);
+    vec4 currentMaxY = vec4(maxCorners[0].y, maxCorners[1].y, maxCorners[2].y, maxCorners[3].y);
+    vec4 currentMaxZ = vec4(maxCorners[0].z, maxCorners[1].z, maxCorners[2].z, maxCorners[3].z);
+
+
+
+    ivec2 outputPos = ivec2(gl_GlobalInvocationID.xy);
+
+    imageStore(outputMinX, outputPos, currentMinX);
+    imageStore(outputMinY, outputPos, currentMinY);
+    imageStore(outputMinZ, outputPos, currentMinZ);
+
+    imageStore(outputMaxX, outputPos, currentMaxX);
+    imageStore(outputMaxY, outputPos, currentMaxY);
+    imageStore(outputMaxZ, outputPos, currentMaxZ);
+
     */
 }
