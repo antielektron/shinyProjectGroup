@@ -3,13 +3,8 @@
 // Depth buffer can not be bound as image2D for whatever reason.
 layout (binding = 0) uniform sampler2D inputSampler;
 
-layout (binding=1, rgba16) writeonly uniform image2D outputMinX;
-layout (binding=2, rgba16) writeonly uniform image2D outputMinY;
-layout (binding=3, rgba16) writeonly uniform image2D outputMinZ;
-
-layout (binding=4, rgba16) writeonly uniform image2D outputMaxX;
-layout (binding=5, rgba16) writeonly uniform image2D outputMaxY;
-layout (binding=6, rgba16) writeonly uniform image2D outputMaxZ;
+layout (binding=1, rgba16) writeonly uniform image2D outputMin;
+layout (binding=2, rgba16) writeonly uniform image2D outputMax;
 
 uniform vec2 inputSize;
 
@@ -34,39 +29,36 @@ layout (local_size_x = 16, local_size_y = 16) in;
 
 int getCascade(float depth)
 {
-    if (depth <= cascadeFars[0])
+    if (depth <= cascadeFar[0])
         return 0;
-    else if (depth <= cascadeFars[1])
+    else if (depth <= cascadeFar[1])
         return 1;
-    else if (depth <= cascadeFars[2])
+    else if (depth <= cascadeFar[2])
         return 2;
     else
         return 3;
 }
 
-void updateMinMaxCorners(inout vec3 minCorners[4], inout vec3 maxCorners[4], in vec2 uv, in float depth)
+void updateMinMaxCorners(inout vec3 minCorner, inout vec3 maxCorner, in vec2 uv, in float depth)
 {
     if (depth < 1)
     {
         // project!
 
-        // find correct cascade index;
-        int index = getCascade(depth);
-
         // NOTE: input is in [0,1]^3
         vec4 pos = screenToLightMatrix * (vec4(uv, depth, 1) * 2 - 1);
-        pos /= -pos.w; // TODO verify!
+        pos /= pos.w;
 
-        minCorners[index] = min(minCorners[index], pos.xyz);
-        maxCorners[index] = max(maxCorners[index], pos.xyz);
+        minCorner = min(minCorner, pos.xyz);
+        maxCorner = max(maxCorner, pos.xyz);
     }
 }
 
-void computeCurrentThreadValue(out vec3 minCorners[4], out vec3 maxCorners[4])
+void computeCurrentThreadValue(out vec3 minCorner, out vec3 maxCorner)
 {
     // initialize with default values
-    minCorners[0] = minCorners[1] = minCorners[2] = minCorners[3] = vec3( 1, 1, 1);
-    maxCorners[0] = maxCorners[1] = maxCorners[2] = maxCorners[3] = vec3(-1,-1,-1);
+    minCorner = vec3( 1, 1, 1);
+    maxCorner = vec3(-1,-1,-1);
 
     ivec2 inputPos = ivec2(gl_GlobalInvocationID.xy)*2;
 
@@ -77,29 +69,39 @@ void computeCurrentThreadValue(out vec3 minCorners[4], out vec3 maxCorners[4])
     float depth;
 
     depth = texture2D(inputSampler, normalizedInputPos).x;
-    updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    updateMinMaxCorners(minCorner, maxCorner, normalizedInputPos, depth);
 
     normalizedInputPos.x += inputDelta.x;
 
     depth = texture2D(inputSampler, normalizedInputPos).x;
-    updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    updateMinMaxCorners(minCorner, maxCorner, normalizedInputPos, depth);
 
     normalizedInputPos.y += inputDelta.y;
 
     depth = texture2D(inputSampler, normalizedInputPos).x;
-    updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    updateMinMaxCorners(minCorner, maxCorner, normalizedInputPos, depth);
 
     normalizedInputPos.x -= inputDelta.x;
 
     depth = texture2D(inputSampler, normalizedInputPos).x;
-    updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    updateMinMaxCorners(minCorner, maxCorner, normalizedInputPos, depth);
 }
 
 void main()
 {
-    vec3 minCorners[4];
-    vec3 maxCorners[4];
-    computeCurrentThreadValue(minCorners, maxCorners);
+    vec3 minCorner;
+    vec3 maxCorner;
+    computeCurrentThreadValue(minCorner, maxCorner);
+
+    // transform into texture space [0, 1]
+    minCorner = minCorner * 0.5 + 0.5;
+    maxCorner = maxCorner * 0.5 + 0.5;
+
+    ivec2 outputPos = ivec2(gl_GlobalInvocationID.xy);
+
+    imageStore(outputMin, outputPos, vec4(minCorner, 1));
+    imageStore(outputMax, outputPos, vec4(maxCorner, 1));
+/*
 
     uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*16;
 
@@ -108,6 +110,12 @@ void main()
     currentMinX = sharedMinX[index] = vec4(minCorners[0].x, minCorners[1].x, minCorners[2].x, minCorners[3].x);
     currentMinY = sharedMinY[index] = vec4(minCorners[0].y, minCorners[1].y, minCorners[2].y, minCorners[3].y);
     currentMinZ = sharedMinZ[index] = vec4(minCorners[0].z, minCorners[1].z, minCorners[2].z, minCorners[3].z);
+
+    // transform into texture space [0, 1]
+    maxCorners[0] = maxCorners[0] * 0.5 + 0.5;
+    maxCorners[1] = maxCorners[1] * 0.5 + 0.5;
+    maxCorners[2] = maxCorners[2] * 0.5 + 0.5;
+    maxCorners[3] = maxCorners[3] * 0.5 + 0.5;
 
     currentMaxX = sharedMaxX[index] = vec4(maxCorners[0].x, maxCorners[1].x, maxCorners[2].x, maxCorners[3].x);
     currentMaxY = sharedMaxY[index] = vec4(maxCorners[0].y, maxCorners[1].y, maxCorners[2].y, maxCorners[3].y);
@@ -341,4 +349,5 @@ void main()
         imageStore(outputMaxY, outputPos, currentMaxY);
         imageStore(outputMaxZ, outputPos, currentMaxZ);
     }
+    */
 }
