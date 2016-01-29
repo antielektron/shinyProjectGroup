@@ -16,8 +16,10 @@
 #define KEYSTR_PROGRAM_COMPOSE "Compose"
 #define KEYSTR_PROGRAM_SHADOW  "Shadow"
 #define KEYSTR_PROGRAM_COPY    "Copy"
-#define KEYSTR_PROGRAM_REDUCE   "Reduce"
-#define KEYSTR_PROGRAM_REDUCE_SAMPLER "Reduce from DepthBuffer"
+#define KEYSTR_PROGRAM_REDUCE_DEPTH             "Reduce Depth"
+#define KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER     "Reduce Depth Sampler"
+#define KEYSTR_PROGRAM_REDUCE_FRUSTUM           "Reduce Frustum"
+#define KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER   "Reduce Frustum Sampler"
 #define KEYSTR_PROGRAM_HORIZONTAL_GAUSS "Horizontal Gauss"
 #define KEYSTR_PROGRAM_VERTICAL_GAUSS "Vertical Gauss"
 
@@ -38,6 +40,7 @@ protected:
                               const QVector3D &destination,
                               QMatrix4x4 &matrix);
     void createLightViewMatrix(const QVector3D &lightDir, const QMatrix4x4 &inverseCameraView, QMatrix4x4 &matrix);
+    void createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransformation, QMatrix4x4 &matrix);
 
 
     GLsizei m_width;
@@ -77,8 +80,12 @@ protected:
 
     // Reduce
     // int m_reduceInverseProjectionMatrixLoc;
-    int m_reduceInputSizeLoc;
+    int m_reduceDepthInputSizeLoc;
+    int m_reduceFrustumInputSizeLoc;
+    int m_reduceFrustumCascadeFarLoc;
+    int m_reduceFrustumScreenToLightMatrixLoc;
     std::vector<GLuint> m_depthReduceTextures;
+    std::vector<std::array<GLuint, 6>> m_frustumReduceMinXTextures;
     GLsizei m_reduceLastTextureSize;
 
     // vertical gauss

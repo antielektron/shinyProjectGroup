@@ -78,13 +78,22 @@ void Renderer::initialize()
     //                QOpenGLShader::Fragment);
 
     // Reduce shader
-    setShaderSource(loadTextFile("shaders/reduce/reduce_sampler.glsl"),
-                    KEYSTR_PROGRAM_REDUCE_SAMPLER,
+    setShaderSource(loadTextFile("shaders/reduce/reduce_depth_sampler.glsl"),
+                    KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER,
                     QOpenGLShader::Compute);
 
-    setShaderSource(loadTextFile("shaders/reduce/reduce_compute.glsl"),
-                    KEYSTR_PROGRAM_REDUCE,
+    setShaderSource(loadTextFile("shaders/reduce/reduce_depth_compute.glsl"),
+                    KEYSTR_PROGRAM_REDUCE_DEPTH,
                     QOpenGLShader::Compute);
+
+    setShaderSource(loadTextFile("shaders/reduce/reduce_frustum_sampler.glsl"),
+                    KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER,
+                    QOpenGLShader::Compute);
+
+    setShaderSource(loadTextFile("shaders/reduce/reduce_frustum_compute.glsl"),
+                    KEYSTR_PROGRAM_REDUCE_FRUSTUM,
+                    QOpenGLShader::Compute);
+
 
     // Gauss Filter shaders
     setShaderSource(loadTextFile("shaders/filter/vertical_gauss.glsl"),
@@ -140,15 +149,16 @@ void Renderer::initialize()
                 std::make_pair(0, "v_position"));
 
     // copy
-    //m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(
-    //                std::make_pair(&m_copyArraySamplerLoc, "sampler"));
-    //m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(
-    //                std::make_pair(&m_copyArrayLayerLoc, "layer"));
-    //m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(
-    //            std::make_pair(0, "v_position"));
+    //m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(&m_copyArraySamplerLoc, "sampler"));
+    //m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(&m_copyArrayLayerLoc, "layer"));
+    //m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(0, "v_position"));
 
 
-    m_uniformLocs[KEYSTR_PROGRAM_REDUCE_SAMPLER].emplace_back(&m_reduceInputSizeLoc, "inputSize");
+    m_uniformLocs[KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER].emplace_back(&m_reduceDepthInputSizeLoc, "inputSize");
+
+    m_uniformLocs[KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER].emplace_back(&m_reduceFrustumInputSizeLoc, "inputSize");
+    m_uniformLocs[KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER].emplace_back(&m_reduceFrustumCascadeFarLoc, "cascadeFar");
+    m_uniformLocs[KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER].emplace_back(&m_reduceFrustumScreenToLightMatrixLoc, "screenToLightMatrix");
 
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussSourceLoc, "sourceImage");
     m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussFilteredLoc, "filteredImage");
@@ -161,8 +171,10 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_SHADOW);
     createProgram(KEYSTR_PROGRAM_COMPOSE);
     // createProgram(KEYSTR_PROGRAM_COPY);
-    createProgram(KEYSTR_PROGRAM_REDUCE_SAMPLER);
-    createProgram(KEYSTR_PROGRAM_REDUCE);
+    createProgram(KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER);
+    createProgram(KEYSTR_PROGRAM_REDUCE_DEPTH);
+    createProgram(KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER);
+    createProgram(KEYSTR_PROGRAM_REDUCE_FRUSTUM);
     createProgram(KEYSTR_PROGRAM_HORIZONTAL_GAUSS);
     createProgram(KEYSTR_PROGRAM_VERTICAL_GAUSS);
 
@@ -173,8 +185,6 @@ void Renderer::initialize()
     // Create ShadowMap
     m_shadowMapSize = 1024;
     m_cascades = 4;
-
-    // TODO don't render to texture but reuse depth buffer!!!
 
     // Create Texture
     glGenTextures(1, &m_shadowMapTexture);
@@ -252,14 +262,46 @@ void Renderer::createLightViewMatrix(const QVector3D &lightDir, const QMatrix4x4
     matrix = rotateCameraDir * rotateLightDir;
 }
 
+void Renderer::createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransformation, QMatrix4x4 &matrix)
+{
+    QVector3D frustumCorners[] = {
+            { -1, -1, -1 },
+            {  1, -1, -1 },
+            { -1,  1, -1 },
+            {  1,  1, -1 },
+            { -1, -1,  1 },
+            {  1, -1,  1 },
+            { -1,  1,  1 },
+            {  1,  1,  1 }
+    };
+
+    MathUtility::transformVectors(frustumTransformation, frustumCorners);
+
+    QVector3D minCorner = frustumCorners[0];
+    QVector3D maxCorner = frustumCorners[1];
+
+    for (const auto &corner : frustumCorners)
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            minCorner[i] = std::min(minCorner[i], corner[i]);
+            maxCorner[i] = std::max(maxCorner[i], corner[i]);
+        }
+    }
+
+    // TODO check if this projection is what we need!
+    matrix.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z());
+
+}
+
 void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 {
 
     QOpenGLShaderProgram *shadowMapProgram = m_programs[KEYSTR_PROGRAM_SHADOW].get();
     QOpenGLShaderProgram *defaultProgram = m_programs[KEYSTR_PROGRAM_RENDER].get();
     QOpenGLShaderProgram *composeProgram = m_programs[KEYSTR_PROGRAM_COMPOSE].get();
-    QOpenGLShaderProgram *reduceStartProgram = m_programs[KEYSTR_PROGRAM_REDUCE_SAMPLER].get();
-    QOpenGLShaderProgram *reduceProgram = m_programs[KEYSTR_PROGRAM_REDUCE].get();
+    QOpenGLShaderProgram *reduceStartProgram = m_programs[KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER].get();
+    QOpenGLShaderProgram *reduceProgram = m_programs[KEYSTR_PROGRAM_REDUCE_DEPTH].get();
     // QOpenGLShaderProgram *copyProgram = m_programs[KEYSTR_PROGRAM_COPY].get();
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
@@ -274,11 +316,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     QMatrix4x4 lightViewMatrix;
     createLightViewMatrix(scene->getDirectionalLightDirection().normalized(), inverseCameraView, lightViewMatrix);
-
-    // Compute viewFrustum of camera in light view
-    auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
-
-    // TODO only compute AABB now.
 
     // Corners of slices
     std::vector<std::vector<QVector3D>> sliceCorners(static_cast<size_t>(m_cascades)+1);
@@ -310,51 +347,22 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     }
 
 
-    QVector3D minCorners[] = {
-            { -1, -1, -1 },
-            {  1, -1, -1 },
-            { -1,  1, -1 },
-            {  1,  1, -1 }
-    };
-    QVector3D maxCorners[] = {
-            { -1, -1,  1 },
-            {  1, -1,  1 },
-            { -1,  1,  1 },
-            {  1,  1,  1 }
-    };
-
-    QVector3D frustumNearFarCorners[] = {
-            { 0, 0, -1 },
-            { 0, 0,  1 }
-    };
-
     QVector3D actualNearFarCorners[] = {
             { 0, 0, minDepth*2 - 1 },
             { 0, 0, maxDepth*2 - 1 },
     };
 
-    // TODO don't use frustum corners, but the bounding box calculated from the depth buffer
-
     // Transform corners into light view space
-    MathUtility::transformVectors(screenToLightTransformation, minCorners);
-    MathUtility::transformVectors(screenToLightTransformation, maxCorners);
-
-    // Transform corners into light view space
-    MathUtility::transformVectors(inverseCameraProjection, frustumNearFarCorners);
     MathUtility::transformVectors(inverseCameraProjection, actualNearFarCorners);
 
     // NOTE: z values are inverted! multiply by -1
-    float projectionNearPlane = -frustumNearFarCorners[0].z();
-    float projectionFarPlane = -frustumNearFarCorners[1].z();
-
     float actualNearPlane = -actualNearFarCorners[0].z();
     float actualFarPlane = -actualNearFarCorners[1].z();
 
     // Coefficient for combining uniform and logarithmic results
     float lambdaUniLog = 0.3f;
 
-    // Interpolate corners in light view space, not screen space
-    for (size_t i = 0; i <= static_cast<size_t>(m_cascades); i++)
+    for (size_t i = 1; i <= static_cast<size_t>(m_cascades); i++)
     {
         // interpolate between actual near/far planes
         float cUni = actualNearPlane + (actualFarPlane - actualNearPlane) * i / m_cascades;
@@ -365,67 +373,31 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
         if (i != 0)
             cascadeFars.push_back(currentZ);
-
-        // Coefficient for affine combination of frustum corners
-        // NOTE: use projection near/far plane
-        float coeff = (currentZ - projectionNearPlane) / (projectionFarPlane - projectionNearPlane);
-
-        for (size_t j = 0; j < 4; j++)
-        {
-            sliceCorners[i].push_back((1 - coeff) * minCorners[j] + coeff * maxCorners[j]);
-        }
     }
 
-    // For each cascade combine two slices
-    for (size_t i = 0; i < static_cast<size_t>(m_cascades); i++)
-    {
-        // compute MINIMAL bounding box of frustumCorners
-        float minZ = sliceCorners[i].front().z();
-        float maxZ = sliceCorners[i].front().z();
-        std::vector<QVector2D> corners2D;
 
-        for (const auto &corner : sliceCorners[i])
-        {
-            corners2D.push_back(corner.toVector2D());
-            if (minZ > corner.z())
-                minZ = corner.z();
-            if (maxZ < corner.z())
-                maxZ = corner.z();
+    // Compute viewFrustum of camera in light view
+    auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
 
-        }
-        for (const auto &corner : sliceCorners[i+1])
-        {
-            corners2D.push_back(corner.toVector2D());
-            if (minZ > corner.z())
-                minZ = corner.z();
-            if (maxZ < corner.z())
-                maxZ = corner.z();
-        }
+    // TODO only compute AABB now.
+    // TODO compute temporary projection matrix wrapping the whole view frustum!
 
-        // Compute on x-y-plane the minimal bounding rectangle
-        std::vector<QVector2D> hull2D;
-        QVector2D maxCorner2D;
-        QVector2D minCorner2D;
-        float frustumRotationAngle;
+    // TODO check if this projection is what we need!
+    QMatrix4x4 tempLightProjection;
+    createFrustumProjectionMatrix(screenToLightTransformation, tempLightProjection);
 
-        MathUtility::getConvexHull(corners2D, hull2D);
-        MathUtility::getMinimalBoundingBox(hull2D,
-                                           minCorner2D,
-                                           maxCorner2D,
-                                           frustumRotationAngle);
+    // TODO transform cascade far planes into screen space!
+    // in shader:
+    // inLight = screenToLight * (xy , depth, 1)
+    // inLight /= inLight.w
+    // branch for depth -> cascades
+    // store in appropriate texture
+    // store: vec3 minCorner[4], vec3 maxCorner[4]
+    // store min[12], max[12]
 
-        // rotate such that minimal bounding box is aabb
-        QMatrix4x4 lightViewRotationZ;
-        lightViewRotationZ.rotate(frustumRotationAngle * 180.f / static_cast<float>(M_PI), QVector3D(0, 0, -1));
 
-        // compute light view projection
-        QMatrix4x4 lightViewProjection;
-        lightViewProjection.ortho(minCorner2D.x(), maxCorner2D.x(), minCorner2D.y(), maxCorner2D.y(), -maxZ, -minZ); // TODO find out why near/far plane are so?
-
-        // NOTE: will work in view space not world space while rendering!
-        cascadeViews.push_back(lightViewProjection * lightViewRotationZ * lightViewMatrix * scene->getCameraView().inverted());
-    }
-
+    // TODO compute cascadeView's
+    // TODO read back
 
     // light direction from camera's perspective
     auto lightDirection = scene->getCameraView() * QVector4D(scene->getDirectionalLightDirection(), 0.);
@@ -585,7 +557,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
 
-    reduceStartProgram->setUniformValue(m_reduceInputSizeLoc, m_width, m_height);
+    reduceStartProgram->setUniformValue(m_reduceDepthInputSizeLoc, m_width, m_height);
 
     glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
@@ -689,6 +661,8 @@ void Renderer::resize(int width, int height)
     glDeleteTextures(1, &m_renderDepthBuffer);
     glDeleteTextures(1, &m_tempTexture);
     glDeleteTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
+    for (auto &arr : m_frustumReduceMinXTextures)
+        glDeleteTextures(6, arr.data());
 
     // Create render texture
     glGenTextures(1, &m_renderTexture);
@@ -751,8 +725,12 @@ void Renderer::resize(int width, int height)
 
     // Create reduce textures!
     auto n = std::ceil(std::log(std::min(m_width, m_height)) / std::log(2.*16.));
+    n = 1; // reduce_frustum_compute.glsl not implemented yet.
     m_depthReduceTextures.resize(n);
     glGenTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
+    for (auto &arr : m_frustumReduceMinXTextures)
+        glGenTextures(6, arr.data());
+
 
     GLsizei prevWidth = m_width;
     GLsizei prevHeight = m_height;
@@ -762,6 +740,16 @@ void Renderer::resize(int width, int height)
         // round up
         prevWidth = (prevWidth-1) / 2 / 16 + 1;
         prevHeight = (prevHeight-1) / 2 / 16 + 1;
+
+        for (int j = 0; j < 6; j++)
+        {
+            glBindTexture(GL_TEXTURE_2D, m_frustumReduceMinXTextures[i][j]);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, prevWidth, prevHeight, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+            // No filtering required
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
 
         glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, prevWidth, prevHeight, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
