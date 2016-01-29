@@ -409,7 +409,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
 
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 6; i++)
     {
         glBindImageTexture(1+i, m_frustumReduceTextures[0][i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16);
     }
@@ -422,76 +422,69 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
 
     // NOTE: read back values are in texturespace [0, 1]
-    QVector3D minCorner( 1, 1, 1);
-    QVector3D maxCorner(-1,-1,-1);
+    QVector4D minCornersXYZ[3] = {{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}};
+    QVector4D maxCornersXYZ[3] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
 
     std::vector<std::array<float, 4>> reducedFrustumPixels;
-    reducedFrustumPixels.resize(((m_width-1)/2+1) * ((m_height-1)/2+1), {-2, -2, -2, -2});
+    reducedFrustumPixels.resize(((m_width-1)/2+1) * ((m_height-1)/2+1));
 
-    glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures[0][0]);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    for (auto &p : reducedFrustumPixels)
+    for (int i = 0; i < 3; i++)
     {
-        for (int j = 0; j < 3; j++)
+        glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures[0][i]);
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        for (auto &p : reducedFrustumPixels)
         {
-            minCorner[j] = std::min(minCorner[j], p[j]*2-1);
+            for (int j = 0; j < 4; j++)
+            {
+                minCornersXYZ[i][j] = std::min(minCornersXYZ[i][j], p[j]);
+            }
         }
     }
 
-    glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures[0][1]);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    for (auto &p : reducedFrustumPixels)
+    for (int i = 0; i < 3; i++)
     {
-        for (int j = 0; j < 3; j++)
+        glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures[0][3+i]);
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        for (auto &p : reducedFrustumPixels)
         {
-            maxCorner[j] = std::max(maxCorner[j], p[j]*2-1);
+            for (int j = 0; j < 3; j++)
+            {
+                maxCornersXYZ[i][j] = std::max(maxCornersXYZ[i][j], p[j]);
+            }
         }
     }
-/*
+
     // sort by cascades
-    QVector3D minCornerCascade[4];
-    QVector3D maxCornerCascade[4];
+    QVector3D minCornersCascade[4];
+    QVector3D maxCornersCascade[4];
 
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 3; j++)
         {
             // transform from texture space to projected space
-            minCornerCascade[i][j] = minCornersXYZ[j][i] * 2 - 1;
-            maxCornerCascade[i][j] = maxCornersXYZ[j][i] * 2 - 1;
+            minCornersCascade[i][j] = minCornersXYZ[j][i] * 2 - 1;
+            maxCornersCascade[i][j] = maxCornersXYZ[j][i] * 2 - 1;
         }
     }
-*/
 
     // transform min/max corners back into light space
     auto inverseTempLightProjection = tempLightProjection.inverted();
-    auto temp = inverseTempLightProjection * QVector4D(minCorner, 1);
-    minCorner = (temp/temp.w()).toVector3D();
-    temp = inverseTempLightProjection * QVector4D(maxCorner, 1);
-    maxCorner = (temp/temp.w()).toVector3D();
+    MathUtility::transformVectors(inverseTempLightProjection, minCornersCascade);
+    MathUtility::transformVectors(inverseTempLightProjection, maxCornersCascade);
 
-    // all cascades identical
-    QMatrix4x4 cascadeProjection;
-    cascadeProjection.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -minCorner.z(), -maxCorner.z());
-    cascadeViews.resize(m_cascades, cascadeProjection * lightViewMatrix * inverseCameraView);
-    /*
     // for all cascades calculate projection matrix
     for (int i = 0; i < m_cascades; i++)
     {
-        std::cout << minCornerCascade[i].x() << " " << minCornerCascade[i].y() << " " << minCornerCascade[i].z() << std::endl;
-        std::cout << maxCornerCascade[i].x() << " " << maxCornerCascade[i].y() << " " << maxCornerCascade[i].z() << std::endl;
-
-        // min/max did happen in projected space => -minZ~>minZ, -maxZ~>maxZ
         QMatrix4x4 cascadeProjection;
-        cascadeProjection.ortho(minCornerCascade[i].x(), maxCornerCascade[i].x(), minCornerCascade[i].y(), maxCornerCascade[i].y(), -minCornerCascade[i].z(), -maxCornerCascade[i].z());
+        // min/max did happen in projected space => -minZ~>minZ, -maxZ~>maxZ
+        cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z(), -maxCornersCascade[i].z());
         cascadeViews.push_back(cascadeProjection * lightViewMatrix * inverseCameraView);
     }
-    std::cout << std::endl;
-    */
 
 
     // light direction from camera's perspective
@@ -770,15 +763,19 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     defaultProgram->setUniformValue(m_diffuseColorLoc, QVector3D(0, 0, 0));
     defaultProgram->setUniformValue(m_ambientColorLoc, QVector3D(1, 1, 0));
 
-    QMatrix4x4 world;
-    world.translate(minCorner);
-    defaultProgram->setUniformValue(m_modelViewMatrixLoc, world);
-    model->draw();
+    for (int i = 0; i < 4; i++)
+    {
+        QMatrix4x4 world;
+        world.translate(minCornersCascade[i]);
+        defaultProgram->setUniformValue(m_modelViewMatrixLoc, world);
+        model->draw();
 
-    world.setToIdentity();
-    world.translate(maxCorner);
-    defaultProgram->setUniformValue(m_modelViewMatrixLoc, world);
-    model->draw();
+        world.setToIdentity();
+        world.translate(maxCornersCascade[i]);
+        defaultProgram->setUniformValue(m_modelViewMatrixLoc, world);
+        model->draw();
+    }
+
 
 
     // Unbind shadow map texture

@@ -43,7 +43,7 @@ void BulletGame::resize(int width, int height)
 {
     auto &proj = m_scene->getCameraProjection();
     proj.setToIdentity();
-    proj.perspective(45.0f, (float)width / height, 0.2f, 100.0f);
+    proj.perspective(45.0f, (float)width / height, 0.2f, 30.0f);
 }
 
 void BulletGame::tick(float dt)
