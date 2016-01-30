@@ -200,7 +200,7 @@ void main()
 	vec3 mixedColor = (result.z / -result.w) / 50. * vec3(1., 1., 1.);
 */
 	// DEBUG
-	
+	/*
 	vec2 center = vec2(0.5,0.5);
 	
 	if (isInCenterEpsilonArea(center))
@@ -223,7 +223,7 @@ void main()
 		mixedColor.z = 0;		
 		
 	}
-	
+	*/
 	
     outputColor = vec4(mixedColor, 1.);
     

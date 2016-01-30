@@ -66,7 +66,7 @@ void Renderer::initialize()
     setShaderSource(loadTextFile("shaders/copy_vertex.glsl"),
                     KEYSTR_PROGRAM_COMPOSE,
                     QOpenGLShader::Vertex);
-    setShaderSource(loadTextFile("shaders/copy_fragment.glsl"),
+    setShaderSource(loadTextFile("shaders/compose/compose_fragment_line_sampling_vo.glsl"),
                     KEYSTR_PROGRAM_COMPOSE,
                     QOpenGLShader::Fragment);
     // copy
@@ -132,6 +132,8 @@ void Renderer::initialize()
     // compose
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                 std::make_pair(&m_composeProjectionMatrixLoc, "projectionMatrix"));
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
+                std::make_pair(&m_composeInverseProjectionMatrixLoc, "inverseProjectionMatrix"));
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                 std::make_pair(&m_composeDepthBufferLoc, "depthBuffer"));
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
@@ -532,6 +534,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     composeProgram->setUniformValue(m_composeOvSamplerLoc, 1);
     composeProgram->setUniformValue(m_composeDepthBufferLoc,2);
     composeProgram->setUniformValue(m_composeProjectionMatrixLoc, scene->getCameraProjection());
+    composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, inverseCameraProjection);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderTexture);
@@ -571,8 +574,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
     // round up
-    prevWidth = (prevWidth-1) / 2 / 16 + 1;
-    prevHeight = (prevHeight-1) / 2 / 16 + 1;
+    prevWidth = (prevWidth-1) / 2 / 8 + 1;
+    prevHeight = (prevHeight-1) / 2 / 8 + 1;
 
     // for every new pixel spawn a thread group!
     glDispatchCompute(prevWidth, prevHeight, 1);
@@ -587,8 +590,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(1, m_depthReduceTextures[i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
         // round up
-        prevWidth = (prevWidth-1) / 2 / 16 + 1;
-        prevHeight = (prevHeight-1) / 2 / 16 + 1;
+        prevWidth = (prevWidth-1) / 2 / 8 + 1;
+        prevHeight = (prevHeight-1) / 2 / 8 + 1;
 
         // for every new pixel spawn a thread group!
         glDispatchCompute(prevWidth, prevHeight, 1);
@@ -720,7 +723,7 @@ void Renderer::resize(int width, int height)
 
 
     // Create reduce textures!
-    auto n = std::ceil(std::log(std::min(m_width, m_height)) / std::log(2.*16.));
+    auto n = std::ceil(std::log(std::min(m_width, m_height)) / std::log(2.*8.));
     m_depthReduceTextures.resize(n);
     glGenTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
 
@@ -730,8 +733,8 @@ void Renderer::resize(int width, int height)
     for (int i = 0; i < n; i++)
     {
         // round up
-        prevWidth = (prevWidth-1) / 2 / 16 + 1;
-        prevHeight = (prevHeight-1) / 2 / 16 + 1;
+        prevWidth = (prevWidth-1) / 2 / 8 + 1;
+        prevHeight = (prevHeight-1) / 2 / 8 + 1;
 
         glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, prevWidth, prevHeight, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
@@ -742,3 +745,4 @@ void Renderer::resize(int width, int height)
     }
     m_reduceLastTextureSize = prevWidth * prevHeight;
 }
+

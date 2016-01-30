@@ -44,7 +44,6 @@ float get_world_depth(vec2 uv)
 	return 1.0 - v.z / (v.w);
 }
 
-
 float get_depth(vec2 uv)
 {
 	float z = texture2D(depthBuffer, uv).x * 2.0 - 1.0;

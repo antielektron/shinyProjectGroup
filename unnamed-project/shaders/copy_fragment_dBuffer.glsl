@@ -2,6 +2,7 @@
 
 in vec2 uv;
 uniform mat4 projectionMatrix;
+uniform mat4 inverseProjectionMatrix;
 
 uniform sampler2D sampler;
 uniform sampler2D ovSampler;
@@ -34,6 +35,16 @@ float rand(float a)
 	return res;
 }
 
+
+// improve depth scaling:
+float get_depth(vec2 uv)
+{
+	float z = texture2D(depthBuffer, uv).x * 2.0 - 1.0;
+	vec4 v = inverseProjectionMatrix * vec4(0.0,0.0, z, 1.0);
+	return (v.z / ((v.w) * 100.0) + 1.0);
+}
+
+
 // stuff for line sampling:
 
 // very stupid perspective scaling approximation function:
@@ -45,7 +56,7 @@ float get_kx(float z)
 	e1 = projectionMatrix * e1;
 	e2 = projectionMatrix * e2;
 	
-	return 1 * (e2.x / e2.w - e1.x / e1.w);
+	return  1. / (0.5 * z);
 }
 
 float get_ky(float z)
@@ -56,7 +67,7 @@ float get_ky(float z)
 	e1 = projectionMatrix * e1;
 	e2 = projectionMatrix * e2;
 	
-	return 1 * (e2.y / e2.w - e1.y / e1.w);	
+	return 1. / (0.5 * z);	
 }
 
 // weight function (calculates how much of the sphere is filled
@@ -80,7 +91,7 @@ float get_dr(vec2 unitPos, vec2 pPos, float p_z)
 	screenSpaceUnitPos = clamp(screenSpaceUnitPos, 0, 1 - eps);
 	
 	
-	return (- p_z + (1 - texture2D(depthBuffer, screenSpaceUnitPos).x)) / kx;
+	return (- p_z + (1 - get_depth(screenSpaceUnitPos))) / kx;
 }
 
 float z_s(vec2 unitPos)
@@ -98,7 +109,7 @@ float lineSampling(int nSamples)
 {
 	float sumSamples = 0.;
 	float sumVolume = 0.;
-	float z = texture2D(depthBuffer, uv).x;
+	float z = get_depth(uv);
 	for (int i = 0; i < nSamples; i++)
 	{
 		// get a random angle and radius for sample point on the
@@ -121,7 +132,7 @@ float lineSampling(int nSamples)
 
 bool isInCenterEpsilonArea(vec2 centerPoint)
 {
-	float zCenter = 1 - texture2D(depthBuffer, centerPoint).x;
+	float zCenter = 1 - get_depth(centerPoint);
 	float kx = get_kx(zCenter);
 	float ky = get_ky(zCenter);
 	
@@ -206,5 +217,6 @@ void main()
     outputColor = vec4(mixedColor, 1.);
     
     // render just Depth:
-    //outputColor = vec4((texture2D(depthBuffer, uv).x) * vec3(1.,1.,1.), 1.);
+    //float z = get_depth(uv);
+    //outputColor = vec4(1 - z * vec3(1.,1.,1.), 1.);
 }
