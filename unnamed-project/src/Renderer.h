@@ -66,7 +66,7 @@ protected:
 
     // Compose Shader
     int m_composeSamplerLoc;
-    int m_composeOvSamplerLoc;
+    int m_composeMomentsSamplerLoc;
     int m_composeProjectionMatrixLoc;
     int m_composeInverseProjectionMatrixLoc;
 
@@ -97,6 +97,7 @@ protected:
     GLuint m_renderFrameBuffer;
     GLuint m_renderTexture;
     GLuint m_voMomentsTexture;
+    GLuint m_voGaussedMomentsBufferTexture;
     GLuint m_renderDepthBuffer;
 
     GLuint m_tempTexture;

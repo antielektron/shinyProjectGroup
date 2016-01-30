@@ -22,7 +22,7 @@ const float roughness = 0.1;
 const float fresnelFactor = 1.;
 
 out vec4 fragColor;
-out float fragNormalDepth;
+out vec2 moments;
 
 const float PI = 3.14159265359;
 
@@ -149,5 +149,6 @@ void main()
         fragColor.xyz *= vec3(1., 1., 0.);
         */
 
-    fragNormalDepth = gl_FragCoord.z*gl_FragCoord.w;
+	float scaledZ = gl_FragCoord.z*gl_FragCoord.w;
+    moments = vec2(scaledZ, pow(scaledZ,2));
 }

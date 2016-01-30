@@ -139,7 +139,7 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                     std::make_pair(&m_composeSamplerLoc, "sampler"));
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
-                    std::make_pair(&m_composeOvSamplerLoc, "ovSampler"));
+                    std::make_pair(&m_composeMomentsSamplerLoc, "momentsSampler"));
     m_attribLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
                 std::make_pair(0, "v_position"));
 
@@ -514,6 +514,24 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     defaultProgram->release();
 
+    // gauss moments of screenspace depth:
+
+    verticalGaussProgram->bind();
+
+    glBindImageTexture(0, m_voMomentsTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(1, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
+
+    verticalGaussProgram->release();
+
+
+    horizontalGaussProgram->bind();
+
+    glBindImageTexture(0, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(1, m_voMomentsTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
+
+    horizontalGaussProgram->release();
 
 
     // Render to Screen
@@ -531,7 +549,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
 
-    composeProgram->setUniformValue(m_composeOvSamplerLoc, 1);
+    composeProgram->setUniformValue(m_composeMomentsSamplerLoc, 1);
     composeProgram->setUniformValue(m_composeDepthBufferLoc,2);
     composeProgram->setUniformValue(m_composeProjectionMatrixLoc, scene->getCameraProjection());
     composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, inverseCameraProjection);
@@ -677,6 +695,16 @@ void Renderer::resize(int width, int height)
     // Create moments/variance texture for volumetric obscurance
     glGenTextures(1, &m_voMomentsTexture);
     glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
+    // Give an empty image to OpenGL ( the last "0" )
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, m_width, m_height, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
+    // Poor filtering. Needed!
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Create gauss filtered Texture for screenspace depth moments:
+    glGenTextures(1, &m_voGaussedMomentsBufferTexture);
+    glBindTexture(GL_TEXTURE_2D, m_voGaussedMomentsBufferTexture);
     // Give an empty image to OpenGL ( the last "0" )
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, m_width, m_height, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
     // Poor filtering. Needed!
