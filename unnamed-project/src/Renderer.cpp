@@ -66,7 +66,7 @@ void Renderer::initialize()
     setShaderSource(loadTextFile("shaders/copy_vertex.glsl"),
                     KEYSTR_PROGRAM_COMPOSE,
                     QOpenGLShader::Vertex);
-    setShaderSource(loadTextFile("shaders/copy_fragment.glsl"),
+    setShaderSource(loadTextFile("shaders/compose/compose_fragment_line_sampling_vo.glsl"),
                     KEYSTR_PROGRAM_COMPOSE,
                     QOpenGLShader::Fragment);
     // copy
