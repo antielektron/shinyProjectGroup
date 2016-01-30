@@ -20,6 +20,8 @@
 #define KEYSTR_PROGRAM_REDUCE_SAMPLER "Reduce from DepthBuffer"
 #define KEYSTR_PROGRAM_HORIZONTAL_GAUSS "Horizontal Gauss"
 #define KEYSTR_PROGRAM_VERTICAL_GAUSS "Vertical Gauss"
+#define KEYSTR_PROGRAM_HORIZONTAL_VO_AREA "Horizontal VO"
+#define KEYSTR_PROGRAM_VERTICAL_VO_AREA "Vertical VO"
 
 class Renderer : public RendererBase
 {

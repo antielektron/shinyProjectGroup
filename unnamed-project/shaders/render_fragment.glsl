@@ -135,7 +135,8 @@ void main()
 
     vec3 shadedColor = clamp(specularTerm * specularColor + diffuseTerm * diffuseColor, 0., 1.);
 
-    fragColor = vec4(clamp(shadowTerm * (shadedColor) + ambientColor, 0., 1.), gl_FragCoord.z*gl_FragCoord.w);
+	float scaledZ = gl_FragCoord.z*gl_FragCoord.w;
+    fragColor = vec4(clamp(shadowTerm * (shadedColor) + ambientColor, 0., 1.), scaledZ);
 
         /*
     int index = getCascade();
@@ -149,6 +150,5 @@ void main()
         fragColor.xyz *= vec3(1., 1., 0.);
         */
 
-	float scaledZ = gl_FragCoord.z*gl_FragCoord.w;
     moments = vec2(scaledZ, pow(scaledZ,2));
 }

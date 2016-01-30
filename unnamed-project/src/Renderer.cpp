@@ -95,6 +95,15 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_HORIZONTAL_GAUSS,
                     QOpenGLShader::Compute);
 
+    // vo variance/moment filter shaders
+    setShaderSource(loadTextFile("shaders/filter/horizontal_vo_area.glsl"),
+                    KEYSTR_PROGRAM_HORIZONTAL_VO_AREA,
+                    QOpenGLShader::Compute);
+
+    setShaderSource(loadTextFile("shaders/filter/vertical_vo_area.glsl"),
+                    KEYSTR_PROGRAM_VERTICAL_VO_AREA,
+                    QOpenGLShader::Compute);
+
     // generate attrib and uniform locations
     // default:
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
@@ -250,6 +259,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     // QOpenGLShaderProgram *copyProgram = m_programs[KEYSTR_PROGRAM_COPY].get();
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
+    QOpenGLShaderProgram *verticalVO = m_programs[KEYSTR_PROGRAM_VERTICAL_VO_AREA].get();
+    QOpenGLShaderProgram *horizontalVO = m_programs[KEYSTR_PROGRAM_HORIZONTAL_VO_AREA].get();
 
     // Input: lightDirection, cameraProjection, cameraView, frustum
     // Output: lightProjection
@@ -516,22 +527,22 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     // gauss moments of screenspace depth:
 
-    verticalGaussProgram->bind();
+    verticalVO->bind();
 
     glBindImageTexture(0, m_voMomentsTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
     glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
 
-    verticalGaussProgram->release();
+    verticalVO->release();
 
 
-    horizontalGaussProgram->bind();
+    horizontalVO->bind();
 
     glBindImageTexture(0, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, m_voMomentsTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
     glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
 
-    horizontalGaussProgram->release();
+    horizontalVO->release();
 
 
     // Render to Screen
