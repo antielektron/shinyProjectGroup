@@ -1,7 +1,7 @@
 #version 430
 
-layout (binding=0, rgba8) readonly uniform image2D sourceImage;
-layout (binding=1, rgba8) writeonly uniform image2D filteredImage;
+layout (binding=0, rg16) readonly uniform image2D sourceImage;
+layout (binding=1, rg16) writeonly uniform image2D filteredImage;
 
 uniform mat4 projectionMatrix;
 
@@ -36,10 +36,11 @@ const int kernelSize = 21;
 
 // for simplicity and testing, my "gauss"-filter looks like:
 const float weights[kernelSize] = {
-    0.05, 0.05, 0.05, 0.05, 0.05,
-    0.05, 0.05, 0.05, 0.05, 0.05,
-    0.05, 0.05, 0.05, 0.05, 0.05,
-    0.05, 0.05, 0.05, 0.05, 0.05, 0.05
+    0.004481, 0.0080891, 0.013722, 0.021874, 0.032768,
+    0.046128, 0.061021, 0.075856, 0.088613, 0.097274,
+    0.100346, 0.097274, 0.088613, 0.075856, 0.061021,
+    0.046128, 0.032768, 0.021874, 0.013722, 0.008089,
+    0.004481
 };
 
 layout (local_size_x = 8, local_size_y = 8) in;
