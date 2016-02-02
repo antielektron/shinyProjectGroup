@@ -49,7 +49,7 @@ void main()
     vec2 depthMinMax;
     computeCurrentThreadValue(depthMinMax);
 
-    uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*8;
+    uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*16;
     sharedData[index] = depthMinMax;
 
     barrier();
@@ -57,8 +57,22 @@ void main()
     vec2 other;
 
     // At least 32 threads per wrap on modern gpu's
-    if (index < 32)
+    if (index < 128)
     {
+        other = sharedData[index + 128];
+        depthMinMax.x = min(depthMinMax.x, other.x);
+        depthMinMax.y = max(depthMinMax.y, other.y);
+        sharedData[index] = depthMinMax;
+
+        barrier();
+
+        other = sharedData[index + 64];
+        depthMinMax.x = min(depthMinMax.x, other.x);
+        depthMinMax.y = max(depthMinMax.y, other.y);
+        sharedData[index] = depthMinMax;
+
+        barrier();
+
         other = sharedData[index + 32];
         depthMinMax.x = min(depthMinMax.x, other.x);
         depthMinMax.y = max(depthMinMax.y, other.y);
