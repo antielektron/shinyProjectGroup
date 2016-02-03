@@ -70,12 +70,12 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_COMPOSE,
                     QOpenGLShader::Fragment);
     // copy
-    //setShaderSource(loadTextFile("shaders/copy_vertex.glsl"),
-    //                KEYSTR_PROGRAM_COPY,
-    //                QOpenGLShader::Vertex);
-    //setShaderSource(loadTextFile("shaders/fragment_array_copy.glsl"),
-    //                KEYSTR_PROGRAM_COPY,
-    //                QOpenGLShader::Fragment);
+    setShaderSource(loadTextFile("shaders/copy_vertex.glsl"),
+                    KEYSTR_PROGRAM_COPY,
+                    QOpenGLShader::Vertex);
+    setShaderSource(loadTextFile("shaders/copy_array_fragment.glsl"),
+                    KEYSTR_PROGRAM_COPY,
+                    QOpenGLShader::Fragment);
 
     // Reduce shader
     setShaderSource(loadTextFile("shaders/reduce/reduce_depth_sampler.glsl"),
@@ -149,9 +149,9 @@ void Renderer::initialize()
                 std::make_pair(0, "v_position"));
 
     // copy
-    //m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(&m_copyArraySamplerLoc, "sampler"));
-    //m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(&m_copyArrayLayerLoc, "layer"));
-    //m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(0, "v_position"));
+    m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(&m_copyArraySamplerLoc, "sampler"));
+    m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(&m_copyArrayLayerLoc, "layer"));
+    m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(0, "v_position"));
 
 
     m_uniformLocs[KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER].emplace_back(&m_reduceDepthInputSizeLoc, "inputSize");
@@ -170,7 +170,7 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_RENDER);
     createProgram(KEYSTR_PROGRAM_SHADOW);
     createProgram(KEYSTR_PROGRAM_COMPOSE);
-    // createProgram(KEYSTR_PROGRAM_COPY);
+    createProgram(KEYSTR_PROGRAM_COPY);
     createProgram(KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER);
     createProgram(KEYSTR_PROGRAM_REDUCE_DEPTH);
     createProgram(KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER);
@@ -304,7 +304,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *reduceDepthProgram = m_programs[KEYSTR_PROGRAM_REDUCE_DEPTH].get();
     QOpenGLShaderProgram *reduceFrustumSamplerProgram = m_programs[KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER].get();
     QOpenGLShaderProgram *reduceFrustumProgram = m_programs[KEYSTR_PROGRAM_REDUCE_FRUSTUM].get();
-    // QOpenGLShaderProgram *copyProgram = m_programs[KEYSTR_PROGRAM_COPY].get();
+    QOpenGLShaderProgram *copyProgram = m_programs[KEYSTR_PROGRAM_COPY].get();
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
 
@@ -826,10 +826,15 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     */
 
     /*
+    // DEBUG: view shadow map depths
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
     copyProgram->bind();
 
     copyProgram->setUniformValue(m_copyArraySamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapDepthBuffer);
+
+    m_quadVao.bind();
 
     glViewport(m_width*0/4, m_height*3/4, m_width/4, m_height/4);
     copyProgram->setUniformValue(m_copyArrayLayerLoc, 0);
@@ -846,6 +851,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glViewport(m_width*3/4, m_height*3/4, m_width/4, m_height/4);
     copyProgram->setUniformValue(m_copyArrayLayerLoc, 3);
     glDrawArrays(GL_QUADS, 0, 4);
+
+    m_quadVao.release();
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
