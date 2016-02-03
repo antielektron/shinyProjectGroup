@@ -193,7 +193,7 @@ void Renderer::initialize()
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_INT, 0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
     // Create Texture 2 (back)
@@ -203,7 +203,7 @@ void Renderer::initialize()
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_INT, 0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
     // Create DepthBuffer
@@ -300,10 +300,10 @@ void Renderer::createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransform
     }
 
     // TODO check if this projection is what we need!
-    matrix.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z() - 10, -minCorner.z());
+    matrix.ortho(minCorner.x()-1, maxCorner.x()+1, minCorner.y()-1, maxCorner.y()+1, -maxCorner.z() - 100, -minCorner.z()+1);
 
     QMatrix4x4 scale;
-    scale.scale(.5, 0.5);
+    scale.scale(0.5, 0.5, 0.5);
     matrix = scale * matrix;
 }
 
@@ -495,7 +495,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     {
         QMatrix4x4 cascadeProjection;
         // min/max did happen in projected space => -minZ~>minZ, -maxZ~>maxZ
-        cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z() -10, -maxCornersCascade[i].z());
+        cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z() - 200, -maxCornersCascade[i].z());
         cascadeViews.push_back(cascadeProjection * lightViewMatrix * inverseCameraView);
     }
 
@@ -536,6 +536,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     /*
     glFinish();
     auto start = std::chrono::system_clock::now();
+    */
 
     // Filter Shadow Map
     for (int i = 0; i < 4; i++)
@@ -545,7 +546,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
         glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-        glDispatchCompute((m_shadowMapSize-1)/256+1, (m_shadowMapSize-1)/1+1, 1);
+        glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 1);
 
         horizontalGaussProgram->release();
 
@@ -554,7 +555,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
         glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-        glDispatchCompute((m_shadowMapSize-1)/1+1, (m_shadowMapSize-1)/256+1, 1);
+        glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 1);
 
         verticalGaussProgram->release();
     }
