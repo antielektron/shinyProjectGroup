@@ -16,7 +16,7 @@ uniform mat4 cascadeViewMatrix[4];
 uniform float cascadeFar[4]; // where do the cascades end?
 
 // gl_TextureMatrix
-uniform usampler2DArray shadowMapSampler;
+uniform sampler2DArray shadowMapSampler;
 
 const float roughness = 0.1;
 const float fresnelFactor = 1.;
@@ -108,11 +108,12 @@ int getCascade()
 void sampleOptimized4MomentsShadowMap(out vec4 out4Moments, vec4 shadowMapValue)
 {
     shadowMapValue.x -= 0.035955884801f;
-    out4Moments = ( 0.2227744146,   0.0771972861,   0.7926986636,   0.0319417555,
+    out4Moments = transpose(mat4( 0.2227744146,   0.0771972861,   0.7926986636,   0.0319417555,
                     0.1549679261,   0.1394629426,   0.7963415838,   -0.172282317,
                     0.1451988946,   0.2120202157,   0.7258694464,   -0.2758014811,
-                    0.163127443,    0.2591432266,   0.6539092497,   -0.3376131734 )
+                    0.163127443,    0.2591432266,   0.6539092497,   -0.3376131734 ))
                     * shadowMapValue;
+
 }
 
 float computeMSMShadwowIntensity(vec4 in4Moments, float depth, float depthBias, float momentBias)
@@ -145,9 +146,9 @@ float computeMSMShadwowIntensity(vec4 in4Moments, float depth, float depthBias, 
         vec4(0.0,0.0,0.0,0.0));
     float Quotient=(Switch.x*z.z-b.x*(Switch.x+z.z)+b.y)
                   /((z.z-Switch.y)*(z.x-z.y));
-    return clamp(Switch.z+Switch.w*Quotient,0,1);
-    //return in4Moments.x;
+    return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
 }
+
 float simpleShadowTerm()
 {
     // Find the correct cascade..
@@ -155,10 +156,8 @@ float simpleShadowTerm()
 
     vec4 lightViewPosition = cascadeViewMatrix[index] * vec4(worldPosition, 1.);
     vec2 uv = vec2(lightViewPosition.xy * 0.5 + 0.5);
-    uvec4 shadowMapValueUint = texture(shadowMapSampler, vec3(uv, index));
+    vec4 shadowMapValue = texture2DArray(shadowMapSampler, vec3(uv, index));
     float depth = lightViewPosition.z*0.5 + 0.5;
-    vec4 shadowMapValue = vec4(shadowMapValueUint);
-    shadowMapValue = shadowMapValue/65535.0;
     vec4 shadowMapMoments;
     sampleOptimized4MomentsShadowMap(shadowMapMoments, shadowMapValue);
     return computeMSMShadwowIntensity(shadowMapMoments, depth, 0.005, 3e-5);

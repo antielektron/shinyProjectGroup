@@ -399,7 +399,11 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         cascadeFarScreen.push_back(z * 0.5f + 0.5f);
     }
 
-
+    for (int i = 0; i < m_cascades; i++)
+    {
+        cascadeViews.push_back(tempLightProjection * lightViewMatrix * inverseCameraView);
+    }
+    /*
     reduceFrustumSamplerProgram->bind();
 
     reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumInputSizeLoc, m_width, m_height);
@@ -485,7 +489,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z(), -maxCornersCascade[i].z());
         cascadeViews.push_back(cascadeProjection * lightViewMatrix * inverseCameraView);
     }
-
+    */
 
     // light direction from camera's perspective
     auto lightDirection = scene->getCameraView() * QVector4D(scene->getDirectionalLightDirection(), 0.);
@@ -499,7 +503,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
 
     // Initialize with max depth.
-    glClearColor(1, 0, 0, 1);
+    glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
@@ -639,7 +643,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
 
 
-
     // Invoke reduce ...
     GLsizei prevWidth = m_width;
     GLsizei prevHeight = m_height;
@@ -768,6 +771,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     defaultProgram->setUniformValue(m_diffuseColorLoc, QVector3D(0, 0, 0));
     defaultProgram->setUniformValue(m_ambientColorLoc, QVector3D(1, 1, 0));
 
+    /*
     for (int i = 0; i < 4; i++)
     {
         QMatrix4x4 world;
@@ -786,7 +790,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
         glEnd();
     }
-    std::cout << std::endl;
+    */
 
     // Unbind shadow map texture
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
@@ -822,39 +826,57 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     horizontalGaussProgram->release();
     */
 
-    /*
     // DEBUG: view shadow map depths
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     copyProgram->bind();
 
-    copyProgram->setUniformValue(m_copyArraySamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapDepthBuffer);
-
     m_quadVao.bind();
 
+    copyProgram->setUniformValue(m_copyArraySamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapTexture);
+
+
     glViewport(m_width*0/4, m_height*3/4, m_width/4, m_height/4);
-    copyProgram->setUniformValue(m_copyArrayLayerLoc, 0);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 4);
     glDrawArrays(GL_QUADS, 0, 4);
 
     glViewport(m_width*1/4, m_height*3/4, m_width/4, m_height/4);
-    copyProgram->setUniformValue(m_copyArrayLayerLoc, 1);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 5);
     glDrawArrays(GL_QUADS, 0, 4);
 
     glViewport(m_width*2/4, m_height*3/4, m_width/4, m_height/4);
-    copyProgram->setUniformValue(m_copyArrayLayerLoc, 2);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 6);
     glDrawArrays(GL_QUADS, 0, 4);
 
     glViewport(m_width*3/4, m_height*3/4, m_width/4, m_height/4);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 7);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapDepthBuffer);
+
+    glViewport(m_width*0/4, m_height*2/4, m_width/4, m_height/4);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 0);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    glViewport(m_width*1/4, m_height*2/4, m_width/4, m_height/4);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 1);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    glViewport(m_width*2/4, m_height*2/4, m_width/4, m_height/4);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 2);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    glViewport(m_width*3/4, m_height*2/4, m_width/4, m_height/4);
     copyProgram->setUniformValue(m_copyArrayLayerLoc, 3);
     glDrawArrays(GL_QUADS, 0, 4);
 
-    m_quadVao.release();
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
+    m_quadVao.release();
+
     copyProgram->release();
-    */
 }
 
 void Renderer::resize(int width, int height)
