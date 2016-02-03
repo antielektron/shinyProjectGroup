@@ -485,7 +485,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     {
         QMatrix4x4 cascadeProjection;
         // min/max did happen in projected space => -minZ~>minZ, -maxZ~>maxZ
-        cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z(), -maxCornersCascade[i].z());
+        cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z() -10, -maxCornersCascade[i].z());
         cascadeViews.push_back(cascadeProjection * lightViewMatrix * inverseCameraView);
     }
 
@@ -834,19 +834,19 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
 
     glViewport(m_width*0/4, m_height*3/4, m_width/4, m_height/4);
-    copyProgram->setUniformValue(m_copyArrayLayerLoc, 4);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 0);
     glDrawArrays(GL_QUADS, 0, 4);
 
     glViewport(m_width*1/4, m_height*3/4, m_width/4, m_height/4);
-    copyProgram->setUniformValue(m_copyArrayLayerLoc, 5);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 1);
     glDrawArrays(GL_QUADS, 0, 4);
 
     glViewport(m_width*2/4, m_height*3/4, m_width/4, m_height/4);
-    copyProgram->setUniformValue(m_copyArrayLayerLoc, 6);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 2);
     glDrawArrays(GL_QUADS, 0, 4);
 
     glViewport(m_width*3/4, m_height*3/4, m_width/4, m_height/4);
-    copyProgram->setUniformValue(m_copyArrayLayerLoc, 7);
+    copyProgram->setUniformValue(m_copyArrayLayerLoc, 3);
     glDrawArrays(GL_QUADS, 0, 4);
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapDepthBuffer);

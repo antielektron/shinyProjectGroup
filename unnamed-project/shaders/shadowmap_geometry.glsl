@@ -19,8 +19,8 @@ void main()
             gl_Position = lightViewPosition;
             // Don't clip objects that are "before" the frustum
             // NOTE: extend frustum towards the light!!!
-            if (gl_Position.z < -1.)
-                 gl_Position.z = -1.;
+            // if (gl_Position.z < -1.)
+            //      gl_Position.z = -1.;
 
             gl_Layer = j;
             EmitVertex();
