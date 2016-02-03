@@ -300,7 +300,7 @@ void Renderer::createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransform
     }
 
     // TODO check if this projection is what we need!
-    matrix.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z());
+    matrix.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z()-10, -minCorner.z());
 
 }
 
@@ -538,6 +538,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     shadowMapProgram->release();
 
+    /*
+    glFinish();
+    auto start = std::chrono::system_clock::now();
+
     // Filter Shadow Map
     for (int i = 0; i < 4; i++)
     {
@@ -546,7 +550,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
         glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-        glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 4);
+        glDispatchCompute((m_shadowMapSize-1)/256+1, (m_shadowMapSize-1)/1+1, 1);
 
         horizontalGaussProgram->release();
 
@@ -555,11 +559,18 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
         glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-        glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 4);
+        glDispatchCompute((m_shadowMapSize-1)/1+1, (m_shadowMapSize-1)/256+1, 1);
 
         verticalGaussProgram->release();
     }
 
+     /*
+    glFinish();
+    auto end = std::chrono::system_clock::now();
+    m_debugSum += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
+    m_debugCount++;
+    std::cout << (double)m_debugSum/m_debugCount << std::endl;
+    */
 
     // Render to Texture
 

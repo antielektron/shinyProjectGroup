@@ -48,7 +48,7 @@ void main()
         cache[startPos+8] = imageLoad(sourceImage, pos + ivec2(0, 4));
     }
 
-    memoryBarrierShared();
+    barrier();
 
     vec4 result = vec4(0, 0, 0, 0);
 
@@ -73,7 +73,7 @@ void main()
     cache[readPos] = imageLoad(sourceImage, sourcePos);
     cache[readPos+1] = imageLoad(sourceImage, sourcePos + ivec2(0, 1));
 
-    memoryBarrierShared();
+    barrier();
 
     vec4 result = vec4(0, 0, 0, 0);
 
