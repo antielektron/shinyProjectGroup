@@ -4,12 +4,20 @@
 #include <memory>
 #include <QFileDialog>
 #include <QWindow>
+#include <QMessageBox>
 
 #include "OpenGLWidget.h"
 #include "PrimitiveGame.h"
 #include "BulletGame.h"
 #include "ShaderEditor/EditorWindow.h"
 #include "SceneEditor/SceneEditorWindow.h"
+#include "utility.h"
+
+#ifdef HAVE_OPENAL
+
+#include <AL/alut.h>
+
+#endif//HAVE_OPENAL
 
 // http://www.ics.com/blog/qt-and-opengl-part-2-rendering-3d-model
 // http://doc.qt.io/qt-5/qtopengl-hellogl2-example.html
@@ -37,6 +45,11 @@ int main(int argc, char **argv)
 
     QCommandLineOption screenOption("screen", "set screen for fullscreen");
     parser.addOption(screenOption);
+
+#ifdef HAVE_OPENAL
+    QCommandLineOption audioTestOption("openal", "testing OpenAL features");
+    parser.addOption(audioTestOption);
+#endif // HAVE_OPENAL
 
 #ifdef HAVE_BULLET
     QCommandLineOption bulletGameOption("bullet", "Start the game!");
@@ -77,6 +90,18 @@ int main(int argc, char **argv)
 
         return app.exec();
     }
+#ifdef HAVE_OPENAL
+
+    else if (parser.isSet(audioTestOption))
+    {
+        alutInit(&argc, argv);
+        QMessageBox::information(nullptr, "info", "hier kommen ein paar Audio tests");
+        playAudioSampleFromFile(nullptr);
+        alutExit();
+    }
+
+#endif //HAVE_BULLET
+
 #ifdef HAVE_BULLET
     else if (parser.isSet(bulletGameOption))
     {
