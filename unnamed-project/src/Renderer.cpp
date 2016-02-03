@@ -290,8 +290,11 @@ void Renderer::createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransform
     }
 
     // TODO check if this projection is what we need!
-    matrix.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z());
+    matrix.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z() - 10, -minCorner.z());
 
+    QMatrix4x4 scale;
+    scale.scale(.5, 0.5);
+    matrix = scale * matrix;
 }
 
 void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
@@ -325,7 +328,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     // Compute actual near and far plane!
 
-    /*
     // Check last texture for values..
     std::vector<std::pair<float, float>> reducedDepthPixels;
     reducedDepthPixels.resize(m_reduceLastTextureSize);
@@ -344,9 +346,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         if (maxDepth < p.second)
             maxDepth = p.second;
     }
-    */
-    float minDepth = 0;
-    float maxDepth = 1;
+
     QVector3D actualNearFarCorners[] = {
             { 0, 0, minDepth*2 - 1 },
             { 0, 0, maxDepth*2 - 1 },
@@ -402,11 +402,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         cascadeFarScreen.push_back(z * 0.5f + 0.5f);
     }
 
-    for (int i = 0; i < m_cascades; i++)
-    {
-        cascadeViews.push_back(tempLightProjection * lightViewMatrix * inverseCameraView);
-    }
-    /*
+
     reduceFrustumSamplerProgram->bind();
 
     reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumInputSizeLoc, m_width, m_height);
@@ -492,7 +488,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z(), -maxCornersCascade[i].z());
         cascadeViews.push_back(cascadeProjection * lightViewMatrix * inverseCameraView);
     }
-    */
 
     // light direction from camera's perspective
     auto lightDirection = scene->getCameraView() * QVector4D(scene->getDirectionalLightDirection(), 0.);
@@ -645,7 +640,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     */
 
 
-    /*
     // Invoke reduce ...
     GLsizei prevWidth = m_width;
     GLsizei prevHeight = m_height;
@@ -684,7 +678,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     }
 
     reduceDepthProgram->release();
-    */
+
 
     /*
     glFinish();
@@ -775,7 +769,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     defaultProgram->setUniformValue(m_diffuseColorLoc, QVector3D(0, 0, 0));
     defaultProgram->setUniformValue(m_ambientColorLoc, QVector3D(1, 1, 0));
 
-    /*
     for (int i = 0; i < 4; i++)
     {
         QMatrix4x4 world;
@@ -794,7 +787,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
         glEnd();
     }
-    */
 
     // Unbind shadow map texture
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
