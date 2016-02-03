@@ -325,6 +325,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     // Compute actual near and far plane!
 
+    /*
     // Check last texture for values..
     std::vector<std::pair<float, float>> reducedDepthPixels;
     reducedDepthPixels.resize(m_reduceLastTextureSize);
@@ -343,7 +344,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         if (maxDepth < p.second)
             maxDepth = p.second;
     }
-
+    */
+    float minDepth = 0;
+    float maxDepth = 1;
     QVector3D actualNearFarCorners[] = {
             { 0, 0, minDepth*2 - 1 },
             { 0, 0, maxDepth*2 - 1 },
@@ -391,10 +394,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     // transform cascade far planes into screen space
     std::vector<float> cascadeFarScreen;
-    for (auto far : cascadeFars)
+    for (auto farz : cascadeFars)
     {
-        // negative far!
-        auto result = scene->getCameraProjection() * QVector4D(0, 0, -far, 1);
+        // negative farz!
+        auto result = scene->getCameraProjection() * QVector4D(0, 0, -farz, 1);
         float z = result.z()/result.w();
         cascadeFarScreen.push_back(z * 0.5f + 0.5f);
     }
@@ -642,7 +645,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     */
 
 
-
+    /*
     // Invoke reduce ...
     GLsizei prevWidth = m_width;
     GLsizei prevHeight = m_height;
@@ -681,6 +684,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     }
 
     reduceDepthProgram->release();
+    */
 
     /*
     glFinish();

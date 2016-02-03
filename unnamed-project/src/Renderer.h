@@ -5,6 +5,7 @@
 
 #include <QOpenGLShaderProgram>
 #include <memory>
+#include <array>
 #include <map>
 #include <unordered_map>
 #include <string>
