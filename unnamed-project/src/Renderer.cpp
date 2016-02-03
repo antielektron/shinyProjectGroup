@@ -196,6 +196,16 @@ void Renderer::initialize()
     glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
+    // Create Texture 2 (back)
+    glGenTextures(1, &m_shadowMapTexture2);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapTexture2);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // Give an empty image to OpenGL ( the last "0" )
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
     // Create DepthBuffer
     glGenTextures(1, &m_shadowMapDepthBuffer);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapDepthBuffer);
@@ -523,7 +533,39 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     shadowMapProgram->release();
 
+    /*
+    glFinish();
+    auto start = std::chrono::system_clock::now();
 
+    // Filter Shadow Map
+    for (int i = 0; i < 4; i++)
+    {
+        horizontalGaussProgram->bind();
+
+        glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
+        glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
+
+        glDispatchCompute((m_shadowMapSize-1)/256+1, (m_shadowMapSize-1)/1+1, 1);
+
+        horizontalGaussProgram->release();
+
+        verticalGaussProgram->bind();
+
+        glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
+        glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
+
+        glDispatchCompute((m_shadowMapSize-1)/1+1, (m_shadowMapSize-1)/256+1, 1);
+
+        verticalGaussProgram->release();
+    }
+
+     /*
+    glFinish();
+    auto end = std::chrono::system_clock::now();
+    m_debugSum += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
+    m_debugCount++;
+    std::cout << (double)m_debugSum/m_debugCount << std::endl;
+    */
 
     // Render to Texture
 

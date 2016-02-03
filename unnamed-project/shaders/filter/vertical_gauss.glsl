@@ -1,7 +1,7 @@
 #version 430
 
-layout (binding=0, rgba8) readonly uniform image2D sourceImage;
-layout (binding=1, rgba8) writeonly uniform image2D filteredImage;
+layout (binding=0, rgba16) readonly uniform image2D sourceImage;
+layout (binding=1, rgba16) writeonly uniform image2D filteredImage;
 
 const int kernelSize = 9;
 const float weights[kernelSize] = {
@@ -16,9 +16,11 @@ void main()
 
     vec4 result = vec4(0, 0, 0, 0);
 
+    ivec2 curPos = pos + ivec2(0, -4);
     for (int i = 0; i < 9; i++)
     {
-        vec4 value = imageLoad(sourceImage, pos + ivec2(0, i - 4));
+        vec4 value = imageLoad(sourceImage, curPos);
+        curPos.y++;
         result += value * weights[i];
     }
 
@@ -46,7 +48,7 @@ void main()
         cache[startPos+8] = imageLoad(sourceImage, pos + ivec2(0, 4));
     }
 
-    memoryBarrierShared();
+    barrier();
 
     vec4 result = vec4(0, 0, 0, 0);
 
@@ -71,7 +73,7 @@ void main()
     cache[readPos] = imageLoad(sourceImage, sourcePos);
     cache[readPos+1] = imageLoad(sourceImage, sourcePos + ivec2(0, 1));
 
-    memoryBarrierShared();
+    barrier();
 
     vec4 result = vec4(0, 0, 0, 0);
 
