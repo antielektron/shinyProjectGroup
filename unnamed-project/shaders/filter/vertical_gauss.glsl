@@ -1,7 +1,7 @@
 #version 430
 
-layout (binding=0, rgba8) readonly uniform image2D sourceImage;
-layout (binding=1, rgba8) writeonly uniform image2D filteredImage;
+layout (binding=0, rgba16) readonly uniform image3D sourceImage;
+layout (binding=1, rgba16) writeonly uniform image3D filteredImage;
 
 const int kernelSize = 9;
 const float weights[kernelSize] = {
@@ -12,13 +12,15 @@ layout (local_size_x = 8, local_size_y = 8) in;
 
 void main()
 {
-    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    ivec3 pos = ivec3(gl_GlobalInvocationID.xyz);
 
     vec4 result = vec4(0, 0, 0, 0);
 
+    ivec3 curPos = pos + ivec3(0, -4, 0);
     for (int i = 0; i < 9; i++)
     {
-        vec4 value = imageLoad(sourceImage, pos + ivec2(0, i - 4));
+        vec4 value = imageLoad(sourceImage, curPos);
+        curPos.y++;
         result += value * weights[i];
     }
 

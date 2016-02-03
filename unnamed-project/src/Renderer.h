@@ -68,6 +68,7 @@ protected:
 
     GLuint m_shadowMapFrameBuffer;
     GLuint m_shadowMapTexture;
+    GLuint m_shadowMapTexture2;
     GLuint m_shadowMapDepthBuffer;
 
     // Compose Shader

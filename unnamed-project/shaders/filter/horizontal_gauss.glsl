@@ -1,8 +1,8 @@
 #version 430
 
-layout (binding=0, rgba8) readonly uniform image2D sourceImage;
+layout (binding=0, rgba16) readonly uniform image3D sourceImage;
 // layout (binding=0) uniform sampler2D sourceSampler;
-layout (binding=1, rgba8) writeonly uniform image2D filteredImage;
+layout (binding=1, rgba16) writeonly uniform image3D filteredImage;
 
 const float weights[9] = {
     0.000002, 0.000428, 0.022321, 0.229742, 0.495015, 0.229742, 0.022321, 0.000428, 0.000002
@@ -27,13 +27,15 @@ layout (local_size_x = 8, local_size_y = 8) in;
 
 void main()
 {
-    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    ivec3 pos = ivec3(gl_GlobalInvocationID.xyz);
 
     vec4 result = vec4(0, 0, 0, 0);
 
+    ivec3 curPos = pos + ivec3(-4, 0, 0);
     for (int i = 0; i < 9; i++)
     {
-        vec4 value = imageLoad(sourceImage, pos + ivec2(i - 4, 0));
+        vec4 value = imageLoad(sourceImage, curPos);
+        curPos.x++;
         // vec2 normalizedPos = (vec2(pos) + vec2(0.5, 0.5) + vec2(offsetHW[i], 0.)) / vec2(size);
         // vec2 normalizedPos = (vec2(pos) + vec2(0.5, 0.5) + vec2(i - 4, 0.)) / vec2(size);
         // vec4 value = texture2D(sourceSampler, normalizedPos);
