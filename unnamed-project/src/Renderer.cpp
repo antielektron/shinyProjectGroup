@@ -538,26 +538,28 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     shadowMapProgram->release();
 
-    /*
     // Filter Shadow Map
-    horizontalGaussProgram->bind();
+    for (int i = 0; i < 4; i++)
+    {
+        horizontalGaussProgram->bind();
 
-    glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA16);
-    glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16);
+        glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
+        glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-    glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 4);
+        glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 4);
 
-    horizontalGaussProgram->release();
+        horizontalGaussProgram->release();
 
-    verticalGaussProgram->bind();
+        verticalGaussProgram->bind();
 
-    glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA16);
-    glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16);
+        glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
+        glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-    glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 4);
+        glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 4);
 
-    verticalGaussProgram->release();
-    */
+        verticalGaussProgram->release();
+    }
+
 
     // Render to Texture
 
