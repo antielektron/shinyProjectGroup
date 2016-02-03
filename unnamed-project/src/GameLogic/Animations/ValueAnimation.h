@@ -19,6 +19,8 @@ public:
 
 protected:
     AccessType m_access;
+
+    std::unique_ptr<InterpolationBase> m_interpolation;
     InterpolatedValue<ValueType> m_interpolatedValue;
 };
 
@@ -26,8 +28,9 @@ protected:
 //------------------------------------------------------------------------------
 template <typename T>
 ValueAnimation<T>::ValueAnimation(Scene *scene, std::unique_ptr<InterpolationBase> interpolation, const AccessType &access, const ValueType &dest) :
-        AnimationBase(scene, std::move(interpolation)),
+        AnimationBase(scene),
         m_access(access),
+        m_interpolation(std::move(interpolation)),
         m_interpolatedValue(m_interpolation.get(), m_access.get(), dest)
 {}
 

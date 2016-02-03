@@ -26,6 +26,8 @@
 #include "GameLogic/Animations/AnimationBase.h"
 #include "IObjectBaseObserver.h"
 
+#define DEFAULT_SHADER_CONFIG_FILEPATH "shaders/configurations/defaultConfig.xml"
+
 class Scene
 {
 public:
@@ -96,6 +98,15 @@ public:
     const QString &getVersion() const;
     const QString &getAuthor() const;
 
+    void setShaderConfigFile(const QString &filepath);
+    const QString &getShaderConfigFile();
+
+    void setPlayerPosition(const QVector3D &position);
+    void setPlayerRotation(const QVector3D &rotation);
+
+    QVector3D &getPlayerPosition();
+    QVector3D &getPlayerRotation();
+
     ObjectBase *findObjectByName(ObjectGroup *root, const QString &name);
 
 private:
@@ -145,6 +156,11 @@ private:
     QString m_sceneName;
     QString m_sceneVersion;
     QString m_sceneAuthor;
+
+    QString m_shaderConfigFile;
+
+    QVector3D m_playerPosition;
+    QVector3D m_playerRotation;
 
     std::unique_ptr<GlobalState> m_globalState;
 };

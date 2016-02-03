@@ -6,9 +6,8 @@
 
 #define PI 3.1415926536f
 
-AnimationBase::AnimationBase(Scene *scene, std::unique_ptr<InterpolationBase> interpolation) :
-        m_scene(scene),
-        m_interpolation(std::move(interpolation))
+AnimationBase::AnimationBase(Scene *scene) :
+        m_scene(scene)
 {}
 
 //------------------------------------------------------------------------------

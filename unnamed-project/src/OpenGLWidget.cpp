@@ -18,7 +18,7 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) :
 
     // render as fast as possible!
     m_timer.setInterval(16); // ~60fps
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(nextFrame()));
     m_timer.start();
 
     start = std::chrono::system_clock::now() + std::chrono::seconds(1);
@@ -35,7 +35,7 @@ OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
 {
     // render as fast as possible!
     m_timer.setInterval(16); // ~60fps
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(nextFrame()));
     m_timer.start();
 
     start = std::chrono::system_clock::now() + std::chrono::seconds(1);
@@ -61,14 +61,19 @@ void OpenGLWidget::setGame(std::shared_ptr<IGame> game)
     }
 }
 
-void OpenGLWidget::setRenderer(std::unique_ptr<IRenderer> renderer)
+void OpenGLWidget::setRenderer(std::unique_ptr<RendererBase> renderer)
 {
     m_renderer = std::move(renderer);
 }
 
-IRenderer *OpenGLWidget::getRenderer()
+RendererBase *OpenGLWidget::getRenderer()
 {
     return m_renderer.get();
+}
+
+float OpenGLWidget::getFps()
+{
+    return m_fps;
 }
 
 void OpenGLWidget::initializeGL()
@@ -98,7 +103,13 @@ void OpenGLWidget::initializeGL()
     m_initialized = true;
 
     m_renderer->initialize();
+
     m_game->initialize();
+
+    // update shader ( results in double shader program initialization,
+    // (but the shader config can also just replace specific shaders)
+    m_renderer->loadConfiguration(
+                m_game->getScene()->getShaderConfigFile().toStdString());
 
     // auto version = context()->format().version();
     // std::cout << "Using OpenGL Version " << version.first << "." << version.second << std::endl;
@@ -108,22 +119,6 @@ void OpenGLWidget::initializeGL()
 
 void OpenGLWidget::paintGL()
 {
-    // TODO do somewhere else!
-    if (m_keyManager->shouldCatchMouse())
-        this->setCursor(Qt::BlankCursor);
-    else
-        this->unsetCursor();
-
-    if (start < std::chrono::system_clock::now())
-    {
-        // std::cout << frame_count << " fps" << std::endl;
-        frame_count = 0;
-        start += std::chrono::seconds(1);
-    }
-    frame_count++;
-
-    m_game->tick();
-
     m_renderer->render(this->defaultFramebufferObject(), m_game->getScene());
 }
 
@@ -138,6 +133,29 @@ void OpenGLWidget::cleanup()
     makeCurrent();
     // m_logoVbo.destroy();
     doneCurrent();
+}
+
+void OpenGLWidget::nextFrame()
+{
+    // TODO do somewhere else!
+    if (m_keyManager->shouldCatchMouse())
+        this->setCursor(Qt::BlankCursor);
+    else
+        this->unsetCursor();
+
+    m_game->tick();
+
+    if (start < std::chrono::system_clock::now())
+    {
+        m_fps = frame_count;
+        emit fpsUpdate(m_fps);
+        frame_count = 0;
+        start += std::chrono::seconds(1);
+    }
+    frame_count++;
+
+    // repaint using opengl
+    update();
 }
 
 void OpenGLWidget::mousePressEvent(QMouseEvent *event)

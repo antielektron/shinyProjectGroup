@@ -8,6 +8,7 @@
 #include <QPushButton>
 
 #include <QFormLayout>
+#include <QLabel>
 
 class SceneEditorGame;
 
@@ -22,6 +23,11 @@ public slots:
     void sceneChanged();
     void valuesChanged();
 
+    void onBrowseTriggered();
+
+signals:
+    void shaderConfigurationChanged(const QString &filename);
+
 private:
     void updateUI();
     void applyScene();
@@ -34,7 +40,19 @@ private:
     QDoubleSpinBox *m_lightColorG;
     QDoubleSpinBox *m_lightColorB;
 
+    QDoubleSpinBox *m_playerPosX;
+    QDoubleSpinBox *m_playerPosY;
+    QDoubleSpinBox *m_playerPosZ;
+
+    QDoubleSpinBox *m_playerRotX;
+    QDoubleSpinBox *m_playerRotY;
+    QDoubleSpinBox *m_playerRotZ;
+
     QFormLayout *m_layout;
+
+    // for file selection:
+    QPushButton *m_browseButton;
+    QLabel   *m_fileSelectionLabel;
 
     QDoubleSpinBox *createNumericField(const QString &name);
 

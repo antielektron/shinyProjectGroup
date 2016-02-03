@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <QFileDialog>
+#include <QWindow>
 
 #include "OpenGLWidget.h"
 #include "PrimitiveGame.h"
@@ -31,6 +32,12 @@ int main(int argc, char **argv)
     QCommandLineOption sceneEditorOption("scene", "Start the scene editor");
     parser.addOption(sceneEditorOption);
 
+    QCommandLineOption fullscreenOption("fullscreen", "start game in fullscreen");
+    parser.addOption(fullscreenOption);
+
+    QCommandLineOption screenOption("screen", "set screen for fullscreen");
+    parser.addOption(screenOption);
+
 #ifdef HAVE_BULLET
     QCommandLineOption bulletGameOption("bullet", "Start the game!");
     parser.addOption(bulletGameOption);
@@ -42,6 +49,13 @@ int main(int argc, char **argv)
     parser.addHelpOption();
     parser.process(app);
 
+    // get screen
+    int screen = 0;
+    if (parser.isSet(screenOption))
+    {
+        screen = parser.value(screenOption).toInt();
+    }
+
     QString levelFile;
 
     if (parser.isSet(levelFileOption))
@@ -52,7 +66,7 @@ int main(int argc, char **argv)
     {
         levelFile = QFileDialog::getOpenFileName(nullptr,
                                                  "Load Level",
-                                                 ".",
+                                                 "./level/",
                                                  "xml files (*.xml)");
     }
 
@@ -76,9 +90,16 @@ int main(int argc, char **argv)
         }
         else
         {
-            // TODO have window (with debug ui)
             OpenGLWidget widget(std::make_shared<BulletGame>(levelFile));
+
             widget.show();
+
+            if (parser.isSet(fullscreenOption))
+            {
+                widget.windowHandle()->setScreen(qApp->screens()[screen]);
+                widget.showFullScreen();
+            }
+
             return app.exec();
         }
     }

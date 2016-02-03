@@ -162,9 +162,7 @@ void Model::loadObj(const std::string &fileName)
         }
     }
     std::cout << m_vertices.size() << std::endl;
-    std::cout << "enter extent update" << std::endl;
     updateExtent();
-    std::cout << "leave extent update" << std::endl;
 }
 
 //------------------------------------------------------------------------------

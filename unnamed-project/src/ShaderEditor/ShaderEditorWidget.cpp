@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QByteArray>
 #include <QMessageBox>
+#include <QAction>
+#include <QLabel>
 
 #include "ShaderEditor/ShaderEditorWidget.h"
 
@@ -49,9 +51,17 @@ ShaderEditorWidget::ShaderEditorWidget(QWidget *parent,
     m_progName = progName;
     setShaderName(type, progName);
 
+    m_action = new QAction(m_shaderName, this);
+    m_action->setCheckable(true);
+
     m_hasChanged = false;
+    m_isSaved = true;
+
+    m_lastFilename = ".";
 
     connectStuff();
+
+    setHidden(true);
 
 }
 
@@ -70,11 +80,25 @@ void ShaderEditorWidget::setColor(const QColor &color)
 }
 
 //------------------------------------------------------------------------------
+QAction *ShaderEditorWidget::getAction()
+{
+    return m_action;
+}
+
+//------------------------------------------------------------------------------
+const QString &ShaderEditorWidget::getFilename()
+{
+    return m_lastFilename;
+}
+
+//------------------------------------------------------------------------------
 void ShaderEditorWidget::setShaderName(QOpenGLShader::ShaderTypeBit type,
                                        const QString &progName)
 {
-    this->setWindowTitle(progName + QString::fromStdString(
-                             shaderTypeToString.at(type)) + " shader");
+    m_shaderName = progName + QString::fromStdString(
+                shaderTypeToString.at(type)) + " shader";
+
+    this->setWindowTitle(m_shaderName);
 }
 
 //------------------------------------------------------------------------------
@@ -84,6 +108,7 @@ void ShaderEditorWidget::connectStuff()
     connect(m_applyButton,SIGNAL(clicked()), this, SLOT(onApplyClicked()));
     connect(m_saveButton, SIGNAL(clicked()), this, SLOT(onSaveClicked()));
     connect(m_loadButton, SIGNAL(clicked()), this, SLOT(onLoadClicked()));
+    connect(m_action, SIGNAL(changed()), this, SLOT(onActionToggled()));
 }
 
 //------------------------------------------------------------------------------
@@ -103,9 +128,28 @@ void ShaderEditorWidget::onUpdateRequest()
 }
 
 //------------------------------------------------------------------------------
+void ShaderEditorWidget::onActionToggled()
+{
+    if (m_action->isChecked())
+    {
+        this->setHidden(false);
+        this->raise();
+    }
+    else
+    {
+        this->setHidden(true);
+    }
+}
+
+//------------------------------------------------------------------------------
 void ShaderEditorWidget::onUserChangedText()
 {
     m_hasChanged = true;
+    m_isSaved= false;
+    // mark title as changed:
+    this->setTitleBarWidget(new QLabel(m_shaderName + "*", this));
+    m_action->setText(m_shaderName + "*");
+
 }
 
 //------------------------------------------------------------------------------
@@ -123,7 +167,7 @@ void ShaderEditorWidget::onSaveClicked()
 {
     QString filename = QFileDialog::getSaveFileName(this,
                                                     tr("Save Shader"),
-                                                    ".",
+                                                    m_lastFilename,
                                                     tr("GLSL files (*.glsl)"));
 
     if (filename.length() > 0)
@@ -141,6 +185,14 @@ void ShaderEditorWidget::onSaveClicked()
         QTextStream stream(&file);
         stream << m_editor->toPlainText();
         file.close();
+
+        QString relativePath = QDir::current().relativeFilePath(filename);
+        m_lastFilename = relativePath;
+        emit filenameChanged(relativePath, m_shaderType, m_progName);
+
+        m_isSaved = true;
+        this->setTitleBarWidget(new QLabel(m_shaderName, this));
+        m_action->setText(m_shaderName);
     }
 }
 
@@ -149,7 +201,7 @@ void ShaderEditorWidget::onLoadClicked()
 {
     QString filename = QFileDialog::getOpenFileName(this,
                                                     tr("Load Shader"),
-                                                    ".",
+                                                    m_lastFilename,
                                                     tr("GLSL files (*.glsl)"));
 
     if (filename.length() > 0)
@@ -169,6 +221,15 @@ void ShaderEditorWidget::onLoadClicked()
 
         // force renderer update
         m_hasChanged = true;
+
+        QString relativePath = QDir::current().relativeFilePath(filename);
+        m_lastFilename = relativePath;
+        emit filenameChanged(relativePath, m_shaderType, m_progName);
+
+        m_isSaved = true;
+        this->setTitleBarWidget(new QLabel(m_shaderName, this));
+
+        m_action->setText(m_shaderName);
         onApplyClicked();
     }
 }

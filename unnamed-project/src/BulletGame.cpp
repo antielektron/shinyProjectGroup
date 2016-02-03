@@ -35,6 +35,8 @@ void BulletGame::initialize()
     IGame::initialize();
 
     loadScene(m_scenefile);
+
+    m_scene->getGlobalState()->triggerEvent("init");
 }
 
 void BulletGame::resize(int width, int height)
@@ -132,7 +134,8 @@ void BulletGame::handleInput(float deltaTime)
     // Reset camera
     if (m_keyManager->isKeyDown(Qt::Key_R))
     {
-        m_playerBody->getWorldTransform().setOrigin(btVector3(0, 0, 0));
+        m_playerBody->getWorldTransform().setOrigin(toBulletVector3(m_scene->getPlayerPosition()));
+        m_playerBody->setLinearVelocity(btVector3(0, 0, 0));
         m_rotX = 0;
         m_rotY = 0;
     }
@@ -224,12 +227,14 @@ void BulletGame::performInteraction()
     if(callback.hasHit())
     {
         auto object = (Object *)callback.m_collisionObject->getUserPointer();
-
-        auto event = object->getInteractionEvent();
-        if (!event.isEmpty())
+        if (object != nullptr)
         {
-            // Trigger the event associated to the object
-            m_scene->getGlobalState()->triggerEvent(event);
+            auto event = object->getInteractionEvent();
+            if (!event.isEmpty())
+            {
+                // Trigger the event associated to the object
+                m_scene->getGlobalState()->triggerEvent(event);
+            }
         }
     }
 }
@@ -310,7 +315,7 @@ void BulletGame::loadScene(const QString &filename)
     btVector3 inertia;
     btTransform transform;
     transform.setIdentity();
-    transform.setOrigin(btVector3(0, 5, 2));
+    transform.setOrigin(toBulletVector3(m_scene->getPlayerPosition()));
 
     float radius = 0.4;
     float height = 1.8;

@@ -104,13 +104,13 @@ void ObjectDetailsWidget::currentObjectChanged()
     // New current object from game
     m_currentObject = m_game->getCurrentObject();
 
-    m_objectPropertiesLocked = true;
-
     if (m_currentObject == nullptr)
     {
         // TODO disable UI
         return;
     }
+
+    m_objectPropertiesLocked = true;
 
     // Update widgets:
     switch (m_currentObject->getObjectType())
@@ -138,10 +138,8 @@ void ObjectDetailsWidget::currentObjectChanged()
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::applyValues()
 {
-    if (!m_currentObject)
-    {
+    if (!m_currentObject || m_objectPropertiesLocked)
         return;
-    }
 
     switch(m_currentObject->getObjectType())
     {
@@ -305,6 +303,8 @@ void ObjectDetailsWidget::applyCurrentObjectBase(ObjectBase *object)
 //------------------------------------------------------------------------------
 void ObjectDetailsWidget::fillModelSelection()
 {
+    m_objectPropertiesLocked = true;
+
     m_modelSelection->clear();
     auto models = m_game->getScene()->getModels();
     std::cout << "update models" << std::endl;
@@ -312,4 +312,8 @@ void ObjectDetailsWidget::fillModelSelection()
     {
         m_modelSelection->addItem(QString::fromStdString( model.second->getName()));
     }
+
+    currentObjectChanged();
+
+    m_objectPropertiesLocked = false;
 }

@@ -3,6 +3,7 @@
 #include <QStyle>
 #include <QApplication>
 #include <QStatusBar>
+#include <QFileDialog>
 
 #include "EditorWindow.h"
 
@@ -33,7 +34,7 @@ EditorWindow::~EditorWindow()
 //------------------------------------------------------------------------------
 void EditorWindow::createDocks()
 {
-    IRenderer *renderer = m_glWidget->getRenderer();
+    RendererBase *renderer = m_glWidget->getRenderer();
     std::vector<std::string> programs;
 
     renderer->getPrograms(programs);
@@ -42,11 +43,12 @@ void EditorWindow::createDocks()
 
     for (const auto &prog : programs)
     {
-        IRenderer::ShaderSourcesType sources;
+        RendererBase::ShaderSourcesType sources;
         renderer->getShadersForProgram(prog, sources);
 
         for (const auto &pair : sources)
         {
+
             ShaderEditorWidget *editorWidget
                     = new ShaderEditorWidget(this,
                                              pair.first,
@@ -65,6 +67,13 @@ void EditorWindow::createDocks()
             connect(this, SIGNAL(updateRequest()),
                     editorWidget, SLOT(onUpdateRequest()));
 
+            connect(editorWidget, SIGNAL(filenameChanged(const QString &,
+                                                         QOpenGLShader::ShaderTypeBit,
+                                                         const QString &)),
+                    this, SLOT(onFilenameChanged(const QString &,
+                                                 QOpenGLShader::ShaderTypeBit,
+                                                 const QString &)));
+
             editorWidget->setAllowedAreas(Qt::LeftDockWidgetArea
                                           | Qt::RightDockWidgetArea);
 
@@ -73,6 +82,7 @@ void EditorWindow::createDocks()
             {
                 this->tabifyDockWidget(previousWidget, editorWidget);
             }
+            m_toolbar->addAction(editorWidget->getAction());
             previousWidget = editorWidget;
         }
     }
@@ -91,6 +101,12 @@ void EditorWindow::createActions()
     m_requestSingleFrameAction = new QAction(style->standardIcon(QStyle::SP_MediaSkipForward),
                                              "render Single Frame",
                                              this);
+    m_saveShaderConfig = new QAction(style->standardIcon(QStyle::SP_DialogSaveButton),
+                                     "save render configuration",
+                                     this);
+    m_loadShaderConfig = new QAction(style->standardIcon(QStyle::SP_DialogOpenButton),
+                                     "load render configuration",
+                                     this);
 }
 
 //------------------------------------------------------------------------------
@@ -101,12 +117,15 @@ void EditorWindow::createToolbar()
     m_toolbar->addAction(m_pauseRenderingAction);
     m_toolbar->addAction(m_resumeRenderingAction);
     m_toolbar->addAction(m_requestSingleFrameAction);
+    m_toolbar->addAction(m_loadShaderConfig);
+    m_toolbar->addAction(m_saveShaderConfig);
 }
 
 //------------------------------------------------------------------------------
 void EditorWindow::connectStuff()
 {
     connect(m_glWidget, SIGNAL(glInitEvent()),this, SLOT(onGlInit()));
+    connect(m_glWidget, SIGNAL(fpsUpdate(float)), this, SLOT(onFpsChanged(float)));
 
     connect(m_pauseRenderingAction, SIGNAL(triggered()),
             this, SLOT(onPauseRenderingClicked()));
@@ -114,6 +133,10 @@ void EditorWindow::connectStuff()
             this, SLOT(onResumeRenderingClicked()));
     connect(m_requestSingleFrameAction, SIGNAL(triggered()),
             this, SLOT(onSingleFrameRequestedClicked()));
+    connect(m_loadShaderConfig, SIGNAL(triggered()),
+            this, SLOT(onLoadShaderConfigClicked()));
+    connect(m_saveShaderConfig, SIGNAL(triggered()),
+            this, SLOT(onSaveShaderConfigClicked()));
 }
 
 //------------------------------------------------------------------------------
@@ -138,6 +161,50 @@ void EditorWindow::onResumeRenderingClicked()
 void EditorWindow::onSingleFrameRequestedClicked()
 {
     m_glWidget->getRenderer()->requestSingleFrameRendering();
+}
+
+//------------------------------------------------------------------------------
+void EditorWindow::onLoadShaderConfigClicked()
+{
+    QString filename = QFileDialog::getOpenFileName(this,
+                                                    "select shader configuration",
+                                                    ".",
+                                                    tr("xml files (*.xml)"));
+
+    if (filename.length() > 0)
+    {
+        m_glWidget->getRenderer()->loadConfiguration(filename.toStdString());
+    }
+}
+
+//------------------------------------------------------------------------------
+void EditorWindow::onSaveShaderConfigClicked()
+{
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    "save shader configuration",
+                                                    ".",
+                                                    tr("xml files (*.xml)"));
+    if (filename.length() > 0)
+    {
+        m_glWidget->getRenderer()->saveConfiguration(filename.toStdString());
+    }
+}
+
+//------------------------------------------------------------------------------
+void EditorWindow::onFilenameChanged(const QString &filename,
+                                     QOpenGLShader::ShaderTypeBit type,
+                                     const QString &progName)
+{
+    std::cout << "set filepath: " << filename.toStdString() << std::endl;
+    m_glWidget->getRenderer()->setShaderFilepath(filename.toStdString(),
+                                                 progName.toStdString(),
+                                                 type);
+}
+
+//------------------------------------------------------------------------------
+void EditorWindow::onFpsChanged(float fps)
+{
+    this->statusBar()->showMessage(QString("FPS: ") + QString::number(fps));
 }
 
 //------------------------------------------------------------------------------

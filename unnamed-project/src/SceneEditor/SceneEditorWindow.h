@@ -38,6 +38,10 @@ public:
     void makeGlWidgetCurrent();
     void doneGlWidgetCurrent();
 
+public slots:
+    void onShaderConfigurationChanged(const QString &filename);
+    void onFpsChanged(float);
+
 protected slots:
     void loadScene();
     void saveScene();

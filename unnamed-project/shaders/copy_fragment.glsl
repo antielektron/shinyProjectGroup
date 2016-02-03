@@ -36,13 +36,26 @@ float rand(float a)
 // stuff for line sampling:
 
 // very stupid perspective scaling approximation function:
-float get_k(float z)
+float get_kx(float z)
 {
 	// physically not correct
-	vec4 e = vec4(1.0, 0., z, 1.);
-	e = projectionMatrix * e;
+	vec4 e1 = vec4(1., 0., z, 1.);
+	vec4 e2 = vec4(0., 0., z, 1.);
+	e1 = projectionMatrix * e1;
+	e2 = projectionMatrix * e2;
 	
-	return 1 / (exp(z*z * 3) - 1 + 4);
+	return 0.1 * (e2.x / e2.w - e1.x / e1.w);
+}
+
+float get_ky(float z)
+{
+	// physically not correct
+	vec4 e1 = vec4(0., 1., z, 1.);
+	vec4 e2 = vec4(0., 0., z, 1.);
+	e1 = projectionMatrix * e1;
+	e2 = projectionMatrix * e2;
+	
+	return 0.1 * (e2.y / e2.w - e1.y / e1.w);	
 }
 
 // weight function (calculates how much of the sphere is filled
@@ -56,31 +69,17 @@ float get_w(float radius)
 
 float get_dr(vec2 unitPos, vec2 pPos, float p_z)
 {
-	float k = get_k(p_z);
-	vec2 scaledUnitPos = vec2(unitPos.x * k, unitPos.y * k);
+	float kx = get_kx(p_z);
+	float ky = get_ky(p_z);
+	vec2 scaledUnitPos = vec2(unitPos.x * kx, unitPos.y * ky);
 	vec2 screenSpaceUnitPos = scaledUnitPos + pPos;
 	//clip if necessary:
 	float max = 1. - eps;
 
-	if (screenSpaceUnitPos.x > max)
-	{
-	    screenSpaceUnitPos.x = max;
-	}
-	if (screenSpaceUnitPos.y > max)
-	{
-	    screenSpaceUnitPos.y = max;
-	}
-	if (screenSpaceUnitPos.x < 0)
-	{
-	    screenSpaceUnitPos.x = 0;
-	}
-	if (screenSpaceUnitPos.y < 0.)
-	{
-	    screenSpaceUnitPos.y = 0.;
-	}	
+	screenSpaceUnitPos = clamp(screenSpaceUnitPos, 0, 1 - eps);
 	
 	
-	return (- p_z + (1 - texture2D(ovSampler, screenSpaceUnitPos).x)) / k;
+	return (- p_z + (1 - texture2D(ovSampler, screenSpaceUnitPos).x)) / kx;
 }
 
 float z_s(vec2 unitPos)
@@ -122,12 +121,44 @@ float lineSampling(int nSamples)
 bool isInCenterEpsilonArea(vec2 centerPoint)
 {
 	float zCenter = 1 - texture2D(ovSampler, centerPoint).x;
-	float k = get_k(zCenter);
+	float kx = get_kx(zCenter);
+	float ky = get_ky(zCenter);
 	
-	float dx = uv.x - centerPoint.x;
-	float dy = uv.y - centerPoint.y;
+	// aspect ratio:
+	float ratio = ky / kx;
 	
-	return (dx * dx + dy * dy) < (k * k); 
+	
+	float dx = (uv.x - centerPoint.x) * ratio;
+	float dy = (uv.y - centerPoint.y);
+	
+	return (dx * dx + dy * dy) < (kx * kx); 
+}
+
+//cursor
+bool isCursor()
+{
+
+	float kx = get_kx(0.5);
+	float ky = get_ky(0.5);
+	
+	// aspect ratio:
+	float ratio = ky / kx;
+	
+	float dx = (uv.x - 0.5) * ratio;
+	float dy = (uv.y - 0.5);
+	float dx2 = dx * dx;
+	float dy2 = dy * dy;
+	
+	if (dx2 < 0.0001)
+	{
+		return false;
+	}
+	
+	if (dx2 + dy2 > 0.0005 && dx2 + dy2 < 0.001)
+	{
+		return true;
+	}
+	return false;
 }
 
 
@@ -136,15 +167,19 @@ void main()
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
 	vec3 mixedColor = lineSampling(samples) * defaultColor;
 
+	if (isCursor())
+	{
+		mixedColor = vec3(1.,1.,1.) - mixedColor;
+	}
 /*
 	float depth = texture2D(ovSampler, uv).x;
 	vec4 result = inverse(projectionMatrix) * vec4(0, 0, depth, 1);
 	vec3 mixedColor = (result.z / -result.w) / 50. * vec3(1., 1., 1.);
 */
 	// DEBUG
-	
-	vec2 center = vec2(0.5,0.5);
 	/*
+	vec2 center = vec2(0.5,0.5);
+	
 	if (isInCenterEpsilonArea(center))
 	{
 		mixedColor.z *= 2 ;

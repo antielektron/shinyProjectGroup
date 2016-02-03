@@ -4,6 +4,7 @@
 #include <QAction>
 #include <QFileDialog>
 #include <QScrollArea>
+#include <QStatusBar>
 
 #include "SceneEditor/SceneEditorGame.h"
 #include "SceneEditor/ObjectDetailsWidget.h"
@@ -65,6 +66,18 @@ void SceneEditorWindow::makeGlWidgetCurrent()
 void SceneEditorWindow::doneGlWidgetCurrent()
 {
     m_glWidget->doneCurrent();
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorWindow::onShaderConfigurationChanged(const QString &filename)
+{
+    m_glWidget->getRenderer()->loadConfiguration(filename.toStdString());
+}
+
+//------------------------------------------------------------------------------
+void SceneEditorWindow::onFpsChanged(float fps)
+{
+    this->statusBar()->showMessage(QString("FPS: ") + QString::number(fps));
 }
 
 //------------------------------------------------------------------------------
@@ -169,6 +182,7 @@ void SceneEditorWindow::createToolbar()
 //------------------------------------------------------------------------------
 void SceneEditorWindow::connectStuff()
 {
+    connect(m_glWidget, SIGNAL(fpsUpdate(float)), this, SLOT(onFpsChanged(float)));
     //connect Actions:
     connect(m_loadScene, SIGNAL(triggered()), this, SLOT(loadScene()));
     connect(m_saveScene, SIGNAL(triggered()), this, SLOT(saveScene()));
@@ -176,6 +190,8 @@ void SceneEditorWindow::connectStuff()
     connect(m_play, SIGNAL(triggered()), m_game.get(), SLOT(runLogic()));
     connect(m_stop, SIGNAL(triggered()), m_game.get(), SLOT(stopLogic()));
     connect(m_pause, SIGNAL(triggered()), m_game.get(), SLOT(togglePauseLogic()));
+    connect(m_globalDetails, SIGNAL(shaderConfigurationChanged(const QString &)),
+            this, SLOT(onShaderConfigurationChanged(const QString &)));
 }
 
 //------------------------------------------------------------------------------
