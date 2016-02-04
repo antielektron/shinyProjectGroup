@@ -551,7 +551,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
         glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-        glDispatchCompute((m_shadowMapSize-1)/256+1, (m_shadowMapSize-1)/1+1, 1);
+        glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 1);
 
         horizontalGaussProgram->release();
 
@@ -560,7 +560,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
         glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-        glDispatchCompute((m_shadowMapSize-1)/1+1, (m_shadowMapSize-1)/256+1, 1);
+        glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 1);
 
         verticalGaussProgram->release();
     }
