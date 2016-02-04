@@ -541,6 +541,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     /*
     glFinish();
     auto start = std::chrono::system_clock::now();
+    */
 
     // Filter Shadow Map
     for (int i = 0; i < 4; i++)
