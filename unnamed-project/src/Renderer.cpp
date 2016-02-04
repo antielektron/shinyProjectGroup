@@ -300,11 +300,7 @@ void Renderer::createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransform
     }
 
     // TODO check if this projection is what we need!
-    matrix.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z() - 10, -minCorner.z());
-
-    QMatrix4x4 scale;
-    scale.scale(.5, 0.5);
-    matrix = scale * matrix;
+    matrix.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z());
 }
 
 void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
@@ -495,8 +491,13 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     {
         QMatrix4x4 cascadeProjection;
         // min/max did happen in projected space => -minZ~>minZ, -maxZ~>maxZ
-        cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z() -10, -maxCornersCascade[i].z());
-        cascadeViews.push_back(cascadeProjection * lightViewMatrix * inverseCameraView);
+        cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z() - 100, -maxCornersCascade[i].z());
+
+        // choose shadow maps exactly twice as bit as they should be!
+        QMatrix4x4 scaling;
+        scaling.scale(0.5, 0.5);
+
+        cascadeViews.push_back(scaling * cascadeProjection * lightViewMatrix * inverseCameraView);
     }
 
     // light direction from camera's perspective
@@ -536,6 +537,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     /*
     glFinish();
     auto start = std::chrono::system_clock::now();
+    */
 
     // Filter Shadow Map
     for (int i = 0; i < 4; i++)
