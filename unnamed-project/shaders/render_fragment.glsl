@@ -147,6 +147,7 @@ float computeMSMShadwowIntensity(vec4 in4Moments, float depth, float depthBias, 
     float Quotient=(Switch.x*z.z-b.x*(Switch.x+z.z)+b.y)
                   /((z.z-Switch.y)*(z.x-z.y));
     return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
+    //return in4Moments.w;
 }
 
 float simpleShadowTerm()
