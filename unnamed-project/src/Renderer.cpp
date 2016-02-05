@@ -491,11 +491,11 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     {
         QMatrix4x4 cascadeProjection;
         // min/max did happen in projected space => -minZ~>minZ, -maxZ~>maxZ
-        cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z() - 100, -maxCornersCascade[i].z());
+        cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z(), -maxCornersCascade[i].z());
 
         // choose shadow maps exactly twice as bit as they should be!
         QMatrix4x4 scaling;
-        scaling.scale(0.5, 0.5);
+       // scaling.scale(0.5, 0.5);
 
         cascadeViews.push_back(scaling * cascadeProjection * lightViewMatrix * inverseCameraView);
     }
@@ -512,7 +512,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
 
     // Initialize with max depth.
-    glClearColor(1, 1, 1, 1);
+    glClearColor(0.999990940, 0.997558594, 0.893437386, 0.000000000);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);

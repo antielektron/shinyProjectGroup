@@ -12,6 +12,9 @@ void main()
 
     float depth = lightViewPosition.z*0.5 + 0.5;
 
+    if (depth < 0.)
+        depth = 0.;
+
     float square = depth*depth;
 	vec4 moments = vec4(depth,square,square*depth,square*square);
 	fragMoments = transpose(mat4(	-2.07224649,	32.23703778,	-68.571074599,	39.3703274134,
