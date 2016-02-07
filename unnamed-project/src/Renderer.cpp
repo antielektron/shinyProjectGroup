@@ -541,6 +541,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     /*
     glFinish();
     auto start = std::chrono::system_clock::now();
+
+    for (int j = 0; j < 100; j++)
+    {
     */
 
     // Filter Shadow Map
@@ -551,7 +554,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
         glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-        glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 1);
+        glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 1);
 
         horizontalGaussProgram->release();
 
@@ -560,17 +563,21 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
         glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-        glDispatchCompute((m_shadowMapSize-1)/8+1, (m_shadowMapSize-1)/8+1, 1);
+        glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 1);
 
         verticalGaussProgram->release();
     }
 
-     /*
+    /*
+    }
+
     glFinish();
     auto end = std::chrono::system_clock::now();
     m_debugSum += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
     m_debugCount++;
     std::cout << (double)m_debugSum/m_debugCount << std::endl;
+    m_debugSum = 0;
+    m_debugCount = 0;
     */
 
     // Render to Texture
@@ -682,11 +689,11 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     composeProgram->release();
 
+
     /*
     glFinish();
     auto start = std::chrono::system_clock::now();
     */
-
 
     // Invoke reduce ...
     GLsizei prevWidth = m_width;
@@ -727,7 +734,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     reduceDepthProgram->release();
 
-
     /*
     glFinish();
     auto end = std::chrono::system_clock::now();
@@ -742,7 +748,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
 
     // DEBUG
-
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     glViewport(0, 0, m_width/2, m_height/2);
@@ -836,11 +841,11 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glEnd();
     }
 
+
     // Unbind shadow map texture
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
     defaultProgram->release();
-
 
 
     /*
