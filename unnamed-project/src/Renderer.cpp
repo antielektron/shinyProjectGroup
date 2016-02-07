@@ -534,6 +534,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     shadowMapProgram->release();
 
+    // AMD gpu's are too agressive!
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+    // these barriers do work: GL_ALL_BARRIER_BITS GL_SHADER_IMAGE_ACCESS_BARRIER_BIT GL_TEXTURE_FETCH_BARRIER_BIT GL_SHADER_STORAGE_BARRIER_BIT
+
     /*
     glFinish();
     auto start = std::chrono::system_clock::now();
