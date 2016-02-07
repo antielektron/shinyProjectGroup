@@ -50,67 +50,66 @@ void main()
     computeCurrentThreadValue(depthMinMax);
 
     uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*16;
+
+    depthMinMax.y = -depthMinMax.y;
     sharedData[index] = depthMinMax;
 
     barrier();
 
+    if (index >= 128)
+    {
+        return;
+    }
+
     vec2 other;
 
-    // At least 32 threads per wrap on modern gpu's
-    if (index < 128)
-    {
-        other = sharedData[index + 128];
-        depthMinMax.x = min(depthMinMax.x, other.x);
-        depthMinMax.y = max(depthMinMax.y, other.y);
-        sharedData[index] = depthMinMax;
+    // At least 32 threads per warp on modern gpu's
 
-        barrier();
+    other = sharedData[index + 128];
+    depthMinMax = min(depthMinMax, other);
+    sharedData[index] = depthMinMax;
 
-        other = sharedData[index + 64];
-        depthMinMax.x = min(depthMinMax.x, other.x);
-        depthMinMax.y = max(depthMinMax.y, other.y);
-        sharedData[index] = depthMinMax;
+    barrier();
 
-        barrier();
+    other = sharedData[index + 64];
+    depthMinMax = min(depthMinMax, other);
+    sharedData[index] = depthMinMax;
 
-        other = sharedData[index + 32];
-        depthMinMax.x = min(depthMinMax.x, other.x);
-        depthMinMax.y = max(depthMinMax.y, other.y);
-        sharedData[index] = depthMinMax;
+    barrier();
 
-        barrier();
+    other = sharedData[index + 32];
+    depthMinMax = min(depthMinMax, other);
+    sharedData[index] = depthMinMax;
 
-        other = sharedData[index + 16];
-        depthMinMax.x = min(depthMinMax.x, other.x);
-        depthMinMax.y = max(depthMinMax.y, other.y);
-        sharedData[index] = depthMinMax;
+    barrier();
 
-        barrier();
+    other = sharedData[index + 16];
+    depthMinMax = min(depthMinMax, other);
+    sharedData[index] = depthMinMax;
 
-        other = sharedData[index + 8];
-        depthMinMax.x = min(depthMinMax.x, other.x);
-        depthMinMax.y = max(depthMinMax.y, other.y);
-        sharedData[index] = depthMinMax;
+    barrier();
 
-        other = sharedData[index + 4];
-        depthMinMax.x = min(depthMinMax.x, other.x);
-        depthMinMax.y = max(depthMinMax.y, other.y);
-        sharedData[index] = depthMinMax;
+    other = sharedData[index + 8];
+    depthMinMax = min(depthMinMax, other);
+    sharedData[index] = depthMinMax;
 
-        other = sharedData[index + 2];
-        depthMinMax.x = min(depthMinMax.x, other.x);
-        depthMinMax.y = max(depthMinMax.y, other.y);
-        sharedData[index] = depthMinMax;
+    barrier();
 
-        other = sharedData[index + 1];
-        depthMinMax.x = min(depthMinMax.x, other.x);
-        depthMinMax.y = max(depthMinMax.y, other.y);
-        sharedData[index] = depthMinMax;
-    }
+    other = sharedData[index + 4];
+    depthMinMax = min(depthMinMax, other);
+    sharedData[index] = depthMinMax;
+
+    other = sharedData[index + 2];
+    depthMinMax = min(depthMinMax, other);
+    sharedData[index] = depthMinMax;
+
+    other = sharedData[index + 1];
+    depthMinMax = min(depthMinMax, other);
+    sharedData[index] = depthMinMax;
 
     if (index == 0)
     {
         ivec2 outputPos = ivec2(gl_WorkGroupID.xy);
-        imageStore(outputTex, outputPos, vec4(depthMinMax, 0, 0));
+        imageStore(outputTex, outputPos, vec4(depthMinMax.x, -depthMinMax.y, 0, 0));
     }
 }
