@@ -20,15 +20,7 @@ uniform float cascadeFar[3];
 uniform mat4 screenToLightMatrix;
 
 
-// TODO single large array!
-shared vec4 sharedMinX[256];
-shared vec4 sharedMinY[256];
-shared vec4 sharedMinZ[256];
-
-shared vec4 sharedMaxX[256];
-shared vec4 sharedMaxY[256];
-shared vec4 sharedMaxZ[256];
-
+shared vec4 sharedMinMax[6*256];
 
 layout (local_size_x = 16, local_size_y = 16) in;
 
@@ -101,6 +93,8 @@ void main()
     computeCurrentThreadValue(minCorners, maxCorners);
 
     uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*16;
+    uint originalIndex = index;
+    uint localIndex = index;
 
     // transform into texture space [0, 1]
     minCorners[0] = minCorners[0] * 0.5 + 0.5;
@@ -108,9 +102,9 @@ void main()
     minCorners[2] = minCorners[2] * 0.5 + 0.5;
     minCorners[3] = minCorners[3] * 0.5 + 0.5;
 
-    vec4 currentMinX = sharedMinX[index] = vec4(minCorners[0].x, minCorners[1].x, minCorners[2].x, minCorners[3].x);
-    vec4 currentMinY = sharedMinY[index] = vec4(minCorners[0].y, minCorners[1].y, minCorners[2].y, minCorners[3].y);
-    vec4 currentMinZ = sharedMinZ[index] = vec4(minCorners[0].z, minCorners[1].z, minCorners[2].z, minCorners[3].z);
+    vec4 currentMinX = sharedMinMax[index] = vec4(minCorners[0].x, minCorners[1].x, minCorners[2].x, minCorners[3].x);
+    vec4 currentMinY = sharedMinMax[index+256] = vec4(minCorners[0].y, minCorners[1].y, minCorners[2].y, minCorners[3].y);
+    vec4 currentMinZ = sharedMinMax[index+512] = vec4(minCorners[0].z, minCorners[1].z, minCorners[2].z, minCorners[3].z);
 
     // transform into texture space [0, 1]
     maxCorners[0] = maxCorners[0] * 0.5 + 0.5;
@@ -118,236 +112,136 @@ void main()
     maxCorners[2] = maxCorners[2] * 0.5 + 0.5;
     maxCorners[3] = maxCorners[3] * 0.5 + 0.5;
 
-    vec4 currentMaxX = sharedMaxX[index] = vec4(maxCorners[0].x, maxCorners[1].x, maxCorners[2].x, maxCorners[3].x);
-    vec4 currentMaxY = sharedMaxY[index] = vec4(maxCorners[0].y, maxCorners[1].y, maxCorners[2].y, maxCorners[3].y);
-    vec4 currentMaxZ = sharedMaxZ[index] = vec4(maxCorners[0].z, maxCorners[1].z, maxCorners[2].z, maxCorners[3].z);
+    vec4 currentMaxX = sharedMinMax[index+768] = -vec4(maxCorners[0].x, maxCorners[1].x, maxCorners[2].x, maxCorners[3].x);
+    vec4 currentMaxY = sharedMinMax[index+1024] = -vec4(maxCorners[0].y, maxCorners[1].y, maxCorners[2].y, maxCorners[3].y);
+    vec4 currentMaxZ = sharedMinMax[index+1280] = -vec4(maxCorners[0].z, maxCorners[1].z, maxCorners[2].z, maxCorners[3].z);
 
     barrier();
 
     vec4 other;
 
-    // TODO reduce different type of values on different threads!
-
-    // At least 32 threads per wrap on modern gpu's
-    if (index < 128)
+    // reduce different type of values on different threads!
+    if (localIndex >= 128)
     {
-        other = sharedMinX[index + 128];
-        currentMinX = min(currentMinX, other);
-        sharedMinX[index] = currentMinX;
-
-        other = sharedMinY[index + 128];
-        currentMinY = min(currentMinY, other);
-        sharedMinY[index] = currentMinY;
-
-        other = sharedMinZ[index + 128];
-        currentMinZ = min(currentMinZ, other);
-        sharedMinZ[index] = currentMinZ;
-
-        other = sharedMaxX[index + 128];
-        currentMaxX = max(currentMaxX, other);
-        sharedMaxX[index] = currentMaxX;
-
-        other = sharedMaxY[index + 128];
-        currentMaxY = max(currentMaxY, other);
-        sharedMaxY[index] = currentMaxY;
-
-        other = sharedMaxZ[index + 128];
-        currentMaxZ = max(currentMaxZ, other);
-        sharedMaxZ[index] = currentMaxZ;
-
-        barrier();
-
-        other = sharedMinX[index + 64];
-        currentMinX = min(currentMinX, other);
-        sharedMinX[index] = currentMinX;
-
-        other = sharedMinY[index + 64];
-        currentMinY = min(currentMinY, other);
-        sharedMinY[index] = currentMinY;
-
-        other = sharedMinZ[index + 64];
-        currentMinZ = min(currentMinZ, other);
-        sharedMinZ[index] = currentMinZ;
-
-        other = sharedMaxX[index + 64];
-        currentMaxX = max(currentMaxX, other);
-        sharedMaxX[index] = currentMaxX;
-
-        other = sharedMaxY[index + 64];
-        currentMaxY = max(currentMaxY, other);
-        sharedMaxY[index] = currentMaxY;
-
-        other = sharedMaxZ[index + 64];
-        currentMaxZ = max(currentMaxZ, other);
-        sharedMaxZ[index] = currentMaxZ;
-
-        barrier();
-
-        other = sharedMinX[index + 32];
-        currentMinX = min(currentMinX, other);
-        sharedMinX[index] = currentMinX;
-
-        other = sharedMinY[index + 32];
-        currentMinY = min(currentMinY, other);
-        sharedMinY[index] = currentMinY;
-
-        other = sharedMinZ[index + 32];
-        currentMinZ = min(currentMinZ, other);
-        sharedMinZ[index] = currentMinZ;
-
-        other = sharedMaxX[index + 32];
-        currentMaxX = max(currentMaxX, other);
-        sharedMaxX[index] = currentMaxX;
-
-        other = sharedMaxY[index + 32];
-        currentMaxY = max(currentMaxY, other);
-        sharedMaxY[index] = currentMaxY;
-
-        other = sharedMaxZ[index + 32];
-        currentMaxZ = max(currentMaxZ, other);
-        sharedMaxZ[index] = currentMaxZ;
-
-        barrier();
-
-        other = sharedMinX[index + 16];
-        currentMinX = min(currentMinX, other);
-        sharedMinX[index] = currentMinX;
-
-        other = sharedMinY[index + 16];
-        currentMinY = min(currentMinY, other);
-        sharedMinY[index] = currentMinY;
-
-        other = sharedMinZ[index + 16];
-        currentMinZ = min(currentMinZ, other);
-        sharedMinZ[index] = currentMinZ;
-
-        other = sharedMaxX[index + 16];
-        currentMaxX = max(currentMaxX, other);
-        sharedMaxX[index] = currentMaxX;
-
-        other = sharedMaxY[index + 16];
-        currentMaxY = max(currentMaxY, other);
-        sharedMaxY[index] = currentMaxY;
-
-        other = sharedMaxZ[index + 16];
-        currentMaxZ = max(currentMaxZ, other);
-        sharedMaxZ[index] = currentMaxZ;
-
-        barrier();
-
-        other = sharedMinX[index + 8];
-        currentMinX = min(currentMinX, other);
-        sharedMinX[index] = currentMinX;
-
-        other = sharedMinY[index + 8];
-        currentMinY = min(currentMinY, other);
-        sharedMinY[index] = currentMinY;
-
-        other = sharedMinZ[index + 8];
-        currentMinZ = min(currentMinZ, other);
-        sharedMinZ[index] = currentMinZ;
-
-        other = sharedMaxX[index + 8];
-        currentMaxX = max(currentMaxX, other);
-        sharedMaxX[index] = currentMaxX;
-
-        other = sharedMaxY[index + 8];
-        currentMaxY = max(currentMaxY, other);
-        sharedMaxY[index] = currentMaxY;
-
-        other = sharedMaxZ[index + 8];
-        currentMaxZ = max(currentMaxZ, other);
-        sharedMaxZ[index] = currentMaxZ;
-
-
-        other = sharedMinX[index + 4];
-        currentMinX = min(currentMinX, other);
-        sharedMinX[index] = currentMinX;
-
-        other = sharedMinY[index + 4];
-        currentMinY = min(currentMinY, other);
-        sharedMinY[index] = currentMinY;
-
-        other = sharedMinZ[index + 4];
-        currentMinZ = min(currentMinZ, other);
-        sharedMinZ[index] = currentMinZ;
-
-        other = sharedMaxX[index + 4];
-        currentMaxX = max(currentMaxX, other);
-        sharedMaxX[index] = currentMaxX;
-
-        other = sharedMaxY[index + 4];
-        currentMaxY = max(currentMaxY, other);
-        sharedMaxY[index] = currentMaxY;
-
-        other = sharedMaxZ[index + 4];
-        currentMaxZ = max(currentMaxZ, other);
-        sharedMaxZ[index] = currentMaxZ;
-
-
-        other = sharedMinX[index + 2];
-        currentMinX = min(currentMinX, other);
-        sharedMinX[index] = currentMinX;
-
-        other = sharedMinY[index + 2];
-        currentMinY = min(currentMinY, other);
-        sharedMinY[index] = currentMinY;
-
-        other = sharedMinZ[index + 2];
-        currentMinZ = min(currentMinZ, other);
-        sharedMinZ[index] = currentMinZ;
-
-        other = sharedMaxX[index + 2];
-        currentMaxX = max(currentMaxX, other);
-        sharedMaxX[index] = currentMaxX;
-
-        other = sharedMaxY[index + 2];
-        currentMaxY = max(currentMaxY, other);
-        sharedMaxY[index] = currentMaxY;
-
-        other = sharedMaxZ[index + 2];
-        currentMaxZ = max(currentMaxZ, other);
-        sharedMaxZ[index] = currentMaxZ;
-
-
-        other = sharedMinX[index + 1];
-        currentMinX = min(currentMinX, other);
-        sharedMinX[index] = currentMinX;
-
-        other = sharedMinY[index + 1];
-        currentMinY = min(currentMinY, other);
-        sharedMinY[index] = currentMinY;
-
-        other = sharedMinZ[index + 1];
-        currentMinZ = min(currentMinZ, other);
-        sharedMinZ[index] = currentMinZ;
-
-        other = sharedMaxX[index + 1];
-        currentMaxX = max(currentMaxX, other);
-        sharedMaxX[index] = currentMaxX;
-
-        other = sharedMaxY[index + 1];
-        currentMaxY = max(currentMaxY, other);
-        sharedMaxY[index] = currentMaxY;
-
-        other = sharedMaxZ[index + 1];
-        currentMaxZ = max(currentMaxZ, other);
-        sharedMaxZ[index] = currentMaxZ;
+        index += 768-128;
+        localIndex -= 128;
+        currentMinX = currentMaxX;
+        currentMinY = currentMaxY;
+        currentMinZ = currentMaxZ;
     }
 
-    if (index == 0)
+    // At least 32 threads per warp on modern gpu's
+
+    other = sharedMinMax[index + 128];
+    currentMinX = min(currentMinX, other);
+    sharedMinMax[index] = currentMinX;
+
+    other = sharedMinMax[index + 256 + 128];
+    currentMinY = min(currentMinY, other);
+    sharedMinMax[index + 256] = currentMinY;
+
+    other = sharedMinMax[index + 512 + 128];
+    currentMinZ = min(currentMinZ, other);
+    sharedMinMax[index + 512] = currentMinZ;
+
+    barrier();
+
+    other = sharedMinMax[index + 64];
+    currentMinX = min(currentMinX, other);
+    sharedMinMax[index] = currentMinX;
+
+    other = sharedMinMax[index + 256 + 64];
+    currentMinY = min(currentMinY, other);
+    sharedMinMax[index + 256] = currentMinY;
+
+    other = sharedMinMax[index + 512 + 64];
+    currentMinZ = min(currentMinZ, other);
+    sharedMinMax[index + 512] = currentMinZ;
+
+    // dismiss 4th sub group..
+    if (localIndex >= 64+32)
     {
-        ivec2 outputPos = ivec2(gl_WorkGroupID.xy);
+        return;
+    }
 
-        // TODO write to all textures at once using multiple threads!!
+    if (localIndex >= 64)
+    {
+        index += 512-64;
+        localIndex -= 64;
+        currentMinX = currentMinZ;
+        // 4th thread group is dismissed!
+    }
 
+    if (localIndex >= 32)
+    {
+        index += 256-32;
+        localIndex -= 32;
+        currentMinX = currentMinY;
+    }
+
+    barrier();
+
+    other = sharedMinMax[index + 32];
+    currentMinX = min(currentMinX, other);
+    sharedMinMax[index] = currentMinX;
+
+    barrier();
+
+    other = sharedMinMax[index + 16];
+    currentMinX = min(currentMinX, other);
+    sharedMinMax[index] = currentMinX;
+
+    barrier();
+
+    other = sharedMinMax[index + 8];
+    currentMinX = min(currentMinX, other);
+    sharedMinMax[index] = currentMinX;
+
+
+
+    other = sharedMinMax[index + 4];
+    currentMinX = min(currentMinX, other);
+    sharedMinMax[index] = currentMinX;
+
+
+
+    other = sharedMinMax[index + 2];
+    currentMinX = min(currentMinX, other);
+    sharedMinMax[index] = currentMinX;
+
+
+
+    other = sharedMinMax[index + 1];
+    currentMinX = min(currentMinX, other);
+    sharedMinMax[index] = currentMinX;
+
+
+    ivec2 outputPos = ivec2(gl_WorkGroupID.xy);
+
+    // used local variables currentMin
+    if (originalIndex == 0)
+    {
         imageStore(outputMinX, outputPos, currentMinX);
-        imageStore(outputMinY, outputPos, currentMinY);
-        imageStore(outputMinZ, outputPos, currentMinZ);
-
-        imageStore(outputMaxX, outputPos, currentMaxX);
-        imageStore(outputMaxY, outputPos, currentMaxY);
-        imageStore(outputMaxZ, outputPos, currentMaxZ);
+    }
+    if (originalIndex == 32)
+    {
+        imageStore(outputMinY, outputPos, currentMinX);
+    }
+    if (originalIndex == 64)
+    {
+        imageStore(outputMinZ, outputPos, currentMinX);
+    }
+    if (originalIndex == 128)
+    {
+        imageStore(outputMaxX, outputPos, -currentMinX);
+    }
+    if (originalIndex == 128 + 32)
+    {
+        imageStore(outputMaxY, outputPos, -currentMinX);
+    }
+    if (originalIndex == 128 + 64)
+    {
+        imageStore(outputMaxZ, outputPos, -currentMinX);
     }
 
     /*
