@@ -125,9 +125,9 @@ void main()
     {
         index += 768-128;
         localIndex -= 128;
-        currentMinX = currentMaxX;
-        currentMinY = currentMaxY;
-        currentMinZ = currentMaxZ;
+        currentMinX = sharedMinMax[index];
+        currentMinY = sharedMinMax[index + 256];
+        currentMinZ = sharedMinMax[index + 512];
     }
 
     // At least 32 threads per warp on modern gpu's
@@ -158,6 +158,8 @@ void main()
     currentMinZ = min(currentMinZ, other);
     sharedMinMax[index + 512] = currentMinZ;
 
+    barrier();
+
     // dismiss 4th sub group..
     if (localIndex >= 64+32)
     {
@@ -168,7 +170,7 @@ void main()
     {
         index += 512-64;
         localIndex -= 64;
-        currentMinX = currentMinZ;
+        currentMinX = sharedMinMax[index];
         // 4th thread group is dismissed!
     }
 
@@ -176,22 +178,20 @@ void main()
     {
         index += 256-32;
         localIndex -= 32;
-        currentMinX = currentMinY;
+        currentMinX = sharedMinMax[index];
     }
-
-    barrier();
 
     other = sharedMinMax[index + 32];
     currentMinX = min(currentMinX, other);
     sharedMinMax[index] = currentMinX;
 
-    barrier();
+
 
     other = sharedMinMax[index + 16];
     currentMinX = min(currentMinX, other);
     sharedMinMax[index] = currentMinX;
 
-    barrier();
+
 
     other = sharedMinMax[index + 8];
     currentMinX = min(currentMinX, other);
