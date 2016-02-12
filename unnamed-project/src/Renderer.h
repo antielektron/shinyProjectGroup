@@ -13,16 +13,17 @@
 #include "RendererBase.h"
 #include "Scene/Scene.h"
 
-#define KEYSTR_PROGRAM_RENDER "Render"
-#define KEYSTR_PROGRAM_COMPOSE "Compose"
-#define KEYSTR_PROGRAM_SHADOW  "Shadow"
-#define KEYSTR_PROGRAM_COPY    "Copy"
+#define KEYSTR_PROGRAM_RENDER                   "Render"
+#define KEYSTR_PROGRAM_COMPOSE                  "Compose"
+#define KEYSTR_PROGRAM_SHADOW                   "Shadow"
+#define KEYSTR_PROGRAM_COPY                     "Copy"
 #define KEYSTR_PROGRAM_REDUCE_DEPTH             "Reduce Depth"
 #define KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER     "Reduce Depth Sampler"
 #define KEYSTR_PROGRAM_REDUCE_FRUSTUM           "Reduce Frustum"
 #define KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER   "Reduce Frustum Sampler"
-#define KEYSTR_PROGRAM_HORIZONTAL_GAUSS "Horizontal Gauss"
-#define KEYSTR_PROGRAM_VERTICAL_GAUSS "Vertical Gauss"
+#define KEYSTR_PROGRAM_HORIZONTAL_GAUSS         "Horizontal Gauss"
+#define KEYSTR_PROGRAM_VERTICAL_GAUSS           "Vertical Gauss"
+#define KEYSTR_PROGRAM_CREATE_MOMENTS           "Create Moments"
 
 class Renderer : public RendererBase
 {

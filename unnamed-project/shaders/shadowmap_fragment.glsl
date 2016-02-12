@@ -3,7 +3,7 @@
 // gl_FragCoord.z sucks
 in vec4 lightViewPosition;
 
-out vec4 fragMoments; // aka depth
+// out vec4 fragMoments; // aka depth
 
 
 void main()
@@ -11,10 +11,11 @@ void main()
     // lightViewPosition from -1 to 1!
 
     float depth = lightViewPosition.z*0.5 + 0.5;
-
     if (depth < 0.)
         depth = 0.;
+    gl_FragDepth = depth;
 
+    /*
     float square = depth*depth;
 	vec4 moments = vec4(depth,square,square*depth,square*square);
 	fragMoments = transpose(mat4(	-2.07224649,	32.23703778,	-68.571074599,	39.3703274134,
@@ -25,4 +26,5 @@ void main()
 	fragMoments.x += 0.035955884801;
     // fragDepth = lightViewPosition.z*0.5 + 0.5; // lightViewPosition.z*0.5 + 0.5 = gl_FragCoord.z;
     // alpha blending ausschalten
+    */
 }

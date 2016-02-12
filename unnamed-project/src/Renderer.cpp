@@ -104,6 +104,11 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_HORIZONTAL_GAUSS,
                     QOpenGLShader::Compute);
 
+    setShaderSource(loadTextFile("shaders/create_moments.glsl"),
+                    KEYSTR_PROGRAM_CREATE_MOMENTS,
+                    QOpenGLShader::Compute);
+
+
     // generate attrib and uniform locations
     // default:
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
@@ -160,12 +165,6 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER].emplace_back(&m_reduceFrustumCascadeFarLoc, "cascadeFar");
     m_uniformLocs[KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER].emplace_back(&m_reduceFrustumScreenToLightMatrixLoc, "screenToLightMatrix");
 
-    m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussSourceLoc, "sourceImage");
-    m_uniformLocs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].emplace_back(&m_verticalGaussFilteredLoc, "filteredImage");
-
-    m_uniformLocs[KEYSTR_PROGRAM_VERTICAL_GAUSS].emplace_back(&m_verticalGaussSourceLoc, "sourceImage");
-    m_uniformLocs[KEYSTR_PROGRAM_VERTICAL_GAUSS].emplace_back(&m_verticalGaussFilteredLoc, "filteredImage");
-
     // create Programs:
     createProgram(KEYSTR_PROGRAM_RENDER);
     createProgram(KEYSTR_PROGRAM_SHADOW);
@@ -177,6 +176,7 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_REDUCE_FRUSTUM);
     createProgram(KEYSTR_PROGRAM_HORIZONTAL_GAUSS);
     createProgram(KEYSTR_PROGRAM_VERTICAL_GAUSS);
+    createProgram(KEYSTR_PROGRAM_CREATE_MOMENTS);
 
     // make stuff
     // --> default program (nothing to do) <------------------------------------
@@ -206,20 +206,22 @@ void Renderer::initialize()
     glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_INT, 0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-    // Create DepthBuffer
+    // Create DepthBuffer (multisample)
     glGenTextures(1, &m_shadowMapDepthBuffer);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapDepthBuffer);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, m_shadowMapDepthBuffer);
+    glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
+    // glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
+    glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 4, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize, m_cascades, false);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 0);
 
     // Create FrameBuffer
     glGenFramebuffers(1, &m_shadowMapFrameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_shadowMapDepthBuffer, 0);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_shadowMapTexture, 0);
+
+    // Set the list of draw buffers.
+    GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers(0, attachments);
 
     // --> compose Program <----------------------------------------------------
     // Create quad
@@ -316,6 +318,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *copyProgram = m_programs[KEYSTR_PROGRAM_COPY].get();
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
+    QOpenGLShaderProgram *createMomentsProgram = m_programs[KEYSTR_PROGRAM_CREATE_MOMENTS].get();
 
     // Input: lightDirection, cameraProjection, cameraView, frustum
     // Output: lightProjection
@@ -548,6 +551,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE);
 
     shadowMapProgram->bind();
 
@@ -563,6 +567,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     }
 
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_MULTISAMPLE);
 
     shadowMapProgram->release();
 
@@ -570,13 +575,24 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     // these barriers do work: GL_ALL_BARRIER_BITS GL_SHADER_IMAGE_ACCESS_BARRIER_BIT GL_TEXTURE_FETCH_BARRIER_BIT GL_SHADER_STORAGE_BARRIER_BIT
 
+    // Resolve MSAA depth to moment texture
+    createMomentsProgram->bind();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, m_shadowMapDepthBuffer);
+
+    glBindImageTexture(1, m_shadowMapTexture, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
+
+    glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 4);
+
+    createMomentsProgram->release();
+
     /*
     glFinish();
     auto start = std::chrono::system_clock::now();
 
     for (int j = 0; j < 100; j++)
     {
-    */
 
     // Filter Shadow Map
     for (int i = 0; i < 4; i++)
@@ -600,7 +616,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         verticalGaussProgram->release();
     }
 
-    /*
     }
 
     glFinish();
