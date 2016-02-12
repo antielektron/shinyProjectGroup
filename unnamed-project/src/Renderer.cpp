@@ -325,12 +325,12 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     std::vector<float> cascadeFars;
 
     // Inverse of common transformations...
-    auto inverseCameraView = scene->getCameraView().inverted();
-    auto inverseCameraProjection = scene->getCameraProjection().inverted();
-    auto inverseCameraTransformation = (scene->getCameraProjection() * scene->getCameraView()).inverted();
+    auto lastInverseCameraView = m_lastCameraView.inverted();
+    auto lastInverseCameraProjection = scene->getCameraProjection().inverted();
+    auto lastInverseCameraTransformation = (scene->getCameraProjection() * m_lastCameraView).inverted();
 
     QMatrix4x4 lightViewMatrix;
-    createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
+    createLightViewMatrix(scene->getDirectionalLightDirection(), lastInverseCameraView, lightViewMatrix);
 
     // Compute actual near and far plane!
 
@@ -353,17 +353,17 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             maxDepth = p.second;
     }
 
-    QVector3D actualNearFarCorners[] = {
+    QVector3D lastNearFarCorners[] = {
             { 0, 0, minDepth*2 - 1 },
             { 0, 0, maxDepth*2 - 1 },
     };
 
     // Transform corners into light view space
-    MathUtility::transformVectors(inverseCameraProjection, actualNearFarCorners);
+    MathUtility::transformVectors(lastInverseCameraProjection, lastNearFarCorners);
 
     // NOTE: z values are inverted! multiply by -1
-    float actualNearPlane = -actualNearFarCorners[0].z();
-    float actualFarPlane = -actualNearFarCorners[1].z();
+    float lastNearPlane = -lastNearFarCorners[0].z();
+    float lastFarPlane = -lastNearFarCorners[1].z();
 
     // Coefficient for combining uniform and logarithmic results
     float lambdaUniLog = 0.3f;
@@ -371,8 +371,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     for (size_t i = 1; i <= static_cast<size_t>(m_cascades); i++)
     {
         // interpolate between actual near/far planes
-        float cUni = actualNearPlane + (actualFarPlane - actualNearPlane) * i / m_cascades;
-        float cLog = actualNearPlane * std::pow(actualFarPlane / actualNearPlane, static_cast<float>(i) / m_cascades); // COMPLEX!
+        float cUni = lastNearPlane + (lastFarPlane - lastNearPlane) * i / m_cascades;
+        float cLog = lastNearPlane * std::pow(lastFarPlane / lastNearPlane, static_cast<float>(i) / m_cascades); // COMPLEX!
 
         // combine cLog and cUni
         float currentZ = lambdaUniLog * cUni + (1 - lambdaUniLog) * cLog;
@@ -381,14 +381,28 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             cascadeFars.push_back(currentZ);
     }
 
+    // transform farz into current camera view! (take camera movement into account)
+    auto cameraView = scene->getCameraView();
+    auto cameraMovement = cameraView * lastInverseCameraView * QVector4D(0, 0, 0, 1);
+    // transform cascade far planes into screen space
+    std::vector<float> cascadeFarScreen;
+    for (auto &farz : cascadeFars)
+    {
+        // negative farz!
+        auto result = scene->getCameraProjection() * QVector4D(0, 0, -farz, 1);
+        float z = result.z()/result.w();
+        cascadeFarScreen.push_back(z * 0.5f + 0.5f);
+
+        farz -= cameraMovement.z();
+    }
 
     // Compute view frustum of camera in light view
-    auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
+    auto lastScreenToLightTransformation = lightViewMatrix * lastInverseCameraTransformation;
 
     // Compute temporary projection matrix wrapping the whole view frustum!
     // TODO check if this projection is what we need! (looks okay, when used for rendering)
     QMatrix4x4 tempLightProjection;
-    createFrustumProjectionMatrix(screenToLightTransformation, tempLightProjection);
+    createFrustumProjectionMatrix(lastScreenToLightTransformation, tempLightProjection);
 
     // in shader:
     // inLight = screenToLight * (xy , depth, 1)
@@ -398,22 +412,12 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     // store: vec3 minCorner[4], vec3 maxCorner[4]
     // store min[12], max[12]
 
-    // transform cascade far planes into screen space
-    std::vector<float> cascadeFarScreen;
-    for (auto farz : cascadeFars)
-    {
-        // negative farz!
-        auto result = scene->getCameraProjection() * QVector4D(0, 0, -farz, 1);
-        float z = result.z()/result.w();
-        cascadeFarScreen.push_back(z * 0.5f + 0.5f);
-    }
-
 
     reduceFrustumSamplerProgram->bind();
 
     reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumInputSizeLoc, m_width, m_height);
     reduceFrustumSamplerProgram->setUniformValueArray(m_reduceFrustumCascadeFarLoc, cascadeFarScreen.data(), m_cascades-1, 1);
-    reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumScreenToLightMatrixLoc, tempLightProjection * screenToLightTransformation);
+    reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumScreenToLightMatrixLoc, tempLightProjection * lastScreenToLightTransformation);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
@@ -486,6 +490,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     MathUtility::transformVectors(inverseTempLightProjection, minCornersCascade);
     MathUtility::transformVectors(inverseTempLightProjection, maxCornersCascade);
 
+    // adjust min x value of first cascade to camera movement..
+    minCornersCascade[0][0] += cameraMovement.z();
+
     // for all cascades calculate projection matrix
     for (int i = 0; i < m_cascades; i++)
     {
@@ -497,11 +504,11 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         QMatrix4x4 scaling;
        // scaling.scale(0.5, 0.5);
 
-        cascadeViews.push_back(scaling * cascadeProjection * lightViewMatrix * inverseCameraView);
+        cascadeViews.push_back(scaling * cascadeProjection * lightViewMatrix * scene->getCameraView().inverted());
     }
 
     // light direction from camera's perspective
-    auto lightDirection = scene->getCameraView() * QVector4D(scene->getDirectionalLightDirection(), 0.);
+    auto lightDirection = scene->getCameraView() * QVector4D(scene->getDirectionalLightDirection(), 0);
 
 
     // Render to ShadowMap
@@ -512,7 +519,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
 
     // Initialize with max depth.
-    glClearColor(0.999990940, 0.997558594, 0.893437386, 0.000000000);
+    glClearColor(0.999990940f, 0.997558594f, 0.893437386f, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
@@ -742,6 +749,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     std::cout << (double)m_debugSum/m_debugCount << std::endl;
     */
 
+    m_lastCameraView = scene->getCameraView();
 
 
 
@@ -802,7 +810,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
         for (auto &corner : renderSliceCorners)
         {
-            auto result = inverseCameraTransformation * QVector4D(corner, entry.first, 1);
+            auto result = lastInverseCameraTransformation * QVector4D(corner, entry.first, 1);
             result /= result.w();
 
             glPointSize(5);

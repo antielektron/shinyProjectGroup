@@ -112,6 +112,8 @@ protected:
     size_t m_debugSum;
     size_t m_debugCount;
 
+    QMatrix4x4 m_lastCameraView;
+
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H
