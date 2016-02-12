@@ -412,6 +412,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     // store: vec3 minCorner[4], vec3 maxCorner[4]
     // store min[12], max[12]
 
+    GLsizei prevWidth = m_width;
+    GLsizei prevHeight = m_height;
 
     reduceFrustumSamplerProgram->bind();
 
@@ -427,11 +429,34 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(1+i, m_frustumReduceTextures[0][i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16);
     }
 
+    // round up
+    prevWidth = (prevWidth-1) / 2 / 16 + 1;
+    prevHeight = (prevHeight-1) / 2 / 16 + 1;
+
     // for every new pixel spawn a thread group!
-    glDispatchCompute((m_width - 1)/2/16 + 1, (m_height - 1)/2/16 + 1, 1);
+    glDispatchCompute(prevWidth, prevHeight, 1);
 
     reduceFrustumSamplerProgram->release();
 
+    reduceFrustumProgram->bind();
+
+    for (int i = 1; i < m_frustumReduceTextures.size(); i++)
+    {
+        for (int j = 0; j < 6; j++)
+        {
+            glBindImageTexture(0+j, m_frustumReduceTextures[i-1][j], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA16);
+            glBindImageTexture(6+j, m_frustumReduceTextures[i][j], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16);
+        }
+
+        // round up
+        prevWidth = (prevWidth-1) / 2 / 16 + 1;
+        prevHeight = (prevHeight-1) / 2 / 16 + 1;
+
+        // for every new pixel spawn a thread group!
+        glDispatchCompute(prevWidth, prevHeight, 1);
+    }
+
+    reduceFrustumProgram->release();
 
 
     // NOTE: read back values are in texturespace [0, 1]
@@ -443,7 +468,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     for (int i = 0; i < 3; i++)
     {
-        glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures[0][i]);
+        glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures.back()[i]);
         glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
         glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -458,7 +483,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     for (int i = 0; i < 3; i++)
     {
-        glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures[0][3+i]);
+        glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures.back()[3+i]);
         glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
         glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -703,8 +728,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     */
 
     // Invoke reduce ...
-    GLsizei prevWidth = m_width;
-    GLsizei prevHeight = m_height;
+    prevWidth = m_width;
+    prevHeight = m_height;
 
     reduceDepthSamplerProgram->bind();
 
@@ -1013,7 +1038,7 @@ void Renderer::resize(int width, int height)
 
     // Create reduce textures!
     auto n = std::ceil(std::log(std::min(m_width, m_height)) / std::log(2.*16.));
-    n = 1; // reduce_frustum_compute.glsl not implemented yet.
+    // n = 1; // reduce_frustum_compute.glsl not implemented yet.
     m_depthReduceTextures.resize(n);
     glGenTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
     m_frustumReduceTextures.resize(n);
@@ -1029,6 +1054,8 @@ void Renderer::resize(int width, int height)
         // round up
         prevWidth = (prevWidth-1) / 2 / 16 + 1;
         prevHeight = (prevHeight-1) / 2 / 16 + 1;
+
+        std::cout << prevWidth << " " << prevHeight << std::endl;
 
         for (int j = 0; j < 6; j++)
         {
