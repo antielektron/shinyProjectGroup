@@ -427,10 +427,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
 
-    for (int i = 0; i < 6; i++)
-    {
-        glBindImageTexture(1+i, m_frustumReduceTextures[0][i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16);
-    }
+    glBindImageTexture(1, m_frustumReduceTextureArrays[0], 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
 
     // round up
     prevWidth = (prevWidth-1) / 2 / 16 + 1;
@@ -443,13 +440,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     reduceFrustumProgram->bind();
 
-    for (int i = 1; i < m_frustumReduceTextures.size(); i++)
+    for (int i = 1; i < m_frustumReduceTextureArrays.size(); i++)
     {
-        for (int j = 0; j < 6; j++)
-        {
-            glBindImageTexture(0+j, m_frustumReduceTextures[i-1][j], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA16);
-            glBindImageTexture(6+j, m_frustumReduceTextures[i][j], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16);
-        }
+        glBindImageTexture(0, m_frustumReduceTextureArrays[i-1], 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16);
+        glBindImageTexture(1, m_frustumReduceTextureArrays[i], 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
 
         // round up
         prevWidth = (prevWidth-1) / 2 / 16 + 1;
@@ -463,38 +457,23 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
 
     // NOTE: read back values are in texturespace [0, 1]
-    QVector4D minCornersXYZ[3] = {{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}};
-    QVector4D maxCornersXYZ[3] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+    QVector4D reducedCorners[6] = {{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}};
 
     std::vector<std::array<float, 4>> reducedFrustumPixels;
-    reducedFrustumPixels.resize(m_reduceLastTextureSize);
+    reducedFrustumPixels.resize(m_reduceLastTextureSize*6);
 
-    for (int i = 0; i < 3; i++)
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_frustumReduceTextureArrays.back());
+    glGetTexImage(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+    for (int i = 0; i < 6; i++)
     {
-        glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures.back()[i]);
-        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        for (auto &p : reducedFrustumPixels)
+        for (int j = m_reduceLastTextureSize*i; j < m_reduceLastTextureSize*(i+1); j++)
         {
-            for (int j = 0; j < 4; j++)
+            auto &p = reducedFrustumPixels[j];
+            for (int k = 0; k < 4; k++)
             {
-                minCornersXYZ[i][j] = std::min(minCornersXYZ[i][j], p[j]);
-            }
-        }
-    }
-
-    for (int i = 0; i < 3; i++)
-    {
-        glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures.back()[3+i]);
-        glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        for (auto &p : reducedFrustumPixels)
-        {
-            for (int j = 0; j < 4; j++)
-            {
-                maxCornersXYZ[i][j] = std::max(maxCornersXYZ[i][j], p[j]);
+                reducedCorners[i][k] = std::min(reducedCorners[i][k], p[k]);
             }
         }
     }
@@ -508,8 +487,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         for (int j = 0; j < 3; j++)
         {
             // transform from texture space to projected space
-            minCornersCascade[i][j] = minCornersXYZ[j][i] * 2 - 1;
-            maxCornersCascade[i][j] = maxCornersXYZ[j][i] * 2 - 1;
+            minCornersCascade[i][j] = reducedCorners[j][i] * 2 - 1; // min
+            maxCornersCascade[i][j] = reducedCorners[3+j][i] * -2 + 1; // max
         }
     }
 
@@ -990,8 +969,7 @@ void Renderer::resize(int width, int height)
     glDeleteTextures(1, &m_renderDepthBuffer);
     glDeleteTextures(1, &m_tempTexture);
     glDeleteTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
-    for (auto &arr : m_frustumReduceTextures)
-        glDeleteTextures(6, arr.data());
+    glDeleteTextures(m_frustumReduceTextureArrays.size(), m_frustumReduceTextureArrays.data());
 
     // Create render texture
     glGenTextures(1, &m_renderTexture);
@@ -1056,9 +1034,8 @@ void Renderer::resize(int width, int height)
     // n = 1; // reduce_frustum_compute.glsl not implemented yet.
     m_depthReduceTextures.resize(n);
     glGenTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
-    m_frustumReduceTextures.resize(n);
-    for (auto &arr : m_frustumReduceTextures)
-        glGenTextures(6, arr.data());
+    m_frustumReduceTextureArrays.resize(n);
+    glGenTextures(m_frustumReduceTextureArrays.size(), m_frustumReduceTextureArrays.data());
 
 
     GLsizei prevWidth = m_width;
@@ -1072,16 +1049,13 @@ void Renderer::resize(int width, int height)
 
         std::cout << prevWidth << " " << prevHeight << std::endl;
 
-        for (int j = 0; j < 6; j++)
-        {
-            glBindTexture(GL_TEXTURE_2D, m_frustumReduceTextures[i][j]);
-            // TODO dynamic texture size!
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, prevWidth, prevHeight, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
-            // No filtering required
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glBindTexture(GL_TEXTURE_2D, 0);
-        }
+        glBindTexture(GL_TEXTURE_2D_ARRAY, m_frustumReduceTextureArrays[i]);
+        // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, prevWidth, prevHeight, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, prevWidth, prevHeight, 6, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+        // No filtering required
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
         glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures[i]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, prevWidth, prevHeight, 0, GL_RG, GL_UNSIGNED_SHORT, 0);

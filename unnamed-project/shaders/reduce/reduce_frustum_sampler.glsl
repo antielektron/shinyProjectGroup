@@ -1,15 +1,8 @@
 #version 450
 
 // Depth buffer can not be bound as image2D for whatever reason.
-layout (binding = 0) uniform sampler2D inputSampler;
-
-layout (binding=1, rgba16) writeonly uniform image2D outputMinX;
-layout (binding=2, rgba16) writeonly uniform image2D outputMinY;
-layout (binding=3, rgba16) writeonly uniform image2D outputMinZ;
-
-layout (binding=4, rgba16) writeonly uniform image2D outputMaxX;
-layout (binding=5, rgba16) writeonly uniform image2D outputMaxY;
-layout (binding=6, rgba16) writeonly uniform image2D outputMaxZ;
+layout (binding=0) uniform sampler2D inputSampler;
+layout (binding=1, rgba16) writeonly uniform image2DArray outputTex;
 
 uniform vec2 inputSize;
 
@@ -102,9 +95,13 @@ void main()
     minCorners[2] = minCorners[2] * 0.5 + 0.5;
     minCorners[3] = minCorners[3] * 0.5 + 0.5;
 
-    vec4 currentMinX = sharedMinMax[index] = vec4(minCorners[0].x, minCorners[1].x, minCorners[2].x, minCorners[3].x);
-    vec4 currentMinY = sharedMinMax[index+256] = vec4(minCorners[0].y, minCorners[1].y, minCorners[2].y, minCorners[3].y);
-    vec4 currentMinZ = sharedMinMax[index+512] = vec4(minCorners[0].z, minCorners[1].z, minCorners[2].z, minCorners[3].z);
+    vec4 currentValue0;
+    vec4 currentValue1;
+    vec4 currentValue2;
+
+    currentValue0 = sharedMinMax[index] = vec4(minCorners[0].x, minCorners[1].x, minCorners[2].x, minCorners[3].x);
+    currentValue1 = sharedMinMax[index+256] = vec4(minCorners[0].y, minCorners[1].y, minCorners[2].y, minCorners[3].y);
+    currentValue2 = sharedMinMax[index+512] = vec4(minCorners[0].z, minCorners[1].z, minCorners[2].z, minCorners[3].z);
 
     // transform into texture space [0, 1]
     maxCorners[0] = maxCorners[0] * 0.5 + 0.5;
@@ -112,9 +109,9 @@ void main()
     maxCorners[2] = maxCorners[2] * 0.5 + 0.5;
     maxCorners[3] = maxCorners[3] * 0.5 + 0.5;
 
-    vec4 currentMaxX = sharedMinMax[index+768] = -vec4(maxCorners[0].x, maxCorners[1].x, maxCorners[2].x, maxCorners[3].x);
-    vec4 currentMaxY = sharedMinMax[index+1024] = -vec4(maxCorners[0].y, maxCorners[1].y, maxCorners[2].y, maxCorners[3].y);
-    vec4 currentMaxZ = sharedMinMax[index+1280] = -vec4(maxCorners[0].z, maxCorners[1].z, maxCorners[2].z, maxCorners[3].z);
+    sharedMinMax[index+768] = vec4(1) - vec4(maxCorners[0].x, maxCorners[1].x, maxCorners[2].x, maxCorners[3].x);
+    sharedMinMax[index+1024] = vec4(1) - vec4(maxCorners[0].y, maxCorners[1].y, maxCorners[2].y, maxCorners[3].y);
+    sharedMinMax[index+1280] = vec4(1) - vec4(maxCorners[0].z, maxCorners[1].z, maxCorners[2].z, maxCorners[3].z);
 
     barrier();
 
@@ -125,38 +122,38 @@ void main()
     {
         index += 768-128;
         localIndex -= 128;
-        currentMinX = sharedMinMax[index];
-        currentMinY = sharedMinMax[index + 256];
-        currentMinZ = sharedMinMax[index + 512];
+        currentValue0 = sharedMinMax[index];
+        currentValue1 = sharedMinMax[index + 256];
+        currentValue2 = sharedMinMax[index + 512];
     }
 
     // At least 32 threads per warp on modern gpu's
 
     other = sharedMinMax[index + 128];
-    currentMinX = min(currentMinX, other);
-    sharedMinMax[index] = currentMinX;
+    currentValue0 = min(currentValue0, other);
+    sharedMinMax[index] = currentValue0;
 
     other = sharedMinMax[index + 256 + 128];
-    currentMinY = min(currentMinY, other);
-    sharedMinMax[index + 256] = currentMinY;
+    currentValue1 = min(currentValue1, other);
+    sharedMinMax[index + 256] = currentValue1;
 
     other = sharedMinMax[index + 512 + 128];
-    currentMinZ = min(currentMinZ, other);
-    sharedMinMax[index + 512] = currentMinZ;
+    currentValue2 = min(currentValue2, other);
+    sharedMinMax[index + 512] = currentValue2;
 
     barrier();
 
     other = sharedMinMax[index + 64];
-    currentMinX = min(currentMinX, other);
-    sharedMinMax[index] = currentMinX;
+    currentValue0 = min(currentValue0, other);
+    sharedMinMax[index] = currentValue0;
 
     other = sharedMinMax[index + 256 + 64];
-    currentMinY = min(currentMinY, other);
-    sharedMinMax[index + 256] = currentMinY;
+    currentValue1 = min(currentValue1, other);
+    sharedMinMax[index + 256] = currentValue1;
 
     other = sharedMinMax[index + 512 + 64];
-    currentMinZ = min(currentMinZ, other);
-    sharedMinMax[index + 512] = currentMinZ;
+    currentValue2 = min(currentValue2, other);
+    sharedMinMax[index + 512] = currentValue2;
 
     barrier();
 
@@ -170,7 +167,7 @@ void main()
     {
         index += 512-64;
         localIndex -= 64;
-        currentMinX = sharedMinMax[index];
+        currentValue0 = sharedMinMax[index];
         // 4th thread group is dismissed!
     }
 
@@ -178,42 +175,42 @@ void main()
     {
         index += 256-32;
         localIndex -= 32;
-        currentMinX = sharedMinMax[index];
+        currentValue0 = sharedMinMax[index];
     }
 
     other = sharedMinMax[index + 32];
-    currentMinX = min(currentMinX, other);
-    sharedMinMax[index] = currentMinX;
+    currentValue0 = min(currentValue0, other);
+    sharedMinMax[index] = currentValue0;
 
 
 
     other = sharedMinMax[index + 16];
-    currentMinX = min(currentMinX, other);
-    sharedMinMax[index] = currentMinX;
+    currentValue0 = min(currentValue0, other);
+    sharedMinMax[index] = currentValue0;
 
 
 
     other = sharedMinMax[index + 8];
-    currentMinX = min(currentMinX, other);
-    sharedMinMax[index] = currentMinX;
+    currentValue0 = min(currentValue0, other);
+    sharedMinMax[index] = currentValue0;
 
 
 
     other = sharedMinMax[index + 4];
-    currentMinX = min(currentMinX, other);
-    sharedMinMax[index] = currentMinX;
+    currentValue0 = min(currentValue0, other);
+    sharedMinMax[index] = currentValue0;
 
 
 
     other = sharedMinMax[index + 2];
-    currentMinX = min(currentMinX, other);
-    sharedMinMax[index] = currentMinX;
+    currentValue0 = min(currentValue0, other);
+    sharedMinMax[index] = currentValue0;
 
 
 
     other = sharedMinMax[index + 1];
-    currentMinX = min(currentMinX, other);
-    sharedMinMax[index] = currentMinX;
+    currentValue0 = min(currentValue0, other);
+    sharedMinMax[index] = currentValue0;
 
 
     ivec2 outputPos = ivec2(gl_WorkGroupID.xy);
@@ -221,61 +218,32 @@ void main()
     // used local variables currentMin
     if (originalIndex == 0)
     {
-        imageStore(outputMinX, outputPos, currentMinX);
+        // min X
+        imageStore(outputTex, ivec3(outputPos, 0), currentValue0);
     }
     if (originalIndex == 32)
     {
-        imageStore(outputMinY, outputPos, currentMinX);
+        // min Y
+        imageStore(outputTex, ivec3(outputPos, 1), currentValue0);
     }
     if (originalIndex == 64)
     {
-        imageStore(outputMinZ, outputPos, currentMinX);
+        // min Z
+        imageStore(outputTex, ivec3(outputPos, 2), currentValue0);
     }
     if (originalIndex == 128)
     {
-        imageStore(outputMaxX, outputPos, -currentMinX);
+        // max X
+        imageStore(outputTex, ivec3(outputPos, 3), currentValue0);
     }
     if (originalIndex == 128 + 32)
     {
-        imageStore(outputMaxY, outputPos, -currentMinX);
+        // max Y
+        imageStore(outputTex, ivec3(outputPos, 4), currentValue0);
     }
     if (originalIndex == 128 + 64)
     {
-        imageStore(outputMaxZ, outputPos, -currentMinX);
+        // max Z
+        imageStore(outputTex, ivec3(outputPos, 5), currentValue0);
     }
-
-    /*
-
-    // transform into texture space [0, 1]
-    minCorners[0] = minCorners[0] * 0.5 + 0.5;
-    minCorners[1] = minCorners[1] * 0.5 + 0.5;
-    minCorners[2] = minCorners[2] * 0.5 + 0.5;
-    minCorners[3] = minCorners[3] * 0.5 + 0.5;
-
-    vec4 currentMinX = vec4(minCorners[0].x, minCorners[1].x, minCorners[2].x, minCorners[3].x);
-    vec4 currentMinY = vec4(minCorners[0].y, minCorners[1].y, minCorners[2].y, minCorners[3].y);
-    vec4 currentMinZ = vec4(minCorners[0].z, minCorners[1].z, minCorners[2].z, minCorners[3].z);
-
-    maxCorners[0] = maxCorners[0] * 0.5 + 0.5;
-    maxCorners[1] = maxCorners[1] * 0.5 + 0.5;
-    maxCorners[2] = maxCorners[2] * 0.5 + 0.5;
-    maxCorners[3] = maxCorners[3] * 0.5 + 0.5;
-
-    vec4 currentMaxX = vec4(maxCorners[0].x, maxCorners[1].x, maxCorners[2].x, maxCorners[3].x);
-    vec4 currentMaxY = vec4(maxCorners[0].y, maxCorners[1].y, maxCorners[2].y, maxCorners[3].y);
-    vec4 currentMaxZ = vec4(maxCorners[0].z, maxCorners[1].z, maxCorners[2].z, maxCorners[3].z);
-
-
-
-    ivec2 outputPos = ivec2(gl_GlobalInvocationID.xy);
-
-    imageStore(outputMinX, outputPos, currentMinX);
-    imageStore(outputMinY, outputPos, currentMinY);
-    imageStore(outputMinZ, outputPos, currentMinZ);
-
-    imageStore(outputMaxX, outputPos, currentMaxX);
-    imageStore(outputMaxY, outputPos, currentMaxY);
-    imageStore(outputMaxZ, outputPos, currentMaxZ);
-
-    */
 }

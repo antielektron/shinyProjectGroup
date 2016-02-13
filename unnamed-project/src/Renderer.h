@@ -88,7 +88,7 @@ protected:
     int m_reduceFrustumCascadeFarLoc;
     int m_reduceFrustumScreenToLightMatrixLoc;
     std::vector<GLuint> m_depthReduceTextures;
-    std::vector<std::array<GLuint, 6>> m_frustumReduceTextures;
+    std::vector<GLuint> m_frustumReduceTextureArrays;
     GLsizei m_reduceLastTextureSize;
 
     // vertical gauss
