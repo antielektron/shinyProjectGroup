@@ -183,7 +183,7 @@ void Renderer::initialize()
 
     // --> shadow map program <-------------------------------------------------
     // Create ShadowMap
-    m_shadowMapSize = 1024;
+    m_shadowMapSize = 512;
     m_cascades = 4;
 
     // Create Texture
@@ -307,7 +307,6 @@ void Renderer::createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransform
 
 void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 {
-
     QOpenGLShaderProgram *shadowMapProgram = m_programs[KEYSTR_PROGRAM_SHADOW].get();
     QOpenGLShaderProgram *defaultProgram = m_programs[KEYSTR_PROGRAM_RENDER].get();
     QOpenGLShaderProgram *composeProgram = m_programs[KEYSTR_PROGRAM_COMPOSE].get();
@@ -561,7 +560,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     glBindImageTexture(1, m_shadowMapTexture, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
 
-    glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 4);
+    glDispatchCompute(m_shadowMapSize/8, m_shadowMapSize/8, 4);
 
     createMomentsProgram->release();
 
