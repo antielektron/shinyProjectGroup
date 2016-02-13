@@ -2,7 +2,7 @@
 
 // Depth buffer can not be bound as image2D for whatever reason.
 layout (binding = 0) uniform sampler2D inputSampler;
-layout (binding=1, rg16) writeonly uniform image2D outputTex;
+layout (binding=1, rg16) writeonly uniform image1D outputTex;
 
 uniform vec2 inputSize;
 
@@ -54,8 +54,6 @@ void main()
     depthMinMax.y = 1 - depthMinMax.y;
     sharedData[index] = depthMinMax;
 
-    barrier();
-
     if (index >= 128)
     {
         return;
@@ -64,6 +62,8 @@ void main()
     vec2 other;
 
     // At least 32 threads per warp on modern gpu's
+
+    barrier();
 
     other = sharedData[index + 128];
     depthMinMax = min(depthMinMax, other);
@@ -87,29 +87,30 @@ void main()
     depthMinMax = min(depthMinMax, other);
     sharedData[index] = depthMinMax;
 
-    barrier();
 
     other = sharedData[index + 8];
     depthMinMax = min(depthMinMax, other);
     sharedData[index] = depthMinMax;
 
-    barrier();
 
     other = sharedData[index + 4];
     depthMinMax = min(depthMinMax, other);
     sharedData[index] = depthMinMax;
 
+
     other = sharedData[index + 2];
     depthMinMax = min(depthMinMax, other);
     sharedData[index] = depthMinMax;
 
+
     other = sharedData[index + 1];
     depthMinMax = min(depthMinMax, other);
-    sharedData[index] = depthMinMax;
+    // sharedData[index] = depthMinMax;
+
 
     if (index == 0)
     {
-        ivec2 outputPos = ivec2(gl_WorkGroupID.xy);
+        int outputPos = int(gl_WorkGroupID.x + gl_WorkGroupID.y*gl_NumWorkGroups.x);
         imageStore(outputTex, outputPos, vec4(depthMinMax, 0, 0));
     }
 }

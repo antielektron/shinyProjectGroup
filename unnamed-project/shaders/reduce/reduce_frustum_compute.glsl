@@ -1,67 +1,69 @@
 #version 450
 
-layout (binding=0, rgba16) readonly uniform image2DArray inputTex;
-layout (binding=1, rgba16) writeonly uniform image2DArray outputTex;
+layout (binding=0, rgba16) readonly uniform image1DArray inputTex;
+layout (binding=1, rgba16) writeonly uniform image1DArray outputTex;
 
 
 shared vec4 sharedMinMax[6*256];
 
-layout (local_size_x = 16, local_size_y = 16) in;
+layout (local_size_x = 256) in;
 
 void computeCurrentThreadValue(out vec4 value0, out vec4 value1, out vec4 value2, out vec4 value3, out vec4 value4, out vec4 value5)
 {
-    ivec2 inputSize = imageSize(inputTex).xy;
-    ivec2 inputPos = 2 * ivec2(gl_GlobalInvocationID.xy);
+    int inputSize = imageSize(inputTex).x;
+    int inputPos = 4 * int(gl_GlobalInvocationID.x); // TODO find good factor!
 
     // initialize with default values
-    value0 = value1 = value2 = value3 = value4 = value5 = vec4(1);
+    value0 = value1 = value2 = value3 = value4 = value5 = vec4(1, 1, 1, 1);
 
-    if (inputPos.x < inputSize.x && inputPos.y < inputSize.y)
+    if (inputPos < inputSize)
     {
-        value0 = min(imageLoad(inputTex, ivec3(inputPos, 0)), value0);
-        value1 = min(imageLoad(inputTex, ivec3(inputPos, 1)), value1);
-        value2 = min(imageLoad(inputTex, ivec3(inputPos, 2)), value2);
+        value0 = min(imageLoad(inputTex, ivec2(inputPos, 0)), value0);
+        value1 = min(imageLoad(inputTex, ivec2(inputPos, 1)), value1);
+        value2 = min(imageLoad(inputTex, ivec2(inputPos, 2)), value2);
 
-        value3 = min(imageLoad(inputTex, ivec3(inputPos, 3)), value3);
-        value4 = min(imageLoad(inputTex, ivec3(inputPos, 4)), value4);
-        value5 = min(imageLoad(inputTex, ivec3(inputPos, 5)), value5);
+        value3 = min(imageLoad(inputTex, ivec2(inputPos, 3)), value3);
+        value4 = min(imageLoad(inputTex, ivec2(inputPos, 4)), value4);
+        value5 = min(imageLoad(inputTex, ivec2(inputPos, 5)), value5);
     }
 
-    if (inputPos.x+1 < inputSize.x && inputPos.y < inputSize.y)
+    inputPos++;
+
+    if (inputPos < inputSize)
     {
-        ivec2 pos = inputPos + ivec2(1, 0);
+        value0 = min(imageLoad(inputTex, ivec2(inputPos, 0)), value0);
+        value1 = min(imageLoad(inputTex, ivec2(inputPos, 1)), value1);
+        value2 = min(imageLoad(inputTex, ivec2(inputPos, 2)), value2);
 
-        value0 = min(imageLoad(inputTex, ivec3(pos, 0)), value0);
-        value1 = min(imageLoad(inputTex, ivec3(pos, 1)), value1);
-        value2 = min(imageLoad(inputTex, ivec3(pos, 2)), value2);
-
-        value3 = min(imageLoad(inputTex, ivec3(pos, 3)), value3);
-        value4 = min(imageLoad(inputTex, ivec3(pos, 4)), value4);
-        value5 = min(imageLoad(inputTex, ivec3(pos, 5)), value5);
+        value3 = min(imageLoad(inputTex, ivec2(inputPos, 3)), value3);
+        value4 = min(imageLoad(inputTex, ivec2(inputPos, 4)), value4);
+        value5 = min(imageLoad(inputTex, ivec2(inputPos, 5)), value5);
     }
-    if (inputPos.x < inputSize.x && inputPos.y+1 < inputSize.y)
+
+    inputPos++;
+
+    if (inputPos < inputSize)
     {
-        ivec2 pos = inputPos + ivec2(0, 1);
+        value0 = min(imageLoad(inputTex, ivec2(inputPos, 0)), value0);
+        value1 = min(imageLoad(inputTex, ivec2(inputPos, 1)), value1);
+        value2 = min(imageLoad(inputTex, ivec2(inputPos, 2)), value2);
 
-        value0 = min(imageLoad(inputTex, ivec3(pos, 0)), value0);
-        value1 = min(imageLoad(inputTex, ivec3(pos, 1)), value1);
-        value2 = min(imageLoad(inputTex, ivec3(pos, 2)), value2);
-
-        value3 = min(imageLoad(inputTex, ivec3(pos, 3)), value3);
-        value4 = min(imageLoad(inputTex, ivec3(pos, 4)), value4);
-        value5 = min(imageLoad(inputTex, ivec3(pos, 5)), value5);
+        value3 = min(imageLoad(inputTex, ivec2(inputPos, 3)), value3);
+        value4 = min(imageLoad(inputTex, ivec2(inputPos, 4)), value4);
+        value5 = min(imageLoad(inputTex, ivec2(inputPos, 5)), value5);
     }
-    if (inputPos.x+1 < inputSize.x && inputPos.y+1 < inputSize.y)
+
+    inputPos++;
+
+    if (inputPos < inputSize)
     {
-        ivec2 pos = inputPos + ivec2(1, 1);
+        value0 = min(imageLoad(inputTex, ivec2(inputPos, 0)), value0);
+        value1 = min(imageLoad(inputTex, ivec2(inputPos, 1)), value1);
+        value2 = min(imageLoad(inputTex, ivec2(inputPos, 2)), value2);
 
-        value0 = min(imageLoad(inputTex, ivec3(pos, 0)), value0);
-        value1 = min(imageLoad(inputTex, ivec3(pos, 1)), value1);
-        value2 = min(imageLoad(inputTex, ivec3(pos, 2)), value2);
-
-        value3 = min(imageLoad(inputTex, ivec3(pos, 3)), value3);
-        value4 = min(imageLoad(inputTex, ivec3(pos, 4)), value4);
-        value5 = min(imageLoad(inputTex, ivec3(pos, 5)), value5);
+        value3 = min(imageLoad(inputTex, ivec2(inputPos, 3)), value3);
+        value4 = min(imageLoad(inputTex, ivec2(inputPos, 4)), value4);
+        value5 = min(imageLoad(inputTex, ivec2(inputPos, 5)), value5);
     }
 }
 
@@ -76,7 +78,7 @@ void main()
 
     computeCurrentThreadValue(currentValue0, currentValue1, currentValue2, currentValue3, currentValue4, currentValue5);
 
-    uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*16;
+    uint index = gl_LocalInvocationID.x;
     uint originalIndex = index;
     uint localIndex = index;
 
@@ -101,6 +103,8 @@ void main()
         currentValue1 = sharedMinMax[index + 256];
         currentValue2 = sharedMinMax[index + 512];
     }
+
+    barrier();
 
     // At least 32 threads per warp on modern gpu's
 
@@ -153,72 +157,74 @@ void main()
         currentValue0 = sharedMinMax[index];
     }
 
+    barrier();
+
     other = sharedMinMax[index + 32];
     currentValue0 = min(currentValue0, other);
     sharedMinMax[index] = currentValue0;
 
-
+    barrier();
 
     other = sharedMinMax[index + 16];
     currentValue0 = min(currentValue0, other);
     sharedMinMax[index] = currentValue0;
 
-
+    barrier();
 
     other = sharedMinMax[index + 8];
     currentValue0 = min(currentValue0, other);
     sharedMinMax[index] = currentValue0;
 
-
+    barrier();
 
     other = sharedMinMax[index + 4];
     currentValue0 = min(currentValue0, other);
     sharedMinMax[index] = currentValue0;
 
-
+    barrier();
 
     other = sharedMinMax[index + 2];
     currentValue0 = min(currentValue0, other);
     sharedMinMax[index] = currentValue0;
 
-
+    barrier();
 
     other = sharedMinMax[index + 1];
     currentValue0 = min(currentValue0, other);
-    sharedMinMax[index] = currentValue0;
+    // sharedMinMax[index] = currentValue0;
 
 
-    ivec2 outputPos = ivec2(gl_WorkGroupID.xy);
+    int outputPos = int(gl_WorkGroupID.x);
 
     // used local variables currentMin
     if (originalIndex == 0)
     {
         // min X
-        imageStore(outputTex, ivec3(outputPos, 0), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 0), currentValue0);
     }
     if (originalIndex == 32)
     {
         // min Y
-        imageStore(outputTex, ivec3(outputPos, 1), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 1), currentValue0);
     }
     if (originalIndex == 64)
     {
         // min Z
-        imageStore(outputTex, ivec3(outputPos, 2), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 2), currentValue0);
     }
     if (originalIndex == 128)
     {
         // max X
-        imageStore(outputTex, ivec3(outputPos, 3), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 3), currentValue0);
     }
     if (originalIndex == 128 + 32)
     {
         // max Y
-        imageStore(outputTex, ivec3(outputPos, 4), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 4), currentValue0);
     }
     if (originalIndex == 128 + 64)
     {
         // max Z
-        imageStore(outputTex, ivec3(outputPos, 5), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 5), currentValue0);
     }
 }

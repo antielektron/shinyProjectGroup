@@ -2,7 +2,7 @@
 
 // Depth buffer can not be bound as image2D for whatever reason.
 layout (binding=0) uniform sampler2D inputSampler;
-layout (binding=1, rgba16) writeonly uniform image2DArray outputTex;
+layout (binding=1, rgba16) writeonly uniform image1DArray outputTex;
 
 uniform vec2 inputSize;
 
@@ -127,6 +127,8 @@ void main()
         currentValue2 = sharedMinMax[index + 512];
     }
 
+    barrier();
+
     // At least 32 threads per warp on modern gpu's
 
     other = sharedMinMax[index + 128];
@@ -178,72 +180,74 @@ void main()
         currentValue0 = sharedMinMax[index];
     }
 
+    barrier();
+
     other = sharedMinMax[index + 32];
     currentValue0 = min(currentValue0, other);
     sharedMinMax[index] = currentValue0;
 
-
+    barrier();
 
     other = sharedMinMax[index + 16];
     currentValue0 = min(currentValue0, other);
     sharedMinMax[index] = currentValue0;
 
-
+    barrier();
 
     other = sharedMinMax[index + 8];
     currentValue0 = min(currentValue0, other);
     sharedMinMax[index] = currentValue0;
 
-
+    barrier();
 
     other = sharedMinMax[index + 4];
     currentValue0 = min(currentValue0, other);
     sharedMinMax[index] = currentValue0;
 
-
+    barrier();
 
     other = sharedMinMax[index + 2];
     currentValue0 = min(currentValue0, other);
     sharedMinMax[index] = currentValue0;
 
-
+    barrier();
 
     other = sharedMinMax[index + 1];
     currentValue0 = min(currentValue0, other);
-    sharedMinMax[index] = currentValue0;
+    // sharedMinMax[index] = currentValue0;
 
 
-    ivec2 outputPos = ivec2(gl_WorkGroupID.xy);
+    int outputPos = int(gl_WorkGroupID.x + gl_WorkGroupID.y*gl_NumWorkGroups.x);
 
     // used local variables currentMin
     if (originalIndex == 0)
     {
         // min X
-        imageStore(outputTex, ivec3(outputPos, 0), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 0), currentValue0);
     }
     if (originalIndex == 32)
     {
         // min Y
-        imageStore(outputTex, ivec3(outputPos, 1), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 1), currentValue0);
     }
     if (originalIndex == 64)
     {
         // min Z
-        imageStore(outputTex, ivec3(outputPos, 2), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 2), currentValue0);
     }
     if (originalIndex == 128)
     {
         // max X
-        imageStore(outputTex, ivec3(outputPos, 3), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 3), currentValue0);
     }
     if (originalIndex == 128 + 32)
     {
         // max Y
-        imageStore(outputTex, ivec3(outputPos, 4), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 4), currentValue0);
     }
     if (originalIndex == 128 + 64)
     {
         // max Z
-        imageStore(outputTex, ivec3(outputPos, 5), currentValue0);
+        imageStore(outputTex, ivec2(outputPos, 5), currentValue0);
     }
 }

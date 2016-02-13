@@ -341,9 +341,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     std::vector<std::pair<float, float>> reducedDepthPixels;
     reducedDepthPixels.resize(m_reduceLastTextureSize);
 
-    glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures.back());
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_RG, GL_FLOAT, reducedDepthPixels.data());
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_1D, m_depthReduceTextures.back());
+    glGetTexImage(GL_TEXTURE_1D, 0, GL_RG, GL_FLOAT, reducedDepthPixels.data());
+    glBindTexture(GL_TEXTURE_1D, 0);
 
     float minDepth = 1;
     float maxDepth = 1;
@@ -415,8 +415,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     // store: vec3 minCorner[4], vec3 maxCorner[4]
     // store min[12], max[12]
 
-    GLsizei prevWidth = m_width;
-    GLsizei prevHeight = m_height;
+    // round up
+    GLsizei initWidth = (m_width-1) / 2 / 16 + 1;
+    GLsizei initHeight = (m_height-1) / 2 / 16 + 1;
 
     reduceFrustumSamplerProgram->bind();
 
@@ -429,14 +430,13 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     glBindImageTexture(1, m_frustumReduceTextureArrays[0], 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
 
-    // round up
-    prevWidth = (prevWidth-1) / 2 / 16 + 1;
-    prevHeight = (prevHeight-1) / 2 / 16 + 1;
-
     // for every new pixel spawn a thread group!
-    glDispatchCompute(prevWidth, prevHeight, 1);
+    glDispatchCompute(initWidth, initHeight, 1);
 
     reduceFrustumSamplerProgram->release();
+
+    // size of first reduction result
+    GLsizei size = initWidth*initHeight;
 
     reduceFrustumProgram->bind();
 
@@ -446,11 +446,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(1, m_frustumReduceTextureArrays[i], 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
 
         // round up
-        prevWidth = (prevWidth-1) / 2 / 16 + 1;
-        prevHeight = (prevHeight-1) / 2 / 16 + 1;
+        size = (size-1) / 4 / 256 + 1;
 
         // for every new pixel spawn a thread group!
-        glDispatchCompute(prevWidth, prevHeight, 1);
+        glDispatchCompute(size, 1, 1);
     }
 
     reduceFrustumProgram->release();
@@ -462,9 +461,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     std::vector<std::array<float, 4>> reducedFrustumPixels;
     reducedFrustumPixels.resize(m_reduceLastTextureSize*6);
 
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_frustumReduceTextureArrays.back());
-    glGetTexImage(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+    glBindTexture(GL_TEXTURE_1D_ARRAY, m_frustumReduceTextureArrays.back());
+    glGetTexImage(GL_TEXTURE_1D_ARRAY, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
+    glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
 
     for (int i = 0; i < 6; i++)
     {
@@ -722,8 +721,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     */
 
     // Invoke reduce ...
-    prevWidth = m_width;
-    prevHeight = m_height;
+    // round up
+    initWidth = (m_width-1) / 2 / 16 + 1;
+    initHeight = (m_height-1) / 2 / 16 + 1;
 
     reduceDepthSamplerProgram->bind();
 
@@ -734,14 +734,13 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
-    // round up
-    prevWidth = (prevWidth-1) / 2 / 16 + 1;
-    prevHeight = (prevHeight-1) / 2 / 16 + 1;
-
     // for every new pixel spawn a thread group!
-    glDispatchCompute(prevWidth, prevHeight, 1);
+    glDispatchCompute(initWidth, initHeight, 1);
 
     reduceDepthSamplerProgram->release();
+
+    // size of first reduction result
+    size = initWidth*initHeight;
 
     reduceDepthProgram->bind();
 
@@ -751,11 +750,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(1, m_depthReduceTextures[i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
         // round up
-        prevWidth = (prevWidth-1) / 2 / 16 + 1;
-        prevHeight = (prevHeight-1) / 2 / 16 + 1;
+        size = (size-1) / 4 / 256 + 1;
 
         // for every new pixel spawn a thread group!
-        glDispatchCompute(prevWidth, prevHeight, 1);
+        glDispatchCompute(size, 1, 1);
     }
 
     reduceDepthProgram->release();
@@ -1028,41 +1026,48 @@ void Renderer::resize(int width, int height)
     GLuint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(2, attachments);
 
+    // round up
+    GLsizei initWidth = (m_width-1) / 2 / 16 + 1;
+    GLsizei initHeight = (m_height-1) / 2 / 16 + 1;
+
+    // size of first reduction result
+    GLsizei size = initWidth*initHeight;
 
     // Create reduce textures!
-    auto n = std::ceil(std::log(std::min(m_width, m_height)) / std::log(2.*16.));
+    auto n = std::ceil(std::log(size) / std::log(4.*256.)) + 1;
     // n = 1; // reduce_frustum_compute.glsl not implemented yet.
     m_depthReduceTextures.resize(n);
     glGenTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
     m_frustumReduceTextureArrays.resize(n);
     glGenTextures(m_frustumReduceTextureArrays.size(), m_frustumReduceTextureArrays.data());
 
-
-    GLsizei prevWidth = m_width;
-    GLsizei prevHeight = m_height;
-
     for (int i = 0; i < n; i++)
     {
-        // round up
-        prevWidth = (prevWidth-1) / 2 / 16 + 1;
-        prevHeight = (prevHeight-1) / 2 / 16 + 1;
+        std::cout << initWidth << " " << initHeight << " " << size << std::endl;
 
-        std::cout << prevWidth << " " << prevHeight << std::endl;
-
-        glBindTexture(GL_TEXTURE_2D_ARRAY, m_frustumReduceTextureArrays[i]);
+        glBindTexture(GL_TEXTURE_1D_ARRAY, m_frustumReduceTextureArrays[i]);
         // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16, prevWidth, prevHeight, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
-        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, prevWidth, prevHeight, 6, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
+        glTexImage2D(GL_TEXTURE_1D_ARRAY, 0, GL_RGBA16, size, 6, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
         // No filtering required
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+        glTexParameteri(GL_TEXTURE_1D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_1D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
 
-        glBindTexture(GL_TEXTURE_2D, m_depthReduceTextures[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, prevWidth, prevHeight, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
+        glBindTexture(GL_TEXTURE_1D, m_depthReduceTextures[i]);
+        glTexImage1D(GL_TEXTURE_1D, 0, GL_RG16, size, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
         // No filtering required
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glBindTexture(GL_TEXTURE_2D, 0);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_1D, 0);
+
+        // store last value..
+        m_reduceLastTextureSize = size;
+
+        // tack size for debug output
+        initWidth = (initWidth-1) / 2 / 16 + 1;
+        initHeight = (initHeight-1) / 2 / 16 + 1;
+
+        // round up
+        size = (size-1) / 4 / 256 + 1;
     }
-    m_reduceLastTextureSize = prevWidth * prevHeight;
 }
