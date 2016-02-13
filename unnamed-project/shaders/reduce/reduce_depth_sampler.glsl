@@ -51,7 +51,7 @@ void main()
 
     uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*16;
 
-    depthMinMax.y = -depthMinMax.y;
+    depthMinMax.y = 1 - depthMinMax.y;
     sharedData[index] = depthMinMax;
 
     barrier();
@@ -110,6 +110,6 @@ void main()
     if (index == 0)
     {
         ivec2 outputPos = ivec2(gl_WorkGroupID.xy);
-        imageStore(outputTex, outputPos, vec4(depthMinMax.x, -depthMinMax.y, 0, 0));
+        imageStore(outputTex, outputPos, vec4(depthMinMax, 0, 0));
     }
 }

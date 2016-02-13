@@ -193,7 +193,7 @@ void Renderer::initialize()
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_INT, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
     // Create Texture 2 (back)
@@ -203,7 +203,7 @@ void Renderer::initialize()
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_INT, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGBA16, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_RGBA, GL_UNSIGNED_SHORT, 0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
     // Create DepthBuffer (multisample)
@@ -346,19 +346,19 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glBindTexture(GL_TEXTURE_2D, 0);
 
     float minDepth = 1;
-    float maxDepth = 0;
+    float maxDepth = 1;
 
     for (auto &p : reducedDepthPixels)
     {
         if (minDepth > p.first)
             minDepth = p.first;
-        if (maxDepth < p.second)
+        if (maxDepth > p.second) // 1 -> min, 0 -> max
             maxDepth = p.second;
     }
 
     QVector3D lastNearFarCorners[] = {
             { 0, 0, minDepth*2 - 1 },
-            { 0, 0, maxDepth*2 - 1 },
+            { 0, 0, maxDepth*-2 + 1 },
     };
 
     // Transform corners into light view space
@@ -818,7 +818,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     slices.emplace_back(-1, QVector3D(1, 0, 0));
     slices.emplace_back( .99999, QVector3D(1, 0, 0));
     slices.emplace_back(minDepth*2 - 1, QVector3D(0, 1, 0));
-    slices.emplace_back(maxDepth*2 - 1, QVector3D(0, 1, 0));
+    slices.emplace_back(maxDepth*-2 + 1, QVector3D(0, 1, 0));
 
     for (auto &entry : slices)
     {

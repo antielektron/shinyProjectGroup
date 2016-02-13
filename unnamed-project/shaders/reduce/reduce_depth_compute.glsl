@@ -7,40 +7,33 @@ layout (local_size_x = 16, local_size_y = 16) in;
 
 shared vec2 sharedData[256];
 
-void updateMinMaxDepth(inout vec2 depthMinMax, in vec2 depth)
-{
-    depthMinMax.x = min(depthMinMax.x, depth.x);
-    depthMinMax.y = max(depthMinMax.y, depth.y);
-}
-
 void computeCurrentThreadValue(out vec2 depthMinMax)
 {
     ivec2 inputSize = imageSize(inputTex);
     ivec2 inputPos = 2 * ivec2(gl_GlobalInvocationID.xy);
 
-    // d = 1 -> Background
-    depthMinMax = vec2(1, 0);
+    depthMinMax = vec2(1);
 
     if (inputPos.x < inputSize.x && inputPos.y < inputSize.y)
     {
-        vec2 a = imageLoad(inputTex, inputPos).xy;
-        updateMinMaxDepth(depthMinMax, a);
+        vec2 value = imageLoad(inputTex, inputPos).xy;
+        depthMinMax = min(depthMinMax, value);
     }
 
     if (inputPos.x+1 < inputSize.x && inputPos.y < inputSize.y)
     {
-        vec2 b = imageLoad(inputTex, inputPos + ivec2(1, 0)).xy;
-        updateMinMaxDepth(depthMinMax, b);
+        vec2 value = imageLoad(inputTex, inputPos + ivec2(1, 0)).xy;
+        depthMinMax = min(depthMinMax, value);
     }
     if (inputPos.x < inputSize.x && inputPos.y+1 < inputSize.y)
     {
-        vec2 c = imageLoad(inputTex, inputPos + ivec2(0, 1)).xy;
-        updateMinMaxDepth(depthMinMax, c);
+        vec2 value = imageLoad(inputTex, inputPos + ivec2(0, 1)).xy;
+        depthMinMax = min(depthMinMax, value);
     }
     if (inputPos.x+1 < inputSize.x && inputPos.y+1 < inputSize.y)
     {
-        vec2 d = imageLoad(inputTex, inputPos + ivec2(1, 1)).xy;
-        updateMinMaxDepth(depthMinMax, d);
+        vec2 value = imageLoad(inputTex, inputPos + ivec2(1, 1)).xy;
+        depthMinMax = min(depthMinMax, value);
     }
 }
 
@@ -51,7 +44,6 @@ void main()
 
     uint index = gl_LocalInvocationID.x + gl_LocalInvocationID.y*16;
 
-    depthMinMax.y = -depthMinMax.y;
     sharedData[index] = depthMinMax;
 
     barrier();
@@ -110,6 +102,6 @@ void main()
     if (index == 0)
     {
         ivec2 outputPos = ivec2(gl_WorkGroupID.xy);
-        imageStore(outputTex, outputPos, vec4(depthMinMax.x, -depthMinMax.y, 0, 0));
+        imageStore(outputTex, outputPos, vec4(depthMinMax, 0, 0));
     }
 }
