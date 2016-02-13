@@ -446,7 +446,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(1, m_frustumReduceTextureArrays[i], 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
 
         // round up
-        size = (size-1) / 4 / 256 + 1;
+        size = (size-1) / 1 / 256 + 1;
 
         // for every new pixel spawn a thread group!
         glDispatchCompute(size, 1, 1);
@@ -750,7 +750,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glBindImageTexture(1, m_depthReduceTextures[i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
 
         // round up
-        size = (size-1) / 4 / 256 + 1;
+        size = (size-1) / 1 / 256 + 1;
 
         // for every new pixel spawn a thread group!
         glDispatchCompute(size, 1, 1);
@@ -1034,7 +1034,7 @@ void Renderer::resize(int width, int height)
     GLsizei size = initWidth*initHeight;
 
     // Create reduce textures!
-    auto n = std::ceil(std::log(size) / std::log(4.*256.)) + 1;
+    auto n = std::ceil(std::log(size) / std::log(1.*256.)) + 1;
     // n = 1; // reduce_frustum_compute.glsl not implemented yet.
     m_depthReduceTextures.resize(n);
     glGenTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
@@ -1068,6 +1068,6 @@ void Renderer::resize(int width, int height)
         initHeight = (initHeight-1) / 2 / 16 + 1;
 
         // round up
-        size = (size-1) / 4 / 256 + 1;
+        size = (size-1) / 1 / 256 + 1;
     }
 }

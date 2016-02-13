@@ -10,7 +10,7 @@ shared vec2 sharedData[256];
 void computeCurrentThreadValue(out vec2 depthMinMax)
 {
     int inputSize = imageSize(inputTex).x;
-    int inputPos = 4 * int(gl_GlobalInvocationID.x);
+    int inputPos = 1 * int(gl_GlobalInvocationID.x);
 
     depthMinMax = vec2(1, 1);
 
@@ -20,6 +20,7 @@ void computeCurrentThreadValue(out vec2 depthMinMax)
         depthMinMax = min(depthMinMax, value);
     }
 
+    /*
     inputPos++;
 
     if (inputPos < inputSize)
@@ -43,6 +44,7 @@ void computeCurrentThreadValue(out vec2 depthMinMax)
         vec2 value = imageLoad(inputTex, inputPos).xy;
         depthMinMax = min(depthMinMax, value);
     }
+    */
 }
 
 void main()

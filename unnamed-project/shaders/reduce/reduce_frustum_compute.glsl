@@ -11,7 +11,7 @@ layout (local_size_x = 256) in;
 void computeCurrentThreadValue(out vec4 value0, out vec4 value1, out vec4 value2, out vec4 value3, out vec4 value4, out vec4 value5)
 {
     int inputSize = imageSize(inputTex).x;
-    int inputPos = 4 * int(gl_GlobalInvocationID.x); // TODO find good factor!
+    int inputPos = 1 * int(gl_GlobalInvocationID.x); // TODO find good factor!
 
     // initialize with default values
     value0 = value1 = value2 = value3 = value4 = value5 = vec4(1, 1, 1, 1);
@@ -27,6 +27,7 @@ void computeCurrentThreadValue(out vec4 value0, out vec4 value1, out vec4 value2
         value5 = min(imageLoad(inputTex, ivec2(inputPos, 5)), value5);
     }
 
+    /*
     inputPos++;
 
     if (inputPos < inputSize)
@@ -65,6 +66,7 @@ void computeCurrentThreadValue(out vec4 value0, out vec4 value1, out vec4 value2
         value4 = min(imageLoad(inputTex, ivec2(inputPos, 4)), value4);
         value5 = min(imageLoad(inputTex, ivec2(inputPos, 5)), value5);
     }
+    */
 }
 
 void main()
