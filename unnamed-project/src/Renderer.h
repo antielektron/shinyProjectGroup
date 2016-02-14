@@ -5,6 +5,7 @@
 
 #include <QOpenGLShaderProgram>
 #include <memory>
+#include <array>
 #include <map>
 #include <unordered_map>
 #include <string>
@@ -12,16 +13,19 @@
 #include "RendererBase.h"
 #include "Scene/Scene.h"
 
-#define KEYSTR_PROGRAM_RENDER "Render"
-#define KEYSTR_PROGRAM_COMPOSE "Compose"
-#define KEYSTR_PROGRAM_SHADOW  "Shadow"
-#define KEYSTR_PROGRAM_COPY    "Copy"
-#define KEYSTR_PROGRAM_REDUCE   "Reduce"
-#define KEYSTR_PROGRAM_REDUCE_SAMPLER "Reduce from DepthBuffer"
-#define KEYSTR_PROGRAM_HORIZONTAL_GAUSS "Horizontal Gauss"
-#define KEYSTR_PROGRAM_VERTICAL_GAUSS "Vertical Gauss"
-#define KEYSTR_PROGRAM_HORIZONTAL_VO_AREA "Horizontal VO"
-#define KEYSTR_PROGRAM_VERTICAL_VO_AREA "Vertical VO"
+#define KEYSTR_PROGRAM_RENDER                   "Render"
+#define KEYSTR_PROGRAM_COMPOSE                  "Compose"
+#define KEYSTR_PROGRAM_SHADOW                   "Shadow"
+#define KEYSTR_PROGRAM_COPY                     "Copy"
+#define KEYSTR_PROGRAM_REDUCE_DEPTH             "Reduce Depth"
+#define KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER     "Reduce Depth Sampler"
+#define KEYSTR_PROGRAM_REDUCE_FRUSTUM           "Reduce Frustum"
+#define KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER   "Reduce Frustum Sampler"
+#define KEYSTR_PROGRAM_HORIZONTAL_GAUSS         "Horizontal Gauss"
+#define KEYSTR_PROGRAM_VERTICAL_GAUSS           "Vertical Gauss"
+#define KEYSTR_PROGRAM_CREATE_MOMENTS           "Create Moments"
+#define KEYSTR_PROGRAM_HORIZONTAL_VO_AREA       "Horizontal VO"
+#define KEYSTR_PROGRAM_VERTICAL_VO_AREA         "Vertical VO"
 
 class Renderer : public RendererBase
 {
@@ -39,6 +43,9 @@ protected:
     void rotateVectorToVector(const QVector3D &source,
                               const QVector3D &destination,
                               QMatrix4x4 &matrix);
+    void createLightViewMatrix(const QVector3D &lightDir, const QMatrix4x4 &inverseCameraView, QMatrix4x4 &matrix);
+    void createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransformation, QMatrix4x4 &matrix);
+
 
     GLsizei m_width;
     GLsizei m_height;
@@ -64,6 +71,7 @@ protected:
 
     GLuint m_shadowMapFrameBuffer;
     GLuint m_shadowMapTexture;
+    GLuint m_shadowMapTexture2;
     GLuint m_shadowMapDepthBuffer;
 
     // Compose Shader
@@ -80,8 +88,12 @@ protected:
 
     // Reduce
     // int m_reduceInverseProjectionMatrixLoc;
-    int m_reduceInputSizeLoc;
+    int m_reduceDepthInputSizeLoc;
+    int m_reduceFrustumInputSizeLoc;
+    int m_reduceFrustumCascadeFarLoc;
+    int m_reduceFrustumScreenToLightMatrixLoc;
     std::vector<GLuint> m_depthReduceTextures;
+    std::vector<GLuint> m_frustumReduceTextureArrays;
     GLsizei m_reduceLastTextureSize;
 
     // vertical gauss
@@ -103,6 +115,8 @@ protected:
     GLuint m_renderDepthBuffer;
 
     GLuint m_tempTexture;
+
+    QMatrix4x4 m_lastCameraView;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H
