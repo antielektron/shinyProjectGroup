@@ -708,7 +708,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-    glViewport(m_width/2, 0, m_width/2, m_height/2);
+    glViewport(0, 0, m_width, m_height);
 
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -921,6 +921,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     horizontalGaussProgram->release();
     */
 
+    /*
     // DEBUG: view shadow map depths
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -948,7 +949,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     copyProgram->setUniformValue(m_copyArrayLayerLoc, 3);
     glDrawArrays(GL_QUADS, 0, 4);
 
-    /*
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapDepthBuffer);
 
     glViewport(m_width*0/4, m_height*2/4, m_width/4, m_height/4);
@@ -966,7 +966,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glViewport(m_width*3/4, m_height*2/4, m_width/4, m_height/4);
     copyProgram->setUniformValue(m_copyArrayLayerLoc, 3);
     glDrawArrays(GL_QUADS, 0, 4);
-    */
 
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
@@ -974,6 +973,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     m_quadVao.release();
 
     copyProgram->release();
+    */
 }
 
 void Renderer::resize(int width, int height)
