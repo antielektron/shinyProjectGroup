@@ -183,7 +183,7 @@ void Renderer::initialize()
 
     // --> shadow map program <-------------------------------------------------
     // Create ShadowMap
-    m_shadowMapSize = 512;
+    m_shadowMapSize = 1024;
     m_cascades = 4;
 
     // Create Texture
@@ -809,7 +809,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             { -1,  1},
             {  1,  1}
     };
-    auto model = scene->getModel("sphere");
 
     std::vector<std::pair<float, QVector3D>> slices;
     slices.emplace_back(-1, QVector3D(1, 0, 0));
