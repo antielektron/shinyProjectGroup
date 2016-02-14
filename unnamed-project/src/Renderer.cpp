@@ -724,7 +724,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     composeProgram->setUniformValue(m_composeMomentsSamplerLoc, 1);
     composeProgram->setUniformValue(m_composeDepthBufferLoc,2);
     composeProgram->setUniformValue(m_composeProjectionMatrixLoc, scene->getCameraProjection());
-    composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, inverseCameraProjection);
+    composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, scene->getCameraProjection().inverted());
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderTexture);
