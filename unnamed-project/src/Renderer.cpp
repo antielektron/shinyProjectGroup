@@ -788,13 +788,13 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     reduceDepthProgram->release();
 
-    /*
     m_lastCameraView = scene->getCameraView();
 
 
 
 
 
+    /*
     // DEBUG
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -948,6 +948,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     copyProgram->setUniformValue(m_copyArrayLayerLoc, 3);
     glDrawArrays(GL_QUADS, 0, 4);
 
+    /*
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapDepthBuffer);
 
     glViewport(m_width*0/4, m_height*2/4, m_width/4, m_height/4);
@@ -965,6 +966,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glViewport(m_width*3/4, m_height*2/4, m_width/4, m_height/4);
     copyProgram->setUniformValue(m_copyArrayLayerLoc, 3);
     glDrawArrays(GL_QUADS, 0, 4);
+    */
 
 
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
@@ -1063,7 +1065,7 @@ void Renderer::resize(int width, int height)
 
     // Create reduce textures!
     auto n = std::ceil(std::log(size) / std::log(1.*256.)) + 1;
-    // n = 1; // reduce_frustum_compute.glsl not implemented yet.
+    n = 1; // reduce_frustum_compute.glsl not implemented yet.
     m_depthReduceTextures.resize(n);
     glGenTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
     m_frustumReduceTextureArrays.resize(n);
