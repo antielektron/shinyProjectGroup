@@ -1,4 +1,4 @@
-#version 150
+#version 450
 #extension GL_EXT_texture_array : enable
 
 in vec3 normal;
