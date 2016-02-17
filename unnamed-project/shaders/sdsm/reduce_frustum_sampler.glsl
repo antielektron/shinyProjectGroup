@@ -7,7 +7,11 @@ layout (binding=1, rgba16) writeonly uniform image1DArray outputTex;
 uniform vec2 inputSize;
 
 // in screen space!
-uniform float cascadeFar[3];
+// uniform float cascadeFar[3];
+layout (binding = 1) buffer cascadeFarBuffer
+{
+    vec4 cascadeFar;
+};
 
 // TODO incude a projection matrix, that wraps the entire view frustum? -> could have easy default min/max corners!
 uniform mat4 screenToLightMatrix;

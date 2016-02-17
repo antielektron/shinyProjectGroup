@@ -1,6 +1,6 @@
 #version 450
 
-layout (binding=0, rgba16) readonly uniform image1DArray inputTex;
+layout (binding = 0, rgba16) readonly uniform image1DArray inputTex;
 
 layout (binding = 1) writeonly buffer cascadeViewBuffer
 {

@@ -174,8 +174,12 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER].emplace_back(&m_reduceFrustumCascadeFarLoc, "cascadeFar");
     m_uniformLocs[KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER].emplace_back(&m_reduceFrustumScreenToLightMatrixLoc, "screenToLightMatrix");
 
+    m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADE_FARS].emplace_back(&m_createCascadeFarsCameraProjectionLoc, "cameraProjectionMatrix");
+    m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADE_FARS].emplace_back(&m_createCascadeFarsInverseCameraProjectionLoc, "inverseCameraProjectionMatrix");
+
     m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADE_VIEWS].emplace_back(&m_createCascadeViewsLightViewMatrixLoc, "lightViewMatrix");
     m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADE_VIEWS].emplace_back(&m_createCascadeViewsInvTempProjMatrixLoc, "inverseTempProjectionMatrix");
+
 
     // create Programs:
     createProgram(KEYSTR_PROGRAM_RENDER);
@@ -263,11 +267,11 @@ void Renderer::initialize()
     // cascade buffers
     glGenBuffers(1, &m_cascadeFarBuffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_cascadeFarBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * 4 /*m_cascades*/, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float) * 4 /*m_cascades*/, NULL, GL_DYNAMIC_COPY);
 
     glGenBuffers(1, &m_cascadeViewBuffer);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_cascadeViewBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float)*16 * 4 /*m_cascades*/, NULL, GL_DYNAMIC_COPY); // GL_DYNAMIC_COPY
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float)*16 * 4 /*m_cascades*/, NULL, GL_DYNAMIC_COPY);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
@@ -352,9 +356,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     // Input: lightDirection, cameraProjection, cameraView, frustum
     // Output: lightProjection
 
-    // Compute these values, they will be given to the gpu!
-    std::vector<float> cascadeFars;
-
     // Inverse of common transformations...
     const auto &cameraView = scene->getCameraView();
     const auto &cameraProjection = scene->getCameraProjection();
@@ -374,68 +375,20 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     createFrustumProjectionMatrix(screenToLightTransformation, tempLightProjection);
 
 
-    // Compute actual near and far plane!
+    // Compute actual near and far plane! (on GPU!)
+    createCascadeFars->bind();
 
-    // Check last texture for values..
-    std::vector<std::pair<float, float>> reducedDepthPixels;
-    reducedDepthPixels.resize(m_reduceLastTextureSize);
+    createCascadeFars->setUniformValue(m_createCascadeFarsCameraProjectionLoc, cameraProjection);
+    createCascadeFars->setUniformValue(m_createCascadeFarsInverseCameraProjectionLoc, inverseCameraProjection);
 
-    glBindTexture(GL_TEXTURE_1D, m_depthReduceTextures.back());
-    glGetTexImage(GL_TEXTURE_1D, 0, GL_RG, GL_FLOAT, reducedDepthPixels.data());
-    glBindTexture(GL_TEXTURE_1D, 0);
+    glBindImageTexture(0, m_depthReduceTextures.back(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
 
-    float minDepth = 1;
-    float maxDepth = 1;
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_cascadeFarBuffer);
 
-    for (auto &p : reducedDepthPixels)
-    {
-        if (minDepth > p.first)
-            minDepth = p.first;
-        if (maxDepth > p.second) // 1 -> min, 0 -> max
-            maxDepth = p.second;
-    }
+    glDispatchCompute(1, 1, 1);
 
-    QVector3D actualNearFarCorners[] = {
-            { 0, 0, minDepth*2 - 1 },
-            { 0, 0, maxDepth*-2 + 1 },
-    };
+    createCascadeFars->release();
 
-    // Transform corners into light view space
-    MathUtility::transformVectors(inverseCameraProjection, actualNearFarCorners);
-
-    // NOTE: z values are inverted! multiply by -1
-    float actualNearPlane = -actualNearFarCorners[0].z();
-    float actualFarPlane = -actualNearFarCorners[1].z();
-
-    // Coefficient for combining uniform and logarithmic results
-    float lambdaUniLog = 0.3f;
-
-    for (size_t i = 1; i <= static_cast<size_t>(m_cascades); i++)
-    {
-        // interpolate between actual near/far planes
-        float cUni = actualNearPlane + (actualFarPlane - actualNearPlane) * i / m_cascades;
-        float cLog = actualNearPlane * std::pow(actualFarPlane / actualNearPlane, static_cast<float>(i) / m_cascades); // COMPLEX!
-
-        // combine cLog and cUni
-        float currentZ = lambdaUniLog * cUni + (1 - lambdaUniLog) * cLog;
-
-        // z in screen space!
-        // negative z!
-        auto screenPos = scene->getCameraProjection() * QVector4D(0, 0, -currentZ, 1);
-        currentZ = screenPos.z()/screenPos.w()*.5f+.5f;
-
-        if (i != 0)
-            cascadeFars.push_back(currentZ);
-    }
-
-    // write to ssbo
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_cascadeFarBuffer);
-    auto dataPtr = (float *)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_WRITE);
-
-    std::copy(cascadeFars.begin(), cascadeFars.end(), dataPtr);
-
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     // in shader:
     // inLight = screenToLight * (xy , depth, 1)
@@ -452,8 +405,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     reduceFrustumSamplerProgram->bind();
 
     reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumInputSizeLoc, m_width, m_height);
-    reduceFrustumSamplerProgram->setUniformValueArray(m_reduceFrustumCascadeFarLoc, cascadeFars.data(), m_cascades-1, 1);
     reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumScreenToLightMatrixLoc, tempLightProjection * screenToLightTransformation);
+    // reduceFrustumSamplerProgram->setUniformValueArray(m_reduceFrustumCascadeFarLoc, cascadeFars.data(), m_cascades-1, 1);
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_cascadeFarBuffer);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
@@ -485,7 +440,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     reduceFrustumProgram->release();
 
 
-    // compute cascade projection matrices on GPU!
+    // Compute cascade projection matrices on GPU!
     createCascadeViews->bind();
 
     auto inverseTempLightProjection = tempLightProjection.inverted();
@@ -499,77 +454,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glDispatchCompute(1, 1, 1);
 
     createCascadeViews->release();
-
-    /*
-    // BEGIN compute cascades
-    // NOTE: read back values are in texturespace [0, 1]
-    QVector4D reducedCorners[6] = {{1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}, {1, 1, 1, 1}};
-
-    std::vector<std::array<float, 4>> reducedFrustumPixels;
-    reducedFrustumPixels.resize(m_reduceLastTextureSize*6);
-
-    glBindTexture(GL_TEXTURE_1D_ARRAY, m_frustumReduceTextureArrays.back());
-    glGetTexImage(GL_TEXTURE_1D_ARRAY, 0, GL_RGBA, GL_FLOAT, reducedFrustumPixels.data());
-    glBindTexture(GL_TEXTURE_1D_ARRAY, 0);
-
-    for (int i = 0; i < 6; i++)
-    {
-        for (int j = m_reduceLastTextureSize*i; j < m_reduceLastTextureSize*(i+1); j++)
-        {
-            auto &p = reducedFrustumPixels[j];
-            for (int k = 0; k < 4; k++)
-            {
-                reducedCorners[i][k] = std::min(reducedCorners[i][k], p[k]);
-            }
-        }
-    }
-
-    // sort by cascades
-    QVector3D minCornersCascade[4];
-    QVector3D maxCornersCascade[4];
-
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 3; j++)
-        {
-            // transform from texture space to projected space
-            minCornersCascade[i][j] = reducedCorners[j][i] * 2 - 1; // min
-            maxCornersCascade[i][j] = reducedCorners[3+j][i] * -2 + 1; // max
-        }
-    }
-
-    // transform min/max corners back into light space
-    auto inverseTempLightProjection = tempLightProjection.inverted();
-    MathUtility::transformVectors(inverseTempLightProjection, minCornersCascade);
-    MathUtility::transformVectors(inverseTempLightProjection, maxCornersCascade);
-
-    // for all cascades calculate projection matrix
-    for (int i = 0; i < m_cascades; i++)
-    {
-        QMatrix4x4 cascadeProjection;
-        // min/max did happen in projected space => -minZ~>minZ, -maxZ~>maxZ
-        cascadeProjection.ortho(minCornersCascade[i].x(), maxCornersCascade[i].x(), minCornersCascade[i].y(), maxCornersCascade[i].y(), -minCornersCascade[i].z(), -maxCornersCascade[i].z());
-
-        // choose shadow maps exactly twice as bit as they should be!
-        QMatrix4x4 scaling;
-       // scaling.scale(0.5, 0.5);
-
-        cascadeViews.push_back(scaling * cascadeProjection * lightViewMatrix * scene->getCameraView().inverted());
-    }
-
-    // write to ssbo (for compatibility)
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_cascadeViewBuffer);
-    dataPtr = (float *)glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY);
-
-    for (auto &matrix : cascadeViews)
-    {
-        dataPtr = std::copy(matrix.data(), matrix.data() + 4*4, dataPtr);
-    }
-
-    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-    // END compute cascades
-    */
 
 
     // light direction from camera's perspective

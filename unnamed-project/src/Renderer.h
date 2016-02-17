@@ -100,6 +100,9 @@ protected:
     std::vector<GLuint> m_frustumReduceTextureArrays;
     GLsizei m_reduceLastTextureSize;
 
+    int m_createCascadeFarsCameraProjectionLoc;
+    int m_createCascadeFarsInverseCameraProjectionLoc;
+
     int m_createCascadeViewsInvTempProjMatrixLoc;
     int m_createCascadeViewsLightViewMatrixLoc;
 
