@@ -5,6 +5,5 @@
     <shader program="Render" type="Vertex" path="shaders/render_vertex.glsl"/>
     <shader program="Render" type="Fragment" path="shaders/render_fragment.glsl"/>
     <shader program="Shadow" type="Vertex" path="shaders/shadowmap_vertex.glsl"/>
-    <shader program="Shadow" type="Fragment" path="shaders/shadowmap_fragment.glsl"/>
     <shader program="Shadow" type="Geometry" path="shaders/shadowmap_geometry.glsl"/>
 </shader_config>

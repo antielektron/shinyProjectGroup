@@ -59,9 +59,8 @@ void Renderer::initialize()
     setShaderSource(loadTextFile("shaders/shadowmap_geometry.glsl"),
                     KEYSTR_PROGRAM_SHADOW,
                     QOpenGLShader::Geometry);
-    setShaderSource(loadTextFile("shaders/shadowmap_fragment.glsl"),
-                    KEYSTR_PROGRAM_SHADOW,
-                    QOpenGLShader::Fragment);
+    // No fragment shader, it's empty
+
     // compose program:
     setShaderSource(loadTextFile("shaders/copy_vertex.glsl"),
                     KEYSTR_PROGRAM_COMPOSE,
@@ -589,6 +588,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_CLAMP);
     glEnable(GL_MULTISAMPLE);
 
     shadowMapProgram->bind();
@@ -606,6 +606,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     }
 
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_CLAMP);
     glDisable(GL_MULTISAMPLE);
 
     shadowMapProgram->release();
