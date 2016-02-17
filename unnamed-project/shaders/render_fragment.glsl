@@ -12,8 +12,17 @@ uniform vec3 specularColor;
 uniform vec3 diffuseColor;
 uniform vec3 ambientColor;
 
-uniform mat4 cascadeViewMatrix[4];
-uniform float cascadeFar[4]; // where do the cascades end?
+// uniform mat4 cascadeViewMatrix[4];
+layout (binding = 0) buffer cascadeViewBuffer
+{
+    mat4 cascadeViewMatrix[4];
+};
+
+// uniform float cascadeFar[4]; // where do the cascades end?
+layout (binding = 1) buffer cascadeFarBuffer
+{
+    vec4 cascadeFar; // NOTE: float[4] will be ill aligned..
+};
 
 // gl_TextureMatrix
 uniform sampler2DArray shadowMapSampler;
@@ -93,7 +102,8 @@ float cooktorranceTerm(vec3 v, vec3 n, vec3 l)
 
 int getCascade()
 {
-    float z = -worldPosition.z;
+    // float z = -worldPosition.z;
+    float z = gl_FragCoord.z;
 
     if (z < cascadeFar[0])
         return 0;
@@ -185,6 +195,7 @@ void main()
 
     float scaledZ = gl_FragCoord.z*gl_FragCoord.w;
     fragColor = vec4(clamp(shadowTerm * (shadedColor) + ambientColor, 0., 1.), scaledZ);
+
         /*
     int index = getCascade();
     if (index == 0)

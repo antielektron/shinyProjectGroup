@@ -26,6 +26,8 @@
 #define KEYSTR_PROGRAM_CREATE_MOMENTS           "Create Moments"
 #define KEYSTR_PROGRAM_HORIZONTAL_VO_AREA       "Horizontal VO"
 #define KEYSTR_PROGRAM_VERTICAL_VO_AREA         "Vertical VO"
+#define KEYSTR_PROGRAM_CREATE_CASCADE_FARS      "Create Cascade Fars"
+#define KEYSTR_PROGRAM_CREATE_CASCADE_VIEWS     "Create Cascade Views"
 
 class Renderer : public RendererBase
 {
@@ -46,12 +48,14 @@ protected:
     void createLightViewMatrix(const QVector3D &lightDir, const QMatrix4x4 &inverseCameraView, QMatrix4x4 &matrix);
     void createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransformation, QMatrix4x4 &matrix);
 
-
     GLsizei m_width;
     GLsizei m_height;
 
     GLsizei m_shadowMapSize;
     GLsizei m_cascades;
+
+    GLuint m_cascadeFarBuffer;
+    GLuint m_cascadeViewBuffer;
 
     // Render Shader
     int m_modelViewMatrixLoc;
@@ -96,13 +100,8 @@ protected:
     std::vector<GLuint> m_frustumReduceTextureArrays;
     GLsizei m_reduceLastTextureSize;
 
-    // vertical gauss
-    int m_verticalGaussSourceLoc;
-    int m_verticalGaussFilteredLoc;
-
-    // horizontal gauss
-    int m_horizontalGaussSourceLoc;
-    int m_horizontalGaussFilteredLoc;
+    int m_createCascadeViewsInvTempProjMatrixLoc;
+    int m_createCascadeViewsLightViewMatrixLoc;
 
 
     QOpenGLVertexArrayObject m_quadVao;
@@ -115,8 +114,6 @@ protected:
     GLuint m_renderDepthBuffer;
 
     GLuint m_tempTexture;
-
-    QMatrix4x4 m_lastCameraView;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H

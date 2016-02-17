@@ -3,7 +3,11 @@
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 12) out;
 
-uniform mat4 cascadeViewMatrix[4];
+// uniform mat4 cascadeViewMatrix[4];
+layout (binding = 0) buffer cascadeViewBuffer
+{
+    mat4 cascadeViewMatrix[4];
+};
 
 out vec4 lightViewPosition;
 
