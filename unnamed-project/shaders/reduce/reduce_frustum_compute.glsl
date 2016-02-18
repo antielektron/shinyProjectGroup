@@ -1,4 +1,4 @@
-#version 450
+#version 440
 
 layout (binding=0, rgba16) readonly uniform image1DArray inputTex;
 layout (binding=1, rgba16) writeonly uniform image1DArray outputTex;
