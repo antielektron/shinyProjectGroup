@@ -24,8 +24,6 @@
 #define KEYSTR_PROGRAM_HORIZONTAL_GAUSS         "Horizontal Gauss"
 #define KEYSTR_PROGRAM_VERTICAL_GAUSS           "Vertical Gauss"
 #define KEYSTR_PROGRAM_CREATE_MOMENTS           "Create Moments"
-#define KEYSTR_PROGRAM_HORIZONTAL_VO_AREA       "Horizontal VO"
-#define KEYSTR_PROGRAM_VERTICAL_VO_AREA         "Vertical VO"
 
 class Renderer : public RendererBase
 {
@@ -111,7 +109,6 @@ protected:
     GLuint m_renderFrameBuffer;
     GLuint m_renderTexture;
     GLuint m_voMomentsTexture;
-    GLuint m_voGaussedMomentsBufferTexture;
     GLuint m_renderDepthBuffer;
 
     GLuint m_tempTexture;

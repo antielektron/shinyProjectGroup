@@ -108,15 +108,6 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_CREATE_MOMENTS,
                     QOpenGLShader::Compute);
 
-    // vo variance/moment filter shaders
-    setShaderSource(loadTextFile("shaders/filter/horizontal_vo_area.glsl"),
-                    KEYSTR_PROGRAM_HORIZONTAL_VO_AREA,
-                    QOpenGLShader::Compute);
-
-    setShaderSource(loadTextFile("shaders/filter/vertical_vo_area.glsl"),
-                    KEYSTR_PROGRAM_VERTICAL_VO_AREA,
-                    QOpenGLShader::Compute);
-
     // generate attrib and uniform locations
     // default:
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].push_back(
@@ -330,9 +321,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
     QOpenGLShaderProgram *createMomentsProgram = m_programs[KEYSTR_PROGRAM_CREATE_MOMENTS].get();
-    QOpenGLShaderProgram *verticalVO = m_programs[KEYSTR_PROGRAM_VERTICAL_VO_AREA].get();
-    QOpenGLShaderProgram *horizontalVO = m_programs[KEYSTR_PROGRAM_HORIZONTAL_VO_AREA].get();
-
     // Input: lightDirection, cameraProjection, cameraView, frustum
     // Output: lightProjection
 
@@ -685,7 +673,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     defaultProgram->release();
 
     // gauss moments of screenspace depth:
-
+    /*
     verticalVO->bind();
 
     glBindImageTexture(0, m_voMomentsTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
@@ -702,7 +690,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
 
     horizontalVO->release();
-
+    */
 
     // Render to Screen
 
@@ -1002,16 +990,6 @@ void Renderer::resize(int width, int height)
     // Create moments/variance texture for volumetric obscurance
     glGenTextures(1, &m_voMomentsTexture);
     glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
-    // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, m_width, m_height, 0, GL_RG, GL_FLOAT, 0);
-    // Poor filtering. Needed!
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Create gauss filtered Texture for screenspace depth moments:
-    glGenTextures(1, &m_voGaussedMomentsBufferTexture);
-    glBindTexture(GL_TEXTURE_2D, m_voGaussedMomentsBufferTexture);
     // Give an empty image to OpenGL ( the last "0" )
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, m_width, m_height, 0, GL_RG, GL_FLOAT, 0);
     // Poor filtering. Needed!
