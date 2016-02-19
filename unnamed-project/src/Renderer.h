@@ -25,6 +25,8 @@
 #define KEYSTR_PROGRAM_VERTICAL_GAUSS           "Vertical Gauss"
 #define KEYSTR_PROGRAM_CREATE_MOMENTS           "Create Moments"
 
+#define NUM_VO_MIPMAP_LEVELS 10 //so there's a height of 1 pixel @toplevel for full-HD
+
 class Renderer : public RendererBase
 {
 public:
