@@ -694,7 +694,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     // generate mipmaps:
     glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
-    //glGenerateMipmap(GL_TEXTURE_2D);
+    glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Render to Screen
