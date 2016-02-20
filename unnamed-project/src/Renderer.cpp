@@ -693,9 +693,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     */
 
     // generate mipmaps:
-    glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
+    //glGenerateMipmap(GL_TEXTURE_2D);
+    //glBindTexture(GL_TEXTURE_2D, 0);
 
     // Render to Screen
 
@@ -997,7 +997,7 @@ void Renderer::resize(int width, int height)
     glGenTextures(1, &m_voMomentsTexture);
     glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, m_width, m_height, 0, GL_RG16, GL_UNSIGNED_SHORT, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, m_width, m_height, 0, GL_RG, GL_FLOAT, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glBindTexture(GL_TEXTURE_2D, 0);
