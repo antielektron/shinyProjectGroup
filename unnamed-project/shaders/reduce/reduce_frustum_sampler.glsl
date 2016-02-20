@@ -1,4 +1,4 @@
-#version 440
+#version 430
 
 // Depth buffer can not be bound as image2D for whatever reason.
 layout (binding=0) uniform sampler2D inputSampler;
