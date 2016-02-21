@@ -74,7 +74,7 @@ float get_depth(vec2 uv)
 
 bool isInCenterEpsilonArea(vec2 centerPoint)
 {
-	float zCenter = get_depth(centerPoint);
+	float zCenter = (1. - textureLod(momentsSampler, vec2(0.5,0.5), 0).x) * .1;
 	float kx = get_kx(zCenter);
 	float ky = get_ky(zCenter);
 	
@@ -85,7 +85,7 @@ bool isInCenterEpsilonArea(vec2 centerPoint)
 	float dx = (uv.x - centerPoint.x) * ratio;
 	float dy = (uv.y - centerPoint.y);
 	
-	return (dx * dx + dy * dy) < (kx * kx); 
+	return (dx * dx + dy * dy) < (zCenter * zCenter); 
 }
 
 
@@ -118,7 +118,7 @@ void main()
 	// aaaand i have no idea what i'm doing now:
 	float voFactor =  a * (pow(z1,2) - pow(z0,2)) / 2.0 + b * (z1 - z0);
 		
-    //vec3 mixedColor = vec3(mean, variance, variance);
+    //vec3 mixedColor = vec3(10* mean, 10 * variance,10 * variance);
     //vec3 mixedColor = vec3(10* (mean - d), 0.,0.);
     vec3 mixedColor = vec3(1.,1.,1.) - clamp(10 * voFactor * vec3(1.,1.,1.), 0, 1);
     
