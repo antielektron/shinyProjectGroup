@@ -68,7 +68,7 @@ bool isCursor()
 
 void main()
 {
-	vec4 moments = texture2D(momentsSampler, uv);
+	vec4 moments = textureLod(momentsSampler, uv, 0);
 	float mean = moments.x;
 	float variance = sqrt(moments.y - pow(mean,2));
 	
