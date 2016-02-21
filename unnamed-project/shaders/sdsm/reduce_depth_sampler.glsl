@@ -1,4 +1,4 @@
-#version 450
+#version 430
 
 // Depth buffer can not be bound as image2D for whatever reason.
 layout (binding = 0) uniform sampler2D inputSampler;
@@ -27,21 +27,19 @@ void computeCurrentThreadValue(out vec2 depthMinMax)
     // TODO size via uniform!
     ivec2 inputPos = ivec2(gl_GlobalInvocationID.xy)*2;
 
-    // Access pixels at center
-    vec2 normalizedInputPos = (vec2(inputPos) + 0.5) / inputSize;
-    vec2 inputDelta = 1 / inputSize;
+    float depth;
 
-    float a = texture2D(inputSampler, normalizedInputPos).x;
-    updateMinMaxDepth(depthMinMax, a);
+    depth = texelFetch(inputSampler, inputPos, 0).x;
+    updateMinMaxDepth(depthMinMax, depth);
 
-    float b = texture2D(inputSampler, normalizedInputPos + vec2(inputDelta.x, 0)).x;
-    updateMinMaxDepth(depthMinMax, b);
+    depth = texelFetch(inputSampler, inputPos + ivec2(1, 0), 0).x;
+    updateMinMaxDepth(depthMinMax, depth);
 
-    float c = texture2D(inputSampler, normalizedInputPos + vec2(0, inputDelta.y)).x;
-    updateMinMaxDepth(depthMinMax, c);
+    depth = texelFetch(inputSampler, inputPos + ivec2(0, 1), 0).x;
+    updateMinMaxDepth(depthMinMax, depth);
 
-    float d = texture2D(inputSampler, normalizedInputPos + inputDelta).x;
-    updateMinMaxDepth(depthMinMax, d);
+    depth = texelFetch(inputSampler, inputPos + ivec2(1, 1), 0).x;
+    updateMinMaxDepth(depthMinMax, depth);
 }
 
 void main()

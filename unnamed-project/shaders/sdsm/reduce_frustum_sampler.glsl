@@ -1,4 +1,4 @@
-#version 450
+#version 430
 
 // Depth buffer can not be bound as image2D for whatever reason.
 layout (binding=0) uniform sampler2D inputSampler;
@@ -64,22 +64,26 @@ void computeCurrentThreadValue(out vec3 minCorners[4], out vec3 maxCorners[4])
 
     float depth;
 
-    depth = texture2D(inputSampler, normalizedInputPos).x;
+    // depth = texture2D(inputSampler, normalizedInputPos).x;
+    depth = texelFetch(inputSampler, inputPos, 0).x;
     updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
 
     normalizedInputPos.x += inputDelta.x;
+    inputPos.x++;
 
-    depth = texture2D(inputSampler, normalizedInputPos).x;
+    depth = texelFetch(inputSampler, inputPos, 0).x;
     updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
 
     normalizedInputPos.y += inputDelta.y;
+    inputPos.y++;
 
-    depth = texture2D(inputSampler, normalizedInputPos).x;
+    depth = texelFetch(inputSampler, inputPos, 0).x;
     updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
 
     normalizedInputPos.x -= inputDelta.x;
+    inputPos.x--;
 
-    depth = texture2D(inputSampler, normalizedInputPos).x;
+    depth = texelFetch(inputSampler, inputPos, 0).x;
     updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
 }
 
