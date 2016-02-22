@@ -606,7 +606,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     glBindImageTexture(1, m_shadowMapTexture, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
 
-    glDispatchCompute(m_shadowMapSize/8, m_shadowMapSize/8, 4);
+    glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 4);
 
     createMomentsProgram->release();
 
