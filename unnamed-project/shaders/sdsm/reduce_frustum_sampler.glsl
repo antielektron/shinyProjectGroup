@@ -62,29 +62,40 @@ void computeCurrentThreadValue(out vec3 minCorners[4], out vec3 maxCorners[4])
     vec2 normalizedInputPos = (vec2(inputPos) + 0.5) / inputSize;
     vec2 inputDelta = 1 / inputSize;
 
-    float depth;
-
     // depth = texture2D(inputSampler, normalizedInputPos).x;
-    depth = texelFetch(inputSampler, inputPos, 0).x;
-    updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+
+    if (inputPos.x < inputSize.x && inputPos.y < inputSize.y)
+    {
+        float depth = texelFetch(inputSampler, inputPos, 0).x;
+        updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    }
 
     normalizedInputPos.x += inputDelta.x;
     inputPos.x++;
 
-    depth = texelFetch(inputSampler, inputPos, 0).x;
-    updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    if (inputPos.x < inputSize.x && inputPos.y < inputSize.y)
+    {
+        float depth = texelFetch(inputSampler, inputPos, 0).x;
+        updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    }
 
     normalizedInputPos.y += inputDelta.y;
     inputPos.y++;
 
-    depth = texelFetch(inputSampler, inputPos, 0).x;
-    updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    if (inputPos.x < inputSize.x && inputPos.y < inputSize.y)
+    {
+        float depth = texelFetch(inputSampler, inputPos, 0).x;
+        updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    }
 
     normalizedInputPos.x -= inputDelta.x;
     inputPos.x--;
 
-    depth = texelFetch(inputSampler, inputPos, 0).x;
-    updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    if (inputPos.x < inputSize.x && inputPos.y < inputSize.y)
+    {
+        float depth = texelFetch(inputSampler, inputPos, 0).x;
+        updateMinMaxCorners(minCorners, maxCorners, normalizedInputPos, depth);
+    }
 }
 
 void main()
