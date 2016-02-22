@@ -27,19 +27,29 @@ void computeCurrentThreadValue(out vec2 depthMinMax)
     // TODO size via uniform!
     ivec2 inputPos = ivec2(gl_GlobalInvocationID.xy)*2;
 
-    float depth;
+    if (inputPos.x < inputSize.x && inputPos.y < inputSize.y)
+    {
+        float depth = texelFetch(inputSampler, inputPos, 0).x;
+        updateMinMaxDepth(depthMinMax, depth);
+    }
 
-    depth = texelFetch(inputSampler, inputPos, 0).x;
-    updateMinMaxDepth(depthMinMax, depth);
+    if (inputPos.x + 1 < inputSize.x && inputPos.y < inputSize.y)
+    {
+        float depth = texelFetch(inputSampler, inputPos + ivec2(1, 0), 0).x;
+        updateMinMaxDepth(depthMinMax, depth);
+    }
 
-    depth = texelFetch(inputSampler, inputPos + ivec2(1, 0), 0).x;
-    updateMinMaxDepth(depthMinMax, depth);
+    if (inputPos.x < inputSize.x && inputPos.y + 1 < inputSize.y)
+    {
+        float depth = texelFetch(inputSampler, inputPos + ivec2(0, 1), 0).x;
+        updateMinMaxDepth(depthMinMax, depth);
+    }
 
-    depth = texelFetch(inputSampler, inputPos + ivec2(0, 1), 0).x;
-    updateMinMaxDepth(depthMinMax, depth);
-
-    depth = texelFetch(inputSampler, inputPos + ivec2(1, 1), 0).x;
-    updateMinMaxDepth(depthMinMax, depth);
+    if (inputPos.x + 1 < inputSize.x && inputPos.y + 1 < inputSize.y)
+    {
+        float depth = texelFetch(inputSampler, inputPos + ivec2(1, 1), 0).x;
+        updateMinMaxDepth(depthMinMax, depth);
+    }
 }
 
 void main()
