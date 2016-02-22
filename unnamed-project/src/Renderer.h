@@ -14,6 +14,7 @@
 #include "Scene/Scene.h"
 
 #define KEYSTR_PROGRAM_RENDER                   "Render"
+#define KEYSTR_PROGRAM_RENDER_DEPTH             "Render Depth"
 #define KEYSTR_PROGRAM_COMPOSE                  "Compose"
 #define KEYSTR_PROGRAM_SHADOW                   "Shadow"
 #define KEYSTR_PROGRAM_COPY                     "Copy"
@@ -68,6 +69,10 @@ protected:
     int m_diffuseColorLoc;
     int m_ambientColorLoc;
     int m_shadowMapSamplerLoc;
+
+    // Render Depth Shader
+    int m_depthOnlyModelViewMatrixLoc;
+    int m_depthOnlyProjectionMatrixLoc;
 
     // ShadowMap Shader
     int m_shadowMapWorldMatrixLoc;

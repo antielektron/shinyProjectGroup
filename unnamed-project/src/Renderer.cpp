@@ -45,14 +45,21 @@ void Renderer::initialize()
     glClearColor(0, 0, 0, 1);
 
     // set shaders:
-    // default program:
+    // Render
     setShaderSource(loadTextFile("shaders/render_vertex.glsl"),
                     KEYSTR_PROGRAM_RENDER,
                     QOpenGLShader::Vertex);
     setShaderSource(loadTextFile("shaders/render_fragment.glsl"),
                     KEYSTR_PROGRAM_RENDER,
                     QOpenGLShader::Fragment);
-    // shadow map program
+
+    // Render Depth
+    setShaderSource(loadTextFile("shaders/render/render_depth_only_vertex.glsl"),
+                    KEYSTR_PROGRAM_RENDER_DEPTH,
+                    QOpenGLShader::Vertex);
+    // No fragment shader, it's empty
+
+    // Shadow Map
     setShaderSource(loadTextFile("shaders/shadowmap_vertex.glsl"),
                     KEYSTR_PROGRAM_SHADOW,
                     QOpenGLShader::Vertex);
@@ -124,8 +131,9 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_VERTICAL_VO_AREA,
                     QOpenGLShader::Compute);
 
-    // generate attrib and uniform locations
-    // default:
+    // Generate attrib and uniform locations
+
+    // Render
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].emplace_back(&m_modelViewMatrixLoc, "modelViewMatrix");
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].emplace_back(&m_projectionMatrixLoc, "projectionMatrix");
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].emplace_back(&m_cascadeViewMatrixLoc, "cascadeViewMatrix");
@@ -137,37 +145,41 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].emplace_back(&m_ambientColorLoc, "ambientColor");
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].emplace_back(&m_shadowMapSamplerLoc, "shadowMapSampler");
 
-    m_attribLocs[KEYSTR_PROGRAM_RENDER].push_back(
-                std::make_pair(0, "v_position"));
-    m_attribLocs[KEYSTR_PROGRAM_RENDER].push_back(
-                std::make_pair(1, "v_normal"));
-
-    // shadow map:
-    m_uniformLocs[KEYSTR_PROGRAM_SHADOW].push_back(
-                    std::make_pair(&m_shadowMapCascadeViewMatrixLoc, "cascadeViewMatrix"));
-    m_uniformLocs[KEYSTR_PROGRAM_SHADOW].push_back(
-                        std::make_pair(&m_shadowMapWorldMatrixLoc, "worldMatrix"));
-
-    // compose
-    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
-                std::make_pair(&m_composeProjectionMatrixLoc, "projectionMatrix"));
-    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
-                std::make_pair(&m_composeInverseProjectionMatrixLoc, "inverseProjectionMatrix"));
-    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
-                std::make_pair(&m_composeDepthBufferLoc, "depthBuffer"));
-    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
-                    std::make_pair(&m_composeSamplerLoc, "sampler"));
-    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
-                    std::make_pair(&m_composeMomentsSamplerLoc, "momentsSampler"));
-    m_attribLocs[KEYSTR_PROGRAM_COMPOSE].push_back(
-                std::make_pair(0, "v_position"));
-
-    // copy
-    m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(&m_copyArraySamplerLoc, "sampler"));
-    m_uniformLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(&m_copyArrayLayerLoc, "layer"));
-    m_attribLocs[KEYSTR_PROGRAM_COPY].push_back(std::make_pair(0, "v_position"));
+    m_attribLocs[KEYSTR_PROGRAM_RENDER].emplace_back(0, "v_position");
+    m_attribLocs[KEYSTR_PROGRAM_RENDER].emplace_back(1, "v_normal");
 
 
+    // Render Depth
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_DEPTH].emplace_back(&m_depthOnlyModelViewMatrixLoc, "modelViewMatrix");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_DEPTH].emplace_back(&m_depthOnlyProjectionMatrixLoc, "projectionMatrix");
+
+    m_attribLocs[KEYSTR_PROGRAM_RENDER_DEPTH].emplace_back(0, "v_position");
+    m_attribLocs[KEYSTR_PROGRAM_RENDER_DEPTH].emplace_back(1, "v_normal");
+
+
+    // Shadow
+    m_uniformLocs[KEYSTR_PROGRAM_SHADOW].emplace_back(&m_shadowMapCascadeViewMatrixLoc, "cascadeViewMatrix");
+    m_uniformLocs[KEYSTR_PROGRAM_SHADOW].emplace_back(&m_shadowMapWorldMatrixLoc, "worldMatrix");
+
+
+    // Compose
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeProjectionMatrixLoc, "projectionMatrix");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeInverseProjectionMatrixLoc, "inverseProjectionMatrix");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeDepthBufferLoc, "depthBuffer");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeSamplerLoc, "sampler");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeMomentsSamplerLoc, "momentsSampler");
+
+    m_attribLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(0, "v_position");
+
+
+    // Copy (Debug)
+    m_uniformLocs[KEYSTR_PROGRAM_COPY].emplace_back(&m_copyArraySamplerLoc, "sampler");
+    m_uniformLocs[KEYSTR_PROGRAM_COPY].emplace_back(&m_copyArrayLayerLoc, "layer");
+
+    m_attribLocs[KEYSTR_PROGRAM_COPY].emplace_back(0, "v_position");
+
+
+    // Misc. Reduce
     m_uniformLocs[KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER].emplace_back(&m_reduceDepthInputSizeLoc, "inputSize");
 
     m_uniformLocs[KEYSTR_PROGRAM_REDUCE_FRUSTUM_SAMPLER].emplace_back(&m_reduceFrustumInputSizeLoc, "inputSize");
@@ -183,6 +195,7 @@ void Renderer::initialize()
 
     // create Programs:
     createProgram(KEYSTR_PROGRAM_RENDER);
+    createProgram(KEYSTR_PROGRAM_RENDER_DEPTH);
     createProgram(KEYSTR_PROGRAM_SHADOW);
     createProgram(KEYSTR_PROGRAM_COMPOSE);
     createProgram(KEYSTR_PROGRAM_COPY);
@@ -338,7 +351,8 @@ void Renderer::createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransform
 void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 {
     QOpenGLShaderProgram *shadowMapProgram = m_programs[KEYSTR_PROGRAM_SHADOW].get();
-    QOpenGLShaderProgram *defaultProgram = m_programs[KEYSTR_PROGRAM_RENDER].get();
+    QOpenGLShaderProgram *renderProgram = m_programs[KEYSTR_PROGRAM_RENDER].get();
+    QOpenGLShaderProgram *renderDepthProgram = m_programs[KEYSTR_PROGRAM_RENDER_DEPTH].get();
     QOpenGLShaderProgram *composeProgram = m_programs[KEYSTR_PROGRAM_COMPOSE].get();
     QOpenGLShaderProgram *reduceDepthSamplerProgram = m_programs[KEYSTR_PROGRAM_REDUCE_DEPTH_SAMPLER].get();
     QOpenGLShaderProgram *reduceDepthProgram = m_programs[KEYSTR_PROGRAM_REDUCE_DEPTH].get();
@@ -353,15 +367,109 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *verticalVO = m_programs[KEYSTR_PROGRAM_VERTICAL_VO_AREA].get();
     QOpenGLShaderProgram *horizontalVO = m_programs[KEYSTR_PROGRAM_HORIZONTAL_VO_AREA].get();
 
-    // Input: lightDirection, cameraProjection, cameraView, frustum
-    // Output: lightProjection
-
     // Inverse of common transformations...
     const auto &cameraView = scene->getCameraView();
     const auto &cameraProjection = scene->getCameraProjection();
     auto inverseCameraView = cameraView.inverted();
     auto inverseCameraProjection = cameraProjection.inverted();
     auto inverseCameraTransformation = (cameraProjection * cameraView).inverted();
+
+    // light direction from camera's perspective
+    auto lightDirection = cameraView * QVector4D(scene->getDirectionalLightDirection(), 0);
+
+
+    // 0. Clear render target
+    glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
+
+    // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
+    glViewport(0, 0, m_width, m_height);
+
+    glClearColor(0, 0, 0, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+    // 1. Render depth only
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glDepthFunc(GL_LESS);
+
+    renderDepthProgram->bind();
+
+    renderDepthProgram->setUniformValue(m_depthOnlyProjectionMatrixLoc, cameraProjection);
+
+    // Render regular objects
+    for (auto &object : scene->getObjects())
+    {
+        auto cameraModelView = cameraView * object->getWorld();
+
+        renderDepthProgram->setUniformValue(m_depthOnlyModelViewMatrixLoc, cameraModelView);
+
+        object->getModel()->draw();
+    }
+
+    // Render debug objects
+    for (auto editorObject : scene->getEditorObjects())
+    {
+        if (!(static_cast<EditorObject *>(editorObject)->isVisible()))
+        {
+            continue;
+        }
+
+        auto cameraModelView = cameraView * editorObject->getWorld();
+
+        renderDepthProgram->setUniformValue(m_depthOnlyModelViewMatrixLoc, cameraModelView);
+
+        editorObject->getModel()->draw();
+    }
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+
+    renderDepthProgram->release();
+
+
+    // 2. Compute shadow map projection matrices
+
+    // 2.1 Reduce min/max depth
+    // round up
+    GLsizei initWidth = (m_width-1) / 2 / 16 + 1;
+    GLsizei initHeight = (m_height-1) / 2 / 16 + 1;
+
+    reduceDepthSamplerProgram->bind();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+
+    reduceDepthSamplerProgram->setUniformValue(m_reduceDepthInputSizeLoc, m_width, m_height);
+
+    glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
+
+    // for every new pixel spawn a thread group!
+    glDispatchCompute(initWidth, initHeight, 1);
+
+    reduceDepthSamplerProgram->release();
+
+    // size of first reduction result
+    GLsizei size = initWidth*initHeight;
+
+    reduceDepthProgram->bind();
+
+    for (int i = 1; i < m_depthReduceTextures.size(); i++)
+    {
+        glBindImageTexture(0, m_depthReduceTextures[i-1], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
+        glBindImageTexture(1, m_depthReduceTextures[i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
+
+        // round up
+        size = (size-1) / 1 / 256 + 1;
+
+        // for every new pixel spawn a thread group!
+        glDispatchCompute(size, 1, 1);
+    }
+
+    reduceDepthProgram->release();
+
+    // Input: lightDirection, cameraProjection, cameraView, frustum
+    // Output: lightProjection
 
     QMatrix4x4 lightViewMatrix;
     createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
@@ -375,7 +483,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     createFrustumProjectionMatrix(screenToLightTransformation, tempLightProjection);
 
 
-    // Compute actual near and far plane! (on GPU!)
+    // 2.2 Compute near and far plane for cascades! (on GPU!)
     createCascadeFars->bind();
 
     createCascadeFars->setUniformValue(m_createCascadeFarsCameraProjectionLoc, cameraProjection);
@@ -390,17 +498,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     createCascadeFars->release();
 
 
-    // in shader:
-    // inLight = screenToLight * (xy , depth, 1)
-    // inLight /= inLight.w
-    // branch for depth -> cascades
-    // store in appropriate texture
-    // store: vec3 minCorner[4], vec3 maxCorner[4]
-    // store min[12], max[12]
-
+    // 2.3 Reduce bbox for each cascade
     // round up
-    GLsizei initWidth = (m_width-1) / 2 / 16 + 1;
-    GLsizei initHeight = (m_height-1) / 2 / 16 + 1;
+    initWidth = (m_width-1) / 2 / 16 + 1;
+    initHeight = (m_height-1) / 2 / 16 + 1;
 
     reduceFrustumSamplerProgram->bind();
 
@@ -421,7 +522,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     reduceFrustumSamplerProgram->release();
 
     // size of first reduction result
-    GLsizei size = initWidth*initHeight;
+    size = initWidth*initHeight;
 
     reduceFrustumProgram->bind();
 
@@ -440,7 +541,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     reduceFrustumProgram->release();
 
 
-    // Compute cascade projection matrices on GPU!
+    // 2.4 Compute cascade projection matrices on GPU!
     createCascadeViews->bind();
 
     auto inverseTempLightProjection = tempLightProjection.inverted();
@@ -456,12 +557,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     createCascadeViews->release();
 
 
-    // light direction from camera's perspective
-    auto lightDirection = scene->getCameraView() * QVector4D(scene->getDirectionalLightDirection(), 0);
-
-
-    // Render to ShadowMap
-
+    // 3. Render to ShadowMap
     glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
 
     // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
@@ -484,7 +580,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     for (auto &object : scene->getObjects())
     {
         // work in camera view space
-        shadowMapProgram->setUniformValue(m_shadowMapWorldMatrixLoc, scene->getCameraView() * object->getWorld());
+        shadowMapProgram->setUniformValue(m_shadowMapWorldMatrixLoc, cameraView * object->getWorld());
 
         object->getModel()->draw();
     }
@@ -499,7 +595,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     // these barriers do work: GL_ALL_BARRIER_BITS GL_SHADER_IMAGE_ACCESS_BARRIER_BIT GL_TEXTURE_FETCH_BARRIER_BIT GL_SHADER_STORAGE_BARRIER_BIT
 
-    // Resolve MSAA depth to moment texture
+
+    // 3.1 Resolve MSAA depth to moment texture
     createMomentsProgram->bind();
 
     glActiveTexture(GL_TEXTURE0);
@@ -551,24 +648,24 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     m_debugCount = 0;
     */
 
-    // Render to Texture
-
+    // 4. Render to Texture
     glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
 
     // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
     glViewport(0, 0, m_width, m_height);
 
-    glClearColor(0, 0, 0, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // NOTE: do not clear, as we already wrote to depth buffer!
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+    // Draw closest pixel
+    glDepthFunc(GL_LEQUAL);
 
-    defaultProgram->bind();
+    renderProgram->bind();
 
-    defaultProgram->setUniformValue(m_projectionMatrixLoc, scene->getCameraProjection());
-    defaultProgram->setUniformValue(m_lightDirectionLoc, QVector3D(lightDirection));
-    defaultProgram->setUniformValue(m_lightColorLoc, scene->getLightColor());
+    renderProgram->setUniformValue(m_projectionMatrixLoc, cameraProjection);
+    renderProgram->setUniformValue(m_lightDirectionLoc, QVector3D(lightDirection));
+    renderProgram->setUniformValue(m_lightColorLoc, scene->getLightColor());
 
     // defaultProgram->setUniformValueArray(m_cascadeViewMatrixLoc, cascadeViews.data(), m_cascades);
     // defaultProgram->setUniformValueArray(m_cascadeFarLoc, cascadeFars.data(), m_cascades, 1);
@@ -578,18 +675,18 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     // Bind shadow map
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapTexture);
-    defaultProgram->setUniformValue(m_shadowMapSamplerLoc, 0);
+    renderProgram->setUniformValue(m_shadowMapSamplerLoc, 0);
 
     // Render regular objects
     for (auto &object : scene->getObjects())
     {
-        auto cameraModelView = scene->getCameraView() * object->getWorld();
+        auto cameraModelView = cameraView * object->getWorld();
 
 
-        defaultProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        defaultProgram->setUniformValue(m_specularColorLoc, object->getSpecularColor());
-        defaultProgram->setUniformValue(m_diffuseColorLoc, object->getDiffuseColor());
-        defaultProgram->setUniformValue(m_ambientColorLoc, object->getAmbientColor());
+        renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+        renderProgram->setUniformValue(m_specularColorLoc, object->getSpecularColor());
+        renderProgram->setUniformValue(m_diffuseColorLoc, object->getDiffuseColor());
+        renderProgram->setUniformValue(m_ambientColorLoc, object->getAmbientColor());
 
         object->getModel()->draw();
     }
@@ -602,12 +699,12 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             continue;
         }
 
-        auto cameraModelView = scene->getCameraView() * editorObject->getWorld();
+        auto cameraModelView = cameraView * editorObject->getWorld();
 
-        defaultProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        defaultProgram->setUniformValue(m_specularColorLoc, editorObject->getSpecularColor());
-        defaultProgram->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseColor());
-        defaultProgram->setUniformValue(m_ambientColorLoc, editorObject->getAmbientColor());
+        renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+        renderProgram->setUniformValue(m_specularColorLoc, editorObject->getSpecularColor());
+        renderProgram->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseColor());
+        renderProgram->setUniformValue(m_ambientColorLoc, editorObject->getAmbientColor());
 
         editorObject->getModel()->draw();
     }
@@ -618,10 +715,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 
-    defaultProgram->release();
+    renderProgram->release();
 
-    // gauss moments of screenspace depth:
 
+    // 5. Gauss moments of screenspace depth:
     verticalVO->bind();
 
     glBindImageTexture(0, m_voMomentsTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
@@ -640,8 +737,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     horizontalVO->release();
 
 
-    // Render to Screen
-
+    // 6. Render to Screen, apply VO
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     glViewport(0, 0, m_width, m_height);
@@ -685,47 +781,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     composeProgram->release();
 
-
-    // Invoke reduce ...
-    // round up
-    initWidth = (m_width-1) / 2 / 16 + 1;
-    initHeight = (m_height-1) / 2 / 16 + 1;
-
-    reduceDepthSamplerProgram->bind();
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
-
-    reduceDepthSamplerProgram->setUniformValue(m_reduceDepthInputSizeLoc, m_width, m_height);
-
-    glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
-
-    // for every new pixel spawn a thread group!
-    glDispatchCompute(initWidth, initHeight, 1);
-
-    reduceDepthSamplerProgram->release();
-
-    // size of first reduction result
-    size = initWidth*initHeight;
-
-    reduceDepthProgram->bind();
-
-    for (int i = 1; i < m_depthReduceTextures.size(); i++)
-    {
-        glBindImageTexture(0, m_depthReduceTextures[i-1], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
-        glBindImageTexture(1, m_depthReduceTextures[i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
-
-        // round up
-        size = (size-1) / 1 / 256 + 1;
-
-        // for every new pixel spawn a thread group!
-        glDispatchCompute(size, 1, 1);
-    }
-
-    reduceDepthProgram->release();
-
-
-
+    // DONE
 
 
     /*
