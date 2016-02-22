@@ -387,11 +387,13 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
     // 1. Render depth only
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glDepthFunc(GL_LESS);
+
+    // no color attachments
+    glDrawBuffers(0, nullptr);
 
     renderDepthProgram->bind();
 
@@ -653,6 +655,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
     glViewport(0, 0, m_width, m_height);
+
+    // Enable color output
+    GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
+    glDrawBuffers(1, attachments);
 
     // NOTE: do not clear, as we already wrote to depth buffer!
 
