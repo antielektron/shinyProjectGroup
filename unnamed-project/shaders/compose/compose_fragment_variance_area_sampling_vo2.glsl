@@ -101,7 +101,7 @@ void main()
 	float r = (1. - depth) * 0.01;
 	
 	// get mipmap level for this area
-	float mmLevel = log2(1. / depth);
+	float mmLevel = log2(1. / r);
 	
 	vec4 moments = textureLod(momentsSampler, uv,mmLevel);
 	float mean = moments.x;
@@ -118,9 +118,9 @@ void main()
 	// aaaand i have no idea what i'm doing now:
 	float voFactor =  a * (pow(z1,2) - pow(z0,2)) / 2.0 + b * (z1 - z0);
 		
-    vec3 mixedColor = vec3(10* mean, 10 * variance,0.1 * mmLevel);
+    //vec3 mixedColor = vec3(10* mean, 10 * variance,10 * variance);
     //vec3 mixedColor = vec3(10* (mean - d), 0.,0.);
-    //vec3 mixedColor = vec3(1.,1.,1.) - clamp(10 * voFactor * vec3(1.,1.,1.), 0, 1);
+    vec3 mixedColor = vec3(1.,1.,1.) - clamp(10 * voFactor * vec3(1.,1.,1.), 0, 1);
     
     // DEBUG
 	
