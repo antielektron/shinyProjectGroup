@@ -98,10 +98,10 @@ void main()
 	float depth = textureLod(momentsSampler, uv, 0).x;
 	
 	// detemine screenspace depth (not physically correct so far)
-	float r = (1. - depth) * 0.01;
+	float r = (depth) ;
 	
 	// get mipmap level for this area
-	float mmLevel = log2(1. / depth);
+	float mmLevel = log2(1. / (0.5 * depth));
 	
 	vec4 moments = textureLod(momentsSampler, uv,mmLevel);
 	float mean = moments.x;
@@ -118,9 +118,9 @@ void main()
 	// aaaand i have no idea what i'm doing now:
 	float voFactor =  a * (pow(z1,2) - pow(z0,2)) / 2.0 + b * (z1 - z0);
 		
-    vec3 mixedColor = vec3(10* mean, 10 * variance,0.1 * mmLevel);
+    //vec3 mixedColor = vec3(10* mean, 10 * variance,0.1 * mmLevel);
     //vec3 mixedColor = vec3(10* (mean - d), 0.,0.);
-    //vec3 mixedColor = vec3(1.,1.,1.) - clamp(10 * voFactor * vec3(1.,1.,1.), 0, 1);
+    vec3 mixedColor = 1. - clamp(5 * voFactor * vec3(1.,1.,1.), 0, 1);
     
     // DEBUG
 	
