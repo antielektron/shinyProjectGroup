@@ -212,7 +212,7 @@ ShaderErrorType RendererBase::createProgram(const std::string &program)
     // link program
     if (!prog->link())
     {
-        std::cerr << "could not link shader program" << std::endl;
+        std::cerr << "could not link shader program " << program << std::endl;
         return ShaderErrorType::LinkingError;
     }
 
