@@ -572,6 +572,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_DEPTH_CLAMP);
     glEnable(GL_MULTISAMPLE);
+    glEnable(GL_CULL_FACE);
 
     shadowMapProgram->bind();
 
@@ -590,6 +591,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_DEPTH_CLAMP);
     glDisable(GL_MULTISAMPLE);
+    glDisable(GL_CULL_FACE);
 
     shadowMapProgram->release();
 
@@ -724,6 +726,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     renderProgram->release();
 
 
+    /*
     // 5. Gauss moments of screenspace depth:
     verticalVO->bind();
 
@@ -741,6 +744,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
 
     horizontalVO->release();
+    */
 
 
     // 6. Render to Screen, apply VO
