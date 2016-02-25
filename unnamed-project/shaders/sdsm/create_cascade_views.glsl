@@ -56,11 +56,19 @@ void main()
     vec4 diag = vec4(2/ext, 0);
     vec4 trans = vec4(-sum/ext, 1);
 
+    float factor = 0.9;
+    mat4 scaling = mat4(
+        factor, 0, 0, 0,
+        0, factor, 0, 0,
+        0, 0, factor, 0,
+        0, 0, 0, 1
+    );
+
     mat4 projection = mat4(
         diag.xwww,
         diag.wyww,
         diag.wwzw,
         trans);
 
-    cascadeViewMatrix[index] = projection * lightViewMatrix;
+    cascadeViewMatrix[index] = scaling * projection * lightViewMatrix;
 }

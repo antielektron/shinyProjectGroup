@@ -527,6 +527,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
         // for every new pixel spawn a thread group!
         glDispatchCompute(size, 1, 1);
+        // NVIDIA gpu's are too aggressive here..
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     }
 
     reduceFrustumProgram->release();
@@ -786,7 +788,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     composeProgram->release();
 
     // DONE
-
 
     /*
     // DEBUG
