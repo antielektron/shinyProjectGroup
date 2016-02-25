@@ -116,8 +116,6 @@ protected:
     GLuint m_renderTexture;
     GLuint m_voMomentsTexture;
     GLuint m_renderDepthBuffer;
-
-    GLuint m_tempTexture;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_H

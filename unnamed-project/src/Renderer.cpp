@@ -341,6 +341,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
     QOpenGLShaderProgram *createMomentsProgram = m_programs[KEYSTR_PROGRAM_CREATE_MOMENTS].get();
+
     // Input: lightDirection, cameraProjection, cameraView, frustum
     // Output: lightProjection
 
@@ -828,28 +829,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     */
 
     /*
-    verticalGaussProgram->bind();
-
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, windowTexture);
-    glBindImageTexture(0, windowTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
-    glBindImageTexture(1, m_renderTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
-    glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
-
-    verticalGaussProgram->release();
-
-    horizontalGaussProgram->bind();
-
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, m_renderTexture);
-    glBindImageTexture(0, m_renderTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA8);
-    glBindImageTexture(1, windowTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
-    glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
-
-    horizontalGaussProgram->release();
-    */
-
-    /*
     // DEBUG: view shadow map depths
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -913,7 +892,6 @@ void Renderer::resize(int width, int height)
     glDeleteTextures(1, &m_renderTexture);
     glDeleteTextures(1, &m_voMomentsTexture);
     glDeleteTextures(1, &m_renderDepthBuffer);
-    glDeleteTextures(1, &m_tempTexture);
     glDeleteTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
     glDeleteTextures(m_frustumReduceTextureArrays.size(), m_frustumReduceTextureArrays.data());
 
@@ -932,17 +910,7 @@ void Renderer::resize(int width, int height)
     glGenTextures(1, &m_voMomentsTexture);
     glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, m_width, m_height, 0, GL_RG, GL_FLOAT, 0);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Create TEMP
-    glGenTextures(1, &m_tempTexture);
-    glBindTexture(GL_TEXTURE_2D, m_tempTexture);
-    // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_width, m_height, 0, GL_RED, GL_UNSIGNED_SHORT, 0);
-    // Poor filtering. Needed!
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16, m_width, m_height, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -1019,4 +987,3 @@ void Renderer::resize(int width, int height)
         size = (size-1) / 1 / 256 + 1;
     }
 }
-
