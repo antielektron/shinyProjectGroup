@@ -57,7 +57,10 @@ void Renderer::initialize()
     setShaderSource(loadTextFile("shaders/render/render_depth_only_vertex.glsl"),
                     KEYSTR_PROGRAM_RENDER_DEPTH,
                     QOpenGLShader::Vertex);
-    // No fragment shader, it's empty
+    // We need a fragment shader to write moments:
+    setShaderSource(loadTextFile("shaders/render/render_depth_only_fragment.glsl"),
+                    KEYSTR_PROGRAM_RENDER_DEPTH,
+                    QOpenGLShader::Fragment);
 
     // Shadow Map
     setShaderSource(loadTextFile("shaders/shadowmap_vertex.glsl"),
@@ -382,7 +385,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glDepthFunc(GL_LESS);
 
     // no color attachments
-    glDrawBuffers(0, nullptr);
+    GLuint voAttachement[1] = { GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(1, voAttachement);
 
     renderDepthProgram->bind();
 
