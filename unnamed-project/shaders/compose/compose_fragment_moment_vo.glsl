@@ -81,13 +81,45 @@ void main()
 	float r = abs(rVec1.y - rVec2.y);
 	
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
-	
+	float mmLevel = log2(1./(1. - r)) + 3;
 	// step 4: get filtered Moments
 	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
 	
 	float mean = moments.x;
 	float variance = sqrt(moments.y - pow(mean,2));
+	// step 5: where the magic happens
 	
+    vec4 b = mix(moments, vec4(0.5,0.5,0.5,0.5), 3e-5);
+    vec3 z;
+    z.x = depth-0.005;
+    float L32D22= -b.x * b.y + b.z;
+    float D22= -b.x * b.x + b.y;
+    float SquaredDepthVariance=-b.y * b.y + b.w;
+    float D33D22=dot(vec2(SquaredDepthVariance,-L32D22),
+                     vec2(D22,                  L32D22));
+    float InvD22=1.0/D22;
+    float L32=L32D22*InvD22;
+    vec3 c=vec3(1.0,z.x,z.x*z.x);
+    c.y-=b.x;
+    c.z-=b.y+L32*c.y;
+    c.y*=InvD22;
+    c.z*=D22/D33D22;
+    c.y-=L32*c.z;
+    c.x-=dot(c.yz,b.xy);
+    float p=c.y/c.z;
+    float q=c.x/c.z;
+    float r2=sqrt((p*p*0.25)-q);
+    z.y=-p*0.5-r2;
+    z.z=-p*0.5+r2;
+    vec4 Switch=
+        (z.z<z.x)?vec4(z.y,z.x,1.0,1.0):(
+        (z.y<z.x)?vec4(z.x,z.y,0.0,1.0):
+        vec4(0.0,0.0,0.0,0.0));
+    float Quotient=(Switch.x*z.z-b.x*(Switch.x+z.z)+b.y)
+                  /((z.z-Switch.y)*(z.x-z.y));
+     float result = 1-clamp(Switch.z+Switch.w*Quotient,0,1);
+    //return in4Moments.w;
+
 	
 	
 	//outputColor = vec4(defaultColor.x, defaultColor.y, isInCenterEpsilonArea(mmLevel*0.1), 1.);
