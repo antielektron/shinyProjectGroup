@@ -1,9 +1,9 @@
 #version 150
 
-out vec2 moments;
+out vec4 moments;
 
 void main()
 {
-    float z = gl_FragCoord.z * gl_FragCoord.w;
-    moments = vec2(z, pow(z,2));
+    float z = 1 - gl_FragCoord.z * gl_FragCoord.w;
+    moments = vec4(z, pow(z,2), pow(z,3), pow(z,4));
 }
