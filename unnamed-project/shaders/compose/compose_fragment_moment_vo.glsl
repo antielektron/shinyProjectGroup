@@ -87,7 +87,8 @@ void sampleOptimized4MomentsShadowMap(out vec4 out4Moments, vec4 shadowMapValue)
 
 }
 
-float computeMSMShadwowIntensity(vec4 in4Moments, float depth, float depthBias, float momentBias)
+// Modified MSMShadowIntensity function
+float computeMSMShadwowIntensity(out vec3 outw, out vec3 outz, vec4 in4Moments, float depth, float depthBias, float momentBias)
 {
     vec4 b = mix(in4Moments, vec4(0.5,0.5,0.5,0.5), momentBias);
     vec3 z;
@@ -115,12 +116,33 @@ float computeMSMShadwowIntensity(vec4 in4Moments, float depth, float depthBias, 
         (z.z<z.x)?vec4(z.y,z.x,1.0,1.0):(
         (z.y<z.x)?vec4(z.x,z.y,0.0,1.0):
         vec4(0.0,0.0,0.0,0.0));
+    float sum = (Switch.x*z.z-b.x*(Switch.x+z.z)+b.y);
     float Quotient=(Switch.x*z.z-b.x*(Switch.x+z.z)+b.y)
                   /((z.z-Switch.y)*(z.x-z.y));
+    
+    outz = z;
+    
+    // wild guess: this are the weights we're looking for?
+    outw.x = b.x*(Switch.x+z.z);
+    outw.y = b.y;
+    outw.z = Switch.x*z.z;
+    
     return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
-    //return in4Moments.x;
-  	//return 1 - (Switch.z+Switch.w*Quotient);
 }
+
+float f(float z, float z_a, float z_b)
+{
+	if (z < z_a)
+	{
+		return 1;
+	}
+	if (z >= z_b)
+	{
+		return 0;
+	}
+	return (z-z_a)/(z_b - z_a);
+}
+
 void main()
 {	
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
@@ -140,18 +162,28 @@ void main()
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
 	float mmLevel = log2(1./(1. - r));
 	// step 4: get filtered Moments
-	vec4 moments = textureLod(momentsSampler, uv, 1.);//mmLevel+3);
+	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
 	
 
 	// step 5: where the magic happens
 	vec4 outMoments;
-	sampleOptimized4MomentsShadowMap(outMoments, moments * 100);
-    float momentMagic =  computeMSMShadwowIntensity(outMoments, depth, 0.005, 3e-5);	
+	sampleOptimized4MomentsShadowMap(outMoments, moments);
+	vec3 w;
+	vec3 z;
+    float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.005, 3e-5);	
   
+	float z_a = depth + 1;
+	float z_b = depth - 1;
 	
+	float sum = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		sum += w[i] * f(z[i], z_a, z_b); 
+	}
 	
-	//outputColor = vec4(result, defaultColor.y, isInCenterEpsilonArea(0.01 *obsTerm), 1.);
-    outputColor = vec4( momentMagic,momentMagic,momentMagic,1);
+	outputColor = vec4(0, defaultColor.y, 0,1);
+	//outputColor = vec4(momentMagic, 0, 0,1);
+    outputColor = vec4( sum,sum,sum,1);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     
 }

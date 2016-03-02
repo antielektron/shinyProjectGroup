@@ -4,7 +4,7 @@ out vec4 moments;
 
 void main()
 {
-    float z = (1 - gl_FragCoord.z * gl_FragCoord.w);
+    float z = (gl_FragCoord.z * gl_FragCoord.w);
     //float z =  gl_FragCoord.z * 100;
     vec4 tempmoments = vec4(z, pow(z,2), pow(z,3), pow(z,4));
     
