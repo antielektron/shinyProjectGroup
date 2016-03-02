@@ -21,8 +21,8 @@ const float voShadingAmount = 1.;
 const float dfShadingAmount = 1.;
 
 // TODO: pass this values to shader
-const float worldSpaceRadius = 5;
-const float farPlane = 30;
+const float worldSpaceRadius = 1;
+const float farPlaneDepth = 30;
 
 
 //cursor
@@ -55,6 +55,17 @@ bool isCursor()
 }
 */
 
+float get_world_depth(float z)
+{
+	vec4 result = inverseProjectionMatrix * vec4(0, 0, z, 1);
+	return - result.z/result.w;
+}
+
+float get_linearized_depth(float world_z)
+{
+	return world_z / farPlaneDepth;
+}
+
 bool isInCenterEpsilonArea(float ssRadius)
 {
 	
@@ -67,23 +78,25 @@ bool isInCenterEpsilonArea(float ssRadius)
 
 
 void main()
-{
+{	
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
 
 	// step 1: get depth
 	float depth = textureLod(momentsSampler, uv, 0.).x;
 	
+	float world_depth = get_world_depth(depth);
+	float lin_depth = get_linearized_depth(world_depth);
+	
 	// step 2: claculate r:
-	vec4 rVec1 = projectionMatrix * vec4(0., worldSpaceRadius, -depth * farPlane, 1.);
-	vec4 rVec2 = projectionMatrix * vec4(0., 0, -depth * farPlane, 1.);
-	rVec1 /= rVec1.w;
-	rVec2 /= rVec2.w;
-	float r = abs(rVec1.y - rVec2.y);
+	vec4 rVec1 = projectionMatrix * vec4(0., 2 * worldSpaceRadius, world_depth, 1.);
+	vec4 rVec2 = projectionMatrix * vec4(0., 0, world_depth, 1.);
+	
+	float r = abs(rVec1.y/rVec1.w - rVec2.y/rVec2.w);
 	
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
-	float mmLevel = log2(1./(1. - r)) + 3;
+	float mmLevel = log2(1./(1. - r));
 	// step 4: get filtered Moments
-	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
+	vec4 moments = textureLod(momentsSampler, uv, mmLevel+3);
 	
 	float mean = moments.x;
 	float variance = sqrt(moments.y - pow(mean,2));
@@ -117,13 +130,25 @@ void main()
         vec4(0.0,0.0,0.0,0.0));
     float Quotient=(Switch.x*z.z-b.x*(Switch.x+z.z)+b.y)
                   /((z.z-Switch.y)*(z.x-z.y));
-     float result = 1-clamp(Switch.z+Switch.w*Quotient,0,1);
-    //return in4Moments.w;
+    float result = 1-clamp(Switch.z+Switch.w*0.5,0,1);    
+    
+    // get weights:
+    vec4 weights;
+    weights.x = Quotient * (Switch.x*z.z) / ((z.z-Switch.y)*(z.x-z.y));
+    weights.y = Quotient * b.x*(Switch.x+z.z)/ ((z.z-Switch.y)*(z.x-z.y));
+    weights.z = Quotient * b.y / ((z.z-Switch.y)*(z.x-z.y));
+    weights.w = Switch.z;
+    
+    float obscuranceTerm = 0.0;
+    
+    // calculate obscurance term:
+    float z_a = world_depth - worldSpaceRadius;
+    float z_b = world_depth + worldSpaceRadius;
 
 	
 	
-	//outputColor = vec4(defaultColor.x, defaultColor.y, isInCenterEpsilonArea(mmLevel*0.1), 1.);
-    //outputColor = vec4(0, 0, mmLevel , 1.);
-    outputColor = vec4(0.,0.,variance, 1.);
+	//outputColor = vec4(result, defaultColor.y, isInCenterEpsilonArea(0.01 *obsTerm), 1.);
+    outputColor = vec4(moments.x ,0,0.,1);
+    //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     
 }
