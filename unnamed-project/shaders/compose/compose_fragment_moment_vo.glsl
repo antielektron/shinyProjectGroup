@@ -76,7 +76,51 @@ bool isInCenterEpsilonArea(float ssRadius)
 	return (dx * dx + dy * dy) < (ssRadius * ssRadius); 
 }
 
+void sampleOptimized4MomentsShadowMap(out vec4 out4Moments, vec4 shadowMapValue)
+{
+    shadowMapValue.x -= 0.035955884801f;
+    out4Moments = transpose(mat4( 0.2227744146,   0.0771972861,   0.7926986636,   0.0319417555,
+                    0.1549679261,   0.1394629426,   0.7963415838,   -0.172282317,
+                    0.1451988946,   0.2120202157,   0.7258694464,   -0.2758014811,
+                    0.163127443,    0.2591432266,   0.6539092497,   -0.3376131734 ))
+                    * shadowMapValue;
 
+}
+
+float computeMSMShadwowIntensity(vec4 in4Moments, float depth, float depthBias, float momentBias)
+{
+    vec4 b = mix(in4Moments, vec4(0.5,0.5,0.5,0.5), momentBias);
+    vec3 z;
+    z.x = depth-depthBias;
+    float L32D22= -b.x * b.y + b.z;
+    float D22= -b.x * b.x + b.y;
+    float SquaredDepthVariance=-b.y * b.y + b.w;
+    float D33D22=dot(vec2(SquaredDepthVariance,-L32D22),
+                     vec2(D22,                  L32D22));
+    float InvD22=1.0/D22;
+    float L32=L32D22*InvD22;
+    vec3 c=vec3(1.0,z.x,z.x*z.x);
+    c.y-=b.x;
+    c.z-=b.y+L32*c.y;
+    c.y*=InvD22;
+    c.z*=D22/D33D22;
+    c.y-=L32*c.z;
+    c.x-=dot(c.yz,b.xy);
+    float p=c.y/c.z;
+    float q=c.x/c.z;
+    float r=sqrt((p*p*0.25)-q);
+    z.y=-p*0.5-r;
+    z.z=-p*0.5+r;
+    vec4 Switch=
+        (z.z<z.x)?vec4(z.y,z.x,1.0,1.0):(
+        (z.y<z.x)?vec4(z.x,z.y,0.0,1.0):
+        vec4(0.0,0.0,0.0,0.0));
+    float Quotient=(Switch.x*z.z-b.x*(Switch.x+z.z)+b.y)
+                  /((z.z-Switch.y)*(z.x-z.y));
+    return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
+    //return in4Moments.x;
+  	//return 1 - (Switch.z+Switch.w*Quotient);
+}
 void main()
 {	
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
@@ -96,59 +140,18 @@ void main()
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
 	float mmLevel = log2(1./(1. - r));
 	// step 4: get filtered Moments
-	vec4 moments = textureLod(momentsSampler, uv, mmLevel+3);
+	vec4 moments = textureLod(momentsSampler, uv, 1.);//mmLevel+3);
 	
-	float mean = moments.x;
-	float variance = sqrt(moments.y - pow(mean,2));
-	// step 5: where the magic happens
-	
-    vec4 b = mix(moments, vec4(0.5,0.5,0.5,0.5), 3e-5);
-    vec3 z;
-    z.x = depth-0.005;
-    float L32D22= -b.x * b.y + b.z;
-    float D22= -b.x * b.x + b.y;
-    float SquaredDepthVariance=-b.y * b.y + b.w;
-    float D33D22=dot(vec2(SquaredDepthVariance,-L32D22),
-                     vec2(D22,                  L32D22));
-    float InvD22=1.0/D22;
-    float L32=L32D22*InvD22;
-    vec3 c=vec3(1.0,z.x,z.x*z.x);
-    c.y-=b.x;
-    c.z-=b.y+L32*c.y;
-    c.y*=InvD22;
-    c.z*=D22/D33D22;
-    c.y-=L32*c.z;
-    c.x-=dot(c.yz,b.xy);
-    float p=c.y/c.z;
-    float q=c.x/c.z;
-    float r2=sqrt((p*p*0.25)-q);
-    z.y=-p*0.5-r2;
-    z.z=-p*0.5+r2;
-    vec4 Switch=
-        (z.z<z.x)?vec4(z.y,z.x,1.0,1.0):(
-        (z.y<z.x)?vec4(z.x,z.y,0.0,1.0):
-        vec4(0.0,0.0,0.0,0.0));
-    float Quotient=(Switch.x*z.z-b.x*(Switch.x+z.z)+b.y)
-                  /((z.z-Switch.y)*(z.x-z.y));
-    float result = 1-clamp(Switch.z+Switch.w*0.5,0,1);    
-    
-    // get weights:
-    vec4 weights;
-    weights.x = Quotient * (Switch.x*z.z) / ((z.z-Switch.y)*(z.x-z.y));
-    weights.y = Quotient * b.x*(Switch.x+z.z)/ ((z.z-Switch.y)*(z.x-z.y));
-    weights.z = Quotient * b.y / ((z.z-Switch.y)*(z.x-z.y));
-    weights.w = Switch.z;
-    
-    float obscuranceTerm = 0.0;
-    
-    // calculate obscurance term:
-    float z_a = world_depth - worldSpaceRadius;
-    float z_b = world_depth + worldSpaceRadius;
 
+	// step 5: where the magic happens
+	vec4 outMoments;
+	sampleOptimized4MomentsShadowMap(outMoments, moments * 100);
+    float momentMagic =  computeMSMShadwowIntensity(outMoments, depth, 0.005, 3e-5);	
+  
 	
 	
 	//outputColor = vec4(result, defaultColor.y, isInCenterEpsilonArea(0.01 *obsTerm), 1.);
-    outputColor = vec4(moments.x ,0,0.,1);
+    outputColor = vec4( momentMagic,momentMagic,momentMagic,1);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     
 }
