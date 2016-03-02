@@ -199,10 +199,16 @@ void BulletGame::updateBulletGeometry(ObjectBase *obj)
         auto object = static_cast<Object *>(obj);
         auto body = static_cast<btRigidBody *>(object->getUserPointer());
 
+        auto oldOrigin = body->getWorldTransform().getOrigin();
+
         btTransform transformation;
         transformation.setFromOpenGLMatrix(object->getWorld().constData());
         body->setWorldTransform(transformation);
 
+        auto newOrigin = body->getWorldTransform().getOrigin();
+
+        // body->setLinearVelocity((newOrigin - oldOrigin) * 60 );
+        // body->setMassProps(10000, btVector3(0, 0, 0));
     }
 }
 
@@ -301,6 +307,7 @@ void BulletGame::loadScene(const QString &filename)
 
         // TODO save body - object pair
         btRigidBody *body = new btRigidBody(0, nullptr, it->second, btVector3(0, 0, 0)); // No inertia
+        body->setFriction(30);
         body->setWorldTransform(transformation);
 
         // link body and object together!

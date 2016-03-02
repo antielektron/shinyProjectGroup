@@ -78,6 +78,14 @@
             <DiffuseColor x="0.5" y="0.5" z="0.5"/>
             <AmbientColor x="0.4" y="0.4" z="0.4"/>
         </Object>
+        <Object name="moving_floor" model="floor" interactionEvent="">
+            <Position x="17" y="-4" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
     </Objects>
     <Attributes/>
     <Events>
@@ -144,6 +152,20 @@
         <Event name="enable bucket" description="">
             <Action type="bmov" lhs="bucket_moving" rhs="0"/>
         </Event>
+        <Event name="init" description="">
+            <Action type="imov" lhs="moving_floor_pos" rhs="10"/>
+            <Action type="animpos" x="17" y="-4" z="[moving_floor_pos]" object="moving_floor">
+                <Interpolation type="linear" duration="5"/>
+            </Action>
+            <Action type="trigger" name="turn_floor" delay="5"/>
+        </Event>
+        <Event name="turn_floor" description="">
+            <Action type="imul" lhs="moving_floor_pos" rhs="-1"/>
+            <Action type="animpos" x="17" y="-4" z="[moving_floor_pos]" object="moving_floor">
+                <Interpolation type="linear" duration="10"/>
+            </Action>
+            <Action type="trigger" name="turn_floor" delay="10"/>
+        </Event>
     </Events>
     <Animators/>
     <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
@@ -151,4 +173,5 @@
         <Position x="0" y="0" z="5"/>
         <Rotation x="0" y="0" z="0"/>
     </Player>
+    <ShaderConfig file="shaders/configurations/defaultConfig.xml"/>
 </Scene>
