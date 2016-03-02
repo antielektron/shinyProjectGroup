@@ -207,8 +207,9 @@ void BulletGame::updateBulletGeometry(ObjectBase *obj)
 
         auto newOrigin = body->getWorldTransform().getOrigin();
 
-        // body->setLinearVelocity((newOrigin - oldOrigin) * 60 );
-        // body->setMassProps(10000, btVector3(0, 0, 0));
+        // TODO set angular velocity!
+        // TODO dynamic framerate
+        body->setLinearVelocity((newOrigin - oldOrigin) * 60);
     }
 }
 
@@ -305,16 +306,28 @@ void BulletGame::loadScene(const QString &filename)
         btTransform transformation;
         transformation.setFromOpenGLMatrix(object->getWorld().constData());
 
+
         // TODO save body - object pair
         btRigidBody *body = new btRigidBody(0, nullptr, it->second, btVector3(0, 0, 0)); // No inertia
-        body->setFriction(30);
         body->setWorldTransform(transformation);
+        body->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
+        m_bulletWorld->addRigidBody(body);
 
         // link body and object together!
         body->setUserPointer(object);
         object->setUserPointer(body);
 
-        m_bulletWorld->addRigidBody(body);
+        /*
+        btCollisionObject *collisionObject = new btCollisionObject();
+        collisionObject->setCollisionShape(it->second);
+        collisionObject->setWorldTransform(transformation);
+        m_bulletWorld->addCollisionObject(collisionObject);
+
+        collisionObject->setCollisionFlags(btCollisionObject::CF_KINEMATIC_OBJECT);
+
+        collisionObject->setUserPointer(object);
+        object->setUserPointer(collisionObject);
+        */
     }
 
     // Add player to bullet world
