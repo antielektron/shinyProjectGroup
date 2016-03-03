@@ -155,7 +155,8 @@ void main()
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
 	float mmLevel = log2(1./(1. - r));
 	// step 4: get filtered Moments
-	vec4 moments = textureLod(momentsSampler, uv, mmLevel + 3);
+	mmLevel = mmLevel * 0.9 + 1;
+	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
 	
 
 	// step 5: where the magic happens
@@ -173,13 +174,13 @@ void main()
 	{
 		sum += w[i] * f(z[i],z_a, z_b); 
 	}
-	
-	sum ;
+	sum -= 1;
+	defaultColor = sum * defaultColor;
 	
 	//outputColor = vec4(0, defaultColor.y, 0,1);
 	//outputColor = vec4(momentMagic, 0, 0,1);
     outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(sum * 0.5),1);
-    outputColor = vec4(sum, sum, sum, 1.0);
+    outputColor = vec4(defaultColor, 1.0);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     
 }
