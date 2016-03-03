@@ -88,7 +88,7 @@ void sampleOptimized4MomentsShadowMap(out vec4 out4Moments, vec4 shadowMapValue)
 }
 
 // Modified MSMShadowIntensity function
-float computeMSMShadwowIntensity(out vec3 outw, out vec3 outz, vec4 in4Moments, float depth, float depthBias, float momentBias)
+float computeMSMShadwowIntensity(out vec3 Weight, out vec3 outz, vec4 in4Moments, float depth, float depthBias, float momentBias)
 {
     vec4 b = mix(in4Moments, vec4(0.5,0.5,0.5,0.5), momentBias);
     vec3 z;
@@ -123,10 +123,10 @@ float computeMSMShadwowIntensity(out vec3 outw, out vec3 outz, vec4 in4Moments, 
     outz = z;
     
     // wild guess: this are the weights we're looking for?
-    outw.x = b.x*(Switch.x+z.z);
-    outw.y = b.y;
-    outw.z = Switch.x*z.z;
     
+	Weight.x=(z.y*z.z-b.x*(z.y+z.z)+b.y)/((z.x-z.y)*(z.x-z.z));
+	Weight.y=(z.x*z.z-b.x*(z.x+z.z)+b.x)/((z.z-z.y)*(z.x-z.y));
+	Weight.z=1.0-Weight.x-Weight.y;
     return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
 }
 
@@ -181,9 +181,9 @@ void main()
 		sum += w[i] * f(z[i], z_a, z_b); 
 	}
 	
-	outputColor = vec4(0, defaultColor.y, 0,1);
+	//outputColor = vec4(0, defaultColor.y, 0,1);
 	//outputColor = vec4(momentMagic, 0, 0,1);
-    outputColor = vec4( sum,sum,sum,1);
+    outputColor = vec4( w.x,w.y,w.z,1);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     
 }
