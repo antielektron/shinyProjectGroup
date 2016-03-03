@@ -75,6 +75,8 @@ protected:
     // Render Depth Shader
     int m_depthOnlyModelViewMatrixLoc;
     int m_depthOnlyProjectionMatrixLoc;
+    int m_depthOnlyInverseProjectionMatrixLoc;
+    int m_depthOnlySceneDepth;
 
     // ShadowMap Shader
     int m_shadowMapWorldMatrixLoc;

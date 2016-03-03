@@ -146,6 +146,8 @@ void Renderer::initialize()
     // Render Depth
     m_uniformLocs[KEYSTR_PROGRAM_RENDER_DEPTH].emplace_back(&m_depthOnlyModelViewMatrixLoc, "modelViewMatrix");
     m_uniformLocs[KEYSTR_PROGRAM_RENDER_DEPTH].emplace_back(&m_depthOnlyProjectionMatrixLoc, "projectionMatrix");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_DEPTH].emplace_back(&m_depthOnlyInverseProjectionMatrixLoc, "inverseProjectionMatrix");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_DEPTH].emplace_back(&m_depthOnlySceneDepth, "sceneDepth");
 
     m_attribLocs[KEYSTR_PROGRAM_RENDER_DEPTH].emplace_back(0, "v_position");
     m_attribLocs[KEYSTR_PROGRAM_RENDER_DEPTH].emplace_back(1, "v_normal");
@@ -391,6 +393,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     renderDepthProgram->bind();
 
     renderDepthProgram->setUniformValue(m_depthOnlyProjectionMatrixLoc, cameraProjection);
+    renderDepthProgram->setUniformValue(m_depthOnlyInverseProjectionMatrixLoc, inverseCameraProjection);
+    renderDepthProgram->setUniformValue(m_depthOnlySceneDepth, 100);
 
     // Render regular objects
     for (auto &object : scene->getObjects())

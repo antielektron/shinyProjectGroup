@@ -21,8 +21,8 @@ const float voShadingAmount = 1.;
 const float dfShadingAmount = 1.;
 
 // TODO: pass this values to shader
-const float worldSpaceRadius = 1;
-const float farPlaneDepth = 30;
+const float worldSpaceRadius = 0.05;
+const float sceneDepth = 100;
 
 
 //cursor
@@ -57,13 +57,7 @@ bool isCursor()
 
 float get_world_depth(float z)
 {
-	vec4 result = inverseProjectionMatrix * vec4(0, 0, z, 1);
-	return - result.z/result.w;
-}
-
-float get_linearized_depth(float world_z)
-{
-	return world_z / farPlaneDepth;
+	return z * sceneDepth;
 }
 
 bool isInCenterEpsilonArea(float ssRadius)
@@ -148,10 +142,9 @@ void main()
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
 
 	// step 1: get depth
-	float depth = 1 - textureLod(momentsSampler, uv,0).x;
+	float depth = textureLod(momentsSampler, uv,0).x;
 	
 	float world_depth = get_world_depth(depth);
-	float lin_depth = get_linearized_depth(world_depth);
 	
 	// step 2: claculate r:
 	vec4 rVec1 = projectionMatrix * vec4(0., 2 * worldSpaceRadius, world_depth, 1.);
@@ -185,7 +178,7 @@ void main()
 	
 	//outputColor = vec4(0, defaultColor.y, 0,1);
 	//outputColor = vec4(momentMagic, 0, 0,1);
-    outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(w.z),1);
+    outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(sum * 0.5),1);
     outputColor = vec4(sum, sum, sum, 1.0);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     

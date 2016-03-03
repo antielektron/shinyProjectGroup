@@ -2,11 +2,22 @@
 
 out vec4 moments;
 uniform mat4 inverseProjectionMatrix;
-const float farPlaneDepth = 30;
+const float sceneDepth = 50;
+
+float get_world_depth(float z)
+{
+	vec4 result = inverseProjectionMatrix * vec4(0, 0, z, 1);
+	return - result.z/result.w;
+}
+
+float get_linearized_depth(float world_z)
+{
+	return world_z / sceneDepth;
+}
 
 void main()
 {
-    float z = (gl_FragCoord.z);
+    float z = get_linearized_depth(get_world_depth(gl_FragCoord.z));
     //float z =  gl_FragCoord.z * 100;
     vec4 tempmoments = vec4(z, pow(z,2), pow(z,3), pow(z,4));
     
