@@ -148,7 +148,7 @@ void main()
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
 
 	// step 1: get depth
-	float depth = textureLod(momentsSampler, uv, 0.).x;
+	float depth = 1 - textureLod(momentsSampler, uv,0).x;
 	
 	float world_depth = get_world_depth(depth);
 	float lin_depth = get_linearized_depth(world_depth);
@@ -162,7 +162,7 @@ void main()
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
 	float mmLevel = log2(1./(1. - r));
 	// step 4: get filtered Moments
-	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
+	vec4 moments = textureLod(momentsSampler, uv, mmLevel + 3);
 	
 
 	// step 5: where the magic happens
@@ -172,18 +172,21 @@ void main()
 	vec3 z;
     float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.005, 3e-5);	
   
-	float z_a = depth + 1;
-	float z_b = depth - 1;
+	float z_a = depth + 0.1;
+	float z_b = depth - 0.1;
 	
 	float sum = 0;
 	for (int i = 0; i < 3; i++)
 	{
-		sum += w[i] * f(z[i], z_a, z_b); 
+		sum += w[i] * f(z[i],z_a, z_b); 
 	}
+	
+	sum ;
 	
 	//outputColor = vec4(0, defaultColor.y, 0,1);
 	//outputColor = vec4(momentMagic, 0, 0,1);
-    outputColor = vec4( w.x,w.y,w.z,1);
+    outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(w.z),1);
+    outputColor = vec4(sum, sum, sum, 1.0);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     
 }

@@ -1,10 +1,12 @@
 #version 150
 
 out vec4 moments;
+uniform mat4 inverseProjectionMatrix;
+const float farPlaneDepth = 30;
 
 void main()
 {
-    float z = (gl_FragCoord.z * gl_FragCoord.w);
+    float z = (gl_FragCoord.z);
     //float z =  gl_FragCoord.z * 100;
     vec4 tempmoments = vec4(z, pow(z,2), pow(z,3), pow(z,4));
     
