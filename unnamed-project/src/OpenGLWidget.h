@@ -59,6 +59,8 @@ private:
     std::unique_ptr<RendererBase> m_renderer;
 	std::unique_ptr<KeyManager> m_keyManager;
 
+	std::unique_ptr<QWidget> m_rendererDebugWidget;
+
 	bool m_prevShouldCatchMouse;
 
     float m_fps;

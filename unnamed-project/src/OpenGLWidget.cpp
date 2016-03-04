@@ -7,6 +7,7 @@
 OpenGLWidget::OpenGLWidget(QWidget *parent) :
     QOpenGLWidget(parent),
     m_renderer(new Renderer()),
+    m_rendererDebugWidget(m_renderer->createDebugWidget()),
     m_initialized(false)
 {
     // enformce opengl version
@@ -30,6 +31,7 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) :
 OpenGLWidget::OpenGLWidget(std::shared_ptr<IGame> game, QWidget *parent) :
     QOpenGLWidget(parent),
     m_renderer(new Renderer()),
+    m_rendererDebugWidget(m_renderer->createDebugWidget()),
     m_game(std::move(game)),
     m_initialized(false)
 {
@@ -64,6 +66,7 @@ void OpenGLWidget::setGame(std::shared_ptr<IGame> game)
 void OpenGLWidget::setRenderer(std::unique_ptr<RendererBase> renderer)
 {
     m_renderer = std::move(renderer);
+    m_rendererDebugWidget.reset(m_renderer->createDebugWidget());
 }
 
 RendererBase *OpenGLWidget::getRenderer()
@@ -199,6 +202,11 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void OpenGLWidget::keyPressEvent(QKeyEvent * event)
 {
+    if (event->key() == Qt::Key_F1)
+    {
+        m_rendererDebugWidget->show();
+    }
+
 	m_keyManager->pressKey(event->key());
 }
 

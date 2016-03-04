@@ -30,6 +30,10 @@ uniform sampler2DArray shadowMapSampler;
 const float roughness = 0.1;
 const float fresnelFactor = 1.;
 
+
+uniform bool colorizeCascades;
+
+
 out vec4 fragColor;
 out vec2 moments;
 
@@ -196,17 +200,18 @@ void main()
     float scaledZ = gl_FragCoord.z*gl_FragCoord.w;
     fragColor = vec4(clamp(shadowTerm * (shadedColor) + ambientColor, 0., 1.), scaledZ);
 
-        /*
-    int index = getCascade();
-    if (index == 0)
-        fragColor.xyz *= vec3(1., 0., 0.);
-    else if (index == 1)
-        fragColor.xyz *= vec3(0., 1., 0.);
-    else if (index == 2)
-        fragColor.xyz *= vec3(0., 0., 1.);
-    else if (index == 3)
-        fragColor.xyz *= vec3(1., 1., 0.);
-        */
+    if (colorizeCascades)
+    {
+        int index = getCascade();
+        if (index == 0)
+            fragColor.xyz *= vec3(1., 0., 0.);
+        else if (index == 1)
+            fragColor.xyz *= vec3(0., 1., 0.);
+        else if (index == 2)
+            fragColor.xyz *= vec3(0., 0., 1.);
+        else if (index == 3)
+            fragColor.xyz *= vec3(1., 1., 0.);
+    }
 
     moments = vec2(scaledZ, pow(scaledZ,2));
 }

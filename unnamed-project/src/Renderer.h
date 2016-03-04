@@ -28,6 +28,7 @@
 
 #define KEYSTR_PROGRAM_CREATE_CASCADE_FARS      "Create Cascade Fars"
 #define KEYSTR_PROGRAM_CREATE_CASCADE_VIEWS     "Create Cascade Views"
+#define KEYSTR_PROGRAM_CREATE_CASCADES_CPU      "Create Cascades CPU"
 
 #define NUM_VO_MIPMAP_LEVELS 10 //so there's a height of 1 pixel @toplevel for full-HD
 
@@ -41,7 +42,22 @@ public:
     virtual void initialize() override;
     virtual void resize(int width, int height) override;
 
+    virtual QWidget *createDebugWidget(QWidget *parent) override;
 
+    enum CascadeStrategy
+    {
+        CascadedShadowMaps,
+        SampleDistributionShadowMaps
+    };
+
+    void setColorizeCascades(bool enabled);
+    bool getColorizeCascades();
+
+    void setCascadedShadowMapsLambda(float lambda);
+    float getCascadedShadowMapsLambda();
+
+    void setCascadeStrategy(CascadeStrategy strategy);
+    CascadeStrategy getCascadeStrategy();
 
 protected:
     virtual void onRenderingInternal(GLuint fbo, Scene *scene) override;
@@ -50,6 +66,14 @@ protected:
                               QMatrix4x4 &matrix);
     void createLightViewMatrix(const QVector3D &lightDir, const QMatrix4x4 &inverseCameraView, QMatrix4x4 &matrix);
     void createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransformation, QMatrix4x4 &matrix);
+
+    // Options
+    bool m_colorizeCascades;
+    float m_cascadedShadowMapsLambda;
+    CascadeStrategy m_cascadeStrategy;
+
+    // TODO shadowMapSize as option
+    // (TODO cascade couunt as option)
 
     GLsizei m_width;
     GLsizei m_height;
@@ -71,6 +95,7 @@ protected:
     int m_diffuseColorLoc;
     int m_ambientColorLoc;
     int m_shadowMapSamplerLoc;
+    int m_colorizeCascadesLoc;
 
     // Render Depth Shader
     int m_depthOnlyModelViewMatrixLoc;
@@ -111,10 +136,13 @@ protected:
 
     int m_createCascadeFarsCameraProjectionLoc;
     int m_createCascadeFarsInverseCameraProjectionLoc;
+    int m_createCascadeFarsLambdaLoc;
 
     int m_createCascadeViewsInvTempProjMatrixLoc;
     int m_createCascadeViewsLightViewMatrixLoc;
 
+    int m_createCascadesCpuCascadeFarLoc;
+    int m_createCascadesCpuCascadeViewMatrixLoc;
 
     QOpenGLVertexArrayObject m_quadVao;
     QOpenGLBuffer m_quadVbo;

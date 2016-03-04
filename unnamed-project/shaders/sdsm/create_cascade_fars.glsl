@@ -10,8 +10,10 @@ layout (binding = 1) writeonly buffer cascadeFarBuffer
 uniform mat4 cameraProjectionMatrix;
 uniform mat4 inverseCameraProjectionMatrix;
 
+
 // Coefficient for combining uniform and logarithmic results
-const float lambdaUniLog = 0.3;
+uniform float lambda;
+
 
 layout (local_size_x = 4) in;
 
@@ -37,7 +39,7 @@ void main()
     float cLog = nearPlane * pow(farPlane / nearPlane, farIndex);
 
     // combine cLog and cUni
-    float currentZ = lambdaUniLog * cUni + (1. - lambdaUniLog) * cLog;
+    float currentZ = (1 - lambda) * cUni + lambda * cLog;
 
     // z in screen space!
     vec4 screenPos = cameraProjectionMatrix * vec4(0, 0, currentZ, 1);

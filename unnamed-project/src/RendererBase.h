@@ -136,6 +136,8 @@ public:
 
     virtual void requestSingleFrameRendering();
 
+    virtual QWidget *createDebugWidget(QWidget *parent = nullptr) = 0;
+
 protected:
     virtual void onRenderingInternal(GLuint fbo, Scene *scene) = 0;
 

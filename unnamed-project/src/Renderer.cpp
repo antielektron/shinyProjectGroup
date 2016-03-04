@@ -13,16 +13,22 @@
 #include "Renderer.h"
 #include "Scene/Scene.h"
 
+#include "RendererDebugWidget.h"
+
 #include "MathUtility.h"
 
 #include "utility.h"
 
 
 Renderer::Renderer() : RendererBase(),
-    m_renderFrameBuffer(0),
-    m_renderTexture(0),
-    m_voMomentsTexture(0),
-    m_renderDepthBuffer(0)
+        m_renderFrameBuffer(0),
+        m_renderTexture(0),
+        m_voMomentsTexture(0),
+        m_renderDepthBuffer(0),
+        // Options
+        m_colorizeCascades(false),
+        m_cascadedShadowMapsLambda(1),
+        m_cascadeStrategy(SampleDistributionShadowMaps)
 {
     // nothing to do here
 }
@@ -111,6 +117,10 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_CREATE_CASCADE_VIEWS,
                     QOpenGLShader::Compute);
 
+    setShaderSource(loadTextFile("shaders/csm/create_cascades.glsl"),
+                    KEYSTR_PROGRAM_CREATE_CASCADES_CPU,
+                    QOpenGLShader::Compute);
+
 
     // Gauss Filter shaders
     setShaderSource(loadTextFile("shaders/filter/vertical_gauss.glsl"),
@@ -138,6 +148,7 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].emplace_back(&m_diffuseColorLoc, "diffuseColor");
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].emplace_back(&m_ambientColorLoc, "ambientColor");
     m_uniformLocs[KEYSTR_PROGRAM_RENDER].emplace_back(&m_shadowMapSamplerLoc, "shadowMapSampler");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER].emplace_back(&m_colorizeCascadesLoc, "colorizeCascades");
 
     m_attribLocs[KEYSTR_PROGRAM_RENDER].emplace_back(0, "v_position");
     m_attribLocs[KEYSTR_PROGRAM_RENDER].emplace_back(1, "v_normal");
@@ -184,9 +195,13 @@ void Renderer::initialize()
 
     m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADE_FARS].emplace_back(&m_createCascadeFarsCameraProjectionLoc, "cameraProjectionMatrix");
     m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADE_FARS].emplace_back(&m_createCascadeFarsInverseCameraProjectionLoc, "inverseCameraProjectionMatrix");
+    m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADE_FARS].emplace_back(&m_createCascadeFarsLambdaLoc, "lambda");
 
     m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADE_VIEWS].emplace_back(&m_createCascadeViewsLightViewMatrixLoc, "lightViewMatrix");
     m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADE_VIEWS].emplace_back(&m_createCascadeViewsInvTempProjMatrixLoc, "inverseTempProjectionMatrix");
+
+    m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADES_CPU].emplace_back(&m_createCascadesCpuCascadeFarLoc, "inputCascadeFar");
+    m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADES_CPU].emplace_back(&m_createCascadesCpuCascadeViewMatrixLoc, "inputCascadeViewMatrix");
 
 
     // create Programs:
@@ -201,6 +216,7 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_REDUCE_FRUSTUM);
     createProgram(KEYSTR_PROGRAM_CREATE_CASCADE_FARS);
     createProgram(KEYSTR_PROGRAM_CREATE_CASCADE_VIEWS);
+    createProgram(KEYSTR_PROGRAM_CREATE_CASCADES_CPU);
     createProgram(KEYSTR_PROGRAM_HORIZONTAL_GAUSS);
     createProgram(KEYSTR_PROGRAM_VERTICAL_GAUSS);
     createProgram(KEYSTR_PROGRAM_CREATE_MOMENTS);
@@ -356,6 +372,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *reduceFrustumProgram = m_programs[KEYSTR_PROGRAM_REDUCE_FRUSTUM].get();
     QOpenGLShaderProgram *createCascadeFars = m_programs[KEYSTR_PROGRAM_CREATE_CASCADE_FARS].get();
     QOpenGLShaderProgram *createCascadeViews = m_programs[KEYSTR_PROGRAM_CREATE_CASCADE_VIEWS].get();
+    QOpenGLShaderProgram *createCascadesCpu = m_programs[KEYSTR_PROGRAM_CREATE_CASCADES_CPU].get();
     QOpenGLShaderProgram *copyProgram = m_programs[KEYSTR_PROGRAM_COPY].get();
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
@@ -429,133 +446,263 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     // 2. Compute shadow map projection matrices
 
-    // 2.1 Reduce min/max depth
-    // round up
-    GLsizei initWidth = (m_width-1) / 2 / 16 + 1;
-    GLsizei initHeight = (m_height-1) / 2 / 16 + 1;
-
-    reduceDepthSamplerProgram->bind();
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
-
-    reduceDepthSamplerProgram->setUniformValue(m_reduceDepthInputSizeLoc, m_width, m_height);
-
-    glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
-
-    // for every new pixel spawn a thread group!
-    glDispatchCompute(initWidth, initHeight, 1);
-
-    reduceDepthSamplerProgram->release();
-
-    // size of first reduction result
-    GLsizei size = initWidth*initHeight;
-
-    reduceDepthProgram->bind();
-
-    for (int i = 1; i < m_depthReduceTextures.size(); i++)
+    switch (m_cascadeStrategy)
     {
-        glBindImageTexture(0, m_depthReduceTextures[i-1], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
-        glBindImageTexture(1, m_depthReduceTextures[i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
+        case SampleDistributionShadowMaps:
+        {
+            // 2.1a Reduce min/max depth
+            // round up
+            GLsizei initWidth = (m_width-1) / 2 / 16 + 1;
+            GLsizei initHeight = (m_height-1) / 2 / 16 + 1;
 
-        // round up
-        size = (size-1) / 1 / 256 + 1;
+            reduceDepthSamplerProgram->bind();
 
-        // for every new pixel spawn a thread group!
-        glDispatchCompute(size, 1, 1);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+
+            reduceDepthSamplerProgram->setUniformValue(m_reduceDepthInputSizeLoc, m_width, m_height);
+
+            glBindImageTexture(1, m_depthReduceTextures[0], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
+
+            // for every new pixel spawn a thread group!
+            glDispatchCompute(initWidth, initHeight, 1);
+
+            reduceDepthSamplerProgram->release();
+
+            // size of first reduction result
+            GLsizei size = initWidth*initHeight;
+
+            reduceDepthProgram->bind();
+
+            for (int i = 1; i < m_depthReduceTextures.size(); i++)
+            {
+                glBindImageTexture(0, m_depthReduceTextures[i-1], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
+                glBindImageTexture(1, m_depthReduceTextures[i], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
+
+                // round up
+                size = (size-1) / 1 / 256 + 1;
+
+                // for every new pixel spawn a thread group!
+                glDispatchCompute(size, 1, 1);
+            }
+
+            reduceDepthProgram->release();
+
+            // Compute view matrix for light (light direction -> Z, camera Z -> X)
+            QMatrix4x4 lightViewMatrix;
+            createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
+
+            // Compute view frustum of camera in light view
+            auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
+
+            // Projection matrix that wraps whole camera frustum
+            QMatrix4x4 tempLightProjection;
+            createFrustumProjectionMatrix(screenToLightTransformation, tempLightProjection);
+
+
+            // 2.2a Compute near and far plane for cascades! (on GPU!)
+            createCascadeFars->bind();
+
+            createCascadeFars->setUniformValue(m_createCascadeFarsCameraProjectionLoc, cameraProjection);
+            createCascadeFars->setUniformValue(m_createCascadeFarsInverseCameraProjectionLoc, inverseCameraProjection);
+            createCascadeFars->setUniformValue(m_createCascadeFarsLambdaLoc, m_cascadedShadowMapsLambda);
+
+            glBindImageTexture(0, m_depthReduceTextures.back(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
+
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_cascadeFarBuffer);
+
+            glDispatchCompute(1, 1, 1);
+
+            createCascadeFars->release();
+
+
+            // 2.3a Reduce bbox for each cascade
+            // round up
+            initWidth = (m_width-1) / 2 / 16 + 1;
+            initHeight = (m_height-1) / 2 / 16 + 1;
+
+            reduceFrustumSamplerProgram->bind();
+
+            reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumInputSizeLoc, m_width, m_height);
+            reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumScreenToLightMatrixLoc, tempLightProjection * screenToLightTransformation);
+            // reduceFrustumSamplerProgram->setUniformValueArray(m_reduceFrustumCascadeFarLoc, cascadeFars.data(), m_cascades-1, 1);
+
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_cascadeFarBuffer);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+
+            glBindImageTexture(1, m_frustumReduceTextureArrays[0], 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
+
+            // for every new pixel spawn a thread group!
+            glDispatchCompute(initWidth, initHeight, 1);
+
+            reduceFrustumSamplerProgram->release();
+
+            // size of first reduction result
+            size = initWidth*initHeight;
+
+            reduceFrustumProgram->bind();
+
+            for (int i = 1; i < m_frustumReduceTextureArrays.size(); i++)
+            {
+                glBindImageTexture(0, m_frustumReduceTextureArrays[i-1], 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16);
+                glBindImageTexture(1, m_frustumReduceTextureArrays[i], 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
+
+                // round up
+                size = (size-1) / 1 / 256 + 1;
+
+                // for every new pixel spawn a thread group!
+                glDispatchCompute(size, 1, 1);
+                // NVIDIA gpu's are too aggressive here..
+                glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+            }
+
+            reduceFrustumProgram->release();
+
+
+            // 2.4a Compute cascade projection matrices on GPU!
+            createCascadeViews->bind();
+
+            auto inverseTempLightProjection = tempLightProjection.inverted();
+            createCascadeViews->setUniformValue(m_createCascadeViewsInvTempProjMatrixLoc, inverseTempLightProjection);
+            createCascadeViews->setUniformValue(m_createCascadeViewsLightViewMatrixLoc, lightViewMatrix * inverseCameraView);
+
+            glBindImageTexture(0, m_frustumReduceTextureArrays.back(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16);
+
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_cascadeViewBuffer);
+
+            glDispatchCompute(1, 1, 1);
+
+            createCascadeViews->release();
+        } break;
+
+
+        case CascadedShadowMaps:
+        {
+            // 2.1b Compute Z-Partitions
+            std::vector<float> cascadeFars;
+            std::vector<QMatrix4x4> cascadeViews;
+
+            // Compute view matrix for light (light direction -> Z, camera Z -> X)
+            QMatrix4x4 lightViewMatrix;
+            createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
+
+            // Compute view frustum of camera in light view
+            auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
+
+            // For interpolation of frustum corners
+            QVector3D frustumNearCorners[] = {
+                    { -1, -1, -1 },
+                    {  1, -1, -1 },
+                    { -1,  1, -1 },
+                    {  1,  1, -1 }
+            };
+            QVector3D frustumFarCorners[] = {
+                    { -1, -1,  1 },
+                    {  1, -1,  1 },
+                    { -1,  1,  1 },
+                    {  1,  1,  1 }
+            };
+
+            // For finding near/far plane
+            QVector3D frustumNearFarPoints[] = {
+                    { 0, 0, -1},
+                    { 0, 0,  1}
+            };
+
+            // Project frustum corners into light view space
+            MathUtility::transformVectors(screenToLightTransformation, frustumNearCorners);
+            MathUtility::transformVectors(screenToLightTransformation, frustumFarCorners);
+            MathUtility::transformVectors(inverseCameraProjection, frustumNearFarPoints);
+
+            // Looking into nevative Z direction!
+            float nearZ = -frustumNearFarPoints[0].z();
+            float farZ = -frustumNearFarPoints[1].z();
+
+            for (int i = 0; i < m_cascades; i++)
+            {
+                // Redundant computations... I don't care!
+                float nearIndex = i/4.f;
+                float cNearUni = nearZ + (farZ - nearZ) * nearIndex;
+                float cNearLog = nearZ * pow(farZ / nearZ, nearIndex);
+                float cascadeNearZ = (1 - m_cascadedShadowMapsLambda) * cNearUni + m_cascadedShadowMapsLambda * cNearLog;
+
+                float farIndex = (i+1.f)/4.f;
+                float cFarUni = nearZ + (farZ - nearZ) * farIndex;
+                float cFarLog = nearZ * pow(farZ / nearZ, farIndex);
+                float cascadeFarZ = (1 - m_cascadedShadowMapsLambda) * cFarUni + m_cascadedShadowMapsLambda * cFarLog;
+
+                {
+                    // project into screen space!
+                    QVector4D cascadeFarPoint(0, 0, -cascadeFarZ, 1);
+                    cascadeFarPoint = cameraProjection * cascadeFarPoint;
+                    cascadeFars.push_back(cascadeFarPoint.z()/cascadeFarPoint.w());
+                }
+
+                {
+                    QVector3D minCorner;
+                    QVector3D maxCorner;
+                    for (int j = 0; j < 4; j++)
+                    {
+                        auto &nearPoint = frustumNearCorners[j];
+                        auto &farPoint = frustumFarCorners[j];
+
+                        float coeff = (cascadeNearZ - nearZ) / (farZ - nearZ);
+                        auto point = coeff * nearPoint + (1 - coeff) * farPoint;
+
+                        if (j == 0)
+                        {
+                            minCorner = maxCorner = point;
+                            continue;
+                        }
+
+                        for (int k = 0; k < 3; k++)
+                        {
+                            if (minCorner[k] > point[k])
+                                minCorner[k] = point[k];
+                            if (maxCorner[k] < point[k])
+                                maxCorner[k] = point[k];
+                        }
+                    }
+                    for (int j = 0; j < 4; j++)
+                    {
+                        auto &nearPoint = frustumNearCorners[j];
+                        auto &farPoint = frustumFarCorners[j];
+
+                        float coeff = (cascadeFarZ - nearZ) / (farZ - nearZ);
+                        auto point = coeff * nearPoint + (1 - coeff) * farPoint;
+
+                        for (int k = 0; k < 3; k++)
+                        {
+                            if (minCorner[k] > point[k])
+                                minCorner[k] = point[k];
+                            if (maxCorner[k] < point[k])
+                                maxCorner[k] = point[k];
+                        }
+                    }
+
+                    // TODO
+                    QMatrix4x4 cascadeView;
+                    cascadeView.frustum(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z());
+                    cascadeViews.push_back(cascadeView);
+                }
+            }
+
+            // 2.2b Move computed values into GPU access only buffer
+            createCascadesCpu->bind();
+
+            createCascadesCpu->setUniformValueArray(m_createCascadesCpuCascadeFarLoc, cascadeFars.data(), 1, m_cascades);
+            createCascadesCpu->setUniformValueArray(m_createCascadesCpuCascadeViewMatrixLoc, cascadeViews.data(), m_cascades);
+
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeFarBuffer);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_cascadeViewBuffer);
+
+            glDispatchCompute(1, 1, 1);
+
+            createCascadesCpu->release();
+        } break;
     }
-
-    reduceDepthProgram->release();
-
-    // Input: lightDirection, cameraProjection, cameraView, frustum
-    // Output: lightProjection
-
-    QMatrix4x4 lightViewMatrix;
-    createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
-
-    // Compute view frustum of camera in light view
-    auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
-
-    // Compute temporary projection matrix wrapping the whole view frustum!
-    // TODO check if this projection is what we need! (looks okay, when used for rendering)
-    QMatrix4x4 tempLightProjection;
-    createFrustumProjectionMatrix(screenToLightTransformation, tempLightProjection);
-
-
-    // 2.2 Compute near and far plane for cascades! (on GPU!)
-    createCascadeFars->bind();
-
-    createCascadeFars->setUniformValue(m_createCascadeFarsCameraProjectionLoc, cameraProjection);
-    createCascadeFars->setUniformValue(m_createCascadeFarsInverseCameraProjectionLoc, inverseCameraProjection);
-
-    glBindImageTexture(0, m_depthReduceTextures.back(), 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
-
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_cascadeFarBuffer);
-
-    glDispatchCompute(1, 1, 1);
-
-    createCascadeFars->release();
-
-
-    // 2.3 Reduce bbox for each cascade
-    // round up
-    initWidth = (m_width-1) / 2 / 16 + 1;
-    initHeight = (m_height-1) / 2 / 16 + 1;
-
-    reduceFrustumSamplerProgram->bind();
-
-    reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumInputSizeLoc, m_width, m_height);
-    reduceFrustumSamplerProgram->setUniformValue(m_reduceFrustumScreenToLightMatrixLoc, tempLightProjection * screenToLightTransformation);
-    // reduceFrustumSamplerProgram->setUniformValueArray(m_reduceFrustumCascadeFarLoc, cascadeFars.data(), m_cascades-1, 1);
-
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_cascadeFarBuffer);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
-
-    glBindImageTexture(1, m_frustumReduceTextureArrays[0], 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
-
-    // for every new pixel spawn a thread group!
-    glDispatchCompute(initWidth, initHeight, 1);
-
-    reduceFrustumSamplerProgram->release();
-
-    // size of first reduction result
-    size = initWidth*initHeight;
-
-    reduceFrustumProgram->bind();
-
-    for (int i = 1; i < m_frustumReduceTextureArrays.size(); i++)
-    {
-        glBindImageTexture(0, m_frustumReduceTextureArrays[i-1], 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16);
-        glBindImageTexture(1, m_frustumReduceTextureArrays[i], 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
-
-        // round up
-        size = (size-1) / 1 / 256 + 1;
-
-        // for every new pixel spawn a thread group!
-        glDispatchCompute(size, 1, 1);
-        // NVIDIA gpu's are too aggressive here..
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-    }
-
-    reduceFrustumProgram->release();
-
-
-    // 2.4 Compute cascade projection matrices on GPU!
-    createCascadeViews->bind();
-
-    auto inverseTempLightProjection = tempLightProjection.inverted();
-    createCascadeViews->setUniformValue(m_createCascadeViewsInvTempProjMatrixLoc, inverseTempLightProjection);
-    createCascadeViews->setUniformValue(m_createCascadeViewsLightViewMatrixLoc, lightViewMatrix * inverseCameraView);
-
-    glBindImageTexture(0, m_frustumReduceTextureArrays.back(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16);
-
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_cascadeViewBuffer);
-
-    glDispatchCompute(1, 1, 1);
-
-    createCascadeViews->release();
 
 
     // 3. Render to ShadowMap
@@ -673,6 +820,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     renderProgram->setUniformValue(m_projectionMatrixLoc, cameraProjection);
     renderProgram->setUniformValue(m_lightDirectionLoc, QVector3D(lightDirection));
     renderProgram->setUniformValue(m_lightColorLoc, scene->getLightColor());
+    renderProgram->setUniformValue(m_colorizeCascadesLoc, m_colorizeCascades);
 
     // defaultProgram->setUniformValueArray(m_cascadeViewMatrixLoc, cascadeViews.data(), m_cascades);
     // defaultProgram->setUniformValueArray(m_cascadeFarLoc, cascadeFars.data(), m_cascades, 1);
@@ -1062,4 +1210,39 @@ void Renderer::resize(int width, int height)
         // round up
         size = (size-1) / 1 / 256 + 1;
     }
+}
+
+QWidget *Renderer::createDebugWidget(QWidget *parent)
+{
+    return new RendererDebugWidget(this, parent);
+}
+
+void Renderer::setColorizeCascades(bool enabled)
+{
+    m_colorizeCascades = enabled;
+}
+
+bool Renderer::getColorizeCascades()
+{
+    return m_colorizeCascades;
+}
+
+void Renderer::setCascadedShadowMapsLambda(float lambda)
+{
+    m_cascadedShadowMapsLambda = lambda;
+}
+
+float Renderer::getCascadedShadowMapsLambda()
+{
+    return m_cascadedShadowMapsLambda;
+}
+
+void Renderer::setCascadeStrategy(CascadeStrategy strategy)
+{
+    m_cascadeStrategy = strategy;
+}
+
+Renderer::CascadeStrategy Renderer::getCascadeStrategy()
+{
+    return m_cascadeStrategy;
 }
