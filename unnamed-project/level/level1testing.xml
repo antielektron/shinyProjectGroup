@@ -565,7 +565,7 @@
         </Object>
         <Object name="planetEarth" model="planetEarth" interactionEvent="">
             <Position x="-60" y="0" z="0"/>
-            <Rotation x="0" y="0" z="0"/>
+            <Rotation x="0" y="40" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -573,7 +573,7 @@
         </Object>
         <Object name="planetEarthSurface" model="planetEarthSurface" interactionEvent="">
             <Position x="-60" y="0" z="0"/>
-            <Rotation x="0" y="0" z="0"/>
+            <Rotation x="0" y="40" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -605,7 +605,7 @@
         </Object>
         <Object name="planetAlpha" model="planetAlpha" interactionEvent="">
             <Position x="-60" y="0" z="0"/>
-            <Rotation x="0" y="0" z="0"/>
+            <Rotation x="0" y="120" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -613,7 +613,7 @@
         </Object>
         <Object name="planetSaturn" model="planetSaturn" interactionEvent="">
             <Position x="-60" y="0" z="0"/>
-            <Rotation x="0" y="0" z="0"/>
+            <Rotation x="0" y="75" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -621,7 +621,7 @@
         </Object>
         <Object name="planetSaturnRing" model="planetSaturnRing" interactionEvent="">
             <Position x="-60" y="0" z="0"/>
-            <Rotation x="0" y="0" z="0"/>
+            <Rotation x="0" y="75" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -629,7 +629,7 @@
         </Object>
         <Object name="planetSekundus" model="planetSekundus" interactionEvent="">
             <Position x="-60" y="0" z="0"/>
-            <Rotation x="0" y="0" z="0"/>
+            <Rotation x="0" y="92" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -637,7 +637,7 @@
         </Object>
         <Object name="planetSekundusMoon" model="planetSekundusMoon" interactionEvent="">
             <Position x="-60" y="0" z="0"/>
-            <Rotation x="0" y="0" z="0"/>
+            <Rotation x="0" y="92" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -645,7 +645,7 @@
         </Object>
         <Object name="planetSekundusMoonSurface" model="planetSekundusMoonSurface" interactionEvent="">
             <Position x="-60" y="0" z="0"/>
-            <Rotation x="0" y="0" z="0"/>
+            <Rotation x="0" y="92" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
