@@ -14,6 +14,15 @@
         <Model name="menger" path="models/menger.obj"/>
         <Model name="mengerplat" path="models/mengerplat.obj"/>
         <Model name="octonorm" path="models/octonorm.obj"/>
+        <Model name="planetAlpha" path="models/planetAlpha.obj"/>
+        <Model name="planetEarth" path="models/planetEarth.obj"/>
+        <Model name="planetEarthSurface" path="models/planetEarthSurface.obj"/>
+        <Model name="planetSaturn" path="models/planetSaturn.obj"/>
+        <Model name="planetSaturnRing" path="models/planetSaturnRing.obj"/>
+        <Model name="planetSekundus" path="models/planetSekundus.obj"/>
+        <Model name="planetSekundusMoon" path="models/planetSekundusMoon.obj"/>
+        <Model name="planetSekundusMoonSurface" path="models/planetSekundusMoonSurface.obj"/>
+        <Model name="planetSun" path="models/planetSun.obj"/>
         <Model name="sphere" path="models/sphere.obj"/>
         <Model name="step" path="models/step.obj"/>
         <Model name="suzanne" path="models/suzanne.obj"/>
@@ -546,6 +555,102 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
+        <Object name="floorPlanet" model="floor2" interactionEvent="">
+            <Position x="-60.9" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="planetEarth" model="planetEarth" interactionEvent="">
+            <Position x="-60" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="planetEarthSurface" model="planetEarthSurface" interactionEvent="">
+            <Position x="-60" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="planetSun" model="planetSun" interactionEvent="">
+            <Position x="-60" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="PlanetDiamant" model="meditatipnchamberDiamant" interactionEvent="sun clicked">
+            <Position x="-54.6" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="0"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.3"/>
+            <AmbientColor x="0.7" y="0.7" z="0.4"/>
+        </Object>
+        <Object name="PlanetDiamant2" model="meditatipnchamberDiamant" interactionEvent="earth clicked">
+            <Position x="-54.6" y="0" z="0.6"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.9"/>
+            <AmbientColor x="0.3" y="0.4" z="0.8"/>
+        </Object>
+        <Object name="planetAlpha" model="planetAlpha" interactionEvent="">
+            <Position x="-60" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="planetSaturn" model="planetSaturn" interactionEvent="">
+            <Position x="-60" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="planetSaturnRing" model="planetSaturnRing" interactionEvent="">
+            <Position x="-60" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="planetSekundus" model="planetSekundus" interactionEvent="">
+            <Position x="-60" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="planetSekundusMoon" model="planetSekundusMoon" interactionEvent="">
+            <Position x="-60" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="planetSekundusMoonSurface" model="planetSekundusMoonSurface" interactionEvent="">
+            <Position x="-60" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
     </Objects>
     <Attributes>
         <Attribute key="plat_x" type="float" value="-1"/>
@@ -557,7 +662,7 @@
             <Precondition type="ieq" lhs="[activated]" rhs="0"/>
             <Action type="imov" lhs="activated" rhs="1"/>
             <Action type="animambientcolor" x="0" y="0.4" z="0" object="menger">
-                <Interpolation type="sinus" duration="2"/>
+                <Interpolation type="sinus" duration="1"/>
             </Action>
             <Action type="animdiffusecolor" x="0" y="0.5" z="0" object="menger">
                 <Interpolation type="forgot name" duration="3"/>
@@ -781,6 +886,42 @@
             <Action type="imov" lhs="activated" rhs="1"/>
             <Action type="animpos" x="0.1" y="3.1" z="0" object="meditatipnchamberUpFinal">
                 <Interpolation type="sinus" duration="4"/>
+            </Action>
+        </Event>
+        <Event name="sun clicked" description="active">
+            <Precondition type="ieq" lhs="[sun]" rhs="0"/>
+            <Action type="imov" lhs="sun" rhs="1"/>
+            <Action type="animambientcolor" x="0.7" y="0.7" z="0.4" object="planetSun">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.9" y="0.9" z="0.3" object="planetSun">
+                <Interpolation type="sinus" duration="4"/>
+            </Action>
+            <Action type="animspecularcolor" x="1" y="1" z="0" object="planetSun">
+                <Interpolation type="linear" duration="4"/>
+            </Action>
+            <Action type="animambientcolor" x="0.5" y="0.5" z="0.4" object="planetEarthSurface">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.4" object="planetEarthSurface">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animambientcolor" x="0.6" y="0.6" z="0.7" object="planetEarth">
+                <Interpolation type="sinus" duration="7"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.6" y="0.8" z="0.9" object="planetEarth">
+                <Interpolation type="sinus" duration="7"/>
+            </Action>
+        </Event>
+        <Event name="earth clicked" description="active">
+            <Precondition type="ieq" lhs="[earth]" rhs="0"/>
+            <Action type="imov" lhs="earth" rhs="1"/>
+            <Action type="imov" lhs="durationEarth" rhs="7"/>
+            <Action type="animrot" x="0" y="-90" z="0" object="planetEarth">
+                <Interpolation type="sinus" duration="[durationEarth]"/>
+            </Action>
+            <Action type="animrot" x="0" y="-90" z="0" object="planetEarthSurface">
+                <Interpolation type="sinus" duration="[durationEarth]"/>
             </Action>
         </Event>
     </Events>
