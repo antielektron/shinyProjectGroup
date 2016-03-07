@@ -2,10 +2,6 @@
 <Scene name="Shiny Scene" version="42" author="Norby">
     <Models>
         <Model name="bauer" path="models/bauer.obj"/>
-        <Model name="busch1" path="models/busch1.obj"/>
-        <Model name="buschA" path="models/buschA.obj"/>
-        <Model name="buschB" path="models/buschB.obj"/>
-        <Model name="buschC" path="models/buschC.obj"/>
         <Model name="chessblack" path="models/chessblack.obj"/>
         <Model name="chesswhite" path="models/chesswhite.obj"/>
         <Model name="dame" path="models/dame.obj"/>
@@ -498,43 +494,6 @@
                 <AmbientColor x="0.7" y="0.5" z="0.5"/>
             </Object>
         </ObjectGroup>
-        <ObjectGroup name="busch1">
-            <Position x="34.8" y="-0.6" z="-14.6"/>
-            <Rotation x="0" y="0" z="0"/>
-            <Scaling x="1" y="1" z="1"/>
-            <Object name="buschA" model="buschA" interactionEvent="">
-                <Position x="0" y="-0.3" z="-0.4"/>
-                <Rotation x="0" y="50" z="0"/>
-                <Scaling x="1" y="1" z="1"/>
-                <SpecularColor x="1" y="1" z="1"/>
-                <DiffuseColor x="0.9" y="0.8" z="0.8"/>
-                <AmbientColor x="0.7" y="0.6" z="0.6"/>
-            </Object>
-            <Object name="buschB" model="buschB" interactionEvent="">
-                <Position x="0" y="0.1" z="0"/>
-                <Rotation x="0" y="0" z="0"/>
-                <Scaling x="1" y="1" z="1"/>
-                <SpecularColor x="1" y="1" z="1"/>
-                <DiffuseColor x="0.7" y="0.9" z="0.7"/>
-                <AmbientColor x="0.5" y="0.7" z="0.5"/>
-            </Object>
-            <Object name="buschC" model="buschC" interactionEvent="">
-                <Position x="0" y="-0.1" z="0"/>
-                <Rotation x="0" y="20" z="0"/>
-                <Scaling x="1" y="1" z="1"/>
-                <SpecularColor x="1" y="1" z="1"/>
-                <DiffuseColor x="0.8" y="0.9" z="0.8"/>
-                <AmbientColor x="0.6" y="0.7" z="0.6"/>
-            </Object>
-            <Object name="busch1" model="busch1" interactionEvent="">
-                <Position x="-3.5" y="0" z="-6.1"/>
-                <Rotation x="0" y="0" z="0"/>
-                <Scaling x="1" y="1" z="1"/>
-                <SpecularColor x="1" y="1" z="1"/>
-                <DiffuseColor x="0.7" y="0.9" z="0.4"/>
-                <AmbientColor x="0.5" y="0.7" z="0.5"/>
-            </Object>
-        </ObjectGroup>
         <Object name="octonorm" model="octonorm" interactionEvent="">
             <Position x="0" y="11.5" z="0.1"/>
             <Rotation x="0" y="180" z="0"/>
@@ -582,14 +541,6 @@
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
-        </Object>
-        <Object name="busch2" model="busch1" interactionEvent="">
-            <Position x="31.7" y="-0.1" z="-21.6"/>
-            <Rotation x="0" y="0" z="0"/>
-            <Scaling x="1" y="1" z="1"/>
-            <SpecularColor x="1" y="1" z="1"/>
-            <DiffuseColor x="0.9" y="0.7" z="0.7"/>
-            <AmbientColor x="0.7" y="0.5" z="0.5"/>
         </Object>
     </Objects>
     <Attributes/>
