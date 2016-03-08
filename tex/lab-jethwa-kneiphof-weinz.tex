@@ -63,7 +63,66 @@ Sample Distribution Shadow Maps \cite{lauritzen2011sample}
 
 \section{Sample Distribution Shadow Maps}
 
-	TODO
+Sample Distribution Shadow Maps (SDSMs) ist ein Verfahren zur adaptiven Optimierung der Shadow Map Auflösung unter Verwendung des Camera-Space Depth Buffers.
+
+\subsection{Algorithmus}
+
+% Cascaded Shadow Maps aka Z-Partitioning
+SDSMs basieren auf Z-Partitoning, wobei das Kamera Frustum entlang der Blickrichtung in mehrere Teilfrusta partitioniert wird. Für jedes Teilfrustum wird eine eigene Shadow Map generiert.
+Auf diese Weise kann mehr Shadow Map Auflösung für nahe Objekte verwendet werden, und weniger Auflösung für weit entfernte Objekte.
+
+% Partitionierung
+Für gute Ergebnisse ist eine geeignete Wahl der Partition ausschlaggebend.
+Anstatt auf eine statische Partitionierung des Kamera Frustums zu setzen wird die Partitionierung von SDSMs in jedem Frame neu berechnet.
+
+% - Min/Max Reduktion
+% - Logarithmische Partitionierung
+Zunächst wird die tatsächliche Near und Far Distanz der sichtbaren Geometrie im Kamera Frustums ermittelt. Dies geschieht mittels Min/Max Reduktion der Tiefenwerte im Kamera Depth Buffer.
+Anschließend wird das Kamera Frustum zwischen tatsächlicher Near und Far Distanz logarithmisch partitioniert um das perspektivische Aliasing zu minimieren.
+
+% Abgrenzung PSSM Logarithmic/Linear
+PSSMs kennen die tatsächliche Near und Far Distanz nicht, und müssen mit der Near und Far Distanz der Projektionsmatrix arbeiten.
+Eine logarithmische Partitionierung würde zu viel Shadow Map Auflösung in den sehr nahen Bereich verschieben, der oft leer ist.
+PSSMs konvexkombinieren die Partitionsgrenzen der linearen und logarithmischen Partitionierung um mehr Auflösung von der Near Plane weg zu bewegen.
+Optimale Koeffizienten müssen meist von Hand ermittelt werden.
+
+% (K-Means and friends)
+Weitere Möglichkeiten das Kamera Frustum intelligent zu partitionieren sind ein adaptiv logarithmisches und ein K-Means Verfahren.
+Das adaptiv logarithmische Verfahren vermeidet Lücken im Histogramm des Kamera Depth Buffers, indem es die Partitionsgrenzen an das Ende von diesen schiebt.
+Das K-Means Verfahren sucht zunächst Maxima im Histogramm des Kamera Depth Buffers und legt dann die Partition entsprechend um die gefundenen Maxima.
+Für beide Verfahren muss zunächst ein Histogramm berechnet werden.
+
+
+% Betrachte Punkte in Light-Space TODO
+Der Algorithmus betrachtet die Verteilung aller sichtbaren Punkte der Szene aus der Sicht des Lichtes.
+Hierzu wird für jedes Sample aus dem Kamera Depth Buffer die Position in der Welt rekonstruiert und in den Light Space transformiert.
+
+
+% Tight Partition Frusta
+
+% Andere Algorithmen benutzen Ecken von jedem Frustum um Shadow Map Frustum zu definieren
+TODO
+
+
+
+\subsection{Implementierung}
+
+TODO
+
+\paragraph{Erster Versuch}
+Im ersten Ansatz haben wir die Reduktionen für die tatsächliche Near und Far Distanz sowie die Bounding Boxen der Geometrie in den Kaskaden auf der GPU berechnet.
+Das Ergebnis haben wir auf die CPU zurück gelesen um aus den Near und Far Distanzen die Partition zu berechnen, bzw. aus den Bounding Boxen das Frustum für die entsprechende Shadow Map.
+Um zu vermeiden, dass der CPU auf die GPU warten muss, haben wir die Ergebnisse aus dem vorherigen Frame, bzw. von vor zwei Frames genutzt, da deren Berechnung dann schon abgeschlossen sein sollte.
+Um Bewegungen der Kamera zu kompensieren, haben wir die Ergebnisse aus dem Kamera Koordinatensystem des vergangenen Frames in die Welt transformiert und von dort in das aktuelle Kamera Koordinatensystem.
+Was wir nicht kompensieren konnten, war das erscheinen neuer Geometrie, die durch die Bewegung der Kamera sichtbar wurde.
+Das hat z.B. zu Bereichen zwischen den Kaskaden geführt, die nicht von einer Shadow Map abgedeckt wurden.
+
+\paragraph{Zweiter Versuch}
+Dieses Problem haben wir gelöst indem wir am Anfang jedes Frames einmal nur die Tiefe gerendert haben.
+Anschließend haben wir darauf die Near und Far Distanz berechnet.
+Anstatt auf die CPU zurück zu lesen, haben wir die Partition in einem Compute Shader auf der GPU berechnet.
+Nachdem dann die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus ebenfalls auf der GPU die Projektionsmatrizen für die Shadow Maps berechnet.
+
 
 \section{Fazit}
 
