@@ -5,8 +5,7 @@
         <Model name="bishop" path="models/bishop.obj"/>
         <Model name="chessblack" path="models/chessblack.obj"/>
         <Model name="chesswhite" path="models/chesswhite.obj"/>
-        <Model name="cloud2" path="models/cloud2.obj"/>
-        <Model name="cloud4" path="models/cloud4.obj"/>
+        <Model name="cloud1" path="models/cloud1.obj"/>
         <Model name="dame" path="models/dame.obj"/>
         <Model name="floor" path="models/floor.obj"/>
         <Model name="floor2" path="models/floor2.obj"/>
@@ -795,7 +794,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-        <Object name="cloud4" model="cloud4" interactionEvent="">
+        <Object name="cloud1" model="cloud1" interactionEvent="">
             <Position x="-64.8" y="7.1" z="-49.9"/>
             <Rotation x="0" y="-20" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -803,7 +802,7 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-        <Object name="cloud1" model="cloud2" interactionEvent="">
+        <Object name="cloud2" model="cloud1" interactionEvent="">
             <Position x="-20" y="3.4" z="-150"/>
             <Rotation x="0" y="-90" z="0"/>
             <Scaling x="1" y="1" z="1"/>
