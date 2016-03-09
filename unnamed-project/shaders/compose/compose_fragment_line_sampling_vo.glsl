@@ -143,8 +143,8 @@ float get_angle(vec3 a, vec3 b)
 
 vec3 get_sky()
 {
-	float theta = verticalViewAngle * (uv.x - 0.5) * 2.;
-	float rho = verticalViewAngle * ratio * (uv.y - 0.5) * 2.;
+	float theta = verticalViewAngle * ratio * (uv.x - 0.5) * 2.;
+	float rho = verticalViewAngle * (uv.y - 0.5) * 2.;
 	
 	vec3 uvAngle = vec3(sin(theta),sin(rho),-1.); 
 	
@@ -152,9 +152,10 @@ vec3 get_sky()
 	float angle = get_angle(uvAngle, lightDirection.xyz);
 	float sqrdAngle = angle * angle;
 	
-	float g = 0.7 - sqrdAngle * 0.1;
+	float g = 1 - sqrdAngle * 0.1;
 	float r = 1 - angle;
-	float b = sqrdAngle * 0.2;
+	float b = 1 - sqrdAngle * 0.1;
+	
 	
 	return vec3(r,g,b);
 }
