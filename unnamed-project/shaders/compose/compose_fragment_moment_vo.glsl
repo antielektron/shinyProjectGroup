@@ -24,8 +24,8 @@ const float voShadingAmount = 1.;
 const float dfShadingAmount = 1.;
 
 // TODO: pass this values to shader
-const float worldSpaceRadius = 1;
-const float sceneDepth = 1000;
+const float worldSpaceRadius = 5;
+const float sceneDepth = 100;
 const float verticalViewAngle = PI/4;
 
 
@@ -186,7 +186,11 @@ void main()
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
 
 	// step 1: get depth
-	float depth = textureLod(momentsSampler, uv,0).x;
+	vec4 tmpmoment = textureLod(momentsSampler, uv,0);
+	vec4 tmpoutmoment;
+	sampleOptimized4MomentsShadowMap(tmpoutmoment, tmpmoment);
+	
+	float depth = tmpoutmoment.x;
 	
 	float world_depth = get_world_depth(depth);
 	
@@ -194,12 +198,12 @@ void main()
 	vec4 rVec1 = projectionMatrix * vec4(0., 2 * worldSpaceRadius, world_depth, 1.);
 	vec4 rVec2 = projectionMatrix * vec4(0., 0, world_depth, 1.);
 	
-	float r = abs(rVec1.y/rVec1.w - rVec2.y/rVec2.w);
+	float r = (1. - depth) * 1;
 	
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
-	float mmLevel = log2(1./(1. - r));
+	float mmLevel = log2(1 / r);
 	// step 4: get filtered Moments
-	mmLevel = mmLevel * 0.9 + 1;
+	mmLevel = mmLevel +4;
 	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
 	
 
@@ -210,15 +214,15 @@ void main()
 	vec3 z;
     float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.005, 3e-5);	
   
-	float z_a = depth + 0.1;
-	float z_b = depth - 0.1;
+	float z0 = depth - r;
+	float z1 = depth + r;	
 	
 	float sum = 0;
 	for (int i = 0; i < 3; i++)
 	{
-		sum += w[i] * f(z[i],z_a, z_b); 
+		sum += w[i] * f(z[i],z0, z1); 
 	}
-	sum *= 0.5;
+	sum = sum;
 	
 	if (depth < 1-10e-4)
 	{
@@ -231,8 +235,9 @@ void main()
 	
 	//outputColor = vec4(0, defaultColor.y, 0,1);
 	//outputColor = vec4(momentMagic, 0, 0,1);
-    outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(sum * 0.5),1);
+    //outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(sum * 0.5),1);
     outputColor = vec4(defaultColor, 1.0);
+    //outputColor = vec4(mmLevel * 0.1 * vec3(1.,1.,1.),1.);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     
 }

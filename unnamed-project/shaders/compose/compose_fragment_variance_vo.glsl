@@ -7,6 +7,7 @@ uniform mat4 inverseProjectionMatrix;
 uniform sampler2D sampler;
 uniform sampler2D momentsSampler;
 uniform sampler2D depthBuffer;
+
 uniform float ratio;
 uniform vec4 lightDirection;
 //uniform float time;
@@ -23,8 +24,8 @@ const float voShadingAmount = 1.;
 const float dfShadingAmount = 1.;
 
 // TODO: pass this values to shader
-const float worldSpaceRadius = 1;
-const float sceneDepth = 1000;
+const float worldSpaceRadius = 5;
+const float sceneDepth = 10;
 const float verticalViewAngle = PI/4;
 
 
@@ -84,6 +85,48 @@ void sampleOptimized4MomentsShadowMap(out vec4 out4Moments, vec4 shadowMapValue)
 
 }
 
+// Modified MSMShadowIntensity function
+float computeMSMShadwowIntensity(out vec3 Weight, out vec3 outz, vec4 in4Moments, float depth, float depthBias, float momentBias)
+{
+    vec4 b = mix(in4Moments, vec4(0.5,0.5,0.5,0.5), momentBias);
+    vec3 z;
+    z.x = depth-depthBias;
+    float L32D22= -b.x * b.y + b.z;
+    float D22= -b.x * b.x + b.y;
+    float SquaredDepthVariance=-b.y * b.y + b.w;
+    float D33D22=dot(vec2(SquaredDepthVariance,-L32D22),
+                     vec2(D22,                  L32D22));
+    float InvD22=1.0/D22;
+    float L32=L32D22*InvD22;
+    vec3 c=vec3(1.0,z.x,z.x*z.x);
+    c.y-=b.x;
+    c.z-=b.y+L32*c.y;
+    c.y*=InvD22;
+    c.z*=D22/D33D22;
+    c.y-=L32*c.z;
+    c.x-=dot(c.yz,b.xy);
+    float p=c.y/c.z;
+    float q=c.x/c.z;
+    float r=sqrt((p*p*0.25)-q);
+    z.y=-p*0.5-r;
+    z.z=-p*0.5+r;
+    vec4 Switch=
+        (z.z<z.x)?vec4(z.y,z.x,1.0,1.0):(
+        (z.y<z.x)?vec4(z.x,z.y,0.0,1.0):
+        vec4(0.0,0.0,0.0,0.0));
+    float sum = (Switch.x*z.z-b.x*(Switch.x+z.z)+b.y);
+    float Quotient=(Switch.x*z.z-b.x*(Switch.x+z.z)+b.y)
+                  /((z.z-Switch.y)*(z.x-z.y));
+    
+    outz = z;
+    
+    // wild guess: this are the weights we're looking for?
+    
+	Weight.x=(z.y*z.z-b.x*(z.y+z.z)+b.y)/((z.x-z.y)*(z.x-z.z));
+	Weight.y=(z.x*z.z-b.x*(z.x+z.z)+b.x)/((z.z-z.y)*(z.x-z.y));
+	Weight.z=1.0-Weight.x-Weight.y;
+    return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
+}
 
 float f(vec4 moments, float z_a, float z_b)
 {
@@ -107,6 +150,7 @@ float get_angle(vec3 a, vec3 b)
     float abs_b = sqrt(b.x * b.x + b.y * b.y + b.z * b.z);
     
     float sin_theta = c/(abs_a * abs_b + 10e-6);
+    
     // check Orientation:
    	bool sameOrientation = false;
    	if (a.x * b.x + a.y * b.y + a.z * b.z > 0)
@@ -140,7 +184,11 @@ void main()
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
 
 	// step 1: get depth
-	float depth = textureLod(momentsSampler, uv,0).x;
+	vec4 tmpmoment = textureLod(momentsSampler, uv,0);
+	vec4 tmpoutmoment;
+	sampleOptimized4MomentsShadowMap(tmpoutmoment, tmpmoment);
+	
+	float depth = tmpoutmoment.x;
 	
 	float world_depth = get_world_depth(depth);
 	
@@ -148,36 +196,48 @@ void main()
 	vec4 rVec1 = projectionMatrix * vec4(0., 2 * worldSpaceRadius, world_depth, 1.);
 	vec4 rVec2 = projectionMatrix * vec4(0., 0, world_depth, 1.);
 	
-	float r = abs(rVec1.y/rVec1.w - rVec2.y/rVec2.w);
+	float r = (1. - depth) * 1;
 	
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
-	float mmLevel = 1 - log2(1./(1. - r));
+	float mmLevel = log2(1 / r);
 	// step 4: get filtered Moments
-	mmLevel = mmLevel * 0.9 + 2;
-	vec4 moments = textureLod(momentsSampler, uv, 3.2);
-	vec4 outMoments;
-	sampleOptimized4MomentsShadowMap(outMoments, moments);
+	mmLevel = mmLevel * 0.3 + 3;
+	vec4 moments = textureLod(momentsSampler, uv,mmLevel);
 	
 
 	// step 5: where the magic happens
-	float z_a = depth + 0.1;
-	float z_b = depth - 0.1;
+	vec4 outMoments = moments;
+	//sampleOptimized4MomentsShadowMap(outMoments, moments);
 	
-	float sum = f(outMoments,z_a, z_b); 
+	float mean = moments.x;
+	float variance = sqrt(moments.y - pow(mean,2));
+
+
+	float a = -1.0 / (2. * variance);
+	float b = -a * (mean + variance);
+	
+	// nonsense... but it could make almost valid results
+	float z0 = depth - r;
+	float z1 = depth + r;
+	
+	// aaaand i have no idea what i'm doing now:
+	float sum =  a * (pow(z1,2) - pow(z0,2)) / 2.0 + b * (z1 - z0);	
+	sum = clamp(sum, 0,1);	
 	
 	if (depth < 1-10e-4)
 	{
-		defaultColor =  sum * vec3(1.,1.,1.);//defaultColor;
+		defaultColor =  sum * defaultColor;
 	}
 	else
 	{
-		defaultColor = get_sky();
+		defaultColor = (sum > 0.1 ? sum : 1) * get_sky();
 	}
 	
 	//outputColor = vec4(0, defaultColor.y, 0,1);
 	//outputColor = vec4(momentMagic, 0, 0,1);
-    outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(sum * 0.5),1);
+    //outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(sum * 0.5),1);
     outputColor = vec4(defaultColor, 1.0);
+   	//outputColor = vec4(sum * vec3(1.,1.,1.),1.);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     
 }
