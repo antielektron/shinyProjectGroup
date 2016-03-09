@@ -50,7 +50,7 @@ Hier könnte ein Text stehen
 \subsection{Volumetric Obscurance}
 Hier könnte ein Text stehen
 \subsection{Moment Shadow Mapping}
-Das Moment Shadow Mapping ist eine Technik, welche dem Variance Shadow Mapping ähnelt. Es benutzt 4 Momente, welche gefiltert werden können. Dadurch können z.B. Light-Leeking verhindert.Moment Shadow Mapping vereint möglichst viele positive Aspekte anderer Schattentechniken und bietet Schatten mit hoher Qualität ohne viel Performance einzubüßen.
+Wir wollen eine Schattentechnik verwenden, die möglichst hohe Qualität liefert und dabei performant bleibt. Moment Shadow Mapping liefert uns dieses Verfahren und wird im weiteren Verlauf erläutert und implementiert.
 
 \section{Related Work}
 
@@ -144,11 +144,23 @@ Nachdem dann die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus e
 	TODO
 	
 \section{Moment Shadow Mapping}
+Um eine möglichst hohe Qualität an Schatten zu erreichen bieten sich verschiedene Verfahren an. Deswegen ist es wünschenswert für uns eine filterbare Daten zu nutzen. Percentage Close Filtering eliminiert effektiv Aliasing Effekt durch samplen der Schadow Map durch einen Filter Kernel.\cite{msm} Allerdings kann dies nur für einzelne Fragmente möglich, da das Verfahren Tiefenabhängig beim Schattentest ist.\citep{msm}
+Es bietet sich daher an mit Momenten zu arbeiten. Variance Shadow Maps nutzen zwei Momente und bietet deshalb zusätzlich die quadrierte Tiefeninformation. Diese wird genutzt um PCF weiter zu approximieren.
+
+
+
+\subsection{Algorithmus}
+
+\subsection{Implementierung}
 Wir implementieren die Hamburger Moment Shadow Mapping Technik, da diese die schnellste und robusteste Methode für das Shadow Mapping darstellt.\cite{msm} Zuerst wird eine Moment Shadow Map gerendert. Der Unterschied zur normalen Shadow Map ist, das zusätzlich noch 4 Momente, bestehend aus der Tiefe der Shadow Map gespeichert werden. Diese reduntanten Tiefeninformationen können noch gefiltert werden. Wir verwenden hierfür einen Gauss Filter oder alternativ noch MSAA. Eine weitere Möglichkeit wäre Mip-Mapping.
 Im zweiten Schritt der Implementierung, wird ein gefiltertes Sample aus der Moment Shadow Map, sowie die Tiefe eines Shadow Map Fragments genutzt, um eine gefilterte Schatten Intensität zu erhalten. Dies wird durch den Algorithmus zwei aus dem Moment Shadow Mapping Paper erreicht.\cite{msm}
 Dadurch erhalten wir ein Intensität für dieses Fragment.
 
-Für das Moment Based Volumetric Obscurance benutzen wir die gleiche Herangehensweise. Allerdings hat es sich herausgestellt, dass die Transformation für 4 Momente zu Artefakten führt, da die numerische optimierung mit der Matrix, wie im MSM Paper beschrieben zu Artefakten führt.
+Für das Moment Based Volumetric Obscurance benutzen wir die gleiche Herangehensweise. Allerdings hat es sich herausgestellt, dass die Transformation für 4 Momente zu Artefakten führt, da die numerische optimierung mit einer der Matritzen, wie im MSM Paper beschrieben zu Artefakten führt. Problematisch ist hier die Varianz um einen möglichst korrekten Wert für die Vomuletric Obscurance zu erhalten.
+Wir wählen ebenfalls 4 Momente um die Volumetric Obscurance zu approximieren und berechnen die benötigten Gewichte durch eine Abbänderung der MSM Funktionen.
+
+
+
 	
 
 
