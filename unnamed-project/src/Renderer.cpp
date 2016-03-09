@@ -663,6 +663,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
                 float cFarLog = nearZ * pow(farZ / nearZ, farIndex);
                 float cascadeFarZ = (1 - m_cascadedShadowMapsLambda) * cFarUni + m_cascadedShadowMapsLambda * cFarLog;
 
+                std::cout << "near " << cascadeNearZ << std::endl;
+                std::cout << "far " << cascadeFarZ << std::endl;
+
                 {
                     // project into screen space!
                     QVector4D cascadeFarPoint(0, 0, -cascadeFarZ, 1);
@@ -673,16 +676,20 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
                 {
                     QVector3D minCorner;
                     QVector3D maxCorner;
+
+                    float coeffNear = (cascadeNearZ - nearZ) / (farZ - nearZ);
+                    float coeffFar = (cascadeFarZ - nearZ) / (farZ - nearZ);
+
                     for (int j = 0; j < 4; j++)
                     {
                         auto &nearPoint = frustumNearCorners[j];
                         auto &farPoint = frustumFarCorners[j];
 
-                        float coeff = (cascadeNearZ - nearZ) / (farZ - nearZ);
-                        auto point = coeff * nearPoint + (1 - coeff) * farPoint;
+                        auto point = (1 - coeffNear) * nearPoint + coeffNear  * farPoint;
 
                         if (j == 0)
                         {
+                            std::cout << coeffNear << std::endl;
                             minCorner = maxCorner = point;
                             continue;
                         }
@@ -700,8 +707,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
                         auto &nearPoint = frustumNearCorners[j];
                         auto &farPoint = frustumFarCorners[j];
 
-                        float coeff = (cascadeFarZ - nearZ) / (farZ - nearZ);
-                        auto point = coeff * nearPoint + (1 - coeff) * farPoint;
+                        auto point = (1 - coeffFar) * nearPoint + coeffFar * farPoint;
 
                         for (int k = 0; k < 3; k++)
                         {
@@ -712,8 +718,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
                         }
                     }
 
-                    // TODO
                     QMatrix4x4 cascadeView;
+                    // TODO
                     cascadeView.frustum(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z());
                     cascadeViews.push_back(cascadeView);
                 }
