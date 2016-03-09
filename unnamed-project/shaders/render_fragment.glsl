@@ -27,8 +27,8 @@ layout (binding = 1) buffer cascadeFarBuffer
 // gl_TextureMatrix
 uniform sampler2DArray shadowMapSampler;
 
-const float roughness = 0.1;
-const float fresnelFactor = 1.;
+const float roughness = 0.4;
+const float fresnelFactor = 0.6;
 
 
 uniform bool colorizeCascades;
