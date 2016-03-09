@@ -43,31 +43,24 @@ durch ein Demo-Spiel dargestellt.
 \end{abstract}
 
 \section{Einleitung}
+Rendern von Schatten ist ein wichtiger Aspekt der interaktiven 3D Grafik. Die Struktur einer Szene, wirkt erst durch Schatten realisitisch und hilft dem Betrachter dabei, diese zu verstehen.
+Allerdings ist das Berechnen der verschiedenen Schattentechniken auch aufwendig und oft anfällig für Fehlerartefakte. Deswegen untersuchen wir in diesem Paper 3 Techniken, welche verschiedene Lösungsansätze und Vorteile bieten.
 \subsection{Sample Distribution Shadow Maps}
 Hier könnte ein Text stehen
 \subsection{Volumetric Obscurance}
 Hier könnte ein Text stehen
 \subsection{Moment Shadow Mapping}
-Hier könnte ein Text stehen
+Das Moment Shadow Mapping ist eine Technik, welche dem Variance Shadow Mapping ähnelt. Es benutzt 4 Momente, welche gefiltert werden können. Dadurch können z.B. Light-Leeking verhindert.Moment Shadow Mapping vereint möglichst viele positive Aspekte anderer Schattentechniken und bietet Schatten mit hoher Qualität ohne viel Performance einzubüßen.
 
 \section{Related Work}
 
 TODO subsections or related work embeddet into techniques
 
-Moment Shadow Mapping \cite{peters2015moment}, Variance Shadow Maps \cite{donnelly2006variance}, Percentage Closer Filtering \cite{reeves1987rendering}
+Moment Shadow Mapping \cite{msm}, Variance Shadow Maps \cite{donnelly2006variance}, Percentage Closer Filtering \cite{reeves1987rendering}
 
 Volumetric Obscurance \cite{loos2010volumetric}
 
 Sample Distribution Shadow Maps \cite{lauritzen2011sample}
-
-
-\section{Moment Shadow Mapping}
-
-	TODO
-
-\section{Volumetric Obscurance}
-
-	TODO
 
 \section{Sample Distribution Shadow Maps}
 
@@ -145,6 +138,18 @@ Dieses Problem haben wir gelöst indem wir am Anfang jedes Frames einmal nur die
 Anschließend haben wir darauf die Near und Far Distanz berechnet.
 Anstatt auf die CPU zurück zu lesen, haben wir die Partition in einem Compute Shader auf der GPU berechnet.
 Nachdem dann die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus ebenfalls auf der GPU die Projektionsmatrizen für die Shadow Maps berechnet.
+
+\section{Volumetric Obscurance}
+
+	TODO
+	
+\section{Moment Shadow Mapping}
+Wir implementieren die Hamburger Moment Shadow Mapping Technik, da diese die schnellste und robusteste Methode für das Shadow Mapping darstellt.\cite{msm} Zuerst wird eine Moment Shadow Map gerendert. Der Unterschied zur normalen Shadow Map ist, das zusätzlich noch 4 Momente, bestehend aus der Tiefe der Shadow Map gespeichert werden. Diese reduntanten Tiefeninformationen können noch gefiltert werden. Wir verwenden hierfür einen Gauss Filter oder alternativ noch MSAA. Eine weitere Möglichkeit wäre Mip-Mapping.
+Im zweiten Schritt der Implementierung, wird ein gefiltertes Sample aus der Moment Shadow Map, sowie die Tiefe eines Shadow Map Fragments genutzt, um eine gefilterte Schatten Intensität zu erhalten. Dies wird durch den Algorithmus zwei aus dem Moment Shadow Mapping Paper erreicht.\cite{msm}
+Dadurch erhalten wir ein Intensität für dieses Fragment.
+
+Für das Moment Based Volumetric Obscurance benutzen wir die gleiche Herangehensweise. Allerdings hat es sich herausgestellt, dass die Transformation für 4 Momente zu Artefakten führt, da die numerische optimierung mit der Matrix, wie im MSM Paper beschrieben zu Artefakten führt.
+	
 
 
 \section{Fazit}
