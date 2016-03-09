@@ -10,3 +10,11 @@ build/
 build-unnamed-project-Desktop-Release/
 build-unnamed-project-Desktop-Debug/
 doxygen/
+
+# LaTeX
+*.aux
+*.log
+*.pdf
+*.bbl
+*.blg
+*.synctex.gz
