@@ -28,7 +28,9 @@ Renderer::Renderer() : RendererBase(),
         // Options
         m_colorizeCascades(false),
         m_cascadedShadowMapsLambda(1),
-        m_cascadeStrategy(SampleDistributionShadowMaps)
+        m_cascadeStrategy(SampleDistributionShadowMaps),
+        m_shadowMapSampleCount(1),
+        m_filterShadowMap(false)
 {
     // nothing to do here
 }
@@ -168,6 +170,7 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_SHADOW].emplace_back(&m_shadowMapCascadeViewMatrixLoc, "cascadeViewMatrix");
     m_uniformLocs[KEYSTR_PROGRAM_SHADOW].emplace_back(&m_shadowMapWorldMatrixLoc, "worldMatrix");
 
+    m_uniformLocs[KEYSTR_PROGRAM_CREATE_MOMENTS].emplace_back(&m_createMomentsSampleCountLoc, "sampleCount");
 
     // Compose
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeProjectionMatrixLoc, "projectionMatrix");
@@ -256,8 +259,9 @@ void Renderer::initialize()
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, m_shadowMapDepthBuffer);
     glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
     // glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize, m_cascades, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, 0);
-    glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 4, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize, m_cascades, false);
+    glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, m_shadowMapSampleCount, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize, m_cascades, false);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 0);
+    m_recreateShadowMap = false;
 
     // Create FrameBuffer
     glGenFramebuffers(1, &m_shadowMapFrameBuffer);
@@ -301,6 +305,23 @@ void Renderer::initialize()
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float)*16 * 4 /*m_cascades*/, NULL, GL_DYNAMIC_COPY);
 
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
+
+void Renderer::createShadowMap()
+{
+    // Try to do minimal work here.
+    glDeleteTextures(1, &m_shadowMapDepthBuffer);
+    glGenTextures(1, &m_shadowMapDepthBuffer);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, m_shadowMapDepthBuffer);
+    glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, GL_TEXTURE_MAX_LEVEL, 0);
+    glTexImage3DMultisample(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, m_shadowMapSampleCount, GL_DEPTH_COMPONENT, m_shadowMapSize, m_shadowMapSize, m_cascades, false);
+    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, 0);
+
+    // Bind new texture to frame buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_shadowMapDepthBuffer, 0);
+
+    m_recreateShadowMap = false;
 }
 
 void Renderer::rotateVectorToVector(const QVector3D &source, const QVector3D &destination, QMatrix4x4 &matrix)
@@ -379,6 +400,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
     QOpenGLShaderProgram *createMomentsProgram = m_programs[KEYSTR_PROGRAM_CREATE_MOMENTS].get();
+
+    // Check if we have to recreate the shadow map depth buffer, because sample count changed
+    if (m_recreateShadowMap)
+        createShadowMap();
 
     // Inverse of common transformations...
     const auto &cameraView = scene->getCameraView();
@@ -757,6 +782,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, m_shadowMapDepthBuffer);
 
+    createMomentsProgram->setUniformValue(m_createMomentsSampleCountLoc, m_shadowMapSampleCount);
+
     glBindImageTexture(1, m_shadowMapTexture, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
 
     glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 4);
@@ -766,34 +793,34 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     /*
     glFinish();
     auto start = std::chrono::system_clock::now();
+    */
 
-    for (int j = 0; j < 100; j++)
+    if (m_filterShadowMap)
     {
+        // Filter Shadow Map
+        for (int i = 0; i < 4; i++)
+        {
+            horizontalGaussProgram->bind();
 
-    // Filter Shadow Map
-    for (int i = 0; i < 4; i++)
-    {
-        horizontalGaussProgram->bind();
+            glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
+            glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-        glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
-        glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
+            glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 1);
 
-        glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 1);
+            horizontalGaussProgram->release();
 
-        horizontalGaussProgram->release();
+            verticalGaussProgram->bind();
 
-        verticalGaussProgram->bind();
+            glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
+            glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
 
-        glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
-        glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
+            glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 1);
 
-        glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 1);
-
-        verticalGaussProgram->release();
+            verticalGaussProgram->release();
+        }
     }
 
-    }
-
+    /*
     glFinish();
     auto end = std::chrono::system_clock::now();
     m_debugSum += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
@@ -1254,4 +1281,25 @@ void Renderer::setCascadeStrategy(CascadeStrategy strategy)
 Renderer::CascadeStrategy Renderer::getCascadeStrategy()
 {
     return m_cascadeStrategy;
+}
+
+void Renderer::setShadowMapSampleCount(int sampleCount)
+{
+    m_shadowMapSampleCount = sampleCount;
+    m_recreateShadowMap = true;
+}
+
+int Renderer::getShadowMapSampleCount()
+{
+    return m_shadowMapSampleCount;
+}
+
+void Renderer::setFilterShadowMap(bool enabled)
+{
+    m_filterShadowMap = enabled;
+}
+
+bool Renderer::getFilterShadowMap()
+{
+    return m_filterShadowMap;
 }
