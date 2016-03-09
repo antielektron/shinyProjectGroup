@@ -137,6 +137,20 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_CREATE_MOMENTS,
                     QOpenGLShader::Compute);
 
+
+    // Capture Frustum
+    setShaderSource(loadTextFile("shaders/awesome_capture/awesome_capture_compute.glsl"),
+                    KEYSTR_PROGRAM_CREATE_CAPTURE,
+                    QOpenGLShader::Compute);
+
+    setShaderSource(loadTextFile("shaders/awesome_capture/awesome_capture_vertex.glsl"),
+                    KEYSTR_PROGRAM_RENDER_CAPTURE,
+                    QOpenGLShader::Vertex);
+
+    setShaderSource(loadTextFile("shaders/awesome_capture/awesome_capture_fragment.glsl"),
+                    KEYSTR_PROGRAM_RENDER_CAPTURE,
+                    QOpenGLShader::Fragment);
+
     // Generate attrib and uniform locations
 
     // Render
@@ -209,6 +223,15 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_CREATE_CASCADES_CPU].emplace_back(&m_createCascadesCpuCascadeViewMatrixLoc, "inputCascadeViewMatrix");
 
 
+    // Capture Frustum
+    m_uniformLocs[KEYSTR_PROGRAM_CREATE_CAPTURE].emplace_back(&m_createCaptureInverseCameraViewLoc, "inverseCameraView");
+    m_uniformLocs[KEYSTR_PROGRAM_CREATE_CAPTURE].emplace_back(&m_createCaptureInverseCameraProjectionLoc, "inverseCameraProjection");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_CAPTURE].emplace_back(&m_renderCaptureCascadeIndexLoc, "cascadeIndex");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_CAPTURE].emplace_back(&m_renderCaptureCameraViewLoc, "cameraView");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_CAPTURE].emplace_back(&m_renderCaptureCameraProjectionLoc, "cameraProjection");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_CAPTURE].emplace_back(&m_renderCaptureColorLoc, "color");
+
+
     // create Programs:
     createProgram(KEYSTR_PROGRAM_RENDER);
     createProgram(KEYSTR_PROGRAM_RENDER_DEPTH);
@@ -225,6 +248,8 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_HORIZONTAL_GAUSS);
     createProgram(KEYSTR_PROGRAM_VERTICAL_GAUSS);
     createProgram(KEYSTR_PROGRAM_CREATE_MOMENTS);
+    createProgram(KEYSTR_PROGRAM_CREATE_CAPTURE);
+    createProgram(KEYSTR_PROGRAM_RENDER_CAPTURE);
 
     // make stuff
     // --> default program (nothing to do) <------------------------------------
@@ -304,6 +329,13 @@ void Renderer::initialize()
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_cascadeViewBuffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float)*16 * 4 /*m_cascades*/, NULL, GL_DYNAMIC_COPY);
 
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+
+    // Capture Buffer
+    glGenBuffers(1, &m_capturedFrustumToWorldBuffer);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_capturedFrustumToWorldBuffer);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float)*16 * 5, NULL, GL_DYNAMIC_COPY);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
@@ -400,6 +432,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *verticalGaussProgram = m_programs[KEYSTR_PROGRAM_VERTICAL_GAUSS].get();
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
     QOpenGLShaderProgram *createMomentsProgram = m_programs[KEYSTR_PROGRAM_CREATE_MOMENTS].get();
+    QOpenGLShaderProgram *createCaptureProgram = m_programs[KEYSTR_PROGRAM_CREATE_CAPTURE].get();
+    QOpenGLShaderProgram *renderCaptureProgram = m_programs[KEYSTR_PROGRAM_RENDER_CAPTURE].get();
+
 
     // Check if we have to recreate the shadow map depth buffer, because sample count changed
     if (m_recreateShadowMap)
@@ -663,9 +698,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
                 float cFarLog = nearZ * pow(farZ / nearZ, farIndex);
                 float cascadeFarZ = (1 - m_cascadedShadowMapsLambda) * cFarUni + m_cascadedShadowMapsLambda * cFarLog;
 
-                std::cout << "near " << cascadeNearZ << std::endl;
-                std::cout << "far " << cascadeFarZ << std::endl;
-
                 {
                     // project into screen space!
                     QVector4D cascadeFarPoint(0, 0, -cascadeFarZ, 1);
@@ -690,7 +722,6 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
                         if (j == 0)
                         {
-                            std::cout << coeffNear << std::endl;
                             minCorner = maxCorner = point;
                             continue;
                         }
@@ -741,138 +772,24 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     }
 
 
-
-
-
-    /*
-    // Rotate light direction to z
-    QMatrix4x4 lightViewRotation;
-    rotateVectorToVector(scene->getDirectionalLightDirection().normalized(), QVector3D(0, 0, 1), lightViewRotation);
-
-    // Compute viewFrustum of camera in light view
-    auto inverseCameraTransformation = (scene->getCameraProjection() * scene->getCameraView()).inverted();
-    auto screenToLightTransformation = lightViewRotation * inverseCameraTransformation;
-
-    // Corners of slices
-    std::vector<std::vector<QVector3D>> sliceCorners(m_cascades+1);
-
-    // Compute these values, they will be given to the gpu!
-    std::vector<QMatrix4x4> cascadeViews;
-    std::vector<float> cascadeFars;
-
-    QVector3D minCorners[] = {
-            { -1, -1, -1 },
-            {  1, -1, -1 },
-            { -1,  1, -1 },
-            {  1,  1, -1 }
-    };
-    QVector3D maxCorners[] = {
-            { -1, -1,  1 },
-            {  1, -1,  1 },
-            { -1,  1,  1 },
-            {  1,  1,  1 }
-    };
-
-    QVector3D nearFarCorners[] = {
-            { 0, 0, -1 },
-            { 0, 0,  1 }
-    };
-
-    // Transform corners into light view space
-    mathUtility::transformVectors(screenToLightTransformation, minCorners);
-    mathUtility::transformVectors(screenToLightTransformation, maxCorners);
-
-    // Transform corners into light view space
-    mathUtility::transformVectors(scene->getCameraProjection().inverted(), nearFarCorners);
-    // NOTE: z values are inverted! multiply by -1
-    for (auto &corner : nearFarCorners)
-        corner = -corner;
-
-    // TODO
-    float lambdaUniLog = 0.5;
-
-    // Interpolate corners in light view space, not screen space
-    for (int i = 0; i <= m_cascades; i++)
+    // DEBUG
+    // Create Capture
+    if (m_captured == CAPTURE_REQUESTED)
     {
-        float cUni = 1 - (float) i / m_cascades; // 1 to 0
-        // float cLog = -1 * -1 ^ (i/m_cascades); // COMPLEX!
+        createCaptureProgram->bind();
 
-        // TODO combine cLog and cUni
-        float coeff = cUni;
+        createCaptureProgram->setUniformValue(m_createCaptureInverseCameraViewLoc, inverseCameraView);
+        createCaptureProgram->setUniformValue(m_createCaptureInverseCameraProjectionLoc, inverseCameraProjection);
 
-        if (i != 0)
-            cascadeFars.push_back(coeff * nearFarCorners[0].z() + (1 - coeff) * nearFarCorners[1].z());
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeViewBuffer);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_capturedFrustumToWorldBuffer);
 
-        for (int j = 0; j < 4; j++)
-        {
-            sliceCorners[i].push_back(coeff * minCorners[j] + (1 - coeff) * maxCorners[j]);
-        }
+        glDispatchCompute(1, 1, 1);
+
+        createCaptureProgram->release();
+
+        m_captured = CAPTURE_ACTIVE;
     }
-
-    // For each cascade combine two slices
-    for (int i = 0; i < m_cascades; i++)
-    {
-        // compute MINIMAL bounding box of frustumCorners
-        float minZ = sliceCorners[i].front().z();
-        float maxZ = sliceCorners[i].front().z();
-        std::vector<QVector2D> corners2D;
-
-        for (const auto &corner : sliceCorners[i])
-        {
-            corners2D.push_back(corner.toVector2D());
-            if (minZ > corner.z())
-                minZ = corner.z();
-            if (maxZ < corner.z())
-                maxZ = corner.z();
-
-        }
-        for (const auto &corner : sliceCorners[i+1])
-        {
-            corners2D.push_back(corner.toVector2D());
-            if (minZ > corner.z())
-                minZ = corner.z();
-            if (maxZ < corner.z())
-                maxZ = corner.z();
-        }
-
-        // Compute on x-y-plane the minimal bounding rectangle
-        std::vector<QVector2D> hull2D;
-        QVector2D maxCorner2D;
-        QVector2D minCorner2D;
-        float frustumRotationAngle;
-
-        mathUtility::getConvexHull(corners2D, hull2D);
-        mathUtility::getMinimalBoundingBox(hull2D,
-                                           minCorner2D,
-                                           maxCorner2D,
-                                           frustumRotationAngle);
-
-        // rotate such that minimal bounding box is aabb
-        QMatrix4x4 lightViewRotationZ;
-        lightViewRotationZ.rotate(frustumRotationAngle * 180.f / static_cast<float>(M_PI), QVector3D(0, 0, -1));
-
-        // compute light view projection
-        QMatrix4x4 lightViewProjection;
-        lightViewProjection.ortho(minCorner2D.x(), maxCorner2D.x(), minCorner2D.y(), maxCorner2D.y(), -maxZ, -minZ); // TODO find out why near/far plane are so?
-
-        // NOTE: will work in view space not world space while rendering!
-        cascadeViews.push_back(lightViewProjection * lightViewRotationZ * lightViewRotation * scene->getCameraView().inverted());
-    }
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // 3. Render to ShadowMap
@@ -1044,6 +961,146 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     renderProgram->release();
 
+
+
+
+
+    // View Capture if enabled
+    if (m_captured == CAPTURE_ACTIVE)
+    {
+        auto drawCube = []() {
+            glBegin(GL_QUADS);
+
+            // X min
+            glVertex3f(-1, -1, -1);
+            glVertex3f(-1, -1,  1);
+            glVertex3f(-1,  1,  1);
+            glVertex3f(-1,  1, -1);
+
+            // X max
+            glVertex3f( 1, -1, -1);
+            glVertex3f( 1, -1,  1);
+            glVertex3f( 1,  1,  1);
+            glVertex3f( 1,  1, -1);
+
+            // Y min
+            glVertex3f(-1, -1, -1);
+            glVertex3f(-1, -1,  1);
+            glVertex3f( 1, -1,  1);
+            glVertex3f( 1, -1, -1);
+
+            // Y max
+            glVertex3f(-1,  1, -1);
+            glVertex3f(-1,  1,  1);
+            glVertex3f( 1,  1,  1);
+            glVertex3f( 1,  1, -1);
+
+            // Z min
+            glVertex3f(-1, -1, -1);
+            glVertex3f(-1,  1, -1);
+            glVertex3f( 1,  1, -1);
+            glVertex3f( 1, -1, -1);
+
+            // Z max
+            glVertex3f(-1, -1,  1);
+            glVertex3f(-1,  1,  1);
+            glVertex3f( 1,  1,  1);
+            glVertex3f( 1, -1,  1);
+
+            glEnd();
+        };
+        auto drawWireframe = []() {
+
+            glBegin(GL_LINE_STRIP);
+
+            glVertex3f(-1,  1, -1);
+            glVertex3f(-1, -1, -1);
+            glVertex3f( 1, -1, -1);
+            glVertex3f( 1,  1, -1);
+
+            glEnd();
+
+            glBegin(GL_LINE_STRIP);
+
+            glVertex3f(-1,  1,  1);
+            glVertex3f(-1,  1, -1);
+            glVertex3f( 1,  1, -1);
+            glVertex3f( 1,  1,  1);
+
+            glEnd();
+
+            glBegin(GL_LINE_STRIP);
+
+            glVertex3f(-1, -1,  1);
+            glVertex3f(-1,  1,  1);
+            glVertex3f( 1,  1,  1);
+            glVertex3f( 1, -1,  1);
+
+            glEnd();
+
+            glBegin(GL_LINE_STRIP);
+
+            glVertex3f(-1, -1, -1);
+            glVertex3f(-1, -1,  1);
+            glVertex3f( 1, -1,  1);
+            glVertex3f( 1, -1, -1);
+
+            glEnd();
+
+        };
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glDisable(GL_CULL_FACE);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        renderCaptureProgram->bind();
+
+        renderCaptureProgram->setUniformValue(m_renderCaptureCameraProjectionLoc, cameraProjection);
+        renderCaptureProgram->setUniformValue(m_renderCaptureCameraViewLoc, cameraView);
+
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_capturedFrustumToWorldBuffer);
+
+        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, 0);
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(1, 0, 0, 0.5));
+        drawCube();
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(1, 0, 0, 1));
+        drawWireframe();
+
+        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, 1);
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(0, 1, 0, 0.5));
+        drawCube();
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(0, 1, 0, 1));
+        drawWireframe();
+
+        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, 2);
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(0, 0, 1, 0.5));
+        drawCube();
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(0, 0, 1, 1));
+        drawWireframe();
+
+        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, 3);
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(1, 1, 0, 0.5));
+        drawCube();
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(1, 1, 0, 1));
+        drawWireframe();
+
+        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, 4);
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(1, 0, 1, 1));
+        drawWireframe();
+
+        glDisable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+
+        renderCaptureProgram->release();
+    }
+
+
+
+
+
+
+
     /*
 
     // 5. Gauss moments of screenspace depth:
@@ -1122,7 +1179,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
 
     // DEBUG
-
+    /*
     QMatrix4x4 lightViewMatrix;
     createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
 
@@ -1161,6 +1218,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+     */
     /*
     QVector2D renderSliceCorners[] = {
             { -1, -1},
@@ -1453,4 +1511,14 @@ void Renderer::setFilterShadowMap(bool enabled)
 bool Renderer::getFilterShadowMap()
 {
     return m_filterShadowMap;
+}
+
+void Renderer::setCapture(bool enabled)
+{
+    m_captured = enabled ? CAPTURE_REQUESTED : CAPTURE_NONE;
+}
+
+bool Renderer::getCapture()
+{
+    return m_captured != CAPTURE_NONE;
 }

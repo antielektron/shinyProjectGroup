@@ -20,6 +20,7 @@ protected slots:
     void onColorCascadesChanged();
     void onCascadedShadowMapsLambdaChanged();
     void onCascadesStrategyChanged();
+    void onAwesomeCaptureChanged();
 
     void onFilterShadowMapChanged();
     void onShadowMapMsaaChanged();
@@ -38,6 +39,8 @@ private:
     QRadioButton *m_sampleDistributionShadowMaps;
 
     QSlider *m_cascadedShadowMapsLambda;
+
+    QCheckBox *m_awesomeCapture;
 
     QCheckBox *m_filterShadowMap;
 

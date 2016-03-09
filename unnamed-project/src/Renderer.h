@@ -30,6 +30,9 @@
 #define KEYSTR_PROGRAM_CREATE_CASCADE_VIEWS     "Create Cascade Views"
 #define KEYSTR_PROGRAM_CREATE_CASCADES_CPU      "Create Cascades CPU"
 
+#define KEYSTR_PROGRAM_CREATE_CAPTURE           "Create Capture"
+#define KEYSTR_PROGRAM_RENDER_CAPTURE           "Render Capture"
+
 #define NUM_VO_MIPMAP_LEVELS 10 //so there's a height of 1 pixel @toplevel for full-HD
 
 
@@ -65,6 +68,9 @@ public:
     void setFilterShadowMap(bool enabled);
     bool getFilterShadowMap();
 
+    void setCapture(bool enabled);
+    bool getCapture();
+
 protected:
     virtual void onRenderingInternal(GLuint fbo, Scene *scene) override;
     void rotateVectorToVector(const QVector3D &source,
@@ -85,6 +91,11 @@ protected:
 
     // set if we need to recreate the shadow map..
     bool m_recreateShadowMap;
+
+
+    /// CAPTURED information
+    enum { CAPTURE_NONE, CAPTURE_REQUESTED, CAPTURE_ACTIVE } m_captured;
+    GLuint m_capturedFrustumToWorldBuffer;
 
     // TODO shadowMapSize as option
     // (TODO cascade couunt as option)
@@ -163,6 +174,15 @@ protected:
     int m_createCascadesCpuCascadeFarLoc;
     int m_createCascadesCpuCascadeViewMatrixLoc;
     float m_ratio;
+
+
+    // Capture
+    int m_createCaptureInverseCameraProjectionLoc;
+    int m_createCaptureInverseCameraViewLoc;
+    int m_renderCaptureCascadeIndexLoc;
+    int m_renderCaptureCameraProjectionLoc;
+    int m_renderCaptureCameraViewLoc;
+    int m_renderCaptureColorLoc;
 
     QOpenGLVertexArrayObject m_quadVao;
     QOpenGLBuffer m_quadVbo;

@@ -78,6 +78,9 @@ QWidget *RendererDebugWidget::generateSDSMOptions()
     m_sampleDistributionShadowMaps = new QRadioButton("SDSM", sdsmOptions);
     layout->addWidget(m_sampleDistributionShadowMaps);
 
+    m_awesomeCapture = new QCheckBox("Awesome Capture");
+    layout->addWidget(m_awesomeCapture);
+
     return sdsmOptions;
 }
 
@@ -107,6 +110,7 @@ void RendererDebugWidget::connectStuff()
     connect(m_cascadedShadowMapsLambda, SIGNAL(valueChanged(int)), this, SLOT(onCascadedShadowMapsLambdaChanged()));
     connect(m_cascadedShadowMaps, SIGNAL(clicked()), this, SLOT(onCascadesStrategyChanged()));
     connect(m_sampleDistributionShadowMaps, SIGNAL(clicked()), this, SLOT(onCascadesStrategyChanged()));
+    connect(m_awesomeCapture, SIGNAL(stateChanged(int)), this, SLOT(onAwesomeCaptureChanged()));
 
     connect(m_filterShadowMap, SIGNAL(stateChanged(int)), this, SLOT(onFilterShadowMapChanged()));
     for (int i = 0; i < 5; i++)
@@ -140,6 +144,12 @@ void RendererDebugWidget::onCascadesStrategyChanged()
         m_renderer->setCascadeStrategy(Renderer::CascadeStrategy::CascadedShadowMaps);
     }
 }
+
+void RendererDebugWidget::onAwesomeCaptureChanged()
+{
+    m_renderer->setCapture(m_awesomeCapture->isChecked());
+}
+
 void RendererDebugWidget::onFilterShadowMapChanged()
 {
     m_renderer->setFilterShadowMap(m_filterShadowMap->isChecked());
