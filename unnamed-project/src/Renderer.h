@@ -119,6 +119,8 @@ protected:
     int m_composeInverseProjectionMatrixLoc;
 
     int m_composeDepthBufferLoc;
+    int m_ratioLoc;
+    int m_composeLightDirectionLoc;
 
     // Copy Shader for texture arrays
     int m_copyArraySamplerLoc;
@@ -143,6 +145,7 @@ protected:
 
     int m_createCascadesCpuCascadeFarLoc;
     int m_createCascadesCpuCascadeViewMatrixLoc;
+    float m_ratio;
 
     QOpenGLVertexArrayObject m_quadVao;
     QOpenGLBuffer m_quadVbo;

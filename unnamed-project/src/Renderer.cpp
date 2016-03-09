@@ -175,6 +175,8 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeDepthBufferLoc, "depthBuffer");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeSamplerLoc, "sampler");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeMomentsSamplerLoc, "momentsSampler");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_ratioLoc, "ratio");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeLightDirectionLoc, "lightDirection");
 
     m_attribLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(0, "v_position");
 
@@ -398,14 +400,17 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // color attachment
+    GLuint voAttachement[1] = { GL_COLOR_ATTACHMENT1 };
+    glDrawBuffers(1, voAttachement);
+
+    glClearColor(1, 1, 1, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     // 1. Render depth only
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     glDepthFunc(GL_LESS);
-
-    // no color attachments
-    GLuint voAttachement[1] = { GL_COLOR_ATTACHMENT1 };
-    glDrawBuffers(1, voAttachement);
 
     renderDepthProgram->bind();
 
@@ -919,6 +924,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     composeProgram->setUniformValue(m_composeDepthBufferLoc,2);
     composeProgram->setUniformValue(m_composeProjectionMatrixLoc, scene->getCameraProjection());
     composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, scene->getCameraProjection().inverted());
+    composeProgram->setUniformValue(m_ratioLoc, m_ratio);
+    composeProgram->setUniformValue(m_composeLightDirectionLoc, lightDirection);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_renderTexture);
@@ -1109,6 +1116,8 @@ void Renderer::resize(int width, int height)
 {
     m_width = width;
     m_height = height;
+
+    m_ratio = width/height;
 
     glDeleteFramebuffers(1, &m_renderFrameBuffer);
     glDeleteTextures(1, &m_renderTexture);
