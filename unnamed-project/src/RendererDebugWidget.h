@@ -20,6 +20,7 @@ protected slots:
     void onColorCascadesChanged();
     void onCascadedShadowMapsLambdaChanged();
     void onCascadesStrategyChanged();
+    void onVolumetricObscuranceChanged();
 
     void onFilterShadowMapChanged();
     void onShadowMapMsaaChanged();
@@ -28,6 +29,7 @@ private:
     void generateWidgets();
     QWidget *generateSDSMOptions();
     QWidget *generateMSMOptions();
+    QWidget *generateVOOptions();
     void connectStuff();
 
     Renderer *m_renderer;
@@ -36,6 +38,10 @@ private:
 
     QRadioButton *m_cascadedShadowMaps;
     QRadioButton *m_sampleDistributionShadowMaps;
+
+    QRadioButton *m_lineVO;
+    QRadioButton *m_varianceVO;
+    QRadioButton *m_momentVO;
 
     QSlider *m_cascadedShadowMapsLambda;
 
