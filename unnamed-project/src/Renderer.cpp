@@ -670,7 +670,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
                     // project into screen space!
                     QVector4D cascadeFarPoint(0, 0, -cascadeFarZ, 1);
                     cascadeFarPoint = cameraProjection * cascadeFarPoint;
-                    cascadeFars.push_back(cascadeFarPoint.z()/cascadeFarPoint.w());
+                    // NOTE: THE RESULT IS FROM -1 TO 1, BUT OUR FAR VALUES FROM 0 TO 1!!!! SCREW YOU!
+                    cascadeFars.push_back(cascadeFarPoint.z()/cascadeFarPoint.w()*0.5f + 0.5f);
                 }
 
                 {
@@ -718,10 +719,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
                         }
                     }
 
-                    QMatrix4x4 cascadeView;
-                    // TODO
-                    cascadeView.frustum(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z());
-                    cascadeViews.push_back(cascadeView);
+                    QMatrix4x4 cascadeProjection;
+                    cascadeProjection.ortho(minCorner.x(), maxCorner.x(), minCorner.y(), maxCorner.y(), -maxCorner.z(), -minCorner.z());
+                    cascadeViews.push_back(cascadeProjection * lightViewMatrix * inverseCameraView);
                 }
             }
 
@@ -739,6 +739,140 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             createCascadesCpu->release();
         } break;
     }
+
+
+
+
+
+    /*
+    // Rotate light direction to z
+    QMatrix4x4 lightViewRotation;
+    rotateVectorToVector(scene->getDirectionalLightDirection().normalized(), QVector3D(0, 0, 1), lightViewRotation);
+
+    // Compute viewFrustum of camera in light view
+    auto inverseCameraTransformation = (scene->getCameraProjection() * scene->getCameraView()).inverted();
+    auto screenToLightTransformation = lightViewRotation * inverseCameraTransformation;
+
+    // Corners of slices
+    std::vector<std::vector<QVector3D>> sliceCorners(m_cascades+1);
+
+    // Compute these values, they will be given to the gpu!
+    std::vector<QMatrix4x4> cascadeViews;
+    std::vector<float> cascadeFars;
+
+    QVector3D minCorners[] = {
+            { -1, -1, -1 },
+            {  1, -1, -1 },
+            { -1,  1, -1 },
+            {  1,  1, -1 }
+    };
+    QVector3D maxCorners[] = {
+            { -1, -1,  1 },
+            {  1, -1,  1 },
+            { -1,  1,  1 },
+            {  1,  1,  1 }
+    };
+
+    QVector3D nearFarCorners[] = {
+            { 0, 0, -1 },
+            { 0, 0,  1 }
+    };
+
+    // Transform corners into light view space
+    mathUtility::transformVectors(screenToLightTransformation, minCorners);
+    mathUtility::transformVectors(screenToLightTransformation, maxCorners);
+
+    // Transform corners into light view space
+    mathUtility::transformVectors(scene->getCameraProjection().inverted(), nearFarCorners);
+    // NOTE: z values are inverted! multiply by -1
+    for (auto &corner : nearFarCorners)
+        corner = -corner;
+
+    // TODO
+    float lambdaUniLog = 0.5;
+
+    // Interpolate corners in light view space, not screen space
+    for (int i = 0; i <= m_cascades; i++)
+    {
+        float cUni = 1 - (float) i / m_cascades; // 1 to 0
+        // float cLog = -1 * -1 ^ (i/m_cascades); // COMPLEX!
+
+        // TODO combine cLog and cUni
+        float coeff = cUni;
+
+        if (i != 0)
+            cascadeFars.push_back(coeff * nearFarCorners[0].z() + (1 - coeff) * nearFarCorners[1].z());
+
+        for (int j = 0; j < 4; j++)
+        {
+            sliceCorners[i].push_back(coeff * minCorners[j] + (1 - coeff) * maxCorners[j]);
+        }
+    }
+
+    // For each cascade combine two slices
+    for (int i = 0; i < m_cascades; i++)
+    {
+        // compute MINIMAL bounding box of frustumCorners
+        float minZ = sliceCorners[i].front().z();
+        float maxZ = sliceCorners[i].front().z();
+        std::vector<QVector2D> corners2D;
+
+        for (const auto &corner : sliceCorners[i])
+        {
+            corners2D.push_back(corner.toVector2D());
+            if (minZ > corner.z())
+                minZ = corner.z();
+            if (maxZ < corner.z())
+                maxZ = corner.z();
+
+        }
+        for (const auto &corner : sliceCorners[i+1])
+        {
+            corners2D.push_back(corner.toVector2D());
+            if (minZ > corner.z())
+                minZ = corner.z();
+            if (maxZ < corner.z())
+                maxZ = corner.z();
+        }
+
+        // Compute on x-y-plane the minimal bounding rectangle
+        std::vector<QVector2D> hull2D;
+        QVector2D maxCorner2D;
+        QVector2D minCorner2D;
+        float frustumRotationAngle;
+
+        mathUtility::getConvexHull(corners2D, hull2D);
+        mathUtility::getMinimalBoundingBox(hull2D,
+                                           minCorner2D,
+                                           maxCorner2D,
+                                           frustumRotationAngle);
+
+        // rotate such that minimal bounding box is aabb
+        QMatrix4x4 lightViewRotationZ;
+        lightViewRotationZ.rotate(frustumRotationAngle * 180.f / static_cast<float>(M_PI), QVector3D(0, 0, -1));
+
+        // compute light view projection
+        QMatrix4x4 lightViewProjection;
+        lightViewProjection.ortho(minCorner2D.x(), maxCorner2D.x(), minCorner2D.y(), maxCorner2D.y(), -maxZ, -minZ); // TODO find out why near/far plane are so?
+
+        // NOTE: will work in view space not world space while rendering!
+        cascadeViews.push_back(lightViewProjection * lightViewRotationZ * lightViewRotation * scene->getCameraView().inverted());
+    }
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // 3. Render to ShadowMap
@@ -985,8 +1119,18 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     // DONE
 
-    /*
+
+
     // DEBUG
+
+    QMatrix4x4 lightViewMatrix;
+    createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
+
+    auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
+
+    QMatrix4x4 tempLightProjection;
+    createFrustumProjectionMatrix(screenToLightTransformation, tempLightProjection);
+
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
     glViewport(0, 0, m_width/2, m_height/2);
@@ -996,28 +1140,28 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    defaultProgram->bind();
+    renderProgram->bind();
 
-    defaultProgram->setUniformValue(m_projectionMatrixLoc, tempLightProjection);
-    defaultProgram->setUniformValue(m_lightDirectionLoc, QVector3D(0, 0, 1));
-    defaultProgram->setUniformValue(m_lightColorLoc, scene->getLightColor());
+    renderProgram->setUniformValue(m_projectionMatrixLoc, tempLightProjection);
+    renderProgram->setUniformValue(m_lightDirectionLoc, QVector3D(0, 0, 1));
+    renderProgram->setUniformValue(m_lightColorLoc, scene->getLightColor());
 
     // Render regular objects
     for (auto &object : scene->getObjects())
     {
         auto cameraModelView = lightViewMatrix * object->getWorld();
 
-        defaultProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        defaultProgram->setUniformValue(m_specularColorLoc, object->getSpecularColor());
-        defaultProgram->setUniformValue(m_diffuseColorLoc, object->getDiffuseColor());
-        defaultProgram->setUniformValue(m_ambientColorLoc, object->getAmbientColor());
+        renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+        renderProgram->setUniformValue(m_specularColorLoc, object->getSpecularColor());
+        renderProgram->setUniformValue(m_diffuseColorLoc, object->getDiffuseColor());
+        renderProgram->setUniformValue(m_ambientColorLoc, object->getAmbientColor());
 
         object->getModel()->draw();
     }
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
-
+    /*
     QVector2D renderSliceCorners[] = {
             { -1, -1},
             {  1, -1},
@@ -1033,10 +1177,10 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     for (auto &entry : slices)
     {
-        defaultProgram->setUniformValue(m_modelViewMatrixLoc, lightViewMatrix);
-        defaultProgram->setUniformValue(m_specularColorLoc, QVector3D(0, 0, 0));
-        defaultProgram->setUniformValue(m_diffuseColorLoc, QVector3D(0, 0, 0));
-        defaultProgram->setUniformValue(m_ambientColorLoc, entry.second);
+        renderProgram->setUniformValue(m_modelViewMatrixLoc, lightViewMatrix);
+        renderProgram->setUniformValue(m_specularColorLoc, QVector3D(0, 0, 0));
+        renderProgram->setUniformValue(m_diffuseColorLoc, QVector3D(0, 0, 0));
+        renderProgram->setUniformValue(m_ambientColorLoc, entry.second);
 
         for (auto &corner : renderSliceCorners)
         {
@@ -1056,15 +1200,15 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     }
 
     // only last cascade
-    defaultProgram->setUniformValue(m_specularColorLoc, QVector3D(0, 0, 0));
-    defaultProgram->setUniformValue(m_diffuseColorLoc, QVector3D(0, 0, 0));
-    defaultProgram->setUniformValue(m_ambientColorLoc, QVector3D(1, 1, 0));
+    renderProgram->setUniformValue(m_specularColorLoc, QVector3D(0, 0, 0));
+    renderProgram->setUniformValue(m_diffuseColorLoc, QVector3D(0, 0, 0));
+    renderProgram->setUniformValue(m_ambientColorLoc, QVector3D(1, 1, 0));
 
     for (int i = 0; i < 4; i++)
     {
         QMatrix4x4 world;
         world.setToIdentity();
-        defaultProgram->setUniformValue(m_modelViewMatrixLoc, world);
+        renderProgram->setUniformValue(m_modelViewMatrixLoc, world);
 
         auto &minCorner = minCornersCascade[i];
         auto &maxCorner = maxCornersCascade[i];
@@ -1078,14 +1222,15 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
         glEnd();
     }
+    */
 
 
     // Unbind shadow map texture
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-    defaultProgram->release();
+    renderProgram->release();
 
-
+    /*
     GLint windowTexture;
     glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);
     */
