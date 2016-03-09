@@ -429,7 +429,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     GLuint voAttachement[1] = { GL_COLOR_ATTACHMENT1 };
     glDrawBuffers(1, voAttachement);
 
-    glClearColor(1, 1, 1, 1);
+    glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // 1. Render depth only

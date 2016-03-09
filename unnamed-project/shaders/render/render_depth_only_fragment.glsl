@@ -2,7 +2,7 @@
 
 out vec4 moments;
 uniform mat4 inverseProjectionMatrix;
-const float sceneDepth = 100;
+const float sceneDepth = 200;
 const float nearPlaneDepth = 3;
 const float correction = 0.2;
 
