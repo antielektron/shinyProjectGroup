@@ -107,7 +107,22 @@ TODO
 
 \subsection{Implementierung}
 
-TODO
+% Rendern der Shadow Map
+Die Shadow Maps für die Kaskaden werden mittels Texture Arrays realisiert, wobei jede Kaskade einen eigenen Layer in dem Array erhält.
+Beim Rendern der Shadow Map transformiert der Vertex Shader die Geometrie zunächst nur in das Welt Koordinatensystem und nicht direkt in das Frustum der Shadow Map.
+Der Geometry Shader klont dann die Geometrie und transformiert sie für jede Kaskade mit der dazugehörigen Projektionsmatrix in das Shadow Map Frustum um sie in den entsprechenden Layer der Shadow Map zu rendern.
+Anstatt die Near Plane des Shadow Map Frustums zu verschieben, um Geometrie die aus der Sicht des Lichtes vor dem Kamera Frustum liegt zu berücksichtigen, wird an der Near Plane des Shadow Map Frustums der Tiefenwert geclampt.
+
+% Reduktion 1
+
+
+% Temporäre Licht Projektion
+
+
+% Reduktion 2
+
+% Keks
+
 
 \paragraph{Erster Versuch}
 Im ersten Ansatz haben wir die Reduktionen für die tatsächliche Near und Far Distanz sowie die Bounding Boxen der Geometrie in den Kaskaden auf der GPU berechnet.
