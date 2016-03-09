@@ -86,6 +86,14 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
+        <Object name="rotating_floor" model="floor" interactionEvent="hit_rotating_floor">
+            <Position x="-2" y="-4" z="20"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
     </Objects>
     <Attributes/>
     <Events>
@@ -158,6 +166,9 @@
                 <Interpolation type="linear" duration="5"/>
             </Action>
             <Action type="trigger" name="turn_floor" delay="5"/>
+            <Action type="fmov" lhs="rotating_floor_angle" rhs="0"/>
+            <Action type="bmov" lhs="rotating_floor_active" rhs="1"/>
+            <Action type="trigger" name="update_rotating_floor" delay="0"/>
         </Event>
         <Event name="turn_floor" description="">
             <Action type="imul" lhs="moving_floor_pos" rhs="-1"/>
@@ -165,6 +176,22 @@
                 <Interpolation type="linear" duration="10"/>
             </Action>
             <Action type="trigger" name="turn_floor" delay="10"/>
+        </Event>
+        <Event name="hit_rotating_floor" description=""/>
+        <Event name="update_rotating_floor" description="when rotating">
+            <Precondition type="beq" lhs="[rotating_floor_active]" rhs="1"/>
+            <Action type="fadd" lhs="rotating_floor_angle" rhs="10"/>
+            <Action type="animrot" x="0" y="[rotating_floor_angle]" z="0" object="rotating_floor">
+                <Interpolation type="linear" duration="2"/>
+            </Action>
+            <Action type="trigger" name="update_rotating_floor" delay="2"/>
+        </Event>
+        <Event name="hit_rotating_floor" description="">
+            <Action type="binv" key="rotating_floor_active"/>
+        </Event>
+        <Event name="update_rotating_floor" description="when not rotating">
+            <Precondition type="beq" lhs="[rotating_floor_active]" rhs="0"/>
+            <Action type="trigger" name="update_rotating_floor" delay="5"/>
         </Event>
     </Events>
     <Animators/>

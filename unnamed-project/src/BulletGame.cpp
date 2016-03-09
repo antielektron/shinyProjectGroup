@@ -125,10 +125,7 @@ void BulletGame::handleInput(float deltaTime)
 
     if (m_keyManager->isKeyPressed(Qt::Key_Space))
     {
-        // TODO initiate jump
-        // velocity += QVector3D(0, speed*2, 0);
-        // m_playerBody->applyCentralForce(btVector3(0, 40, 0));
-        m_playerBody->applyCentralImpulse(btVector3(0, 10, 0));
+        performJump();
     }
 
     // Reset camera
@@ -199,17 +196,27 @@ void BulletGame::updateBulletGeometry(ObjectBase *obj)
         auto object = static_cast<Object *>(obj);
         auto body = static_cast<btRigidBody *>(object->getUserPointer());
 
-        auto oldOrigin = body->getWorldTransform().getOrigin();
+        auto oldTransform = body->getWorldTransform();
 
-        btTransform transformation;
-        transformation.setFromOpenGLMatrix(object->getWorld().constData());
-        body->setWorldTransform(transformation);
+        btTransform transform;
+        transform.setFromOpenGLMatrix(object->getWorld().constData());
+        body->setWorldTransform(transform);
 
-        auto newOrigin = body->getWorldTransform().getOrigin();
+        auto deltaTransform = oldTransform.inverse() * transform;
 
-        // TODO set angular velocity!
         // TODO dynamic framerate
-        body->setLinearVelocity((newOrigin - oldOrigin) * 60);
+        body->setLinearVelocity(deltaTransform.getOrigin() * 60);
+
+        auto rotationQuaternion = deltaTransform.getRotation();
+        if (rotationQuaternion.getAngle() != 0)
+        {
+            // Manual axis computation.. Bullet thinks that the rotation is to small.
+            btScalar s_squared = 1.f - rotationQuaternion.w()*rotationQuaternion.w();
+            btScalar s = 1.f/btSqrt(s_squared);
+            auto axis = btVector3(rotationQuaternion.x() * s, rotationQuaternion.y() * s, rotationQuaternion.z() * s);
+
+            body->setAngularVelocity(axis*rotationQuaternion.getAngle() * 60);
+        }
     }
 }
 
@@ -243,6 +250,25 @@ void BulletGame::performInteraction()
                 m_scene->getGlobalState()->triggerEvent(event);
             }
         }
+    }
+}
+
+void BulletGame::performJump()
+{
+    // player bottom is at -0.9
+    // player eye  is at 0.9-0.2 = 0.7
+    // bottom = -0.9-0.7 = -1.6
+    btVector3 start = toBulletVector3(m_position);
+    btVector3 end = toBulletVector3(m_position + QVector3D(0, -1.6f-0.1f, 0));
+
+    btCollisionWorld::ClosestRayResultCallback callback(start, end);
+
+    // Perform raycast
+    m_bulletWorld->rayTest(start, end, callback);
+
+    if(callback.hasHit())
+    {
+        m_playerBody->applyCentralImpulse(btVector3(0, 10, 0));
     }
 }
 

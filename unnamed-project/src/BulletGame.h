@@ -40,6 +40,7 @@ private:
     void updateBulletGeometry(ObjectBase *obj);
 
     void performInteraction();
+    void performJump();
 
     QString m_scenefile;
     std::unique_ptr<Scene> m_scene;
