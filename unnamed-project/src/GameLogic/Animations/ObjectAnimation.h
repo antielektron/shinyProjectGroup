@@ -35,12 +35,18 @@ void ObjectAnimation<T>::tick(float time, IObjectBaseObserver *observer)
 {
     auto currentValue = this->m_interpolatedValue.interpolatedValue(time);
 
-    this->m_access.set(currentValue);
-
-    observer->notify(this->m_object);
-
     if (this->m_interpolation->isFinished(time))
+    {
+        // in order to make bullet recognize that this object is no longer moving, notify again.
+        observer->notify(this->m_object);
+
         this->m_scene->deleteAnimation(this);
+    }
+    else
+    {
+        this->m_access.set(currentValue);
+        observer->notify(this->m_object);
+    }
 }
 
 

@@ -167,7 +167,7 @@
             </Action>
             <Action type="trigger" name="turn_floor" delay="5"/>
             <Action type="fmov" lhs="rotating_floor_angle" rhs="0"/>
-            <Action type="bmov" lhs="rotating_floor_active" rhs="1"/>
+            <Action type="imov" lhs="rotating_floor_active" rhs="1"/>
             <Action type="trigger" name="update_rotating_floor" delay="0"/>
         </Event>
         <Event name="turn_floor" description="">
@@ -177,9 +177,8 @@
             </Action>
             <Action type="trigger" name="turn_floor" delay="10"/>
         </Event>
-        <Event name="hit_rotating_floor" description=""/>
         <Event name="update_rotating_floor" description="when rotating">
-            <Precondition type="beq" lhs="[rotating_floor_active]" rhs="1"/>
+            <Precondition type="ieq" lhs="[rotating_floor_active]" rhs="1"/>
             <Action type="fadd" lhs="rotating_floor_angle" rhs="10"/>
             <Action type="animrot" x="0" y="[rotating_floor_angle]" z="0" object="rotating_floor">
                 <Interpolation type="linear" duration="2"/>
@@ -187,10 +186,10 @@
             <Action type="trigger" name="update_rotating_floor" delay="2"/>
         </Event>
         <Event name="hit_rotating_floor" description="">
-            <Action type="binv" key="rotating_floor_active"/>
+            <Action type="imul" lhs="rotating_floor_active" rhs="-1"/>
         </Event>
         <Event name="update_rotating_floor" description="when not rotating">
-            <Precondition type="beq" lhs="[rotating_floor_active]" rhs="0"/>
+            <Precondition type="ieq" lhs="[rotating_floor_active]" rhs="-1"/>
             <Action type="trigger" name="update_rotating_floor" delay="5"/>
         </Event>
     </Events>

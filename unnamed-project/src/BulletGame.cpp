@@ -217,6 +217,10 @@ void BulletGame::updateBulletGeometry(ObjectBase *obj)
 
             body->setAngularVelocity(axis*rotationQuaternion.getAngle() * 60);
         }
+        else
+        {
+            body->setAngularVelocity(btVector3(0, 0, 0));
+        }
     }
 }
 
