@@ -144,14 +144,17 @@ Nachdem dann die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus e
 	TODO
 	
 \section{Moment Shadow Mapping}
-Um eine möglichst hohe Qualität an Schatten zu erreichen bieten sich verschiedene Verfahren an. Deswegen ist es wünschenswert für uns eine filterbare Daten zu nutzen. Percentage Close Filtering eliminiert effektiv Aliasing Effekt durch samplen der Schadow Map durch einen Filter Kernel.\cite{msm} Allerdings kann dies nur für einzelne Fragmente möglich, da das Verfahren Tiefenabhängig beim Schattentest ist.\citep{msm}
-Es bietet sich daher an mit Momenten zu arbeiten. Variance Shadow Maps nutzen zwei Momente und bietet deshalb zusätzlich die quadrierte Tiefeninformation. Diese wird genutzt um PCF weiter zu approximieren.
 
-
+Um eine möglichst hohe Qualität an Schatten zu erreichen bieten sich verschiedene Verfahren an. Deswegen ist es wünschenswert für uns eine filterbare Daten zu nutzen. Percentage Close Filtering eliminiert effektiv Aliasing Effekt durch samplen der Schadow Map durch einen Filter Kernel.\cite{msm} 
+Allerdings kann dies nur für einzelne Fragmente möglich, da das Verfahren Tiefenabhängig beim Schattentest ist.\cite{msm}
+Es bietet sich daher an mit Momenten zu arbeiten. Variance Shadow Maps nutzen zwei Momente und bietet deshalb zusätzlich die quadrierte Tiefeninformation. Diese wird genutzt um PCF weiter zu approximieren und filterbare Shadow Maps zu nutzen.
+Wir werden das Hamburger Moment Shadow Mapping nutzen, welches 4 Momente nutzt und den Variance Shadow Maps ähnlich ist. Zum filtern nutzen wir MSAA und zum Vergleich einen Gauss Filter. Die Implementierung war denkbar einfach, da wir bereits DirectX Code hatten durch die Präsentation des Moment Shadow Mapping Papers\cite{msm}
 
 \subsection{Algorithmus}
 
+
 \subsection{Implementierung}
+
 Wir implementieren die Hamburger Moment Shadow Mapping Technik, da diese die schnellste und robusteste Methode für das Shadow Mapping darstellt.\cite{msm} Zuerst wird eine Moment Shadow Map gerendert. Der Unterschied zur normalen Shadow Map ist, das zusätzlich noch 4 Momente, bestehend aus der Tiefe der Shadow Map gespeichert werden. Diese reduntanten Tiefeninformationen können noch gefiltert werden. Wir verwenden hierfür einen Gauss Filter oder alternativ noch MSAA. Eine weitere Möglichkeit wäre Mip-Mapping.
 Im zweiten Schritt der Implementierung, wird ein gefiltertes Sample aus der Moment Shadow Map, sowie die Tiefe eines Shadow Map Fragments genutzt, um eine gefilterte Schatten Intensität zu erhalten. Dies wird durch den Algorithmus zwei aus dem Moment Shadow Mapping Paper erreicht.\cite{msm}
 Dadurch erhalten wir ein Intensität für dieses Fragment.
