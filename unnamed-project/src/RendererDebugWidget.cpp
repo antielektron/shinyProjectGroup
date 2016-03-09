@@ -54,7 +54,8 @@ void RendererDebugWidget::generateWidgets()
     auto msmOptions = generateMSMOptions();
     layout->addWidget(msmOptions);
 
-    // TODO create volumetric obscurance options
+    auto voOptions = generateVOOptions();
+    layout->addWidget(voOptions);
 }
 
 QWidget *RendererDebugWidget::generateSDSMOptions()
@@ -84,6 +85,24 @@ QWidget *RendererDebugWidget::generateSDSMOptions()
     return sdsmOptions;
 }
 
+QWidget *RendererDebugWidget::generateVOOptions()
+{
+    auto voOptions = new QGroupBox("VO variants", this);
+    auto layout = new QVBoxLayout(voOptions);
+    voOptions->setLayout(layout);
+
+    m_lineVO = new QRadioButton("line sampling", voOptions);
+    layout->addWidget(m_lineVO);
+
+    m_varianceVO = new QRadioButton("variance area sampling", voOptions);
+    layout->addWidget(m_varianceVO);
+
+    m_momentVO = new QRadioButton("moment area sampling", voOptions);
+    layout->addWidget(m_momentVO);
+
+    return voOptions;
+}
+
 QWidget *RendererDebugWidget::generateMSMOptions()
 {
     auto msmOptions = new QGroupBox("MSM Options", this);
@@ -111,6 +130,10 @@ void RendererDebugWidget::connectStuff()
     connect(m_cascadedShadowMaps, SIGNAL(clicked()), this, SLOT(onCascadesStrategyChanged()));
     connect(m_sampleDistributionShadowMaps, SIGNAL(clicked()), this, SLOT(onCascadesStrategyChanged()));
     connect(m_awesomeCapture, SIGNAL(stateChanged(int)), this, SLOT(onAwesomeCaptureChanged()));
+
+    connect(m_lineVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
+    connect(m_varianceVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
+    connect(m_momentVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
 
     connect(m_filterShadowMap, SIGNAL(stateChanged(int)), this, SLOT(onFilterShadowMapChanged()));
     for (int i = 0; i < 5; i++)
@@ -148,6 +171,23 @@ void RendererDebugWidget::onCascadesStrategyChanged()
 void RendererDebugWidget::onAwesomeCaptureChanged()
 {
     m_renderer->setCapture(m_awesomeCapture->isChecked());
+}
+
+
+void RendererDebugWidget::onVolumetricObscuranceChanged()
+{
+    if (m_lineVO->isChecked())
+    {
+        m_renderer->loadConfiguration("shaders/configurations/defaultConfig.xml");
+    }
+    else if(m_varianceVO->isChecked())
+    {
+        m_renderer->loadConfiguration("shaders/configurations/VarianceVO.xml");
+    }
+    else if(m_momentVO->isChecked())
+    {
+        m_renderer->loadConfiguration("shaders/configurations/MomentVO.xml");
+    }
 }
 
 void RendererDebugWidget::onFilterShadowMapChanged()
