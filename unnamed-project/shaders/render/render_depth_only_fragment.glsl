@@ -2,9 +2,9 @@
 
 out vec4 moments;
 uniform mat4 inverseProjectionMatrix;
-const float sceneDepth = 200;
+const float sceneDepth = 1000;
 const float nearPlaneDepth = 3;
-const float correction = 0.1;
+const float correction = 0.2;
 
 float get_world_depth(float z)
 {

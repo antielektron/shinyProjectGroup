@@ -7,7 +7,6 @@ uniform mat4 inverseProjectionMatrix;
 uniform sampler2D sampler;
 uniform sampler2D momentsSampler;
 uniform sampler2D depthBuffer;
-
 uniform float ratio;
 uniform vec4 lightDirection;
 //uniform float time;
@@ -85,60 +84,16 @@ void sampleOptimized4MomentsShadowMap(out vec4 out4Moments, vec4 shadowMapValue)
 
 }
 
-// Modified MSMShadowIntensity function
-float computeMSMShadwowIntensity(out vec3 Weight, out vec3 outz, vec4 in4Moments, float depth, float depthBias, float momentBias)
-{
-    vec4 b = mix(in4Moments, vec4(0.5,0.5,0.5,0.5), momentBias);
-    vec3 z;
-    z.x = depth-depthBias;
-    float L32D22= -b.x * b.y + b.z;
-    float D22= -b.x * b.x + b.y;
-    float SquaredDepthVariance=-b.y * b.y + b.w;
-    float D33D22=dot(vec2(SquaredDepthVariance,-L32D22),
-                     vec2(D22,                  L32D22));
-    float InvD22=1.0/D22;
-    float L32=L32D22*InvD22;
-    vec3 c=vec3(1.0,z.x,z.x*z.x);
-    c.y-=b.x;
-    c.z-=b.y+L32*c.y;
-    c.y*=InvD22;
-    c.z*=D22/D33D22;
-    c.y-=L32*c.z;
-    c.x-=dot(c.yz,b.xy);
-    float p=c.y/c.z;
-    float q=c.x/c.z;
-    float r=sqrt((p*p*0.25)-q);
-    z.y=-p*0.5-r;
-    z.z=-p*0.5+r;
-    vec4 Switch=
-        (z.z<z.x)?vec4(z.y,z.x,1.0,1.0):(
-        (z.y<z.x)?vec4(z.x,z.y,0.0,1.0):
-        vec4(0.0,0.0,0.0,0.0));
-    float sum = (Switch.x*z.z-b.x*(Switch.x+z.z)+b.y);
-    float Quotient=(Switch.x*z.z-b.x*(Switch.x+z.z)+b.y)
-                  /((z.z-Switch.y)*(z.x-z.y));
-    
-    outz = z;
-    
-    // wild guess: this are the weights we're looking for?
-    
-	Weight.x=(z.y*z.z-b.x*(z.y+z.z)+b.y)/((z.x-z.y)*(z.x-z.z));
-	Weight.y=(z.x*z.z-b.x*(z.x+z.z)+b.x)/((z.z-z.y)*(z.x-z.y));
-	Weight.z=1.0-Weight.x-Weight.y;
-    return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
-}
 
-float f(float z, float z_a, float z_b)
+float f(vec4 moments, float z_a, float z_b)
 {
-	if (z < z_a)
-	{
-		return 1;
-	}
-	if (z >= z_b)
-	{
-		return 0;
-	}
-	return (z-z_a)/(z_b - z_a);
+	float mean = moments.x;
+	float sigma = sqrt(moments.y - pow(mean,2));	
+	
+	float a = (-1.)/(2* sigma);
+	float b = -a*(mean + sigma);
+	
+	return a*(z_b * z_b - z_a * z_a)/2 + b * (z_b - z_a);
 }
 
 float get_angle(vec3 a, vec3 b)
@@ -197,32 +152,23 @@ void main()
 	float r = abs(rVec1.y/rVec1.w - rVec2.y/rVec2.w);
 	
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
-	float mmLevel = log2(1./(1. - r));
+	float mmLevel = 1 - log2(1./(1. - r));
 	// step 4: get filtered Moments
-	mmLevel = mmLevel * 0.9 + 1;
-	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
+	mmLevel = mmLevel * 0.9 + 2;
+	vec4 moments = textureLod(momentsSampler, uv, 3.2);
+	vec4 outMoments;
+	sampleOptimized4MomentsShadowMap(outMoments, moments);
 	
 
 	// step 5: where the magic happens
-	vec4 outMoments;
-	sampleOptimized4MomentsShadowMap(outMoments, moments);
-	vec3 w;
-	vec3 z;
-    float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.005, 3e-5);	
-  
 	float z_a = depth + 0.1;
 	float z_b = depth - 0.1;
 	
-	float sum = 0;
-	for (int i = 0; i < 3; i++)
-	{
-		sum += w[i] * f(z[i],z_a, z_b); 
-	}
-	sum *= 0.5;
+	float sum = f(outMoments,z_a, z_b); 
 	
 	if (depth < 1-10e-4)
 	{
-		defaultColor =  sum * defaultColor;
+		defaultColor =  sum * vec3(1.,1.,1.);//defaultColor;
 	}
 	else
 	{
