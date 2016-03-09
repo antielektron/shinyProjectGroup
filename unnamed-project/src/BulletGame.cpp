@@ -125,10 +125,7 @@ void BulletGame::handleInput(float deltaTime)
 
     if (m_keyManager->isKeyPressed(Qt::Key_Space))
     {
-        // TODO initiate jump
-        // velocity += QVector3D(0, speed*2, 0);
-        // m_playerBody->applyCentralForce(btVector3(0, 40, 0));
-        m_playerBody->applyCentralImpulse(btVector3(0, 10, 0));
+        performJump();
     }
 
     // Reset camera
@@ -243,6 +240,25 @@ void BulletGame::performInteraction()
                 m_scene->getGlobalState()->triggerEvent(event);
             }
         }
+    }
+}
+
+void BulletGame::performJump()
+{
+    // player bottom is at -0.9
+    // player eye  is at 0.9-0.2 = 0.7
+    // bottom = -0.9-0.7 = -1.6
+    btVector3 start = toBulletVector3(m_position);
+    btVector3 end = toBulletVector3(m_position + QVector3D(0, -1.6f-0.1f, 0));
+
+    btCollisionWorld::ClosestRayResultCallback callback(start, end);
+
+    // Perform raycast
+    m_bulletWorld->rayTest(start, end, callback);
+
+    if(callback.hasHit())
+    {
+        m_playerBody->applyCentralImpulse(btVector3(0, 10, 0));
     }
 }
 
