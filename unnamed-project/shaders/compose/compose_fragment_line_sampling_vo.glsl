@@ -129,7 +129,7 @@ float get_angle(vec3 a, vec3 b)
     float abs_a = sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
     float abs_b = sqrt(b.x * b.x + b.y * b.y + b.z * b.z);
     
-    float sin_theta = c/(abs_a * abs_b);
+    float sin_theta = c/(abs_a * abs_b + 10e-6);
     
     // check Orientation:
    	bool sameOrientation = false;
