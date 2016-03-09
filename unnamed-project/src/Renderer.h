@@ -59,6 +59,12 @@ public:
     void setCascadeStrategy(CascadeStrategy strategy);
     CascadeStrategy getCascadeStrategy();
 
+    void setShadowMapSampleCount(int sampleCount);
+    int getShadowMapSampleCount();
+
+    void setFilterShadowMap(bool enabled);
+    bool getFilterShadowMap();
+
 protected:
     virtual void onRenderingInternal(GLuint fbo, Scene *scene) override;
     void rotateVectorToVector(const QVector3D &source,
@@ -67,10 +73,18 @@ protected:
     void createLightViewMatrix(const QVector3D &lightDir, const QMatrix4x4 &inverseCameraView, QMatrix4x4 &matrix);
     void createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransformation, QMatrix4x4 &matrix);
 
+    void createShadowMap();
+
     // Options
     bool m_colorizeCascades;
     float m_cascadedShadowMapsLambda;
     CascadeStrategy m_cascadeStrategy;
+
+    int m_shadowMapSampleCount;
+    bool m_filterShadowMap;
+
+    // set if we need to recreate the shadow map..
+    bool m_recreateShadowMap;
 
     // TODO shadowMapSize as option
     // (TODO cascade couunt as option)
@@ -111,6 +125,9 @@ protected:
     GLuint m_shadowMapTexture;
     GLuint m_shadowMapTexture2;
     GLuint m_shadowMapDepthBuffer;
+
+    // Create ShadowMap Moments
+    int m_createMomentsSampleCountLoc;
 
     // Compose Shader
     int m_composeSamplerLoc;

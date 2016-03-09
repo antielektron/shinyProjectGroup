@@ -6,6 +6,8 @@ layout (binding=1, rgba16) writeonly uniform image2DArray momentImage;
 
 layout (local_size_x = 16, local_size_y = 16) in;
 
+uniform int sampleCount;
+
 void main()
 {
     ivec3 pos = ivec3(gl_GlobalInvocationID.xyz);
@@ -19,13 +21,13 @@ void main()
     float square = depth * depth;
     moments = vec4(depth, square, square*depth, square*square);
     */
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < sampleCount; i++)
     {
         float depth = texelFetch(depthSampler, pos, i).x;
         float square = depth * depth;
         moments += vec4(depth, square, square*depth, square*square);
     }
-    moments /= 4.;
+    moments /= sampleCount;
 
 	vec4 fragMoments = transpose(mat4(	-2.07224649,	32.23703778,	-68.571074599,	39.3703274134,
                                         13.7948857237,	-59.4683975703, 82.0359750338,	-35.364903257,

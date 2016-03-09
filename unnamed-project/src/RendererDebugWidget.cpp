@@ -29,6 +29,15 @@ RendererDebugWidget::RendererDebugWidget(Renderer *renderer, QWidget *parent) :
             m_sampleDistributionShadowMaps->setChecked(true);
             break;
     }
+
+    m_filterShadowMap->setChecked(m_renderer->getFilterShadowMap());
+    for (int i = 0; i < 5; i++)
+    {
+        if (m_renderer->getShadowMapSampleCount() == 1<<i)
+        {
+            m_shadowMapMsaa[i]->setChecked(true);
+        }
+    }
 }
 
 RendererDebugWidget::~RendererDebugWidget()
@@ -41,6 +50,9 @@ void RendererDebugWidget::generateWidgets()
 
     auto sdsmOptions = generateSDSMOptions();
     layout->addWidget(sdsmOptions);
+
+    auto msmOptions = generateMSMOptions();
+    layout->addWidget(msmOptions);
 
     // TODO create volumetric obscurance options
 }
@@ -69,12 +81,38 @@ QWidget *RendererDebugWidget::generateSDSMOptions()
     return sdsmOptions;
 }
 
+QWidget *RendererDebugWidget::generateMSMOptions()
+{
+    auto msmOptions = new QGroupBox("MSM Options", this);
+
+    auto layout = new QVBoxLayout(msmOptions);
+    msmOptions->setLayout(layout);
+
+    m_filterShadowMap = new QCheckBox("Filter Shadowmap");
+    layout->addWidget(m_filterShadowMap);
+
+
+    for (int i = 0; i < 5; i++)
+    {
+        m_shadowMapMsaa[i] = new QRadioButton(QString::number(1<<i) + "x MSAA", msmOptions);
+        layout->addWidget(m_shadowMapMsaa[i]);
+    }
+
+    return msmOptions;
+}
+
 void RendererDebugWidget::connectStuff()
 {
     connect(m_colorizeCascades, SIGNAL(stateChanged(int)), this, SLOT(onColorCascadesChanged()));
     connect(m_cascadedShadowMapsLambda, SIGNAL(valueChanged(int)), this, SLOT(onCascadedShadowMapsLambdaChanged()));
     connect(m_cascadedShadowMaps, SIGNAL(clicked()), this, SLOT(onCascadesStrategyChanged()));
     connect(m_sampleDistributionShadowMaps, SIGNAL(clicked()), this, SLOT(onCascadesStrategyChanged()));
+
+    connect(m_filterShadowMap, SIGNAL(stateChanged(int)), this, SLOT(onFilterShadowMapChanged()));
+    for (int i = 0; i < 5; i++)
+    {
+        connect(m_shadowMapMsaa[i], SIGNAL(clicked()), this, SLOT(onShadowMapMsaaChanged()));
+    }
 }
 
 void RendererDebugWidget::onColorCascadesChanged()
@@ -100,5 +138,20 @@ void RendererDebugWidget::onCascadesStrategyChanged()
     else if (m_cascadedShadowMaps->isChecked())
     {
         m_renderer->setCascadeStrategy(Renderer::CascadeStrategy::CascadedShadowMaps);
+    }
+}
+void RendererDebugWidget::onFilterShadowMapChanged()
+{
+    m_renderer->setFilterShadowMap(m_filterShadowMap->isChecked());
+}
+
+void RendererDebugWidget::onShadowMapMsaaChanged()
+{
+    for (int i = 0; i < 5; i++)
+    {
+        if (m_shadowMapMsaa[i]->isChecked())
+        {
+            m_renderer->setShadowMapSampleCount(1<<i);
+        }
     }
 }
