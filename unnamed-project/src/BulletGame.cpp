@@ -196,17 +196,27 @@ void BulletGame::updateBulletGeometry(ObjectBase *obj)
         auto object = static_cast<Object *>(obj);
         auto body = static_cast<btRigidBody *>(object->getUserPointer());
 
-        auto oldOrigin = body->getWorldTransform().getOrigin();
+        auto oldTransform = body->getWorldTransform();
 
-        btTransform transformation;
-        transformation.setFromOpenGLMatrix(object->getWorld().constData());
-        body->setWorldTransform(transformation);
+        btTransform transform;
+        transform.setFromOpenGLMatrix(object->getWorld().constData());
+        body->setWorldTransform(transform);
 
-        auto newOrigin = body->getWorldTransform().getOrigin();
+        auto deltaTransform = oldTransform.inverse() * transform;
 
-        // TODO set angular velocity!
         // TODO dynamic framerate
-        body->setLinearVelocity((newOrigin - oldOrigin) * 60);
+        body->setLinearVelocity(deltaTransform.getOrigin() * 60);
+
+        auto rotationQuaternion = deltaTransform.getRotation();
+        if (rotationQuaternion.getAngle() != 0)
+        {
+            // Manual axis computation.. Bullet thinks that the rotation is to small.
+            btScalar s_squared = 1.f - rotationQuaternion.w()*rotationQuaternion.w();
+            btScalar s = 1.f/btSqrt(s_squared);
+            auto axis = btVector3(rotationQuaternion.x() * s, rotationQuaternion.y() * s, rotationQuaternion.z() * s);
+
+            body->setAngularVelocity(axis*rotationQuaternion.getAngle() * 60);
+        }
     }
 }
 
