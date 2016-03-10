@@ -60,7 +60,7 @@ Zusätzlich implementieren wir alles in einer eigenen 3D Engine und generieren d
 % Introduction
 \subsection{Sample Distribution Shadow Maps}
 
-Ein häufiges Problem bei der Shadow Map generierung ist Aliasing durch Over und Under Sampling.
+Ein häufiges Problem bei der Shadow Map Generierung ist Aliasing durch Over und Under Sampling.
 Sample Distribution Shadow Maps (SDSMs) \cite{sdsm} sind ein voll automatisches Verfahren mit konstantem Speicherbedarf und einer vorhersagbaren Worst-Case Laufzeit, die nicht von der Szenenkomplexität abhängt.
 Das Verfahren ist dadurch sehr gut für den Einsatz in Echtzeit Grafikanwendungen geeignet.
 SDSM ist ein Screen Space Verfahren, welches adaptiv in jedem Frame Z-Partitionen \cite{zpart} (Hier auch Kaskaden \cite{csm}) erstellt.
@@ -199,7 +199,7 @@ Jede Thread Gruppe (von 256 Threads) generiert einen neuen Eintrag pro Wert.
 Ausserdem versuchen wir die Zugriffsmuster auf den Shared Memory so weit es geht zu optimieren und Bank Conflicts zu vermeiden \cite{reduction}.
 Um so mehr verschiedene Werte auf einmal reduziert werden, desto mehr können idle Zeiten von Threads in den Thread Gruppen vermieden werden.
 
-Anstatt nach einer halbierung der Daten die eine Hälfte der Threads ihre Arbeit beendigen zu lassen, wird der erste zu reduzierende Wert von der ersten Hälfte der Threads, und die zweite zu reduzierende Wert von der zweiten Hälfte der Threads weiter bearbeitet und so weiter, bis jeder Thread sich nur noch um höchstens einen Wert kümmern muss (z.B. Minimale X Koordinate der zweiten Kaskade).
+Anstatt nach einer halbierung der Daten die eine Hälfte der Threads ihre Arbeit beendigen zu lassen, wird der erste zu reduzierende Wert von der ersten Hälfte der Threads, und die zweite zu reduzierende Wert von der zweiten Hälfte der Threads weiter bearbeitet und so weiter, bis jeder Thread sich nur noch um höchstens einen Wert kümmern muss.
 Damit die Arbeit so aufgeteilt werden kann, müssen alle Reduktionsprobleme vom selben Typ sein.
 \begin{equation}
   far = \max\{ depth \} = 1 - \min \{ 1 - depth \}
@@ -210,6 +210,11 @@ Dies gilt analog für die Max-Corners der Bounding Boxen.
 
 Die Reduktionsergebnisse werden in 1D Texturen gespeichert.
 So wird die Anzahl der Threads, die in einem Reduktionsschritt keine sinnvollen Daten einlesen, minimiert.
+
+% In der zweiten Reduktion werden insgesammt $| \{min, max\} \times \{X, Y, Z\} \times \{0, 1, 2, 3\} | = 24$ Werte berechnet.
+% Um die Vektorarithmetik der GPU auszunutzen empfiehlt es sich jeweils die vier Kaskaden in einen Vektor zusammen zu fassen, so dass noch 6 Vektoren reduziert werden, die jeweils in einer 4 Kanal Textur gespeichert werden.
+
+
 
 % Keks
 TODO irgendwas vergessen?
@@ -381,7 +386,8 @@ Die MBVO färbt Konturen der Geometrie sehr dunkel ein und hat Ähnlichkeiten mi
 % Fazit
 \subsection{Sample Distribution Shadow Maps}
 SDSMs sind sehr robust und benötigen keine möglicherweise von Hand zu optimierenden Parameter um gute Ergebnisse zu liefern.
-PSSMs können oft ähnlich gute Ergebnisse liefern, wenn sie optimal eingestellt sind, allerdings gilt dies meist nur für eine konkrete Sicht auf die Szene.
+PSSMs können oft ähnlich gute Ergebnisse liefern wenn sie optimal eingestellt sind.
+Allerdings gilt dies meist nur für eine bestimmte Sicht auf die Szene.
 Befindet sich mehr oder weniger Geometrie in unmittelbarer nähe zur Kamera, so liefert PSSM keine guten Ergebnisse mehr.
 SDSM passt ihre Z-Partitionen adaptiv an die veränderte Sichtbarkeit an.
 Dies ist möglich, da SDSMs die tatsächliche Near Plane kennen, wo PSSMs nur eine untere Schranke hierfür kennen, die sich aus der Camera Projektion ergibt.
