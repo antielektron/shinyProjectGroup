@@ -11,6 +11,13 @@
 \usepackage{subfig}
 \usepackage{multirow}
 \usepackage{array}
+\usepackage{svg}
+
+\usepackage[]{algorithm2e}
+
+%für pseudocode:
+\SetKwProg{Fn}{Function}{}{end}\SetKwFunction{FRecurs}{FnRecursive}%
+\SetAlgoLongEnd
 
 % Benötigte Angaben für die Titelseite
 \title{ Moment Shadow Mapping, Moment Based Volumetric Obscurance und Sample Distribution Shadow Maps }
@@ -64,7 +71,9 @@ Des Weiteren werden die Shadow Map Frusta von SDSMs eng um die tatsächlich sich
 
 % Introduction
 \subsection{Volumetric Obscurance}
-Hier könnte ein Text stehen
+Obscurance (= Umgebungsverdeckung) ist eine Technik zur Berechnung von Schatten basierend auf der Annahme,
+dass sich gegenseiteg verdeckende Geometrie zu einem verringertem Lichteinfall führt. In diesem Paper werden
+wir verschiedene Screenspace Algorithmen für Volumetric Obscurance erläutern und kurz unsere Implementationen vorstellen.
 
 
 % Introduction
@@ -90,8 +99,22 @@ Sample Distribution Shadow Maps \cite{sdsm}
 % Related Work
 \subsection{Volumetric Obscurance}
 
-Volumetric Obscurance \cite{loos2010volumetric}
+Ambient Occlusion (= Umgebungsverdeckung) ist eine weit verbreitete Technik um Schatten in 3D-Szenen
+zu approximieren[citation needed]. Dafür gibt es allgemein 2 Ansätze:
+\begin{enumerate}
+	\item "Global Ambient Occlusion": für jeden Punkt in der Szene wird geprüft, ob der Himmel von diesem
+		Punkt aus sichtbar ist (bzw. ob eine maximale Distanz ohne Kollision erreicht werden kann bei geschlossenen
+		Szenen). Dieses Verfahren ist relativ teuer, kann aber z.B. für statische Szenen vorberechnet werden.
+	\item Screenspace Ambient Occlusion (SSAO): für jeden Pixel im Screenspace [klingt blöd] werden Point Samples
+		innerhalb einer bestimmten Umgebung erstellt. Mit Hilfe der Tiefeninformationen des Depth Buffers
+		wird die Anzahl der Samples, die hinter der Szenengeometrie liegen müssen bestimmt. Anhand dieser Anzahl
+		kann der Pixel entsprechend abgedunkelt werden. 
+	[TODO: citation needed]
+\end{enumerate}  
+Volumetric Obscurance ist eine Alternative zum Screenspace Volumetric Obscurance, welche wir im folgenden
+Erläutern werden
 
+\cite{loos2010volumetric}
 
 % Related Work
 \subsection{Moment Shadow Mapping}
@@ -216,9 +239,104 @@ Nachdem die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus ebenfa
 % Main
 \section{Volumetric Obscurance}
 
-	TODO
-	
+Volumentric Obscurance wird aus dem Screenspace[denglish] berechnet. Allgemein wird für jeden Punkt der Szene, der auf
+dem Bildschirm gezeichnet wird, eine gegebene Umgebung (z.B. eine Einheitskugel um diesen Punkt) betrachtet.
+Für diese Umgebung wird der Anteil an Geometrie berechnet, die für den Beobachter sichtbar ist. Je mehr Geometrie
+verdeckt ist, umso mehr wird der korrespondierende Pixel abgedunkelt um so den ausbleibenden Lichteinfall
+[aka Schatten?] zu simulieren.
+Das entsprechnde mathematische Modell sieht wie folgt aus [paper vo]:
+$$
+V(P) = \int_{X} \rho (d(P,x))O(x)dx
+$$
+Dabei ist $X$ die Nachbarschaft um den Punkt $P$, $O$ ist die Verdeckungs-Funktion. Diese
+ist 0, falls Verdeckung stattfindet, sonst 1. $\rho$ ist eine abfallende Funktion
+die 1 bei P ist und mit der Distanz abfällt. Wie in [paper vo] beschrieben ist der 
+sichtbare Effekt jedoch nur sehr minimal, weshalb diese Funktion als konstant angesehen 
+wird \cite{voPaper}
 
+\subsection{Line Sampling}
+Line Sampled Volumetric Obscurance nutzt (möglichst) zufallsverteilte Samples innerhalb auf der auf den
+Screenspace projezierten Umgebung des Punktes. In der hier implementierten Version (die ebenfalls in
+\cite{voPaper} beschrieben wird) wird die Einheitskugel um den Punkt P in der Szene betrachtet.
+Sei nun $d$ die Tiefe des Punktes $P$. Dann ist die allgemeine Verdeckungsfunktion für eine andere Tiefe
+$z$ :
+$$
+f(z) = \begin{cases} 1 &  \text{für } z \leq d \\ 0 & \text{für } z > d \end{cases}
+$$
+Für die hier vorgestellte Implementierung wird eine feste Anzahl $N$ an Samples verwendet.
+Dann ergibt sich daraus:
+$$
+F_{N}(z_0, \dots, z_N) = \sum_i^N \frac{v_i}{2 \cdot z_{s_i}} \max{(\min{(z_{s_i}, d_{r_i})} + z_{s_i}, 0)}
+$$
+Dabei ist $z_i$ die Tiefe des i-ten Samples im Depth-Buffer, $d_{r_i}$ ist die Tiefe $z_i$ gemapped in die
+betrachtete Umgebung des Punktes $P$, $z_{s_i} = \sqrt{1 - x_i^2 - y_i^2}$. $(x_i, y_i)$ ist die Position des
+i-ten Samples auf der Einheitsscheibe (also der Querschnitt der Einheitskugel, die den Punkt P 
+beinhaltet und dessen normale parallel zur Blickrichtung liegt). \newline
+
+\begin{figure}
+	\centering
+
+	\includesvg{LineSamples}
+	\label{ref:lineSample}
+
+	\caption{Line Sampling}
+\end{figure}
+
+\subsubsection{Implementierung}
+	\textbf{Line Sampling Pseudo Code}\\
+	\begin{algorithm}[H]
+		
+		\Fn{LineSampling(nSamples, depth)}{
+			sumSamples = 0\;
+			sumVolume = 0\;
+		    \For{i = 0 $\rightarrow$ nSamples - 1}{
+		    	radius = rand()\;
+		    	$\alpha$ = rand()$\cdot 2\pi$\;
+		    	weight = $\sqrt{1 - radius^2}$\;
+		    	p = $(\cos{(\alpha)} \cdot radius,\sin{(\alpha)} \cdot radius)^T$\;
+		    	sumSamples = sumSamples + weight $\cdot$ SamplePoint(p, depth)\;
+		    	sumVolume = sumVolume + weight\;
+		    }
+		    return $\frac{sumSamples}{sumVolume}$ \;
+		}
+		
+		\Fn{SamplePoint(p, depth)}{
+			\textit{hier wird ein einzelner Punkt gesampled, wie oben beschrieben [TODO?]}
+		}
+		
+		\Fn{rand()}{
+			return \textit{zufälliger Wert im Intervall [0,1]}\;
+		}
+		
+	\end{algorithm}
+
+\subsubsection{Ergebnisse}
+TODO
+
+\subsection{Area Sampling}
+Line Sampling Volumetric Obscurance nutzt zufallsverteilte Samples um die Verdeckung einer
+Raumregion zu approximieren. Ein alternativer Ansatz ist Area Sampling. Anstatt zufallsverteilter Samples
+versucht Area Sampling die Verteilung über das Mittel statistischer Größen zu ermitteln. Dafür
+wird der selbe Ansatz wie bei Variance Shadow Maps \cite{vsmPaper} verwendet. Beim Line Sampling
+nutzten wir samples auf dem DepthBuffer, beim Area Sampling schreiben wir stattdessen die ersten beiden
+Momente $(z^1, z^2)$ für jeden Pixel im Screenspace heraus und filtern diese Größe über einen Bereich, der
+Abhängig von der Tiefe ist (analog zu der von der Tiefe abhängigen, auf den Screenspace projezierten Umgebung
+im Abschnitt Line Sampling). In unserer Implementierung bestimmen wir in einem Renderschritt [blödes Wort]
+die Tiefe der Szene $(z)$ aus Sicht der Kamera und schreiben das Tupel $(z, z^2)$ in den ersten beiden
+Farbkanälen einer Textur. Bevor wir die finale Szene rendern mipmappen [ist das ein Verb?] wir die Textur.
+In der Nachbearbeitung (Compose Schritt) der gerenderten Szene greifen wir abhängig von der Tiefe an jedem
+Pixel auf die entsprechende Mipmap-Ebene zu, welche die so gefilterten Momente enthält [kein Schöner Satz!].
+Über das abgegriffene[?!?] Tupel $t = (z_f, z_f^2)$ bekommen wir dann einen Approximierten Mittelwert 
+$\mu = t[0]$ und die gemittelte Varianz $\sigma^2 = t[1] - t[0]^2$. Dann lässt sich der Verdeckungsfaktor 
+folgendermaßen abschätzen:
+$$
+V_c = a\cdot(z_1^2 - z_0^2) / 2 + b \cdot (z_1 - z_0)
+$$
+wobei $z_0$ und $z_1$ die Start- und Endtiefe der Umgebung des betrachteten Punktes P sind und die 
+Koeffizienten $a$ und $b$ definiert sind als:
+$$
+a = \frac{-1}{2 \cdot \sigma}; \quad b = -a \cdot (\mu + \sigma)
+$$
 
 
 % Main
