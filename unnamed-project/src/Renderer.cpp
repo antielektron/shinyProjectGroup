@@ -164,6 +164,10 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_RENDER_LIGHTVIEW,
                     QOpenGLShader::Fragment);
 
+    setShaderSource(loadTextFile("shaders/lightview/lightview_samples.glsl"),
+                    KEYSTR_PROGRAM_RENDER_VISIBLE_SAMPLES,
+                    QOpenGLShader::Compute);
+
 
     // Generate attrib and uniform locations
 
@@ -254,6 +258,9 @@ void Renderer::initialize()
     m_attribLocs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].emplace_back(0, "v_position");
     m_attribLocs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].emplace_back(1, "v_normal");
 
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_VISIBLE_SAMPLES].emplace_back(&m_visibleSamplesScreenToLightLoc, "screenToLightTransformation");
+
+
     // create Programs:
     createProgram(KEYSTR_PROGRAM_RENDER);
     createProgram(KEYSTR_PROGRAM_RENDER_DEPTH);
@@ -273,6 +280,7 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_CREATE_CAPTURE);
     createProgram(KEYSTR_PROGRAM_RENDER_CAPTURE);
     createProgram(KEYSTR_PROGRAM_RENDER_LIGHTVIEW);
+    createProgram(KEYSTR_PROGRAM_RENDER_VISIBLE_SAMPLES);
 
     // make stuff
     // --> default program (nothing to do) <------------------------------------
@@ -356,8 +364,8 @@ void Renderer::initialize()
 
 
     // Capture Buffer
-    glGenBuffers(2, m_capturedFrustumToWorldBuffer);
-    for (int i = 0; i < 2; i++)
+    glGenBuffers(4, m_capturedFrustumToWorldBuffer);
+    for (int i = 0; i < 4; i++)
     {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_capturedFrustumToWorldBuffer[i]);
         glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float)*16 * 5, NULL, GL_DYNAMIC_COPY);
@@ -460,7 +468,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *createMomentsProgram = m_programs[KEYSTR_PROGRAM_CREATE_MOMENTS].get();
     QOpenGLShaderProgram *createCaptureProgram = m_programs[KEYSTR_PROGRAM_CREATE_CAPTURE].get();
     QOpenGLShaderProgram *renderLightView = m_programs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].get();
-
+    QOpenGLShaderProgram *renderVisibleSamples = m_programs[KEYSTR_PROGRAM_RENDER_VISIBLE_SAMPLES].get();
 
     // Check if we have to recreate the shadow map depth buffer, because sample count changed
     if (m_recreateShadowMap)
@@ -870,6 +878,21 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glDisable(GL_DEPTH_TEST);
 
         renderLightView->release();
+
+        renderVisibleSamples->bind();
+
+        renderVisibleSamples->setUniformValue(m_visibleSamplesScreenToLightLoc, tempLightProjection * screenToLightTransformation);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+
+        GLint windowTexture;
+        glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);
+        glBindImageTexture(1, windowTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+        glDispatchCompute((m_width - 1) / 16 + 1, (m_height - 1) / 16 + 1, 1);
+
+        renderVisibleSamples->release();
 
         renderCapture(lightViewMatrix, tempLightProjection);
     }

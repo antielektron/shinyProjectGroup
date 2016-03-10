@@ -50,7 +50,7 @@ private:
 
     QPushButton *m_awesomeCapture;
     QCheckBox *m_awesomeCaptureEnabled;
-    QRadioButton *m_awesomeCaptureSlot[2];
+    QRadioButton *m_awesomeCaptureSlot[4];
     QButtonGroup *m_awesomeSlotGroup;
 
     QCheckBox *m_lightView;

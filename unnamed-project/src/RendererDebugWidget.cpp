@@ -90,7 +90,7 @@ QWidget *RendererDebugWidget::generateSDSMOptions()
 
     m_awesomeSlotGroup = new QButtonGroup(this);
 
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 4; i++)
     {
         m_awesomeCaptureSlot[i] = new QRadioButton(QString("Slot ") + QString::number(i));
         layout->addWidget(m_awesomeCaptureSlot[i]);
