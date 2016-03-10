@@ -6,7 +6,7 @@
 \usepackage[T1]{fontenc}
 % Darstellung von URLs
 \usepackage{url}
-\usepackage{amsmath,amssymb} 
+\usepackage{amsmath,amssymb}
 \usepackage{listings}
 \usepackage{subfig}
 \usepackage{multirow}
@@ -75,7 +75,7 @@ Wir wollen eine Schattentechnik verwenden, die möglichst hohe Qualität liefert
 
 \section{Related Work}
 
-Es gibt bereits Verfahren \cite{CSM} \cite{PSSM} um Perspektivisches Aliasing zu minimieren.
+Es gibt bereits Verfahren \cite{csm} \cite{pssm} um Perspektivisches Aliasing zu minimieren.
 Allerdings liefern diese nicht immer gute Ergebnisse.
 
 Andere Verfahren wie Adaptive Shadow Maps \cite{asm}
@@ -215,7 +215,7 @@ Algorithmus 1 minimiert Fs(zf), sodass wir eine untere Schranke nutzen können. 
 Letztendlich führt uns dies zu Algorithmus 3. Dieser ist ein Spezialfall des Algorithmus 2 und liefert und letztendlich die Schattenintensität. Light Leeking und Aliasing werden elegant umgangen und wir erhalten eine Schattenintensität, die sowohl helle als auch dunkle Werte gut einschätzen kann. Ausserdem gilt dieser Algorithmus als robust genug für Echtzeitanwendung, was in der Implementierung aufgezeigt wird. Da Algorithmus 3 theoretisch auf double precision Werten aufbaut, welche zu Speicherintensiv wären, nutzt die Implementierung einen einfach Bias Moment Vector und im Paper wird gezeigt, das dies nicht zu besonders großen Fehlern führt. Weiterführend ist der Algorithmus im Paper Moment Shadow Mapping erklärt\cite{msm}
 \subsection{Moment Based Volumetric Obscurance}
 Für die Moment Based Volumetric Obscurance benötigen wir noch Gewichte aus dem Moment Shadow Mapping. Diese finden sich in Algorithmus 2 und werden in unserer Implementierung weiter genutzt.
-Hierfür nutzen wir die Funktion Es(f) = Summe wi*f(zi) (Extra Paper!). Diese liefert uns den gewünschten Term für die Moment Based Volumetric Obscurance. Allerdings haben wir während der Implementierung noch kein stimmiges Bild erhalten, welches aber im Abschnitt der Implementierung weiter erläutert wird. Weiterführen wird der Algorithmus im Anhang erläutert, durch zusätzliche Notizen, welche wir für die Projekgruppe erhalten haben. Diese beziehen sich im speziellen auf die MBVO um Zusammenhang mit dem MSM. (CHRISTOPHS NOTIZEN EINFÜGEN)
+Hierfür nutzen wir die Funktion $Es(f) = \sum w_i*f(z_i)$ (Extra Paper!) auf Basis von $S = \sum w_i*Dirac$ aus dem MSM Algorithmus. Diese liefert uns den gewünschten Term für die Moment Based Volumetric Obscurance. Allerdings haben wir während der Implementierung noch kein stimmiges Bild erhalten, welches aber im Abschnitt der Implementierung weiter erläutert wird. Weiterführen wird der Algorithmus im Anhang erläutert, durch zusätzliche Notizen, welche wir für die Projekgruppe erhalten haben. Diese beziehen sich im speziellen auf die MBVO um Zusammenhang mit dem MSM. (CHRISTOPHS NOTIZEN EINFÜGEN)
 
 % MSM
 \subsection{Implementierung}
