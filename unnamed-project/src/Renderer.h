@@ -69,6 +69,11 @@ public:
     void setFilterShadowMap(bool enabled);
     bool getFilterShadowMap();
 
+    void awesomeCapture();
+
+    void setCaptureSlot(int slot);
+    int getCaptureSlot();
+
     void setCapture(bool enabled);
     bool getCapture();
 
@@ -100,8 +105,10 @@ protected:
 
 
     /// CAPTURED information
-    enum { CAPTURE_NONE, CAPTURE_REQUESTED, CAPTURE_ACTIVE } m_captured;
-    GLuint m_capturedFrustumToWorldBuffer;
+    bool m_captureRequested;
+    bool m_captureEnabled;
+    int m_captureSlot;
+    GLuint m_capturedFrustumToWorldBuffer[2];
 
     bool m_renderLightView;
 

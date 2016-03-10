@@ -82,9 +82,20 @@ QWidget *RendererDebugWidget::generateSDSMOptions()
     m_lightView = new QCheckBox("Light View");
     layout->addWidget(m_lightView);
 
-    m_awesomeCapture = new QCheckBox("Awesome Capture");
+    m_awesomeCapture = new QPushButton("Awesome Capture");
     layout->addWidget(m_awesomeCapture);
 
+    m_awesomeCaptureEnabled = new QCheckBox("Enable Capture");
+    layout->addWidget(m_awesomeCaptureEnabled);
+
+    m_awesomeSlotGroup = new QButtonGroup(this);
+
+    for (int i = 0; i < 2; i++)
+    {
+        m_awesomeCaptureSlot[i] = new QRadioButton(QString("Slot ") + QString::number(i));
+        layout->addWidget(m_awesomeCaptureSlot[i]);
+        m_awesomeSlotGroup->addButton(m_awesomeCaptureSlot[i], i);
+    }
 
     return sdsmOptions;
 }
@@ -133,8 +144,11 @@ void RendererDebugWidget::connectStuff()
     connect(m_cascadedShadowMapsLambda, SIGNAL(valueChanged(int)), this, SLOT(onCascadedShadowMapsLambdaChanged()));
     connect(m_cascadedShadowMaps, SIGNAL(clicked()), this, SLOT(onCascadesStrategyChanged()));
     connect(m_sampleDistributionShadowMaps, SIGNAL(clicked()), this, SLOT(onCascadesStrategyChanged()));
-    connect(m_awesomeCapture, SIGNAL(stateChanged(int)), this, SLOT(onAwesomeCaptureChanged()));
     connect(m_lightView, SIGNAL(stateChanged(int)), this, SLOT(onLightViewChanged()));
+
+    connect(m_awesomeCapture, SIGNAL(clicked(bool)), this, SLOT(onAwesomeCaptureCapture()));
+    connect(m_awesomeCaptureEnabled, SIGNAL(stateChanged(int)), this, SLOT(onAwesomeCaptureChanged()));
+    connect(m_awesomeSlotGroup, SIGNAL(buttonClicked(int)), this, SLOT(onAwesomeSlotChanged(int)));
 
     connect(m_lineVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_varianceVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
@@ -173,9 +187,19 @@ void RendererDebugWidget::onCascadesStrategyChanged()
     }
 }
 
+void RendererDebugWidget::onAwesomeCaptureCapture()
+{
+    m_renderer->awesomeCapture();
+}
+
 void RendererDebugWidget::onAwesomeCaptureChanged()
 {
-    m_renderer->setCapture(m_awesomeCapture->isChecked());
+    m_renderer->setCapture(m_awesomeCaptureEnabled->isChecked());
+}
+
+void RendererDebugWidget::onAwesomeSlotChanged(int slot)
+{
+    m_renderer->setCaptureSlot(slot);
 }
 
 void RendererDebugWidget::onLightViewChanged()
