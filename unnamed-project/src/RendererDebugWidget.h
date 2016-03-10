@@ -21,6 +21,8 @@ protected slots:
     void onCascadedShadowMapsLambdaChanged();
     void onCascadesStrategyChanged();
     void onAwesomeCaptureChanged();
+    void onLightViewChanged();
+
     void onVolumetricObscuranceChanged();
 
     void onFilterShadowMapChanged();
@@ -47,6 +49,7 @@ private:
     QSlider *m_cascadedShadowMapsLambda;
 
     QCheckBox *m_awesomeCapture;
+    QCheckBox *m_lightView;
 
     QCheckBox *m_filterShadowMap;
 

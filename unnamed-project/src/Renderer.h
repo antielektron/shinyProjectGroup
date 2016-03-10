@@ -32,6 +32,7 @@
 
 #define KEYSTR_PROGRAM_CREATE_CAPTURE           "Create Capture"
 #define KEYSTR_PROGRAM_RENDER_CAPTURE           "Render Capture"
+#define KEYSTR_PROGRAM_RENDER_LIGHTVIEW         "Render Light View"
 
 #define NUM_VO_MIPMAP_LEVELS 10 //so there's a height of 1 pixel @toplevel for full-HD
 
@@ -71,6 +72,9 @@ public:
     void setCapture(bool enabled);
     bool getCapture();
 
+    void setRenderLightView(bool enabled);
+    bool getRenderLightView();
+
 protected:
     virtual void onRenderingInternal(GLuint fbo, Scene *scene) override;
     void rotateVectorToVector(const QVector3D &source,
@@ -80,6 +84,8 @@ protected:
     void createFrustumProjectionMatrix(const QMatrix4x4 & frustumTransformation, QMatrix4x4 &matrix);
 
     void createShadowMap();
+
+    void renderCapture(const QMatrix4x4 &cameraView, const QMatrix4x4 &cameraProjection);
 
     // Options
     bool m_colorizeCascades;
@@ -96,6 +102,9 @@ protected:
     /// CAPTURED information
     enum { CAPTURE_NONE, CAPTURE_REQUESTED, CAPTURE_ACTIVE } m_captured;
     GLuint m_capturedFrustumToWorldBuffer;
+
+    bool m_renderLightView;
+
 
     // TODO shadowMapSize as option
     // (TODO cascade couunt as option)
@@ -183,6 +192,13 @@ protected:
     int m_renderCaptureCameraProjectionLoc;
     int m_renderCaptureCameraViewLoc;
     int m_renderCaptureColorLoc;
+
+    // LightView
+    int m_lightViewModelViewMatrixLoc;
+    int m_lightViewProjectionMatrixLoc;
+    int m_lightViewDiffuseColorLoc;
+    int m_lightViewAmbientColorLoc;
+
 
     QOpenGLVertexArrayObject m_quadVao;
     QOpenGLBuffer m_quadVbo;

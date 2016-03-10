@@ -30,7 +30,8 @@ Renderer::Renderer() : RendererBase(),
         m_cascadedShadowMapsLambda(1),
         m_cascadeStrategy(SampleDistributionShadowMaps),
         m_shadowMapSampleCount(1),
-        m_filterShadowMap(false)
+        m_filterShadowMap(false),
+        m_renderLightView(false)
 {
     // nothing to do here
 }
@@ -151,6 +152,16 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_RENDER_CAPTURE,
                     QOpenGLShader::Fragment);
 
+    // Light View
+    setShaderSource(loadTextFile("shaders/lightview/lightview_vertex.glsl"),
+                    KEYSTR_PROGRAM_RENDER_LIGHTVIEW,
+                    QOpenGLShader::Vertex);
+
+    setShaderSource(loadTextFile("shaders/lightview/lightview_fragment.glsl"),
+                    KEYSTR_PROGRAM_RENDER_LIGHTVIEW,
+                    QOpenGLShader::Fragment);
+
+
     // Generate attrib and uniform locations
 
     // Render
@@ -231,6 +242,14 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_RENDER_CAPTURE].emplace_back(&m_renderCaptureCameraProjectionLoc, "cameraProjection");
     m_uniformLocs[KEYSTR_PROGRAM_RENDER_CAPTURE].emplace_back(&m_renderCaptureColorLoc, "color");
 
+    // Light View
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].emplace_back(&m_lightViewProjectionMatrixLoc, "projectionMatrix");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].emplace_back(&m_lightViewModelViewMatrixLoc, "modelViewMatrix");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].emplace_back(&m_lightViewDiffuseColorLoc, "diffuseColor");
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].emplace_back(&m_lightViewAmbientColorLoc, "ambientColor");
+
+    m_attribLocs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].emplace_back(0, "v_position");
+    m_attribLocs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].emplace_back(1, "v_normal");
 
     // create Programs:
     createProgram(KEYSTR_PROGRAM_RENDER);
@@ -250,6 +269,7 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_CREATE_MOMENTS);
     createProgram(KEYSTR_PROGRAM_CREATE_CAPTURE);
     createProgram(KEYSTR_PROGRAM_RENDER_CAPTURE);
+    createProgram(KEYSTR_PROGRAM_RENDER_LIGHTVIEW);
 
     // make stuff
     // --> default program (nothing to do) <------------------------------------
@@ -433,7 +453,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *horizontalGaussProgram = m_programs[KEYSTR_PROGRAM_HORIZONTAL_GAUSS].get();
     QOpenGLShaderProgram *createMomentsProgram = m_programs[KEYSTR_PROGRAM_CREATE_MOMENTS].get();
     QOpenGLShaderProgram *createCaptureProgram = m_programs[KEYSTR_PROGRAM_CREATE_CAPTURE].get();
-    QOpenGLShaderProgram *renderCaptureProgram = m_programs[KEYSTR_PROGRAM_RENDER_CAPTURE].get();
+    QOpenGLShaderProgram *renderLightView = m_programs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].get();
 
 
     // Check if we have to recreate the shadow map depth buffer, because sample count changed
@@ -792,388 +812,319 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     }
 
 
-    // 3. Render to ShadowMap
-    glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
-
-    // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
-    glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
-
-    // Initialize with max depth.
-    glClearColor(0.999990940f, 0.997558594f, 0.893437386f, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_DEPTH_CLAMP);
-    glEnable(GL_MULTISAMPLE);
-    glEnable(GL_CULL_FACE);
-
-    shadowMapProgram->bind();
-
-
-    // shadowMapProgram->setUniformValueArray(m_shadowMapCascadeViewMatrixLoc, cascadeViews.data(), m_cascades);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeViewBuffer);
-
-    for (auto &object : scene->getObjects())
+    if (m_renderLightView)
     {
-        // work in camera view space
-        shadowMapProgram->setUniformValue(m_shadowMapWorldMatrixLoc, cameraView * object->getWorld());
+        // Use the captured information to display frustum stuff
+        createCaptureProgram->bind();
 
-        object->getModel()->draw();
-    }
+        createCaptureProgram->setUniformValue(m_createCaptureInverseCameraViewLoc, inverseCameraView);
+        createCaptureProgram->setUniformValue(m_createCaptureInverseCameraProjectionLoc, inverseCameraProjection);
 
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_DEPTH_CLAMP);
-    glDisable(GL_MULTISAMPLE);
-    glDisable(GL_CULL_FACE);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeViewBuffer);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_capturedFrustumToWorldBuffer);
 
-    shadowMapProgram->release();
+        glDispatchCompute(1, 1, 1);
 
-    // AMD gpu's are too agressive!
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-    // these barriers do work: GL_ALL_BARRIER_BITS GL_SHADER_IMAGE_ACCESS_BARRIER_BIT GL_TEXTURE_FETCH_BARRIER_BIT GL_SHADER_STORAGE_BARRIER_BIT
+        createCaptureProgram->release();
 
+        // Compute view matrix for light (light direction -> Z, camera Z -> X)
+        QMatrix4x4 lightViewMatrix;
+        createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
 
-    // 3.1 Resolve MSAA depth to moment texture
-    createMomentsProgram->bind();
+        // Compute view frustum of camera in light view
+        auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, m_shadowMapDepthBuffer);
+        // Projection matrix that wraps whole camera frustum
+        QMatrix4x4 tempLightProjection;
+        createFrustumProjectionMatrix(screenToLightTransformation, tempLightProjection);
 
-    createMomentsProgram->setUniformValue(m_createMomentsSampleCountLoc, m_shadowMapSampleCount);
+        // Render Light View
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-    glBindImageTexture(1, m_shadowMapTexture, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
+        glViewport(0, 0, m_width, m_height);
 
-    glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 4);
-
-    createMomentsProgram->release();
-
-    /*
-    glFinish();
-    auto start = std::chrono::system_clock::now();
-    */
-
-    if (m_filterShadowMap)
-    {
-        // Filter Shadow Map
-        for (int i = 0; i < 4; i++)
-        {
-            horizontalGaussProgram->bind();
-
-            glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
-            glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
-
-            glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 1);
-
-            horizontalGaussProgram->release();
-
-            verticalGaussProgram->bind();
-
-            glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
-            glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
-
-            glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 1);
-
-            verticalGaussProgram->release();
-        }
-    }
-
-    /*
-    glFinish();
-    auto end = std::chrono::system_clock::now();
-    m_debugSum += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
-    m_debugCount++;
-    std::cout << (double)m_debugSum/m_debugCount << std::endl;
-    m_debugSum = 0;
-    m_debugCount = 0;
-    */
-
-    // 4. Render to Texture
-    glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
-
-    // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
-    glViewport(0, 0, m_width, m_height);
-
-    // Enable color output
-    GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
-    glDrawBuffers(1, attachments);
-
-    // NOTE: do not clear, as we already wrote to depth buffer!
-
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    // Draw closest pixel
-    glDepthFunc(GL_LEQUAL);
-
-    renderProgram->bind();
-
-    renderProgram->setUniformValue(m_projectionMatrixLoc, cameraProjection);
-    renderProgram->setUniformValue(m_lightDirectionLoc, QVector3D(lightDirection));
-    renderProgram->setUniformValue(m_lightColorLoc, scene->getLightColor());
-    renderProgram->setUniformValue(m_colorizeCascadesLoc, m_colorizeCascades);
-
-    // defaultProgram->setUniformValueArray(m_cascadeViewMatrixLoc, cascadeViews.data(), m_cascades);
-    // defaultProgram->setUniformValueArray(m_cascadeFarLoc, cascadeFars.data(), m_cascades, 1);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeViewBuffer);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_cascadeFarBuffer);
-
-    // Bind shadow map
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapTexture);
-    renderProgram->setUniformValue(m_shadowMapSamplerLoc, 0);
-
-    // Render regular objects
-    for (auto &object : scene->getObjects())
-    {
-        auto cameraModelView = cameraView * object->getWorld();
-
-
-        renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        renderProgram->setUniformValue(m_specularColorLoc, object->getSpecularColor());
-        renderProgram->setUniformValue(m_diffuseColorLoc, object->getDiffuseColor());
-        renderProgram->setUniformValue(m_ambientColorLoc, object->getAmbientColor());
-
-        object->getModel()->draw();
-    }
-
-    // Render debug objects
-    for (auto editorObject : scene->getEditorObjects())
-    {
-        if (!(static_cast<EditorObject *>(editorObject)->isVisible()))
-        {
-            continue;
-        }
-
-        auto cameraModelView = cameraView * editorObject->getWorld();
-
-        renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-        renderProgram->setUniformValue(m_specularColorLoc, editorObject->getSpecularColor());
-        renderProgram->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseColor());
-        renderProgram->setUniformValue(m_ambientColorLoc, editorObject->getAmbientColor());
-
-        editorObject->getModel()->draw();
-    }
-
-    // Unbind shadow map texture
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
-
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-
-    renderProgram->release();
-
-
-
-
-
-    // View Capture if enabled
-    if (m_captured == CAPTURE_ACTIVE)
-    {
-        auto drawCube = []() {
-            glBegin(GL_QUADS);
-
-            // X min
-            glVertex3f(-1, -1, -1);
-            glVertex3f(-1, -1,  1);
-            glVertex3f(-1,  1,  1);
-            glVertex3f(-1,  1, -1);
-
-            // X max
-            glVertex3f( 1, -1, -1);
-            glVertex3f( 1, -1,  1);
-            glVertex3f( 1,  1,  1);
-            glVertex3f( 1,  1, -1);
-
-            // Y min
-            glVertex3f(-1, -1, -1);
-            glVertex3f(-1, -1,  1);
-            glVertex3f( 1, -1,  1);
-            glVertex3f( 1, -1, -1);
-
-            // Y max
-            glVertex3f(-1,  1, -1);
-            glVertex3f(-1,  1,  1);
-            glVertex3f( 1,  1,  1);
-            glVertex3f( 1,  1, -1);
-
-            // Z min
-            glVertex3f(-1, -1, -1);
-            glVertex3f(-1,  1, -1);
-            glVertex3f( 1,  1, -1);
-            glVertex3f( 1, -1, -1);
-
-            // Z max
-            glVertex3f(-1, -1,  1);
-            glVertex3f(-1,  1,  1);
-            glVertex3f( 1,  1,  1);
-            glVertex3f( 1, -1,  1);
-
-            glEnd();
-        };
-        auto drawWireframe = []() {
-
-            glBegin(GL_LINE_STRIP);
-
-            glVertex3f(-1,  1, -1);
-            glVertex3f(-1, -1, -1);
-            glVertex3f( 1, -1, -1);
-            glVertex3f( 1,  1, -1);
-
-            glEnd();
-
-            glBegin(GL_LINE_STRIP);
-
-            glVertex3f(-1,  1,  1);
-            glVertex3f(-1,  1, -1);
-            glVertex3f( 1,  1, -1);
-            glVertex3f( 1,  1,  1);
-
-            glEnd();
-
-            glBegin(GL_LINE_STRIP);
-
-            glVertex3f(-1, -1,  1);
-            glVertex3f(-1,  1,  1);
-            glVertex3f( 1,  1,  1);
-            glVertex3f( 1, -1,  1);
-
-            glEnd();
-
-            glBegin(GL_LINE_STRIP);
-
-            glVertex3f(-1, -1, -1);
-            glVertex3f(-1, -1,  1);
-            glVertex3f( 1, -1,  1);
-            glVertex3f( 1, -1, -1);
-
-            glEnd();
-
-        };
+        // Clear!
+        glClearColor(0, 0, 0, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
+        // Draw closest pixel
+        glDepthFunc(GL_LESS);
+
+        renderLightView->bind();
+
+        renderLightView->setUniformValue(m_lightViewProjectionMatrixLoc, tempLightProjection);
+
+        // Render regular objects
+        for (auto &object : scene->getObjects())
+        {
+            auto cameraModelView = lightViewMatrix * object->getWorld();
+
+            renderLightView->setUniformValue(m_lightViewModelViewMatrixLoc, cameraModelView);
+            renderLightView->setUniformValue(m_lightViewDiffuseColorLoc, object->getDiffuseColor());
+            renderLightView->setUniformValue(m_lightViewAmbientColorLoc, object->getAmbientColor());
+
+            object->getModel()->draw();
+        }
+
         glDisable(GL_CULL_FACE);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        renderCaptureProgram->bind();
-
-        renderCaptureProgram->setUniformValue(m_renderCaptureCameraProjectionLoc, cameraProjection);
-        renderCaptureProgram->setUniformValue(m_renderCaptureCameraViewLoc, cameraView);
-
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_capturedFrustumToWorldBuffer);
-
-        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, 0);
-        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(1, 0, 0, 0.5));
-        drawCube();
-        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(1, 0, 0, 1));
-        drawWireframe();
-
-        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, 1);
-        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(0, 1, 0, 0.5));
-        drawCube();
-        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(0, 1, 0, 1));
-        drawWireframe();
-
-        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, 2);
-        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(0, 0, 1, 0.5));
-        drawCube();
-        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(0, 0, 1, 1));
-        drawWireframe();
-
-        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, 3);
-        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(1, 1, 0, 0.5));
-        drawCube();
-        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(1, 1, 0, 1));
-        drawWireframe();
-
-        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, 4);
-        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(1, 0, 1, 1));
-        drawWireframe();
-
-        glDisable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
 
-        renderCaptureProgram->release();
+        renderLightView->release();
+
+        renderCapture(lightViewMatrix, tempLightProjection);
     }
+    else
+    {
+        // 3. Render to ShadowMap
+        glBindFramebuffer(GL_FRAMEBUFFER, m_shadowMapFrameBuffer);
+
+        // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
+        glViewport(0, 0, m_shadowMapSize, m_shadowMapSize);
+
+        // Initialize with max depth.
+        glClearColor(0.999990940f, 0.997558594f, 0.893437386f, 0);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_DEPTH_CLAMP);
+        glEnable(GL_MULTISAMPLE);
+        glEnable(GL_CULL_FACE);
+
+        shadowMapProgram->bind();
 
 
+        // shadowMapProgram->setUniformValueArray(m_shadowMapCascadeViewMatrixLoc, cascadeViews.data(), m_cascades);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeViewBuffer);
+
+        for (auto &object : scene->getObjects())
+        {
+            // work in camera view space
+            shadowMapProgram->setUniformValue(m_shadowMapWorldMatrixLoc, cameraView * object->getWorld());
+
+            object->getModel()->draw();
+        }
+
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_DEPTH_CLAMP);
+        glDisable(GL_MULTISAMPLE);
+        glDisable(GL_CULL_FACE);
+
+        shadowMapProgram->release();
+
+        // AMD gpu's are too agressive!
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        // these barriers do work: GL_ALL_BARRIER_BITS GL_SHADER_IMAGE_ACCESS_BARRIER_BIT GL_TEXTURE_FETCH_BARRIER_BIT GL_SHADER_STORAGE_BARRIER_BIT
 
 
+        // 3.1 Resolve MSAA depth to moment texture
+        createMomentsProgram->bind();
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE_ARRAY, m_shadowMapDepthBuffer);
+
+        createMomentsProgram->setUniformValue(m_createMomentsSampleCountLoc, m_shadowMapSampleCount);
+
+        glBindImageTexture(1, m_shadowMapTexture, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16);
+
+        glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 4);
+
+        createMomentsProgram->release();
+
+        /*
+        glFinish();
+        auto start = std::chrono::system_clock::now();
+        */
+
+        if (m_filterShadowMap)
+        {
+            // Filter Shadow Map
+            for (int i = 0; i < 4; i++)
+            {
+                horizontalGaussProgram->bind();
+
+                glBindImageTexture(0, m_shadowMapTexture, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
+                glBindImageTexture(1, m_shadowMapTexture2, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
+
+                glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 1);
+
+                horizontalGaussProgram->release();
+
+                verticalGaussProgram->bind();
+
+                glBindImageTexture(0, m_shadowMapTexture2, 0, GL_FALSE, i, GL_READ_ONLY, GL_RGBA16);
+                glBindImageTexture(1, m_shadowMapTexture, 0, GL_FALSE, i, GL_WRITE_ONLY, GL_RGBA16);
+
+                glDispatchCompute(m_shadowMapSize/16, m_shadowMapSize/16, 1);
+
+                verticalGaussProgram->release();
+            }
+        }
+
+        /*
+        glFinish();
+        auto end = std::chrono::system_clock::now();
+        m_debugSum += std::chrono::duration_cast<std::chrono::microseconds>(end-start).count();
+        m_debugCount++;
+        std::cout << (double)m_debugSum/m_debugCount << std::endl;
+        m_debugSum = 0;
+        m_debugCount = 0;
+        */
+
+        // 4. Render to Texture
+        glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
+
+        // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
+        glViewport(0, 0, m_width, m_height);
+
+        // Enable color output
+        GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
+        glDrawBuffers(1, attachments);
+
+        // NOTE: do not clear, as we already wrote to depth buffer!
+
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
+        // Draw closest pixel
+        glDepthFunc(GL_LEQUAL);
+
+        renderProgram->bind();
+
+        renderProgram->setUniformValue(m_projectionMatrixLoc, cameraProjection);
+        renderProgram->setUniformValue(m_lightDirectionLoc, QVector3D(lightDirection));
+        renderProgram->setUniformValue(m_lightColorLoc, scene->getLightColor());
+        renderProgram->setUniformValue(m_colorizeCascadesLoc, m_colorizeCascades);
+
+        // defaultProgram->setUniformValueArray(m_cascadeViewMatrixLoc, cascadeViews.data(), m_cascades);
+        // defaultProgram->setUniformValueArray(m_cascadeFarLoc, cascadeFars.data(), m_cascades, 1);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeViewBuffer);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_cascadeFarBuffer);
+
+        // Bind shadow map
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapTexture);
+        renderProgram->setUniformValue(m_shadowMapSamplerLoc, 0);
+
+        // Render regular objects
+        for (auto &object : scene->getObjects())
+        {
+            auto cameraModelView = cameraView * object->getWorld();
 
 
+            renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+            renderProgram->setUniformValue(m_specularColorLoc, object->getSpecularColor());
+            renderProgram->setUniformValue(m_diffuseColorLoc, object->getDiffuseColor());
+            renderProgram->setUniformValue(m_ambientColorLoc, object->getAmbientColor());
 
-    /*
+            object->getModel()->draw();
+        }
 
-    // 5. Gauss moments of screenspace depth:
-    verticalVO->bind();
+        // Render debug objects
+        for (auto editorObject : scene->getEditorObjects())
+        {
+            if (!(static_cast<EditorObject *>(editorObject)->isVisible()))
+            {
+                continue;
+            }
 
-    glBindImageTexture(0, m_voMomentsTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
-    glBindImageTexture(1, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
-    glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
+            auto cameraModelView = cameraView * editorObject->getWorld();
 
-    verticalVO->release();
+            renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+            renderProgram->setUniformValue(m_specularColorLoc, editorObject->getSpecularColor());
+            renderProgram->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseColor());
+            renderProgram->setUniformValue(m_ambientColorLoc, editorObject->getAmbientColor());
 
+            editorObject->getModel()->draw();
+        }
 
-    horizontalVO->bind();
+        // Unbind shadow map texture
+        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-    glBindImageTexture(0, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
-    glBindImageTexture(1, m_voMomentsTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
-    glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
 
-    horizontalVO->release();
-    */
-
-    // generate mipmaps:
-    glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // needed, to make mipmaps available!!!
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // 6. Render to Screen, apply VO
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-    glViewport(0, 0, m_width, m_height);
-
-    glClearColor(0, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glEnable(GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    composeProgram->bind();
+        renderProgram->release();
 
 
-    composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
+        // View Capture if enabled
+        if (m_captured == CAPTURE_ACTIVE)
+        {
+            renderCapture(cameraView, cameraProjection);
+        }
 
-    composeProgram->setUniformValue(m_composeMomentsSamplerLoc, 1);
-    composeProgram->setUniformValue(m_composeDepthBufferLoc,2);
-    composeProgram->setUniformValue(m_composeProjectionMatrixLoc, scene->getCameraProjection());
-    composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, scene->getCameraProjection().inverted());
-    composeProgram->setUniformValue(m_ratioLoc, m_ratio);
-    composeProgram->setUniformValue(m_composeLightDirectionLoc, lightDirection);
+        /*
+        // 5. Gauss moments of screenspace depth:
+        verticalVO->bind();
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_renderTexture);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+        glBindImageTexture(0, m_voMomentsTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
+        glBindImageTexture(1, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
+        glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
 
-    m_quadVao.bind();
-    glDrawArrays(GL_QUADS, 0, 4);
-    m_quadVao.release();
+        verticalVO->release();
 
-    /*
-    glViewport(0, 0, m_width/4, m_height/4);
-    glBindTexture(GL_TEXTURE_2D, m_normalTexture);
-    glDrawArrays(GL_QUADS, 0, 4);
-    */
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+        horizontalVO->bind();
 
-    glDisable(GL_BLEND);
+        glBindImageTexture(0, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
+        glBindImageTexture(1, m_voMomentsTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
+        glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
 
-    composeProgram->release();
+        horizontalVO->release();
+        */
 
+        // generate mipmaps:
+        glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // needed, to make mipmaps available!!!
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        // 6. Render to Screen, apply VO
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+        glViewport(0, 0, m_width, m_height);
+
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glEnable(GL_BLEND);
+        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        composeProgram->bind();
+
+
+        composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
+
+        composeProgram->setUniformValue(m_composeMomentsSamplerLoc, 1);
+        composeProgram->setUniformValue(m_composeDepthBufferLoc,2);
+        composeProgram->setUniformValue(m_composeProjectionMatrixLoc, scene->getCameraProjection());
+        composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, scene->getCameraProjection().inverted());
+        composeProgram->setUniformValue(m_ratioLoc, m_ratio);
+        composeProgram->setUniformValue(m_composeLightDirectionLoc, lightDirection);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+
+        m_quadVao.bind();
+        glDrawArrays(GL_QUADS, 0, 4);
+        m_quadVao.release();
+
+        /*
+        glViewport(0, 0, m_width/4, m_height/4);
+        glBindTexture(GL_TEXTURE_2D, m_normalTexture);
+        glDrawArrays(GL_QUADS, 0, 4);
+        */
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        glDisable(GL_BLEND);
+
+        composeProgram->release();
+    }
     // DONE
 
 
@@ -1457,6 +1408,137 @@ void Renderer::resize(int width, int height)
     }
 }
 
+void Renderer::renderCapture(const QMatrix4x4 &cameraView, const QMatrix4x4 &cameraProjection)
+{
+    QOpenGLShaderProgram *renderCaptureProgram = m_programs[KEYSTR_PROGRAM_RENDER_CAPTURE].get();
+
+    auto drawCube = []() {
+        glBegin(GL_QUADS);
+
+        // X min
+        glVertex3f(-1, -1, -1);
+        glVertex3f(-1, -1,  1);
+        glVertex3f(-1,  1,  1);
+        glVertex3f(-1,  1, -1);
+
+        // X max
+        glVertex3f( 1, -1, -1);
+        glVertex3f( 1, -1,  1);
+        glVertex3f( 1,  1,  1);
+        glVertex3f( 1,  1, -1);
+
+        // Y min
+        glVertex3f(-1, -1, -1);
+        glVertex3f(-1, -1,  1);
+        glVertex3f( 1, -1,  1);
+        glVertex3f( 1, -1, -1);
+
+        // Y max
+        glVertex3f(-1,  1, -1);
+        glVertex3f(-1,  1,  1);
+        glVertex3f( 1,  1,  1);
+        glVertex3f( 1,  1, -1);
+
+        // Z min
+        glVertex3f(-1, -1, -1);
+        glVertex3f(-1,  1, -1);
+        glVertex3f( 1,  1, -1);
+        glVertex3f( 1, -1, -1);
+
+        // Z max
+        glVertex3f(-1, -1,  1);
+        glVertex3f(-1,  1,  1);
+        glVertex3f( 1,  1,  1);
+        glVertex3f( 1, -1,  1);
+
+        glEnd();
+    };
+    auto drawWireframe = []() {
+
+        glBegin(GL_LINE_STRIP);
+
+        glVertex3f(-1,  1, -1);
+        glVertex3f(-1, -1, -1);
+        glVertex3f( 1, -1, -1);
+        glVertex3f( 1,  1, -1);
+
+        glEnd();
+
+        glBegin(GL_LINE_STRIP);
+
+        glVertex3f(-1,  1,  1);
+        glVertex3f(-1,  1, -1);
+        glVertex3f( 1,  1, -1);
+        glVertex3f( 1,  1,  1);
+
+        glEnd();
+
+        glBegin(GL_LINE_STRIP);
+
+        glVertex3f(-1, -1,  1);
+        glVertex3f(-1,  1,  1);
+        glVertex3f( 1,  1,  1);
+        glVertex3f( 1, -1,  1);
+
+        glEnd();
+
+        glBegin(GL_LINE_STRIP);
+
+        glVertex3f(-1, -1, -1);
+        glVertex3f(-1, -1,  1);
+        glVertex3f( 1, -1,  1);
+        glVertex3f( 1, -1, -1);
+
+        glEnd();
+
+    };
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glDisable(GL_CULL_FACE);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    QVector3D cascadeColors[] = {
+            {1, 0, 0},
+            {0, 1, 0},
+            {0, 0, 1},
+            {1, 1, 0},
+            {1, 0, 1}
+    };
+
+    renderCaptureProgram->bind();
+
+    renderCaptureProgram->setUniformValue(m_renderCaptureCameraProjectionLoc, cameraProjection);
+    renderCaptureProgram->setUniformValue(m_renderCaptureCameraViewLoc, cameraView);
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_capturedFrustumToWorldBuffer);
+
+    // faces
+    for (int i = 0; i < 4; i++)
+    {
+        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, i);
+
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(cascadeColors[i], 0.5));
+        drawCube();
+    }
+
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+
+    // wireframes (also camera frustum)
+    for (int i = 0; i < 5; i++)
+    {
+        renderCaptureProgram->setUniformValue(m_renderCaptureCascadeIndexLoc, i);
+
+        renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(cascadeColors[i], 1));
+        drawWireframe();
+    }
+
+    renderCaptureProgram->release();
+}
+
+
+
 QWidget *Renderer::createDebugWidget(QWidget *parent)
 {
     return new RendererDebugWidget(this, parent);
@@ -1521,4 +1603,14 @@ void Renderer::setCapture(bool enabled)
 bool Renderer::getCapture()
 {
     return m_captured != CAPTURE_NONE;
+}
+
+void Renderer::setRenderLightView(bool enabled)
+{
+    m_renderLightView = enabled;
+}
+
+bool Renderer::getRenderLightView()
+{
+    return m_renderLightView;
 }
