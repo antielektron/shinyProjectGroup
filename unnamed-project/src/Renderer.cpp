@@ -837,6 +837,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         // Projection matrix that wraps whole camera frustum
         QMatrix4x4 tempLightProjection;
         createFrustumProjectionMatrix(screenToLightTransformation, tempLightProjection);
+        QMatrix4x4 scaling;
+        scaling.scale(0.99, 0.99, 0.99);
+        tempLightProjection = scaling*tempLightProjection;
 
         // Render Light View
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);

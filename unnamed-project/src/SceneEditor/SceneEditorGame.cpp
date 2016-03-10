@@ -109,6 +109,9 @@ void SceneEditorGame::tick(float dt)
 
     float speed = 10.0f * m_deltaTime;
 
+    if (m_keyManager->isKeyDown(Qt::Key_Control))
+        speed *= 5;
+
 	if (m_keyManager->shouldCatchMouse())
 	{
 		m_rotX += m_keyManager->getRelativeY() * .1;

@@ -2,8 +2,9 @@
 
 #include <iostream>
 
-PrimitiveGame::PrimitiveGame() :
-        m_wasEscDown(false)
+PrimitiveGame::PrimitiveGame(const QString &scenefile) :
+        m_wasEscDown(false),
+        m_scenefile(scenefile)
 {
 }
 
@@ -12,36 +13,19 @@ void PrimitiveGame::initialize()
     // call parent
     IGame::initialize();
 
-    m_scene = std::unique_ptr<Scene>(new Scene());
-
-    // static camera
-    m_position = QVector3D(0, 0, 5);
-    updatePosMatrix(QVector3D(0,0,0));
-
-
-    m_scene->addModel(std::unique_ptr<Model>(new Model("models/octonorm.obj")));
-    m_scene->addModel(std::unique_ptr<Model>(new Model("models/sphere.obj")));
-    m_scene->addModel(std::unique_ptr<Model>(new Model("models/suzanne.obj")));
-
-    auto octo = m_scene->createObject("octonorm");
-    auto sphere = m_scene->createObject("sphere");
-    auto suzanne = m_scene->createObject("suzanne");
-    sphere->setPosition(QVector3D(3, 0, 0));
-    suzanne->setPosition(QVector3D(6, 0, 0));
-
+    // Load a test level by default or empty scene
+    m_scene.reset(new Scene(m_scenefile));
 
     m_scene->getSceneRoot()->updateWorld();
 
-    //set directional light:
-    m_scene->setDirectionalLightDirection(QVector3D(0.3, 1.0, 0.3));
-    m_scene->setLightColor(QVector3D(1.0, 1.0, 1.0));
+    m_position = m_scene->getPlayerPosition();
 }
 
 void PrimitiveGame::resize(int width, int height)
 {
     auto &proj = m_scene->getCameraProjection();
     proj.setToIdentity();
-    proj.perspective(45.0f, (float)width / height, 0.01f, 100.0f);
+    proj.perspective(45.0f, (float)width / height, 0.2f, 500.0f);
 }
 
 void PrimitiveGame::tick(float dt)
@@ -53,7 +37,10 @@ void PrimitiveGame::tick(float dt)
 
     m_keyManager->tick();
 
-    float speed = 7.0f * dt;
+    float speed = 10.0f * dt;
+
+    if (m_keyManager->isKeyDown(Qt::Key_Control))
+        speed *= 5;
 
     if (m_keyManager->shouldCatchMouse())
     {
