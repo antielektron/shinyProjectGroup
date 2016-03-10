@@ -911,7 +911,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_DEPTH_CLAMP);
         glEnable(GL_MULTISAMPLE);
-        glEnable(GL_CULL_FACE);
+        // glEnable(GL_CULL_FACE);
 
         shadowMapProgram->bind();
 
@@ -930,7 +930,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_DEPTH_CLAMP);
         glDisable(GL_MULTISAMPLE);
-        glDisable(GL_CULL_FACE);
+        // glDisable(GL_CULL_FACE);
 
         shadowMapProgram->release();
 
@@ -1006,7 +1006,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         // NOTE: do not clear, as we already wrote to depth buffer!
 
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        // glEnable(GL_CULL_FACE);
         // Draw closest pixel
         glDepthFunc(GL_LEQUAL);
 
@@ -1062,7 +1062,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         // Unbind shadow map texture
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-        glDisable(GL_CULL_FACE);
+        // glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
 
         renderProgram->release();
