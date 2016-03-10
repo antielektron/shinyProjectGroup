@@ -109,16 +109,24 @@ Sample Distribution Shadow Maps (SDSMs) ist ein Verfahren zur adaptiven Optimier
 \subsection{Algorithmus}
 
 % Cascaded Shadow Maps aka Z-Partitioning
-SDSMs basieren auf Z-Partitoning, wobei das Kamera Frustum entlang der Blickrichtung in mehrere Teilfrusta partitioniert wird. Für jedes Teilfrustum wird eine eigene Shadow Map generiert.
+SDSMs basieren auf Z-Partitoning, wobei das Kamera Frustum entlang der Blickrichtung in mehrere Kaskaden partitioniert wird. Für jedes Kaskade wird eine eigene Shadow Map generiert.
 Auf diese Weise kann mehr Shadow Map Auflösung für nahe Objekte verwendet werden, und weniger Auflösung für weit entfernte Objekte.
+
+
+% Betrachte Punkte in Light-Space TODO
+Der Algorithmus betrachtet die Verteilung aller sichtbaren Punkte der Szene aus der Sicht des Lichtes (im Light Space).
+Hierzu wird für jedes Sample aus dem Camera Depth Buffer die Position in der Welt rekonstruiert und in den Light Space transformiert.
+Die so erhaltenen Punkte sind genau die, für die beim Rendern der Szene aus der Sicht der Kamera auf die Shadow Map zugegriffen wird.
+
 
 % Partitionierung
 Für gute Ergebnisse ist eine geeignete Wahl der Partition ausschlaggebend.
-Anstatt auf eine statische Partitionierung des Kamera Frustums zu setzen wird die Partitionierung von SDSMs in jedem Frame neu berechnet.
+Anstatt auf eine statische Partitionierung des Kamera Frustums \cite{pssm} zu setzen, wird die Partitionierung von SDSMs in jedem Frame neu berechnet, so dass sie die sichtbare Geometrie optimal abdeckt.
 
 % - Min/Max Reduktion
 % - Logarithmische Partitionierung
-Zunächst wird die tatsächliche Near und Far Distanz der sichtbaren Geometrie im Kamera Frustums ermittelt. Dies geschieht mittels Min/Max Reduktion der Tiefenwerte im Kamera Depth Buffer.
+Zunächst wird die tatsächliche Near und Far Distanz der sichtbaren Geometrie im Kamera Frustums ermittelt.
+Dies geschieht mittels Min/Max Reduktion der Tiefenwerte im Kamera Depth Buffer.
 Anschließend wird das Kamera Frustum zwischen tatsächlicher Near und Far Distanz logarithmisch partitioniert um das perspektivische Aliasing zu minimieren.
 
 % Abgrenzung PSSM Logarithmic/Linear
@@ -128,18 +136,21 @@ PSSMs konvexkombinieren die Partitionsgrenzen der linearen und logarithmischen P
 Optimale Koeffizienten müssen meist von Hand ermittelt werden.
 
 % (K-Means and friends)
-Weitere Möglichkeiten das Kamera Frustum intelligent zu partitionieren sind ein adaptiv logarithmisches und ein K-Means Verfahren.
+Weitere Möglichkeiten das Kamera Frustum intelligent zu partitionieren, sind ein adaptiv logarithmisches und ein K-Means Verfahren.
 Das adaptiv logarithmische Verfahren vermeidet Lücken im Histogramm des Kamera Depth Buffers, indem es die Partitionsgrenzen an das Ende von diesen schiebt.
 Das K-Means Verfahren sucht zunächst Maxima im Histogramm des Kamera Depth Buffers und legt dann die Partition entsprechend um die gefundenen Maxima.
-Für beide Verfahren muss zunächst ein Histogramm berechnet werden.
-
-
-% Betrachte Punkte in Light-Space TODO
-Der Algorithmus betrachtet die Verteilung aller sichtbaren Punkte der Szene aus der Sicht des Lichtes.
-Hierzu wird für jedes Sample aus dem Kamera Depth Buffer die Position in der Welt rekonstruiert und in den Light Space transformiert.
+Für beide Verfahren muss zunächst das Histogramm des Camera Depth Buffers berechnet werden.
 
 
 % Tight Partition Frusta
+Andere Algorithmen wie PSSM \cite{pssm} projizieren die Ecken des Kamera Frustums bzw. der Kaskaden in den Light Space um das Frustum für die Shadow Map zu erhalten.
+Um das Frustum möglichst klein zu wählen kann dort eine Oriented Bounding Box anstelle einer Axis Aligned Bounding Box (AABB) berechnet werden.
+Die Konvexe Hülle der in den Light Space projizierten Punkte kann ein sehr komplexes Polygon werden, weshalb es sich für SDSMs nicht lohnt diese zu berechnen.
+
+SDSMs berechnen für jede Kaskade eine AABB, die dann das Frustum für die Shadow Map bildet.
+Damit die AABBs die sichtbare Geometrie sinnvoll einschließen, wird der Light Space so rotiert, dass die Z-Achse des Camera Spaces sich an der X-Achse des Light Spaces ausgerichtet.
+
+Die AABBs für die 
 
 % Andere Algorithmen benutzen Ecken von jedem Frustum um Shadow Map Frustum zu definieren
 TODO
@@ -150,43 +161,54 @@ TODO
 
 % Rendern der Shadow Map
 Die Shadow Maps für die Kaskaden werden mittels Texture Arrays realisiert, wobei jede Kaskade einen eigenen Layer in dem Array erhält.
-Beim Rendern der Shadow Map transformiert der Vertex Shader die Geometrie zunächst nur in das Welt Koordinatensystem und nicht direkt in das Frustum der Shadow Map.
+Beim Rendern der Shadow Map transformiert der Vertex Shader die Geometrie zunächst nur in den World Space und nicht direkt in das Frustum der Shadow Map.
 Der Geometry Shader klont dann die Geometrie und transformiert sie für jede Kaskade mit der dazugehörigen Projektionsmatrix in das Shadow Map Frustum um sie in den entsprechenden Layer der Shadow Map zu rendern.
-Anstatt die Near Plane des Shadow Map Frustums zu verschieben, um Geometrie die aus der Sicht des Lichtes vor dem Kamera Frustum liegt zu berücksichtigen, wird an der Near Plane des Shadow Map Frustums der Tiefenwert geclampt.
-
-% Light Space (to detailed?)
-% Um eine Transformation in den Light Space zu bekommen, der analog zum Camera Space die Szene aus der Sicht des Lichtes betrachtet, wird zunächst die Licht Richtung auf die Z Achse rotiert und anschließend die Z-Achse des Camera Spaces an der X-Achse ausgerichtet.
+Anstatt die Near Plane des Shadow Map Frustums zu verschieben, um Geometrie die aus der Sicht des Lichtes vor dem Camera Frustum liegt zu berücksichtigen, wird an der Near Plane des Shadow Map Frustums der Tiefenwert geclampt.
 
 % Temporäre Licht Projektion
 Um die Bounding Boxen der Geometrie in den einzelnen Kaskaden zu berechnen, müssen die Koordinaten im Light Space auf den Bereich $[0, 1]$ gemappt werden.
 Hierzu werden die Eckpunkte im Screen Space in die Welt, und anschließend in den Light Space transformiert, wo dann deren Axis Aligned Bounding Box auf $[0, 1]^3$ projiziert wird.
-So ist es garantiert, dass die Koordinaten sämmtlicher sichtbarer Geometrie im Light Space clamping in einer Textur gespeichert werden können.
+So ist es garantiert, dass die Koordinaten sämmtlicher sichtbarer Geometrie im Light Space ohne clamping in einer Textur gespeichert werden können.
 
 % Reduktion 1 & 2
-Die beiden Reduktionen werden jeweils in einem Compute Shader ausgeführt. Jeder Thread liest 1 bis 4 Einträge pro zu reduzierendem Wert ein. Jede Thread Gruppe (von 256 Threads) generiert einen neuen Eintrag pro Wert.
+Die beiden Reduktionen werden jeweils in einem Compute Shader ausgeführt.
+Jeder Thread liest 1 bis 4 Einträge pro zu reduzierendem Wert ein.
+Jede Thread Gruppe (von 256 Threads) generiert einen neuen Eintrag pro Wert.
 Ausserdem versuchen wir die Zugriffsmuster auf den Shared Memory so weit es geht zu optimieren und Bank Conflicts zu vermeiden \cite{reduction}.
-Um so mehr verschiedene Werte auf einmal reduziert werden, um so mehr können idle Zeiten von Threads in den Thread Gruppen vermieden werden.
-Anstatt dass nach einer halbierung der Daten die eine Hälfte der Threads ihre Arbeit beendigt, wird der erste zu reduzierende Wert von der ersten Hälfte der Threads, und die zweite zu reduzierende Variable von der zweiten Hälfte der Threads bearbeitet, und so weiter bis jeder Thread sich nur noch um höchstens einen Wert kümmern muss (z.B. Minimale X Koordinate der zweiten Kaskade).
-Die Reduktionsergebnisse werden in 1D Texturen gespeichert, um die Anzahl der Threads die in einem Reduktionsschritt keine sinnvollen Daten einlesen zu minimieren.
+Um so mehr verschiedene Werte auf einmal reduziert werden, desto mehr können idle Zeiten von Threads in den Thread Gruppen vermieden werden.
 
+Anstatt nach einer halbierung der Daten die eine Hälfte der Threads ihre Arbeit beendigen zu lassen, wird der erste zu reduzierende Wert von der ersten Hälfte der Threads, und die zweite zu reduzierende Wert von der zweiten Hälfte der Threads weiter bearbeitet und so weiter, bis jeder Thread sich nur noch um höchstens einen Wert kümmern muss (z.B. Minimale X Koordinate der zweiten Kaskade).
+Damit die Arbeit so aufgeteilt werden kann, müssen alle Reduktionsprobleme vom selben Typ sein.
+\begin{equation}
+  far = \max\{ depth \} = 1 - \min \{ 1 - depth \}
+\end{equation}
+Maximierungsprobleme werden während der Reduktionen Minimierungsprobleme betrachtet.
+Durch die Addition von $1$ verlässt der zu reduzierende Wert den Wertebereich $[0, 1]$ nicht.
+Dies gilt analog für die Max-Corners der Bounding Boxen.
+
+Die Reduktionsergebnisse werden in 1D Texturen gespeichert.
+So wird die Anzahl der Threads, die in einem Reduktionsschritt keine sinnvollen Daten einlesen, minimiert.
 
 % Keks
+TODO irgendwas vergessen?
+
 
 % SDSM
 \paragraph{Erster Versuch}
 Im ersten Ansatz haben wir die Reduktionen für die tatsächliche Near und Far Distanz sowie die Bounding Boxen der Geometrie in den Kaskaden auf der GPU berechnet.
 Das Ergebnis haben wir auf die CPU zurück gelesen um aus den Near und Far Distanzen die Partition zu berechnen, bzw. aus den Bounding Boxen das Frustum für die entsprechende Shadow Map.
 Um zu vermeiden, dass der CPU auf die GPU warten muss, haben wir die Ergebnisse aus dem vorherigen Frame, bzw. von vor zwei Frames genutzt, da deren Berechnung dann schon abgeschlossen sein sollte.
-Um Bewegungen der Kamera zu kompensieren, haben wir die Ergebnisse aus dem Kamera Koordinatensystem des vergangenen Frames in die Welt transformiert und von dort in das aktuelle Kamera Koordinatensystem.
+Um Bewegungen der Kamera zu kompensieren, haben wir die Ergebnisse aus dem Camera Space des vergangenen Frames in die Welt transformiert und von dort in den aktuelle Camera Space.
 Was wir nicht kompensieren konnten, war das erscheinen neuer Geometrie, die durch die Bewegung der Kamera sichtbar wurde.
 Das hat z.B. zu Bereichen zwischen den Kaskaden geführt, die nicht von einer Shadow Map abgedeckt wurden.
+Selbst wenn wir zur Sicherheit einen Rand in die Shadow Map einbauen, was nicht im Sinne von SDSM ist, können schnelle Bewegungen nicht kompensiert werden.
 
 % SDSM
 \paragraph{Zweiter Versuch}
-Dieses Problem haben wir gelöst indem wir am Anfang jedes Frames einmal nur die Tiefe gerendert haben.
-Anschließend haben wir darauf die Near und Far Distanz berechnet.
-Anstatt auf die CPU zurück zu lesen, haben wir die Partition in einem Compute Shader auf der GPU berechnet.
-Nachdem dann die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus ebenfalls auf der GPU die Projektionsmatrizen für die Shadow Maps berechnet.
+Dieses Problem haben wir gelöst, indem wir am Anfang jedes Frames einen Depth Only Pass gerendert haben.
+Anschließend haben wir darauf die Near und Far Distanz wie zu vor berechnet.
+Anstatt diese auf die CPU zurück zu lesen, haben wir die Partition in einem Compute Shader auf der GPU berechnet.
+Nachdem die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus ebenfalls auf der GPU die Projektionsmatrizen für die Shadow Maps berechnet.
 
 
 
@@ -245,7 +267,7 @@ SDSMs sind sehr robust und benötigen keine möglicherweise von Hand zu optimier
 PSSMs können oft ähnlich gute Ergebnisse liefern, wenn sie optimal eingestellt sind, allerdings gilt dies meist nur für eine konkrete Sicht auf die Szene.
 Befindet sich mehr oder weniger Geometrie in unmittelbarer nähe zur Kamera, so liefert PSSM keine guten Ergebnisse mehr.
 SDSM passt ihre Z-Partitionen adaptiv an die veränderte Sichtbarkeit an.
-Dies ist möglich, da SDSMs die tatsächliche Near Plane kennen, wo PSSMs nur eine untere Schranke hierfür kennen, die sich aus der Kamera Projektion ergibt.
+Dies ist möglich, da SDSMs die tatsächliche Near Plane kennen, wo PSSMs nur eine untere Schranke hierfür kennen, die sich aus der Camera Projektion ergibt.
 
 % Verbesserung der MSM durch SDSM
 % TODO erstmal nur skizziert!
