@@ -234,7 +234,7 @@ void main()
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
 	vec3 mixedColor = lineSampling(samples) * defaultColor;
 
-	if (texture2D(depthBuffer, uv).x >= 1-10e-4)
+	if (texture2D(depthBuffer, uv).x == 1)
 	{
 		mixedColor = get_sky();
 	}

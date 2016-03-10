@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene name="Shiny Scene" version="42" author="Norby">
+    <Models>
+        <Model name="leaves001" path="models/leaves001.obj"/>
+        <Model name="leaves002" path="models/leaves002.obj"/>
+        <Model name="octonorm" path="models/octonorm.obj"/>
+        <Model name="terrain" path="models/landscape/terrain.obj"/>
+        <Model name="tree001" path="models/tree001.obj"/>
+        <Model name="tree002" path="models/tree002.obj"/>
+    </Models>
+    <Objects>
+        <ObjectGroup name="tree1">
+            <Position x="30" y="0.2" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="stem" model="tree001" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.4" y="0.4" z="0.4"/>
+                <AmbientColor x="0.5" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="leaves" model="leaves001" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0" y="0" z="0"/>
+                <DiffuseColor x="0.5" y="0.8" z="0.5"/>
+                <AmbientColor x="0.4" y="0.4" z="0.1"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="tree2.1">
+            <Position x="-3.7" y="39.2" z="300"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="stem" model="tree002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.4" y="0.4" z="0.4"/>
+                <AmbientColor x="0.5" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="leaves" model="leaves002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0" y="0" z="0"/>
+                <DiffuseColor x="0.4" y="0.2" z="0"/>
+                <AmbientColor x="0.4" y="0.3" z="0.4"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="tree2.2">
+            <Position x="30" y="16.6" z="250"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="stem" model="tree002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.4" y="0.4" z="0.4"/>
+                <AmbientColor x="0.5" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="leaves" model="leaves002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0" y="0" z="0"/>
+                <DiffuseColor x="0.4" y="0.2" z="0"/>
+                <AmbientColor x="0.4" y="0.3" z="0.4"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="tree2.3">
+            <Position x="-4.1" y="-14.3" z="140.9"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="stem" model="tree002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.4" y="0.4" z="0.4"/>
+                <AmbientColor x="0.5" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="leaves" model="leaves002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0" y="0" z="0"/>
+                <DiffuseColor x="0.4" y="0.2" z="0"/>
+                <AmbientColor x="0.4" y="0.3" z="0.4"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="tree2.4">
+            <Position x="-40" y="-7.6" z="170"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="stem" model="tree002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.4" y="0.4" z="0.4"/>
+                <AmbientColor x="0.5" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="leaves" model="leaves002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0" y="0" z="0"/>
+                <DiffuseColor x="0.4" y="0.2" z="0"/>
+                <AmbientColor x="0.4" y="0.3" z="0.4"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="tree2.5">
+            <Position x="3" y="4" z="220"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="stem" model="tree002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.4" y="0.4" z="0.4"/>
+                <AmbientColor x="0.5" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="leaves" model="leaves002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0" y="0" z="0"/>
+                <DiffuseColor x="0.4" y="0.2" z="0"/>
+                <AmbientColor x="0.4" y="0.3" z="0.4"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="tree2.6">
+            <Position x="-80" y="50.2" z="292"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="stem" model="tree002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.4" y="0.4" z="0.4"/>
+                <AmbientColor x="0.5" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="leaves" model="leaves002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0" y="0" z="0"/>
+                <DiffuseColor x="0.4" y="0.2" z="0"/>
+                <AmbientColor x="0.4" y="0.3" z="0.4"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="tree2.7">
+            <Position x="-50" y="26.4" z="230"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="stem" model="tree002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0.5" y="0.5" z="0.5"/>
+                <DiffuseColor x="0.4" y="0.4" z="0.4"/>
+                <AmbientColor x="0.5" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="leaves" model="leaves002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="0" y="0" z="0"/>
+                <DiffuseColor x="0.4" y="0.2" z="0"/>
+                <AmbientColor x="0.4" y="0.3" z="0.4"/>
+            </Object>
+        </ObjectGroup>
+        <Object name="terrain" model="terrain" interactionEvent="">
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.5" y="0.5" z="0.5"/>
+            <AmbientColor x="0.4" y="0.4" z="0.4"/>
+        </Object>
+    </Objects>
+    <Attributes/>
+    <Events/>
+    <Animators/>
+    <DirectionalLight x="1.2" y="1" z="0.5" r="1" g="1" b="1"/>
+    <Player>
+        <Position x="0" y="0" z="0"/>
+        <Rotation x="0" y="0" z="0"/>
+    </Player>
+    <ShaderConfig file="shaders/configurations/defaultConfig.xml"/>
+</Scene>
