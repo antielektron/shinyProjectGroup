@@ -51,8 +51,15 @@ Deshalb untersuchen wir in diesem Paper 3 Techniken, welche verschiedene Lösung
 Zusätzlich implementieren wir alles in einer eigenen 3D Engine und generieren daraus ein kurzes Spiel um die Techniken zu demonstrieren.
 
 
+% Introduction
 \subsection{Sample Distribution Shadow Maps}
-Hier könnte ein Text stehen, vielleicht auch nicht
+
+Ein häufiges Problem bei der Shadow Map generierung ist Aliasing durch Over und Under Sampling.
+Sample Distribution Shadow Maps (SDSMs) \cite{sdsm} sind ein voll automatisches Verfahren mit konstantem Speicherbedarf und einer vorhersagbaren Worst-Case Laufzeit, die nicht von der Szenenkomplexität abhängt.
+Das Verfahren ist dadurch sehr gut für den Einsatz in Echtzeit Grafikanwendungen geeignet.
+SDSM ist ein Screen Space Verfahren, welches adaptiv in jedem Frame Z-Partitionen \cite{zpart} (Hier auch Kaskaden \cite{csm}) erstellt.
+So wird mehr Shadow Map Auflösung für Bereiche in der nähe der Kamera zur Verfügung gestellt und weniger für weit entfernte Bereiche, wodurch Perspektivischem Aliasing entgegen gewirkt wird.
+Des Weiteren werden die Shadow Map Frusta von SDSMs eng um die tatsächlich sichtbare Geometrie gelegt, was die zur verfügung Stehende Auflösung in den Shadow Maps zusätzlich erhöht.
 
 
 % Introduction
@@ -68,12 +75,16 @@ Wir wollen eine Schattentechnik verwenden, die möglichst hohe Qualität liefert
 
 \section{Related Work}
 
-TODO subsections or related work embeddet into techniques
+Es gibt bereits Verfahren \cite{CSM} \cite{PSSM} um Perspektivisches Aliasing zu minimieren.
+Allerdings liefern diese nicht immer gute Ergebnisse.
+
+Andere Verfahren wie Adaptive Shadow Maps \cite{asm}
+
 
 % Related Work
 \subsection{Sample Distribution Shadow Maps}
 
-Sample Distribution Shadow Maps \cite{lauritzen2011sample}
+Sample Distribution Shadow Maps \cite{sdsm}
 
 
 % Related Work
@@ -86,6 +97,7 @@ Volumetric Obscurance \cite{loos2010volumetric}
 \subsection{Moment Shadow Mapping}
 
 Moment Shadow Mapping \cite{msm}, Variance Shadow Maps \cite{donnelly2006variance}, Percentage Closer Filtering \cite{reeves1987rendering}
+
 
 
 % Main
@@ -228,7 +240,13 @@ Die MBVO färbt Konturen der Geometrie sehr dunkel ein und hat Ähnlichkeiten mi
 
 
 % Fazit
-\subsection{SDSM}	
+\subsection{Sample Distribution Shadow Maps}
+SDSMs sind sehr robust und benötigen keine möglicherweise von Hand zu optimierenden Parameter um gute Ergebnisse zu liefern.
+PSSMs können oft ähnlich gute Ergebnisse liefern, wenn sie optimal eingestellt sind, allerdings gilt dies meist nur für eine konkrete Sicht auf die Szene.
+Befindet sich mehr oder weniger Geometrie in unmittelbarer nähe zur Kamera, so liefert PSSM keine guten Ergebnisse mehr.
+SDSM passt ihre Z-Partitionen adaptiv an die veränderte Sichtbarkeit an.
+Dies ist möglich, da SDSMs die tatsächliche Near Plane kennen, wo PSSMs nur eine untere Schranke hierfür kennen, die sich aus der Kamera Projektion ergibt.
+
 % Verbesserung der MSM durch SDSM
 % TODO erstmal nur skizziert!
 SDSMs optimieren nicht nur die Ausnutzung der Shadow Map Auflösung, sondern auch die Ausnutzung der zur Verfügung stehenden Genauigkeit in der Shadow Map, da die Shadow Map Frusta in allen drei Dimensionen eng um die sichtbare Geometrie gelegt wird.
