@@ -420,7 +420,7 @@ Dabei ist $z_i$ die Tiefe des i-ten Samples im Depth-Buffer, $d_{r_i}$ ist die T
 betrachtete Umgebung des Punktes $P$, $z_{s_i} = \sqrt{1 - x_i^2 - y_i^2}$. $(x_i, y_i)$ ist die Position des
 i-ten Samples auf der Einheitsscheibe (also der Querschnitt der Einheitskugel, die den Punkt P 
 beinhaltet und dessen normale parallel zur Blickrichtung liegt). $v_i$ beschreibt das ``eindimensionale
-Volume'', dass die zum Sample korrespondierende Linie füllt (z.B. hat bei einer Einheitskugel genau das Sample
+Volumen'', dass die zum Sample korrespondierende Linie füllt (z.B. hat bei einer Einheitskugel genau das Sample
 ein Volumen von 2, das durch $P$ geht) \newline
 
 \begin{figure}
@@ -483,7 +483,7 @@ die Anzahl der Samples, \textit{depth} die Tiefe des zum Punkt $P$ korrespondier
 		\includegraphics[width = 6cm]{vo_assets/vo_lineSample_sample1000.png}
 		\label{ref:lineSample1000}
 	}
-	\caption{LineSampling mit verschiedenen Samples}
+	\caption{LineSampling mit verschieden vielen Samples pro Pixel}
 \end{figure}
 
 \subsection{Area Sampling}
@@ -534,6 +534,7 @@ an der Stelle \textit{uv} den Texel an gegebenem \textit{level} abgreift.
 \textit{getRadiusInScreenspace(depth)} rechnet das Ausmaß der auf den Screenspace projezierten Weltumgebung
 aus (in uv-Koordinaten).
 
+[TODO: make fancy screenshots]
 
 % Main
 \section{Moment Shadow Mapping}
