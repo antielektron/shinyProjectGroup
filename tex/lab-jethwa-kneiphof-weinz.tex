@@ -15,6 +15,17 @@
 \usepackage{setspace}
 \lstset{language=C++}
 
+\usepackage{tikz}
+\usetikzlibrary{calc, arrows,shapes,snakes,automata,backgrounds,petri}
+\tikzset{
+	%Define standard arrow tip
+	>=stealth',
+	%Define style for different line styles
+	help lines/.style={dashed, thick},
+	axis/.style={<->},
+	line/.style={thick};
+}
+
 \usepackage[]{algorithm2e}
 \pagestyle{plain}
 
@@ -293,6 +304,34 @@ SDSMs berechnen für jede Kaskade eine AABB, die dann das Frustum für die Shado
 Damit die AABBs die sichtbare Geometrie sinnvoll umschließen, wird der Light Space so rotiert, dass die Z-Achse des Camera Spaces sich an der X-Achse des Light Spaces ausgerichtet
 
 
+% SDSM Cascades colorized
+\begin{figure}
+	\centering
+	\subfloat{
+		\includegraphics[width=5.5cm]{sdsm_assets/pssm_colorized_near.png}
+	}
+	\subfloat{
+		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_colorized_near.png}
+	}
+
+	\subfloat{
+		\includegraphics[width=5.5cm]{sdsm_assets/pssm_colorized_far.png}
+	}
+	\subfloat{
+		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_colorized_far.png}
+	}
+
+	\caption{
+Visualisierung der Kaskaden in den Farben rot (nah), grün, blau, gelb (fern).
+Links sind Partitionierungen durch Parallel Split Shadow Maps zu sehen.
+Rechts sind Partitionierungen durch Sample Distribution Shadow Maps zu sehen.
+Die Partitionierung der PSSMs ist für das obere linke Bild optimiert.
+Während SDSMs die Kaskaden unten rechts adaptiv anpassen können, versagen die PSSMs in dem unteren linken Bild.
+}
+\end{figure}
+
+
+% SDSM Camera View
 \begin{figure}
 	\centering
 	\subfloat[PSSM] {
@@ -306,6 +345,7 @@ Damit die AABBs die sichtbare Geometrie sinnvoll umschließen, wird der Light Sp
 	\caption{Eine Szene die weit entfernte und sehr nahe Schatten enthält.}
 \end{figure}
 
+%  SDSM Light View
 \begin{figure}
 	\centering
 	\subfloat[PSSM] {
@@ -365,7 +405,7 @@ TODO irgendwas vergessen?
 
 
 % SDSM
-\paragraph{Erster Versuch}
+\subsubsection{Erster Versuch}
 Im ersten Ansatz haben wir die Reduktionen für die tatsächliche Near und Far Distanz sowie die Bounding Boxen der Geometrie in den Kaskaden auf der GPU berechnet.
 Das Ergebnis haben wir auf die CPU zurück gelesen um aus den Near und Far Distanzen die Partition zu berechnen, bzw. aus den Bounding Boxen das Frustum für die entsprechende Shadow Map.
 Um zu vermeiden, dass der CPU auf die GPU warten muss, haben wir die Ergebnisse aus dem vorherigen Frame, bzw. von vor zwei Frames genutzt, da deren Berechnung dann schon abgeschlossen sein sollte.
@@ -375,12 +415,71 @@ Das hat z.B. zu Bereichen zwischen den Kaskaden geführt, die nicht von einer Sh
 Selbst wenn wir zur Sicherheit einen Rand in die Shadow Map einbauen, was nicht im Sinne von SDSM ist, können schnelle Bewegungen nicht kompensiert werden.
 
 % SDSM
-\paragraph{Zweiter Versuch}
+\subsubsection{Zweiter Versuch}
 Dieses Problem haben wir gelöst, indem wir am Anfang jedes Frames einen Depth Only Pass gerendert haben.
 Anschließend haben wir darauf die Near und Far Distanz wie zu vor berechnet.
 Anstatt diese auf die CPU zurück zu lesen, haben wir die Partition in einem Compute Shader auf der GPU berechnet.
 Nachdem die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus ebenfalls auf der GPU die Projektionsmatrizen für die Shadow Maps berechnet.
 
+
+% SDSM
+\subsubsection{Sheared Sample Distribution Shadow Maps}
+Wenn das Licht schräg (geneigt) von der Seite einfällt, sind die Shadow Map Frusta entlang ihrer Z-Achse oft sehr ausgedehnt.
+% Auf der Licht zugewandten Seite des Frustums liegen abgetastet Punkte einer bestimmten Höhe oft näher am Licht, als die Punkte auf der Licht abgewandten Seite.
+Dadurch wird die Genauigkeit bei der Quantifizierung der Tiefe in der Shadow Map verschlechtert.
+
+%\begin{figure}
+%	\centering
+%	\begin{tikzpicture}[x=1cm,y=1cm] 
+		
+%		\draw [] (-1.5, -1) rectangle (1.5, 1);
+%		\draw [] (-1.5*0.8, -1*0.8) rectangle (1.5*0.8, 1*0.8);
+%		\draw [] (-1.5, -1) -- (-1.5*0.8, -1*0.8);
+%		\draw [] ( 1.5, -1) -- ( 1.5*0.8, -1*0.8);
+%		\draw [] ( 1.5,  1) -- ( 1.5*0.8,  1*0.8);
+%		\draw [] (-1.5,  1) -- (-1.5*0.8,  1*0.8);
+
+%		\draw [rotate around={45:(0,0)}] ({-sqrt(1.5^2 + 1^2)},{-sqrt(1.5^2 + 1^2)}) rectangle ({sqrt(1.5^2 + 1^2)}, {sqrt(1.5^2 + 1^2)});
+		
+		% Light Ray
+%		\draw [->] (-3, 3) -- (-2, 2);
+%		\draw [->] (-3.5, 2.5) -- (-2.5, 1.5);
+%		\draw [->] (-2.5, 3.5) -- (-1.5, 2.5);
+		
+%		\draw (1,1) -- (1,4) -- (5,4) -- (5,1) -- (1,1);
+		
+%		\draw [dotted, thick] (1,4) -- (1,5) node [above] {$x_1$};
+%		\draw [dotted, thick] (5,4) -- (5,5) node [above] {$x_2$};
+		
+%		\draw [dotted, thick] (5,1) -- (6,1) node [right] {$y_2$};
+%		\draw [dotted, thick] (5,4) -- (6,4) node [right] {$y_1$};
+	
+%	\end{tikzpicture}
+%\end{figure}
+
+%  SDSM Shear
+\begin{figure}
+	\centering
+	\subfloat [Sample Distribution Shadow Maps] {
+		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_no_shear_volumes_small.png}
+		\label{ref:sdsm_light}
+	}
+	\subfloat [Sheared Sample Distribution Shadow Maps] {
+		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_shear_volumes_small.png}
+		\label{ref:sdsm_light}
+	}
+	
+	\caption{Visualisierung der Shadow Map Frusta.}
+\end{figure}
+
+Unsere Lösung für dieses Problem ist eine einfache Scherung des Light Spaces.
+Die X-Achse des Camera Spaces wird im Light Space auf die Y-Achse abgebildet.
+So haben Koordinaten, die im Camera Space die gleiche Höhe (Y-Achse) haben, im Light Space die gleiche Tiefe (Z-Achse).
+
+Auch wenn wir es so geschafft haben in vielen Situationen die Shadow Map Frusta weiter zu verkleinern, ist durch die Scherung die Filterbarkeit der Momente \cite{msm} nicht mehr gegeben.
+Es war relativ einfach Situationen zu provozieren, in denen die Scherung keine Sinnvolle transformation erzeugt hat.
+
+TODO soll das hier auch mit rein?
 
 
 
@@ -736,10 +835,36 @@ Dies kommt dem Moment Shadow Mapping zu gute, da so feinere Abstufungen in den M
 % Fazit
 \subsection{Moment Shadow Mapping}
 Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch sehr gut zur Geltung kommen. Artefakte wie Aliasing und Light Bleeding werden stärker gemindert als bei VSM möglich. Ausserdem funktiort die Implementierung sehr einfach. Das Verfahren ist schnell und bietet beim Filtern viele Freiheiten. Wir nutzen Gauss und 1xMSAA-16xMSAA welches verschiedene Ergebnisse liefert.
+
+\begin{figure}
+	\centering
+	\subfloat[Gauss Filter]{
+
+		\includegraphics[width = 6cm]{msm_assets/baumGauss.png}
+		\label{ref:lineSample0001}
+	}
+    \subfloat[10 Samples]{
+
+		\includegraphics[width = 6cm]{msm_assets/baum1MSAA.png}
+		\label{ref:lineSample0010}
+	}
+	
+	\subfloat[100 Samples]{
+		\includegraphics[width = 6cm]{msm_assets/baum2MSAA.png}
+		\label{ref:lineSample0100}
+	}
+	\subfloat[1000 Samples]{
+		\includegraphics[width = 6cm]{msm_assets/baum16MSAA}
+		\label{ref:lineSample1000}
+	}
+	\caption{LineSampling mit verschieden vielen Samples pro Pixel}
+\end{figure}
+
 Auch dies hat sich kaum auf die Performance ausgewirkt und wir sind mit dem Ergebniss sehr zufrieden.
 Im direkten Verlgleich zu PCF fällt auf, das MSM weitere Artefakte unterbindet. Im Verlgleich zu VSM bieten die 4 statt 2 Momente ebenfalls einen Vorteil. Light Leeking wird effektiv vermindert, was bei VSM nicht der Fall ist.
 Für die Zukunft wollen wir noch weiteres filtern testen, um das Aliasing weiter zu vermindern.
 (Füge Verlgeichsbilder für MSM mit Gauss, 2xMSAA, 4xMSAA, 16xxMSAA ein)
+(1xMSAA nutzt lineare Interpolation zwischen zwei Pixeln)
 
 % Fazit
 \subsection{Volumetric Obscurance}
