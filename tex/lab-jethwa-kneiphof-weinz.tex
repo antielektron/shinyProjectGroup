@@ -188,15 +188,15 @@ Des Weiteren werden die Shadow Map Frusta von SDSMs eng um die tatsächlich sich
 % Introduction
 \subsection{Volumetric Obscurance}
 Obscurance (= Umgebungsverdeckung) ist eine Technik zur Berechnung von Schatten basierend auf der Annahme,
-dass sich gegenseiteg verdeckende Geometrie zu einem verringertem Lichteinfall führt. In diesem Paper werden
-wir verschiedene Screenspace Algorithmen für Volumetric Obscurance erläutern und kurz unsere Implementationen vorstellen.
+dass sich gegenseitig verdeckende Geometrie zu einem verringertem Lichteinfall führt. In diesem Paper werden
+wir verschiedene Screenspace-Algorithen für Volumetric Obscurance erläutern und kurz unsere Implementationen vorstellen.
 
 
 % Introduction
 \subsection{Moment Shadow Mapping}
-Wir wollen eine Schattentechnik verwenden, die möglichst hohe Qualität liefert und dabei performant bleibt. Wünschenswert, wäre ebenfalls filterbare Shadow Maps.
+Wir wollen eine Schattentechnik verwenden, die möglichst hohe Qualität liefert und dabei performant bleibt. Wünschenswert wäre ebenfalls filterbare Shadow Maps.
 Moment Shadow Mapping(MSM) liefert uns dieses Verfahren und wird im weiteren Verlauf erläutert und implementiert. 
-Zusätzlich betrachen wir Moment Based Volumetric Obscurance (MBVO) um einen Term für die Volumetric Obscurance zu erhalten, welcher auf der MSM Technik basiert. Ziel ist es, ein ästethisches Bild zu erhalten, auch wenn dieses physikalisch nicht unbedingt richtig ist.
+Zusätzlich betrachen wir Moment Based Volumetric Obscurance (MBVO) um einen Term für die Volumetric Obscurance zu erhalten, welcher auf der MSM Technik basiert. Ziel ist es, ein ästhetisches Bild zu erhalten, auch wenn dieses physikalisch nicht unbedingt richtig ist.
 
 \section{Related Work}
 
@@ -213,7 +213,7 @@ Sie erreichen eine hohe Qualität auf Kosten von Performanz, wodurch sie für Ec
 % Related Work
 \subsection{Volumetric Obscurance}
 
-Ambient Occlusion (= Umgebungsverdeckung) ist eine rendertechnik um Schatten in 3D-Szenen
+Ambient Occlusion (= Umgebungsverdeckung) ist eine Rendertechnik um Schatten in 3D-Szenen
 zu approximieren. Dafür gibt es allgemein 2 Ansätze:
 \begin{enumerate}
 	\item "Global Ambient Occlusion": für jeden Punkt in der Szene wird geprüft, ob der Himmel von diesem
@@ -238,7 +238,7 @@ Im Gegensatz zu normalen Texturen, können Shadow Maps nicht einfach gefiltert w
 Percentage Closer Filtering ist ein Ansatz um dies zu ermöglichen und Aliasing zu vermindern. Diese Technik versucht den Prozentwert eines Objekts zu erkennen, welcher näher an der Lichtquelle liegt und nicht im Schatten. 
 Mithilfe von Chebichev's Ungleichung, lässt sich so eine exaktere approximierung für PCF erreichen \cite{reeves1987rendering}
 
-Variance Shadow Maps benutzt 2 Momente, also zwei Tiefenwerte. Ein filtern ist  möglich und PCF wird weiter verbessert bzw. approximiert. VSM ist hinsichtlich der MSM ein spezialfall für $m = 2$, also 2 statt 4 Momenten. Normalerweise betrachten wir die Tiefe um eine Shadow Map zu rendern. VSM nutzt die Tiefe und die quadrierte Tiefe und speichert diese in einem 2-Kanal Buffer. Der Vorteil liegt daran, dass nun Pre-Processing Effekte genutzt werden um die so erstellte Variance Shadow Map zu filtern.\cite{donnelly2006variance}
+Variance Shadow Maps benutzt 2 Momente, also zwei Tiefenwerte. Ein Filtern ist möglich und PCF wird weiter verbessert bzw. approximiert. VSM ist hinsichtlich der MSM ein spezialfall für $m = 2$, also 2 statt 4 Momenten. Normalerweise betrachten wir die Tiefe um eine Shadow Map zu rendern. VSM nutzt die Tiefe und die quadrierte Tiefe und speichert diese in einem 2-Kanal Buffer. Der Vorteil liegt daran, dass nun Pre-Processing Effekte genutzt werden um die so erstellte Variance Shadow Map zu filtern.\cite{donnelly2006variance}
 
 Desweiteren betrachen wir Moment Based Volumetric Obscurance. Also eine Volumetric Obscurance die auf die Moment Shadow Mapping Technologie aufbaut. Die eigentliche Volumetric Obscurance wird in den entsprechen Abschnitten weiter erläutert.
 
@@ -556,10 +556,10 @@ Auch VSM löst dieses und der Vorteil liegt in der Vermeidung von Artefakten, wi
 Hierzu gibt es von Nvidia einen kurzen Algorithmus, der dies ebenfalls vermindert.\cite{nvidiavsm}
 Eine weitere Schritt in Richtung Hamburger MSM wird im Paper durchdurch Algorithmus 2 erreicht.
 Algorithmus 2 bietet aber noch nicht die nötige Robustheit für eine Echtzeitanwendung welche wir aber implementieren möchten.\cite{msm}
-Letztendlich führt uns dies zu Algorithmus 3, welchen wir auch genutzt haben bzw. als HLSL Code gegeben hatten. Dieser ist ein Spezialfall des Algorithmus 2 und liefert und  die gewünschte Schattenintensität. 
+Letztendlich führt uns dies zu Algorithmus 3, welchen wir auch genutzt haben bzw. als HLSL Code gegeben hatten. Dieser ist ein Spezialfall des Algorithmus 2 und liefert uns die gewünschte Schattenintensität. 
 Light Bleeding und Aliasing werden vermindert und wir erhalten eine Schattenintensität, die sowohl helle als auch dunkle Werte gut einschätzen kann. 
-Dies übertrifft die Ergebnisse von VSM und PCF bzw. erweitert und übertrifft die Ergebnisse umd Artefakte weiter zu verhinden. Dadurch erhalten wir qualitativ hochwertige Schatten ohne viel Leistung einzubüßen. Ausserdem ist dieser Algorithmus robust genug für Echtzeitanwendung, was in der Implementierung aufgezeigt wird. 
-Da Algorithmus 3 auf double precision Werten aufbaut, welche zu Speicherintensiv wären, nutzt die Implementierung einen einfach Bias Moment Vector und im Paper wird gezeigt, dass dies nur zu kleinere Ungenauigkeiten führt.\cite{msm} Auch diesen Bias haben wir in unserer Implementierung genutzt. Wir hatten bereits HLSL Codevorliegen, da dieser bereits implementiert wurde. Diesen haben wir im weiteren Verlauf für GLGS umgesetzt.
+Dies übertrifft die Ergebnisse von VSM und PCF bzw. erweitert die Ergebnisse um Artefakte weiter zu verhinden. Dadurch erhalten wir qualitativ hochwertige Schatten ohne viel Leistung einzubüßen. Ausserdem ist dieser Algorithmus robust genug für Echtzeitanwendung, was in der Implementierung aufgezeigt wird. 
+Da Algorithmus 3 auf double precision Werten aufbaut, welche zu Speicherintensiv wären, nutzt die Implementierung einfach einen Bias Moment Vector und im Paper wird gezeigt, dass dies nur zu kleinere Ungenauigkeiten führt.\cite{msm} Auch diesen Bias haben wir in unserer Implementierung genutzt. Wir hatten bereits HLSL Codevorliegen, da dieser bereits implementiert wurde. Diesen haben wir im weiteren Verlauf für GLGS umgesetzt.
 
 \subsection{Moment Based Volumetric Obscurance}
 Für die Moment Based Volumetric Obscurance benötigen wir noch Gewichte aus dem Moment Shadow Mapping. Diese finden sich in Algorithmus 2 und werden in unserer Implementierung weiter genutzt.
@@ -573,8 +573,8 @@ Zuerst wird eine Moment Shadow Map gerendert. Der Unterschied zur normalen Shado
 Im zweiten Schritt der Implementierung, wird ein gefiltertes Sample aus der Moment Shadow Map, sowie die Tiefe eines Shadow Map Fragments genutzt, um eine gefilterte Schatten Intensität zu erhalten.
 Wir nutzen hierfür eine weitere Funktion um diese Berechnungen durzuführen und einen Wert für die Schattenintensität zu generieren, welchen wir im Programm nutzen können. Dies ist im Abschnitt Algorithmus bereits näher erläutert.
 Im Shader haben wir dann folgendes angewendet um oben genanntes umzusetzen.
-Das erstellen der Momente passiert in einem eignen Shader. Hierfür nutzen wir die Tiefe und speichern uns zusätzlich noch die Tiefe hoch 2, 3 und 4. Diese werden gesampelt und dann weiter an den Fragment Shader gereicht.
-Im Fragment Shader, verarbeiten wir die Momente. Das heißt wir benutzen zwei Funktion um oben genannte gefilterte Samples zu generieren und diese dann in einer in eine Schattenintensität umzuwandeln. Hierfür haben wir den gegeben Direct X Shader in OpenGL übersetzt. Beachtenswert war, das Matrixtransformationen etwas anders gehandhabt werden als in DirectX und ein paar Standardfunktionen selbstgeschrieben werden müssen, was in den ersten Versuchen zu Fehlern in den Momenten geführt hat. Nun führen wir den GLGS Code auf, welchen wir aus dem gegebenen HLSL Code geändert haben und dieser wird mit obigen Schritten erläutert.
+Das Erstellen der Momente passiert in einem eigenen Shader. Hierfür nutzen wir die Tiefe und speichern uns zusätzlich noch die Tiefe hoch 2, 3 und 4. Diese werden gesampelt und dann weiter an den Fragment Shader gereicht.
+Im Fragment Shader, verarbeiten wir die Momente. Das heißt wir benutzen zwei Funktion um oben genannte gefilterte Samples zu generieren und diese dann in eine Schattenintensität umzuwandeln. Hierfür haben wir den gegeben Direct X Shader in OpenGL übersetzt. Beachtenswert war, das Matrixtransformationen etwas anders gehandhabt werden als in DirectX und ein paar Standardfunktionen selbstgeschrieben werden müssen, was in den ersten Versuchen zu Fehlern in den Momenten geführt hat. Nun führen wir den GLGS Code auf, welchen wir aus dem gegebenen HLSL Code geändert haben und dieser wird mit obigen Schritten erläutert.
 
 \begin{lstlisting}[language=GLSL]
 void main()
@@ -630,7 +630,7 @@ void sampleOptimized4MomentsShadowMap(out vec4 out4Moments,
 
 }
 \end{lstlisting}
-Hier werden die Sample rückgerechnet, damit diese besser in eine Textur schreiben können.
+Hier werden die Samples rückgerechnet, damit diese besser in eine Textur schreiben können.
 Dies geschieht im Fragment\_Shader
 \begin{lstlisting}[language=GLSL]
 float computeMSMShadwowIntensity(vec4 in4Moments, float depth, 
@@ -735,12 +735,15 @@ Dies kommt dem Moment Shadow Mapping zu gute, da so feinere Abstufungen in den M
 
 % Fazit
 \subsection{Moment Shadow Mapping}
-Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch sehr gut zur Geltung kommen. Artefakte wie Aliasing und Light Bleeding werden stärker gemindert als bei VSM möglich. Ausserdem funktiort die Implementierung sehr einfach. Das Verfahren ist schnell und bietet beim filtern viele Freiheiten. Wir nutzen Gauss und 1xMSAA-16xMSAA welches verschiedene Ergebnisse liefert.
+Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch sehr gut zur Geltung kommen. Artefakte wie Aliasing und Light Bleeding werden stärker gemindert als bei VSM möglich. Ausserdem funktiort die Implementierung sehr einfach. Das Verfahren ist schnell und bietet beim Filtern viele Freiheiten. Wir nutzen Gauss und 1xMSAA-16xMSAA welches verschiedene Ergebnisse liefert.
 Auch dies hat sich kaum auf die Performance ausgewirkt und wir sind mit dem Ergebniss sehr zufrieden.
 Im direkten Verlgleich zu PCF fällt auf, das MSM weitere Artefakte unterbindet. Im Verlgleich zu VSM bieten die 4 statt 2 Momente ebenfalls einen Vorteil. Light Leeking wird effektiv vermindert, was bei VSM nicht der Fall ist.
 Für die Zukunft wollen wir noch weiteres filtern testen, um das Aliasing weiter zu vermindern.
 (Füge Verlgeichsbilder für MSM mit Gauss, 2xMSAA, 4xMSAA, 16xxMSAA ein)
 
+% Fazit
+\subsection{Volumetric Obscurance}
+TODO
 
 % Fazit
 \subsection{Moment Based Volumetric Obscurance}
