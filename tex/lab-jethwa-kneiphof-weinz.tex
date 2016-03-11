@@ -374,7 +374,6 @@ $$
 
 \subsubsection{} \textbf{Pseudocode für Area Sampling:} \\
 \begin{algorithm}[H]
-
     \Fn{AreaSampling(momentsMipmap, uv)}{
 		unfilteredMoments = getMomentsFromLevel(momentsMipmap, uv, 0)\;
 		depth = unfilteredMoments[0]\;
@@ -390,7 +389,6 @@ $$
 		vCoeff = $V_c(z_0, z_1, a, b)$\;
 		return vCoeff\;
 	}
-
 \end{algorithm}
 Dabei ist \textit{getMomentsFromLevel(mipmap, uv, level)} die Funktion, die von der Mipmap \textit{mipmap}
 an der Stelle \textit{uv} den Texel an gegebenem \textit{level} abgreift. 
@@ -417,7 +415,7 @@ Da Algorithmus 3 auf double precision Werten aufbaut, welche zu Speicherintensiv
 
 \subsection{Moment Based Volumetric Obscurance}
 Für die Moment Based Volumetric Obscurance benötigen wir noch Gewichte aus dem Moment Shadow Mapping. Diese finden sich in Algorithmus 2 und werden in unserer Implementierung weiter genutzt.
-Hierfür nutzen wir die Funktion $Es(f) = \sum w_i*f(z_i)$ (Extra Paper!) auf Basis von $S = \sum w_i*Dirac$ aus dem MSM Algorithmus. Diese liefert uns den gewünschten Term für die Moment Based Volumetric Obscurance. Allerdings haben wir während der Implementierung noch kein stimmiges Bild erhalten, welches aber im Abschnitt der Implementierung weiter erläutert wird. Weiterführen wird der Algorithmus im Anhang erläutert, durch zusätzliche Notizen, welche wir für die Projekgruppe erhalten haben. Diese beziehen sich im speziellen auf die MBVO um Zusammenhang mit dem MSM. (CHRISTOPHS NOTIZEN EINFÜGEN)
+Hierfür nutzen wir die Funktion $Es(f) = \sum w_i*f(z_i)$ \cite{mbvo} auf Basis von $S = \sum w_i*\delta$ aus dem MSM Algorithmus. Durch angleichen unserer Implementierung um die Gewichte $w_i$ zu erhalten, können wir die Funktion für das MBVO berechnen. Diese liefert uns den gewünschten Term für die Moment Based Volumetric Obscurance. Allerdings haben wir während der Implementierung noch kein stimmiges Bild erhalten, welches aber im Abschnitt der Implementierung weiter erläutert wird. Weiterführen wird der Algorithmus im Anhang erläutert, durch zusätzliche Notizen, welche wir für die Projekgruppe erhalten haben. Diese beziehen sich im speziellen auf die MBVO im Zusammenhang mit dem MSM.\cite{mbvo}
 
 % MSM
 \subsection{Implementierung}
