@@ -242,18 +242,18 @@ Nachdem die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus ebenfa
 % Main
 \section{Volumetric Obscurance}
 
-Volumentric Obscurance wird aus dem Screenspace[denglish] berechnet. Allgemein wird für jeden Punkt der Szene, der auf
+Volumentric Obscurance wird aus dem Screenspace berechnet. Allgemein wird für jeden Punkt der Szene, der auf
 dem Bildschirm gezeichnet wird, eine gegebene Umgebung (z.B. eine Einheitskugel um diesen Punkt) betrachtet.
 Für diese Umgebung wird der Anteil an Geometrie berechnet, die für den Beobachter sichtbar ist. Je mehr Geometrie
-verdeckt ist, umso mehr wird der korrespondierende Pixel abgedunkelt um so den ausbleibenden Lichteinfall
-[aka Schatten?] zu simulieren.
-Das entsprechnde mathematische Modell sieht wie folgt aus [paper vo]:
+verdeckt ist, umso mehr wird der korrespondierende Pixel abgedunkelt um so den ausbleibenden Lichteinfall,
+also den Schatten, zu simulieren.
+Das entsprechnde mathematische Modell sieht wie folgt aus \cite{voPaper}
 $$
 V(P) = \int_{X} \rho (d(P,x))O(x)dx
 $$
 Dabei ist $X$ die Nachbarschaft um den Punkt $P$, $O$ ist die Verdeckungs-Funktion. Diese
 ist 0, falls Verdeckung stattfindet, sonst 1. $\rho$ ist eine abfallende Funktion
-die 1 bei P ist und mit der Distanz abfällt. Wie in [paper vo] beschrieben ist der 
+die 1 bei P ist und mit der Distanz abfällt. Wie in \cite{voPaper} beschrieben, ist der 
 sichtbare Effekt jedoch nur sehr minimal, weshalb diese Funktion als konstant angesehen 
 wird \cite{voPaper}
 
@@ -326,14 +326,14 @@ Momente $(z^1, z^2)$ für jeden Pixel im Screenspace heraus und filtern diese Gr
 Abhängig von der Tiefe ist (analog zu der von der Tiefe abhängigen, auf den Screenspace projezierten Umgebung
 im Abschnitt Line Sampling). In unserer Implementierung bestimmen wir in einem Renderschritt [blödes Wort]
 die Tiefe der Szene $(z)$ aus Sicht der Kamera und schreiben das Tupel $(z, z^2)$ in den ersten beiden
-Farbkanälen einer Textur. Bevor wir die finale Szene rendern mipmappen [ist das ein Verb?] wir die Textur.
+Farbkanälen einer Textur. Bevor wir die finale Szene rendern mipmappen wir die Textur.
 In der Nachbearbeitung (Compose Schritt) der gerenderten Szene greifen wir abhängig von der Tiefe an jedem
-Pixel auf die entsprechende Mipmap-Ebene zu, welche die so gefilterten Momente enthält [kein Schöner Satz!].
-Über das abgegriffene[?!?] Tupel $t = (z_f, z_f^2)$ bekommen wir dann einen Approximierten Mittelwert 
+Pixel auf die entsprechende Mipmap-Ebene zu, welche die so gefilterten Momente enthält.
+Über das abgegriffene Tupel $t = (z_f, z_f^2)$ bekommen wir dann einen Approximierten Mittelwert 
 $\mu = t[0]$ und die gemittelte Varianz $\sigma^2 = t[1] - t[0]^2$. Dann lässt sich der Verdeckungsfaktor 
 folgendermaßen abschätzen:
 $$
-V_c = a\cdot(z_1^2 - z_0^2) / 2 + b \cdot (z_1 - z_0)
+V_c(z_0, z_1, a, b) = a\cdot(z_1^2 - z_0^2) / 2 + b \cdot (z_1 - z_0)
 $$
 wobei $z_0$ und $z_1$ die Start- und Endtiefe der Umgebung des betrachteten Punktes P sind und die 
 Koeffizienten $a$ und $b$ definiert sind als:
@@ -341,6 +341,28 @@ $$
 a = \frac{-1}{2 \cdot \sigma}; \quad b = -a \cdot (\mu + \sigma)
 $$
 
+\subsubsection{} \textbf{Pseudocode für Area Sampling:} \\
+\begin{algorithm}[H]
+
+    \Fn{AreaSampling(momentsMipmap, uv)}{
+		unfilteredMoments = getMomentsFromLevel(momentsMipmap, uv, 0)\;
+		depth = unfilteredMoments[0]\;
+		r = getRadiusInScreenspace(depth)\;
+		mipMapLevel = $\log_2 (\frac{1}{1 - r})$ \;
+		moments = getMomentsFromLevel(momentsMipmap, uv, mipMapLevel)\;
+		$\mu$ = moments[0]\;
+		$\sigma$ = $\sqrt{ \text{moments[1]} - \mu^2}$\;
+		$a$ = $\frac{-1}{2 \cdot \sigma}$\;
+		$b$ = $-a \cdot (\mu + \sigma)$\;
+		$z_0$ = depth - r\;
+		$z_1$ = depth + r\;
+		vCoeff = $V_c(z_0, z_1, a, b)$\;
+		return vCoeff\;
+	}
+
+\end{algorithm}
+Dabei ist \textit{getMomentsFromLevel(mipmap, uv, level)} die Funktion, die von der Mipmap \textit{mipmap}
+an der Stelle \textit{uv} den Texel an gegebenem \textit{level} abgreift. 
 
 % Main
 \section{Moment Shadow Mapping}
