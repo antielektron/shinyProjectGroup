@@ -99,7 +99,7 @@ Sie erreichen eine hohe Qualität auf Kosten von Performanz, wodurch sie für Ec
 % Related Work
 \subsection{Volumetric Obscurance}
 
-Ambient Occlusion (= Umgebungsverdeckung) ist eine weit verbreitete Technik um Schatten in 3D-Szenen
+Ambient Occlusion (= Umgebungsverdeckung) ist eine rendertechnik um Schatten in 3D-Szenen
 zu approximieren. Dafür gibt es allgemein 2 Ansätze:
 \begin{enumerate}
 	\item "Global Ambient Occlusion": für jeden Punkt in der Szene wird geprüft, ob der Himmel von diesem
@@ -305,7 +305,9 @@ $$
 Dabei ist $z_i$ die Tiefe des i-ten Samples im Depth-Buffer, $d_{r_i}$ ist die Tiefe $z_i$ gemapped in die
 betrachtete Umgebung des Punktes $P$, $z_{s_i} = \sqrt{1 - x_i^2 - y_i^2}$. $(x_i, y_i)$ ist die Position des
 i-ten Samples auf der Einheitsscheibe (also der Querschnitt der Einheitskugel, die den Punkt P 
-beinhaltet und dessen normale parallel zur Blickrichtung liegt). \newline
+beinhaltet und dessen normale parallel zur Blickrichtung liegt). $v_i$ beschreibt das ``eindimensionale
+Volume'', dass die zum Sample korrespondierende Linie füllt (z.B. hat bei einer Einheitskugel genau das Sample
+ein Volumen von 2, das durch $P$ geht) \newline
 
 \begin{figure}
 	\centering
@@ -316,7 +318,7 @@ beinhaltet und dessen normale parallel zur Blickrichtung liegt). \newline
 	\caption{Line Sampling}
 \end{figure}
 
-\subsubsection{Implementierung}
+\subsubsection{}
 	\textbf{Line Sampling Pseudo Code}\\
 	\begin{algorithm}[H]
 		
@@ -326,16 +328,16 @@ beinhaltet und dessen normale parallel zur Blickrichtung liegt). \newline
 		    \For{i = 0 $\rightarrow$ nSamples - 1}{
 		    	radius = rand()\;
 		    	$\alpha$ = rand()$\cdot 2\pi$\;
-		    	weight = $\sqrt{1 - radius^2}$\;
+		    	$v_i$ = $\sqrt{1 - radius^2}$\;
 		    	p = $(\cos{(\alpha)} \cdot radius,\sin{(\alpha)} \cdot radius)^T$\;
-		    	sumSamples = sumSamples + weight $\cdot$ SamplePoint(p, depth)\;
-		    	sumVolume = sumVolume + weight\;
+		    	sumSamples = sumSamples + $v_i$ $\cdot$ SamplePoint(p, depth)\;
+		    	sumVolume = sumVolume + $v_i$\;
 		    }
 		    return $\frac{sumSamples}{sumVolume}$ \;
 		}
 		
 		\Fn{SamplePoint(p, depth)}{
-			\textit{hier wird ein einzelner Punkt gesampled, wie oben beschrieben [TODO?]}
+			\textit{hier wird ein einzelner Punkt gesampled, wie oben beschrieben [TODO maybe pseudocode it]}
 		}
 		
 		\Fn{rand()}{
@@ -343,9 +345,32 @@ beinhaltet und dessen normale parallel zur Blickrichtung liegt). \newline
 		}
 		
 	\end{algorithm}
+\textit{LineSampling} gibt einen Koeffizienten für die Schattierung zurück, \textit{nSamples} ist
+die Anzahl der Samples, \textit{depth} die Tiefe des zum Punkt $P$ korrespondierenden Texel.
 
-\subsubsection{Ergebnisse}
-TODO
+\begin{figure}
+	\centering
+	\subfloat[1 Sample]{
+
+		\includegraphics[width = 6cm]{vo_assets/vo_lineSample_sample0001.png}
+		\label{ref:lineSample0001}
+	}
+    \subfloat[10 Samples]{
+
+		\includegraphics[width = 6cm]{vo_assets/vo_lineSample_sample0010.png}
+		\label{ref:lineSample0010}
+	}
+	
+	\subfloat[100 Samples]{
+		\includegraphics[width = 6cm]{vo_assets/vo_lineSample_sample0100.png}
+		\label{ref:lineSample0100}
+	}
+	\subfloat[1000 Samples]{
+		\includegraphics[width = 6cm]{vo_assets/vo_lineSample_sample1000.png}
+		\label{ref:lineSample1000}
+	}
+	\caption{LineSampling mit verschiedenen Samples}
+\end{figure}
 
 \subsection{Area Sampling}
 Line Sampling Volumetric Obscurance nutzt zufallsverteilte Samples um die Verdeckung einer
@@ -391,7 +416,10 @@ $$
 	}
 \end{algorithm}
 Dabei ist \textit{getMomentsFromLevel(mipmap, uv, level)} die Funktion, die von der Mipmap \textit{mipmap}
-an der Stelle \textit{uv} den Texel an gegebenem \textit{level} abgreift. 
+an der Stelle \textit{uv} den Texel an gegebenem \textit{level} abgreift.
+\textit{getRadiusInScreenspace(depth)} rechnet das Ausmaß der auf den Screenspace projezierten Weltumgebung
+aus (in uv-Koordinaten).
+
 
 % Main
 \section{Moment Shadow Mapping}
