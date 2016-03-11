@@ -187,8 +187,7 @@ void main()
 	
 	float world_depth = get_world_depth(depth);
 	
-	// step 2: claculate r:
-    // step 2: claculate r:
+	// step 2: calculate r:
     vec4 rVec1 = projectionMatrix * vec4(0., 2 * worldSpaceRadius, world_depth, 1.);
     vec4 rVec2 = projectionMatrix * vec4(0., 0, world_depth, 1.);
 
