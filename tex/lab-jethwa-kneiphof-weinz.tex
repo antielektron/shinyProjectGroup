@@ -175,12 +175,36 @@ Um das Frustum möglichst klein zu wählen kann dort eine Oriented Bounding Box 
 Die Konvexe Hülle der in den Light Space projizierten Punkte kann ein sehr komplexes Polygon werden, weshalb es sich für SDSMs nicht lohnt diese zu berechnen.
 
 SDSMs berechnen für jede Kaskade eine AABB, die dann das Frustum für die Shadow Map bildet.
-Damit die AABBs die sichtbare Geometrie sinnvoll einschließen, wird der Light Space so rotiert, dass die Z-Achse des Camera Spaces sich an der X-Achse des Light Spaces ausgerichtet.
+Damit die AABBs die sichtbare Geometrie sinnvoll umschließen, wird der Light Space so rotiert, dass die Z-Achse des Camera Spaces sich an der X-Achse des Light Spaces ausgerichtet
 
-Die AABBs für die 
 
-% Andere Algorithmen benutzen Ecken von jedem Frustum um Shadow Map Frustum zu definieren
-TODO
+\begin{figure}
+	\centering
+	\subfloat[PSSM] {
+		\includegraphics[width=5.5cm]{sdsm_assets/pssm_scene.png}
+		\label{ref:pssm_scene}
+	}
+	\subfloat[SDSM] {
+		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_scene.png}
+		\label{ref:sdsm_scene}
+	}
+	\caption{Eine Szene die weit entfernte und sehr nahe Schatten enthält.}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\subfloat[PSSM] {
+		\includegraphics[width=5.5cm]{sdsm_assets/pssm_light_view.png}
+		\label{ref:pssm_light}
+	}
+	\subfloat[SDSM] {
+		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_light_view.png}
+		\label{ref:sdsm_light}
+	}
+
+	\caption{Visulaisierung der von den Shadow Maps abgedeckten Bereichen mit PSSM und SDSM aus der Sicht des Lichtes.}
+\end{figure}
+
 
 
 % SDSM
