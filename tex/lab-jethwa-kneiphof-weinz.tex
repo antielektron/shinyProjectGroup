@@ -36,8 +36,6 @@
 % Hier das Institut angeben
 \institute{Institut für Informatik der Universität Bonn}
 
-\pagestyle{plain}
-
 \begin{document}
 
 % Erstellung des Titels
@@ -79,8 +77,7 @@ wir verschiedene Screenspace Algorithmen für Volumetric Obscurance erläutern u
 
 % Introduction
 \subsection{Moment Shadow Mapping}
-Wir wollen eine Schattentechnik verwenden, die möglichst hohe Qualität liefert und dabei performant bleibt. Wünschenswert, wäre ebenfalls filterbare Shadow Maps und eine performante Methode. Moment Shadow Mapping liefert uns dieses Verfahren und wird im weiteren Verlauf erläutert und implementiert. Uns war es wichtig das wir diese Technik in OpenGL und C++ verwirklichen können. Moment Shadow Mapping basiert auf den Variance Shadow Maps, welches wiederum auf PCF basiert, bzw. dieses weiter verbessert. Deswegen schauen wir uns im Related Work Teil auch diese Techniken an und klären im weiteren Verlauf, warum Moment Shadow Maps bessere Qualität liefern.
-Desweiteren versuchen wir Volumetric Obscurance mit Momenten zu versehen und so einen Term für die Volumetric Obscurance zu berechnen.
+Wir wollen eine Schattentechnik verwenden, die möglichst hohe Qualität liefert und dabei performant bleibt. Wünschenswert, wäre ebenfalls filterbare Shadow Maps und eine performante Methode. Moment Shadow Mapping liefert uns dieses Verfahren und wird im weiteren Verlauf erläutert und implementiert.
 
 
 
@@ -100,16 +97,17 @@ Sie erreichen eine hohe Qualität auf Kosten von Performanz, wodurch sie für Ec
 \subsection{Volumetric Obscurance}
 
 Ambient Occlusion (= Umgebungsverdeckung) ist eine weit verbreitete Technik um Schatten in 3D-Szenen
-zu approximieren[citation needed]. Dafür gibt es allgemein 2 Ansätze:
+zu approximieren. Dafür gibt es allgemein 2 Ansätze:
 \begin{enumerate}
 	\item "Global Ambient Occlusion": für jeden Punkt in der Szene wird geprüft, ob der Himmel von diesem
-		Punkt aus sichtbar ist (bzw. ob eine maximale Distanz ohne Kollision erreicht werden kann bei geschlossenen
-		Szenen). Dieses Verfahren ist relativ teuer, kann aber z.B. für statische Szenen vorberechnet werden.
-	\item Screenspace Ambient Occlusion (SSAO): für jeden Pixel im Screenspace [klingt blöd] werden Point Samples
+		Punkt aus sichtbar ist (bzw. bei geschlossenen Szenen: ob eine maximale Distanz ohne Kollision erreicht
+		 werden kann). Dieses Verfahren ist relativ teuer, kann aber z.B. für statische Szenen vorberechnet
+		 werden.
+		\cite{aoPaper}
+	\item Screenspace Ambient Occlusion (SSAO): für jeden Pixel im Screenspace werden Point Samples
 		innerhalb einer bestimmten Umgebung erstellt. Mit Hilfe der Tiefeninformationen des Depth Buffers
 		wird die Anzahl der Samples, die hinter der Szenengeometrie liegen müssen bestimmt. Anhand dieser Anzahl
-		kann der Pixel entsprechend abgedunkelt werden. 
-	[TODO: citation needed]
+		kann der Pixel entsprechend abgedunkelt werden.  \cite{cry2Paper}
 \end{enumerate}  
 Volumetric Obscurance ist eine Alternative zum Screenspace Volumetric Obscurance, welche wir im folgenden
 Erläutern werden
@@ -120,12 +118,6 @@ Erläutern werden
 \subsection{Moment Shadow Mapping}
 
 Moment Shadow Mapping \cite{msm}, Variance Shadow Maps \cite{donnelly2006variance}, Percentage Closer Filtering \cite{reeves1987rendering}
-
-Percentage Closer Filtering sorgt bereits für filterbare Shadow Maps. Allerdings nur je Fragment, da dies beim Tiefentest geschiet.
-
-Variance Shadow Maps benutzt 2 Momente und löst das General Moment Problem. Ein filtern ist ebenfalls möglich und PCF wird weiter verbessert bzw. approximiert. VSM ist hinsichtlich der MSM ein spezialfall für $m = 2$.
-
-Desweiteren betrachen wir Moment Based Volumetric Obscurance. Die eigentliche Volumetric Obscurance wird in den entsprechen Abschnitten weiter erläutert.
 
 
 
@@ -384,19 +376,13 @@ Wir werden das Hamburger Moment Shadow Mapping nutzen, welches 4 Momente generie
 
 % MSM
 \subsection{Algorithmus}
-
-Wir nutzen den Algorithmus Hamburger Moment Shadow Mapping. Dieser versucht das General Moment Problem zu lösen. Hierfür nutzen wir die Algorithmus 3 aus dem Moment Shadow Mapping Paper.\cite{msm} Der grundlegende Aufbau des MSM, ist dem der VSM sehr ähnlich, denn VSM ist hinsichtlich des MSM ein Spezialfall für $m = 2$. Für uns wünschenswert, war aber eine Methode mit $m = 4$.
-Wir möchten das General Moment Problem lösen, damit wir eine möglichst scharfe untere Schranke nutzen können.\cite{msm}. 
-Auch VSM löst dieses und der Vorteil liegt in der Vermeidung von Artefakten, wie etwa Surface acne. Übrig bleiben noch Artefakte wie Light Leeking durch falsche Schattenintensitä. Da wir bisher eine untere Schranke haben überschätzen wird niemals die Werte niemals für die Schattenintensität. Allerdings können nocht Fehler wie etwa Light Leeking auftreten. 
-Eine weitere Vereinfachung in Richtung Hamburger MSM wird im Paper durchdurch Algorithmus 2 erreicht, welcher $F_s(z_f)$ zu minimiert. Desweiteren bestimmen wir Gewichte durch den Algorithmus 2 durch $E_s(b) = b$ und $G(b,z_f) = F_s(z_f)$.
-Algorithmus 2 bietet aber noch nicht die nötige Robustheit für eine Echtzeitanwendung.\cite{msm}
-Letztendlich führt uns dies zu Algorithmus 3, welchen wir auch genutzt haben. Dieser ist ein Spezialfall des Algorithmus 2 und liefert und  die gewünschte Schattenintensität. 
-Light Leeking und Aliasing werden vermindert und wir erhalten eine Schattenintensität, die sowohl helle als auch dunkle Werte gut einschätzen kann. Dies übertrifft die Ergebnisse von VSM und PCF offensichtlich. Ausserdem ist dieser Algorithmus robust genug für Echtzeitanwendung, was in der Implementierung aufgezeigt wird. 
-Da Algorithmus 3 auf double precision Werten aufbaut, welche zu Speicherintensiv wären, nutzt die Implementierung einen einfach Bias Moment Vector und im Paper wird gezeigt, dass dies nur zu kleinere Ungenauigkeiten führt.\cite{msm} Auch diesen Bias haben wir in unserer Implementierung genutzt. Wir hatten bereits Shader Code für DirectX vorliegen, da dieser bereits implementiert wurde. Diesen haben wir im weiteren Verlauf für OpenGL umgesetzt.
-
+%Füge Algorithmen 1-3 ein und beschreibe
+Wir nutzen den Algorithmus Hamburger Moment Shadow Mapping. Dieser versucht das General Moment Problem\cite{msm} zu lösen. Hierfür nutzen wir Algorithmus 1. Hierfür nutzen wir die Algorithmus 3 aus dem Moment Shadow Mapping Paper. Der grundlegende Aufbau des MSM, ist dem des VSM sehr ähnlich, denn VSM ist hinsichtlich des MSM ein spezialfall für m = 2. Für uns wünschenswert, war aber eine Methode mit m = 4.
+Algorithmus 1 minimiert Fs(zf), sodass wir eine untere Schranke nutzen können. Dies löst das General Moment Problem. Auch VSM löst dieses und der Vorteil liegt in der Vermeidung von Artefakten, wie etwa Surface acne. Übrig bleiben noch Artefakte wie wie Light Leeking durch falsche Schattenintensität, da wir bisher eine untere Schranke haben und die Werte niemals überschätzen. Eine weitere Vereinfachung in Richtung Hamburger MSM erreichen wir durch Algorithmus 2, welcher uns eine Linearkombination liefert um Fs(zf) zu minimieren. Desweiteren bestimmen wir Gewichte durch den Algorithmus 2 durch Es(b) = b und G(b,zf) = Fs(zf). Algorithmus 2 bietet aber noch nicht die nötige Robustheit für eine Echtzeitanwendung.\cite{msm}
+Letztendlich führt uns dies zu Algorithmus 3. Dieser ist ein Spezialfall des Algorithmus 2 und liefert und letztendlich die Schattenintensität. Light Leeking und Aliasing werden elegant umgangen und wir erhalten eine Schattenintensität, die sowohl helle als auch dunkle Werte gut einschätzen kann. Ausserdem gilt dieser Algorithmus als robust genug für Echtzeitanwendung, was in der Implementierung aufgezeigt wird. Da Algorithmus 3 theoretisch auf double precision Werten aufbaut, welche zu Speicherintensiv wären, nutzt die Implementierung einen einfach Bias Moment Vector und im Paper wird gezeigt, das dies nicht zu besonders großen Fehlern führt. Weiterführend ist der Algorithmus im Paper Moment Shadow Mapping erklärt\cite{msm}
 \subsection{Moment Based Volumetric Obscurance}
 Für die Moment Based Volumetric Obscurance benötigen wir noch Gewichte aus dem Moment Shadow Mapping. Diese finden sich in Algorithmus 2 und werden in unserer Implementierung weiter genutzt.
-Hierfür nutzen wir die Funktion $Es(f) = \sum w_i*f(z_i)$ \cite{mbvo} auf Basis von $S = \sum w_i*\delta$ aus dem MSM Algorithmus. Durch angleichen unserer Implementierung um die Gewichte $w_i$ zu erhalten, können wir die Funktion für das MBVO berechnen. Diese liefert uns den gewünschten Term für die Moment Based Volumetric Obscurance. Allerdings haben wir während der Implementierung noch kein stimmiges Bild erhalten, welches aber im Abschnitt der Implementierung weiter erläutert wird. Weiterführen wird der Algorithmus im Anhang erläutert, durch zusätzliche Notizen, welche wir für die Projekgruppe erhalten haben. Diese beziehen sich im speziellen auf die MBVO im Zusammenhang mit dem MSM.\cite{mbvo}
+Hierfür nutzen wir die Funktion $Es(f) = \sum w_i*f(z_i)$ (Extra Paper!) auf Basis von $S = \sum w_i*Dirac$ aus dem MSM Algorithmus. Diese liefert uns den gewünschten Term für die Moment Based Volumetric Obscurance. Allerdings haben wir während der Implementierung noch kein stimmiges Bild erhalten, welches aber im Abschnitt der Implementierung weiter erläutert wird. Weiterführen wird der Algorithmus im Anhang erläutert, durch zusätzliche Notizen, welche wir für die Projekgruppe erhalten haben. Diese beziehen sich im speziellen auf die MBVO um Zusammenhang mit dem MSM. (CHRISTOPHS NOTIZEN EINFÜGEN)
 
 % MSM
 \subsection{Implementierung}
@@ -413,7 +399,7 @@ Im Fragment Shader, verarbeiten wir die Momente. Das heißt wir benutzen zwei Fu
 Für das Moment Based Volumetric Obscurance benutzen wir die gleiche Herangehensweise. Allerdings hat es sich herausgestellt, dass die Transformation für 4 Momente zu Artefakten führt. Dies entspricht dem samplent im Fragment Shader aus der Implementierung des Moment Shadow Mapping. Deswegen wurde dieser Schritt für das Moment Based Volumetric Obscurance entfernt. Das samplen bei der Generierung der Momente bleibt erhalten. Problematisch ist hier die Varianz um einen möglichst korrekten Wert für die Vomuletric Obscurance zu erhalten. Möglicherweise sind hier noch weitere Feineinstellung und Variablen nötig um ein stimmiges Bild zu erhalten. Technisch gesehen, funktiert das Verfahren aber.
 Wir wählen ebenfalls 4 Momente um die Volumetric Obscurance zu approximieren und berechnen die benötigten Gewichte durch eine Abbänderung der MSM Funktionen. Dies ist ebenfalls im Abschnitt Algorithmus näher erläutert.
 Im Shader wird die Funktion zum generieren der Schattenintensität um eine Berechnung der Gewichte erweitert, sodass diese für die Volumetric Obscurance nutzbar ausgegeben werden können.
-Die MBVO färbt Konturen der Geometrie sehr dunkel ein und hat Ähnlichkeiten mit einem Cell Shading Effekt.
+Die MBVO färbt Konturen der Geometrie sehr dunkel ein und hat Ähnlichkeiten mit enem Cell Shading Effekt.
 
 
 
@@ -439,11 +425,10 @@ Dies kommt dem Moment Shadow Mapping zu gute, da so feinere Abstufungen in den M
 \subsection{Moment Shadow Mapping}
 Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch sehr gut zur Geltung kommen. Artefakte wie Aliasing und Light Leeking werden optimal gemindert bzw. ganz eliminiert. Ausserdem funktiort die Implementierung sehr einfach. Das Verfahren ist schnell und bietet beim filtern viele Freiheiten. Wir nutzen Gauss und 1xMSAA-16xMSAA welches verschiedene Ergebnisse liefert.
 Auch dies hat sich kaum auf die Performance ausgewirkt und wir sind mit dem Ergebniss sehr zufrieden.
-Für die Zukunft wollen wir noch weiteres filtern testen, um das Aliasing weiter zu vermindern.
 
 % Fazit
 \subsection{Moment Based Volumetric Obscurance}
-Das Verfahren zur Moment Based Volumetric Obscurance war ebenfalls leicht umzusetzen, da sich die Implementierung kaum vom MSM unterscheidet. Aufgrund von anfänglichen Artefakten, haben wir aber eine sample Methode entfernt, welches ein stimmigeres Bild ergab. Insgesamt ist das Bild aber noch nicht stimmig genug, hier müssen wir weiter mit den Werten experimentieren, damit keine Cell Shading Optik erscheint. Interessant ist das Moment Based Volumetric Obscurance aber ebenfalls für grossflächiges filtern, welches noch weitere Experimente benötigt.
+Das Verfahren zur Moment Based Volumetric Obscurance war ebenfalls leicht umzusetzen, da sich die Implementierung kaum vom MSM unterscheidet. Aufgrund von anfänglichen Artefakten, haben wir aber eine sample Methode entfernt, welches ein stimmigeres Bild ergab. Insgesamt ist das Bild aber noch nicht stimmig genug, hier müssen wir weiter mit den Werten experimentieren, damit keine Cell Shading Optik erscheint. Interessant ist das Moment Based Volumetric Obscurance aber ebenfalls für grossflächuiges Filtern, welches noch weitere Experimente benötigt.
 
 
 
