@@ -181,6 +181,26 @@ Damit die AABBs die sichtbare Geometrie sinnvoll umschließen, wird der Light Sp
 
 \begin{figure}
 	\centering
+	\subfloat[]{
+		\includegraphics[width=5.5cm]{sdsm_assets/pssm_colorized_near.png}
+	}
+	\subfloat[]{
+		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_colorized_near.png}
+	}
+	
+	\subfloat[]{
+		\includegraphics[width=5.5cm]{sdsm_assets/pssm_colorized_far.png}
+	}
+	\subfloat[]{
+		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_colorized_far.png}
+	}
+	
+	\caption{Visualisierung der Kaskaden in rot (nah), grün, blau, gelb (fern). (a) und (c) zeigen die Partitionierung durch Parallel Split Shadow Maps, optimiert für (a). (b) und (d) zeigen die Partitionierungen durch Sample Distribution Shadow Maps. Während Sample Distribution Shadow Maps die Kaskaden adaptiv anpassen können, versagen die Parallel Split Shadow Maps}
+\end{figure}
+
+
+\begin{figure}
+	\centering
 	\subfloat[PSSM] {
 		\includegraphics[width=5.5cm]{sdsm_assets/pssm_scene.png}
 		\label{ref:pssm_scene}
