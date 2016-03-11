@@ -16,6 +16,7 @@
 \lstset{language=C++}
 
 \usepackage[]{algorithm2e}
+\
 
 %für pseudocode:
 \SetKwProg{Fn}{Function}{}{end}\SetKwFunction{FRecurs}{FnRecursive}%
@@ -528,13 +529,9 @@ Weight.z=1.0-Weight.x-Weight.y;
 \end{lstlisting}
 Das ganze haben wir in einem Compose Shader implementiert und die Funktionen aus dem MSM weitestgehend übernommen.
 Wir wählen ebenfalls 4 Momente um die Volumetric Obscurance zu approximieren und berechnen die benötigten Gewichte durch eine Abbänderung der MSM Funktionen. Dies ist ebenfalls im Abschnitt Algorithmus näher erläutert.
-<<<<<<< HEAD
 Im Shader wird die Funktion zum generieren der Schattenintensität um eine Berechnung der Gewichte erweitert, sodass diese für die Volumetric Obscurance nutzbar ausgegeben werden können. Im weiteren Verlauf wird dies noch mit dem Area Sampling aus der Volumetric Obscurance erweitert. Dies ist im Abschnitt Volumetric Obscurance näher erläutert.
 Die MBVO färbt Konturen der Geometrie sehr dunkel ein und hat Ähnlichkeiten mit einem Cell Shading Effekt.
-=======
-Im Shader wird die Funktion zum generieren der Schattenintensität um eine Berechnung der Gewichte erweitert, sodass diese für die Volumetric Obscurance nutzbar ausgegeben werden können.
-Die MBVO färbt Konturen der Geometrie sehr dunkel ein und hat Ähnlichkeiten mit enem Cell Shading Effekt.
->>>>>>> 20eff61bbfb1348c54676476c67ce01233849eb8
+
 
 
 \section{Fazit}
@@ -559,11 +556,9 @@ Dies kommt dem Moment Shadow Mapping zu gute, da so feinere Abstufungen in den M
 \subsection{Moment Shadow Mapping}
 Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch sehr gut zur Geltung kommen. Artefakte wie Aliasing und Light Bleeding werden stärker gemindert als bei VSM möglich. Ausserdem funktiort die Implementierung sehr einfach. Das Verfahren ist schnell und bietet beim filtern viele Freiheiten. Wir nutzen Gauss und 1xMSAA-16xMSAA welches verschiedene Ergebnisse liefert.
 Auch dies hat sich kaum auf die Performance ausgewirkt und wir sind mit dem Ergebniss sehr zufrieden.
-<<<<<<< HEAD
 Im direkten Verlgleich zu PCF fällt auf, das MSM weitere Artefakte unterbindet. Im Verlgleich zu VSM bieten die 4 statt 2 Momente ebenfalls einen Vorteil. Light Leeking wird effektiv vermindert, was bei VSM nicht der Fall ist.
 Für die Zukunft wollen wir noch weiteres filtern testen, um das Aliasing weiter zu vermindern.
-=======
->>>>>>> 20eff61bbfb1348c54676476c67ce01233849eb8
+
 
 % Fazit
 \subsection{Moment Based Volumetric Obscurance}
