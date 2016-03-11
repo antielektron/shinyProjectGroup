@@ -735,11 +735,35 @@ Dies kommt dem Moment Shadow Mapping zu gute, da so feinere Abstufungen in den M
 
 % Fazit
 \subsection{Moment Shadow Mapping}
+\begin{figure}
+	\centering
+	\subfloat[Gauss Filter]{
+
+		\includegraphics[width = 6cm]{msm_assets/baumGauss.png}
+		\label{ref:lineSample0001}
+	}
+    \subfloat[10 Samples]{
+
+		\includegraphics[width = 6cm]{msm_assets/baum1MSAA.png}
+		\label{ref:lineSample0010}
+	}
+	
+	\subfloat[100 Samples]{
+		\includegraphics[width = 6cm]{msm_assets/baum2MSAA.png}
+		\label{ref:lineSample0100}
+	}
+	\subfloat[1000 Samples]{
+		\includegraphics[width = 6cm]{msm_assets/baum16MSAA}
+		\label{ref:lineSample1000}
+	}
+	\caption{LineSampling mit verschieden vielen Samples pro Pixel}
+\end{figure}
 Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch sehr gut zur Geltung kommen. Artefakte wie Aliasing und Light Bleeding werden stärker gemindert als bei VSM möglich. Ausserdem funktiort die Implementierung sehr einfach. Das Verfahren ist schnell und bietet beim filtern viele Freiheiten. Wir nutzen Gauss und 1xMSAA-16xMSAA welches verschiedene Ergebnisse liefert.
 Auch dies hat sich kaum auf die Performance ausgewirkt und wir sind mit dem Ergebniss sehr zufrieden.
 Im direkten Verlgleich zu PCF fällt auf, das MSM weitere Artefakte unterbindet. Im Verlgleich zu VSM bieten die 4 statt 2 Momente ebenfalls einen Vorteil. Light Leeking wird effektiv vermindert, was bei VSM nicht der Fall ist.
 Für die Zukunft wollen wir noch weiteres filtern testen, um das Aliasing weiter zu vermindern.
 (Füge Verlgeichsbilder für MSM mit Gauss, 2xMSAA, 4xMSAA, 16xxMSAA ein)
+(1xMSAA nutzt lineare Interpolation zwischen zwei Pixeln)
 
 
 % Fazit
