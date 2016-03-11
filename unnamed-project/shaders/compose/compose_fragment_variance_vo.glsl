@@ -199,12 +199,12 @@ void main()
 	float r = abs(rVec1.y/rVec1.w - rVec2.y/rVec2.w);
 	
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
-	float mmLevel = log2(1 / (1 - r))* 3;
+	float mmLevel = 1 - depth;
 	//float mmLevel = ((1 - depth) * 10);
 	
 	// step 4: get filtered Moments
-	mmLevel = clamp (mmLevel, 2, 5);
-	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
+	//mmLevel = clamp (mmLevel, 2, 5);
+	vec4 moments = textureLod(momentsSampler, uv, mmLevel*4);
 	
 
 	// step 5: where the magic happens
