@@ -199,7 +199,7 @@ void main()
 	float r = abs(rVec1.y/rVec1.w - rVec2.y/rVec2.w);
 	
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
-	float mmLevel = 1 - depth;
+	float mmLevel = log2(1./(1.-r)) * 2;
 	//float mmLevel = ((1 - depth) * 10);
 	
 	// step 4: get filtered Moments
@@ -237,10 +237,10 @@ void main()
 	
 	//outputColor = vec4(0, defaultColor.y, 0,1);
 	//outputColor = vec4(momentMagic, 0, 0,1);
-    //outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(sum * 0.5),1);
+    outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(r * 0.5),1);
     outputColor = vec4(defaultColor, 1.0);
     //outputColor = vec4(0, mmLevel * 0.1, 0.,1.);
-   	//outputColor = vec4(sum * vec3(1.,1.,1.),1.);
+   	//outputColor = vec4(r * vec3(1.,1.,1.),1.);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     
 }
