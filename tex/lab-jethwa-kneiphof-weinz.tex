@@ -590,11 +590,15 @@ void main()
     }
     moments /= sampleCount;
 
-	vec4 fragMoments = transpose(mat4(	
-	-2.07224649,32.23703778,-68.571074599,39.3703274134,
-    13.7948857237,-59.4683975703,82.0359750338,-35.364903257,
-    0.105877704,-1.9077466311,9.3496555107,-6.6543490743,
-    9.7924062118,-33.7652110555,47.9456096605,-23.9728048165)
+	vec4 fragMoments = transpose(mat4(
+	-2.07224649,	32.23703778,
+	-68.571074599,	39.3703274134,
+    	 13.7948857237,	-59.4683975703,
+    	 82.0359750338,	-35.364903257,
+    	  0.105877704,	-1.9077466311,
+    	  9.3496555107,	-6.6543490743,
+    	  9.7924062118,	-33.7652110555,
+    	 47.9456096605,	-23.9728048165)
     )	* moments;
 	fragMoments.x += 0.035955884801;
 
@@ -602,13 +606,10 @@ void main()
 }
 \end{lstlisting}
 
-Hier wird im create\_moments\_Shader die Momente
-$$
-z, z^2, z^3, z^4
-$$
-$z$ entpricht der Tiefe aus dem Depth Buffer.
-generiert und durch eine Matrix transformiert damit eine 16-bit Quantifikation ausreicht.
-Die Tiefe wird per TexelFetch gewonnen und zu oben genannten Werten gespeichert.
+Hier werden im create\_moments\_Shader, die Momente $z, z^2, z^3, z^4$, wobei
+$z$ der Tiefe aus dem Depth Buffer entspricht,
+generiert und durch eine Matrix transformiert.
+Dies geschieht damit eine 16-bit Quantifikation ausreicht.
 
 \begin{lstlisting}
 void sampleOptimized4MomentsShadowMap(out vec4 out4Moments, 
@@ -616,10 +617,14 @@ void sampleOptimized4MomentsShadowMap(out vec4 out4Moments,
 {
     shadowMapValue.x -= 0.035955884801f;
     out4Moments = transpose(mat4(     			
-    	0.2227744146,0.0771972861,0.7926986636,0.0319417555,
-    0.1549679261,0.1394629426,0.7963415838,-0.172282317,
-    0.1451988946,0.2120202157,0.7258694464,-0.2758014811,
-    0.163127443,0.2591432266,0.6539092497,-0.3376131734))
+    		0.2227744146, 0.0771972861,
+    		0.7926986636, 0.0319417555,
+     		0.1549679261, 0.1394629426,
+     		0.7963415838, -0.172282317,
+     		0.1451988946, 0.2120202157,
+     		0.7258694464, -0.2758014811,
+     		0.163127443, 0.2591432266,
+     		0.6539092497, -0.3376131734))
     * shadowMapValue;
 
 }
@@ -637,7 +642,7 @@ float computeMSMShadwowIntensity(vec4 in4Moments, float depth,
     float D22= -b.x * b.x + b.y;
     float SquaredDepthVariance=-b.y * b.y + b.w;
     float D33D22=dot(vec2(SquaredDepthVariance,-L32D22),
-                     vec2(D22,                  L32D22));
+                     vec2(D22, L32D22));
     float InvD22=1.0/D22;
     float L32=L32D22*InvD22;
     vec3 c=vec3(1.0,z.x,z.x*z.x);
@@ -653,13 +658,13 @@ float computeMSMShadwowIntensity(vec4 in4Moments, float depth,
     z.y=-p*0.5-r;
     z.z=-p*0.5+r;
     vec4 Switch=
-        (z.z<z.x)?vec4(z.y,z.x,1.0,1.0):(
-        (z.y<z.x)?vec4(z.x,z.y,0.0,1.0):
+        (z.z<z.x)?vec4(z.y,z.x,1.0,1.0):
+       ((z.y<z.x)?vec4(z.x,z.y,0.0,1.0):
         vec4(0.0,0.0,0.0,0.0));
     float Quotient=(Switch.x*z.z-b.x*
-    				(Switch.x+z.z)+b.y)/
-    				((z.z-Switch.y)
-    				*(z.x-z.y));
+    			(Switch.x+z.z)+b.y)/
+    			((z.z-Switch.y)
+    			*(z.x-z.y));
     return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
     
 }
