@@ -21,6 +21,7 @@ public:
 protected slots:
     void onColorCascadesChanged();
     void onCascadedShadowMapsLambdaChanged();
+    void onLightSheeringChanged();
     void onCascadesStrategyChanged();
     void onAwesomeCaptureCapture();
     void onAwesomeCaptureChanged();
@@ -47,6 +48,8 @@ private:
     QRadioButton *m_sampleDistributionShadowMaps;
 
     QSlider *m_cascadedShadowMapsLambda;
+
+    QCheckBox *m_lightSheering;
 
     QPushButton *m_awesomeCapture;
     QCheckBox *m_awesomeCaptureEnabled;

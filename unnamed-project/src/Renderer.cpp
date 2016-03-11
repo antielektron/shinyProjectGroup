@@ -591,6 +591,15 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             QMatrix4x4 lightViewMatrix;
             createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
 
+            if (m_lightSheering)
+            {
+                auto cameraXDir = lightViewMatrix * inverseCameraView * QVector4D(1, 0, 0, 0);
+                // sheer light Y to camera X
+                QMatrix4x4 sheering;
+                sheering.setColumn(1, cameraXDir);
+                lightViewMatrix = sheering.inverted() * lightViewMatrix;
+            }
+
             // Compute view frustum of camera in light view
             auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
 
@@ -686,6 +695,15 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             // Compute view matrix for light (light direction -> Z, camera Z -> X)
             QMatrix4x4 lightViewMatrix;
             createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
+
+            if (m_lightSheering)
+            {
+                auto cameraXDir = lightViewMatrix * inverseCameraView * QVector4D(1, 0, 0, 0);
+                // sheer light Y to camera X
+                QMatrix4x4 sheering;
+                sheering.setColumn(1, cameraXDir);
+                lightViewMatrix = sheering.inverted() * lightViewMatrix;
+            }
 
             // Compute view frustum of camera in light view
             auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
@@ -1586,6 +1604,16 @@ void Renderer::setCascadedShadowMapsLambda(float lambda)
 float Renderer::getCascadedShadowMapsLambda()
 {
     return m_cascadedShadowMapsLambda;
+}
+
+void Renderer::setLightSheering(bool enabled)
+{
+    m_lightSheering = enabled;
+}
+
+bool Renderer::getLightSheering()
+{
+    return m_lightSheering;
 }
 
 void Renderer::setCascadeStrategy(CascadeStrategy strategy)

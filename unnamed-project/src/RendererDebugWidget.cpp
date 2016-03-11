@@ -73,6 +73,9 @@ QWidget *RendererDebugWidget::generateSDSMOptions()
     m_cascadedShadowMapsLambda->setRange(0, 100);
     m_cascadedShadowMapsLambda->setTickInterval(1);
 
+    m_lightSheering = new QCheckBox("Light Sheering");
+    layout->addWidget(m_lightSheering);
+
     m_cascadedShadowMaps = new QRadioButton("CSM", sdsmOptions);
     layout->addWidget(m_cascadedShadowMaps);
 
@@ -142,6 +145,7 @@ void RendererDebugWidget::connectStuff()
 {
     connect(m_colorizeCascades, SIGNAL(stateChanged(int)), this, SLOT(onColorCascadesChanged()));
     connect(m_cascadedShadowMapsLambda, SIGNAL(valueChanged(int)), this, SLOT(onCascadedShadowMapsLambdaChanged()));
+    connect(m_lightSheering, SIGNAL(stateChanged(int)), this, SLOT(onLightSheeringChanged()));
     connect(m_cascadedShadowMaps, SIGNAL(clicked()), this, SLOT(onCascadesStrategyChanged()));
     connect(m_sampleDistributionShadowMaps, SIGNAL(clicked()), this, SLOT(onCascadesStrategyChanged()));
     connect(m_lightView, SIGNAL(stateChanged(int)), this, SLOT(onLightViewChanged()));
@@ -173,6 +177,11 @@ void RendererDebugWidget::onCascadedShadowMapsLambdaChanged()
     float max = m_cascadedShadowMapsLambda->maximum();
 
     m_renderer->setCascadedShadowMapsLambda((value - min) / (max - min));
+}
+
+void RendererDebugWidget::onLightSheeringChanged()
+{
+    m_renderer->setLightSheering(m_lightSheering->isChecked());
 }
 
 void RendererDebugWidget::onCascadesStrategyChanged()
