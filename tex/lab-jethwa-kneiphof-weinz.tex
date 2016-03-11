@@ -611,7 +611,7 @@ $z$ der Tiefe aus dem Depth Buffer entspricht,
 generiert und durch eine Matrix transformiert.
 Dies geschieht damit eine 16-bit Quantifikation ausreicht.
 
-\begin{lstlisting}
+\begin{lstlisting}[language=GLSL]
 void sampleOptimized4MomentsShadowMap(out vec4 out4Moments, 
 	vec4 shadowMapValue)
 {
@@ -631,7 +631,7 @@ void sampleOptimized4MomentsShadowMap(out vec4 out4Moments,
 \end{lstlisting}
 Hier werden die Sample rückgerechnet, damit diese besser in eine Textur schreiben können.
 Dies geschieht im Fragment\_Shader
-\begin{lstlisting}
+\begin{lstlisting}[language=GLSL]
 float computeMSMShadwowIntensity(vec4 in4Moments, float depth, 
 	float depthBias, float momentBias)
 {
@@ -669,7 +669,7 @@ float computeMSMShadwowIntensity(vec4 in4Moments, float depth,
     
 }
 \end{lstlisting}
-\begin{lstlisting}
+\begin{lstlisting}[language=GLSL]
 float simpleShadowTerm()
 {
     
@@ -692,7 +692,7 @@ Die Funktionen rufen wir in der simpleShadowTerm() Funktion auf und geben diese 
 
 \subsection{Moment Based Volumetric Obscurance}
 Für das Moment Based Volumetric Obscurance benutzen wir die gleiche Herangehensweise. Allerdings hat es sich herausgestellt, dass die Transformation für 4 Momente zu Artefakten führt. Dies entspricht dem samplen im Fragment Shader aus der Implementierung des Moment Shadow Mapping. Deswegen wurde dieser Schritt für das Moment Based Volumetric Obscurance entfernt. Das samplen bei der Generierung der Momente bleibt erhalten. Problematisch ist hier die Varianz um einen möglichst korrekten Wert für die Vomuletric Obscurance zu erhalten. Möglicherweise sind hier noch weitere Feineinstellung und Variablen nötig um ein stimmiges Bild zu erhalten. Technisch gesehen, funktiert das Verfahren aber.
-\begin{lstlisting}
+\begin{lstlisting}[language=GLSL]
 // Modified MSMShadowIntensity function
 void computeMSMWeights(out vec3 Weight, out vec3 outz, vec4 in4Moments, 
 float depth, float depthBias, float momentBias)
