@@ -62,6 +62,7 @@ private:
 
     QRadioButton *m_shadowMapMsaa[5];
 
+    QRadioButton *m_noVO;
     QRadioButton *m_lineVO;
     QRadioButton *m_varianceVO;
     QRadioButton *m_momentVO;
