@@ -841,23 +841,23 @@ Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch s
 	\subfloat[Gauss Filter]{
 
 		\includegraphics[width = 6cm]{msm_assets/baumGauss.png}
-		\label{ref:lineSample0001}
+		\label{ref:msmgauss}
 	}
-    \subfloat[10 Samples]{
+    \subfloat[1xMSAA]{
 
 		\includegraphics[width = 6cm]{msm_assets/baum1MSAA.png}
-		\label{ref:lineSample0010}
+		\label{ref:msm1}
 	}
 	
-	\subfloat[100 Samples]{
+	\subfloat[12xMSAA]{
 		\includegraphics[width = 6cm]{msm_assets/baum2MSAA.png}
-		\label{ref:lineSample0100}
+		\label{ref:msm2}
 	}
-	\subfloat[1000 Samples]{
-		\includegraphics[width = 6cm]{msm_assets/baum16MSAA}
-		\label{ref:lineSample1000}
+	\subfloat[16xMSAA]{
+		\includegraphics[width = 6cm]{msm_assets/baum16MSAA.png}
+		\label{ref:msm16}
 	}
-	\caption{LineSampling mit verschieden vielen Samples pro Pixel}
+	\caption{Moment Shadow Mapping mit Gauss Filter, 1xMSAA bis 16x MSAA. Hierbei ist zu beachten das 1xMSAA zwischen Pixeln interpoliert}
 \end{figure}
 
 Auch dies hat sich kaum auf die Performance ausgewirkt und wir sind mit dem Ergebniss sehr zufrieden.
@@ -872,7 +872,31 @@ TODO
 
 % Fazit
 \subsection{Moment Based Volumetric Obscurance}
-Das Verfahren zur Moment Based Volumetric Obscurance war ebenfalls leicht umzusetzen, da sich die Implementierung kaum vom MSM unterscheidet. Aufgrund von anfänglichen Artefakten, haben wir aber eine sample Methode entfernt, welches ein stimmigeres Bild ergab. Insgesamt ist das Bild aber noch nicht stimmig genug, hier müssen wir weiter mit den Werten experimentieren, damit keine Cell Shading Optik erscheint. Interessant ist das Moment Based Volumetric Obscurance aber ebenfalls für grossflächuiges Filtern, welches noch weitere Experimente benötigt.
+\begin{figure}
+	\centering
+	\subfloat[MBVO Beispiel 1]{
+
+		\includegraphics[width = 6cm]{msm_assets/mbvo001.png}
+		\label{ref:mbvo1}
+	}
+    \subfloat[MBVO Beispiel 2]{
+
+		\includegraphics[width = 6cm]{msm_assets/mbvo002.png}
+		\label{ref:mbvo2}
+	}
+	
+	\subfloat[MBVO Beispiel 2]{
+		\includegraphics[width = 6cm]{msm_assets/mbvo003.png}
+		\label{ref:mbvo3}
+	}
+	\subfloat[MBVO Beispiel 3]{
+		\includegraphics[width = 6cm]{msm_assets/mbvo004.png}
+		\label{ref:mbvo4}
+	}
+	\caption{Moment Based Volumetric Obscurance Beispiele mit verschiedenen Geometrien und Entfernungen}
+\end{figure}
+
+Das Verfahren zur Moment Based Volumetric Obscurance war ebenfalls leicht umzusetzen, da sich die Implementierung kaum vom MSM unterscheidet. Aufgrund von anfänglichen Artefakten, haben wir aber eine sample Methode entfernt, welches ein stimmigeres Bild ergab. Insgesamt ist das Bild aber noch nicht stimmig genug, hier müssen wir weiter mit den Werten experimentieren, damit keine Cell Shading Optik erscheint. Möglicherweise ist das Moment Based Volumetric Obscurance aber ebenfalls für grossflächiges Filtern andwendbar, welches noch weitere Experimente benötigt.
 (Füge Bilder für MBVO ein mit Vergleich zu VO)
 
 
