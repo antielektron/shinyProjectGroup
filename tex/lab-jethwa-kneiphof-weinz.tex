@@ -11,7 +11,13 @@
 \usepackage{subfig}
 \usepackage{multirow}
 \usepackage{array}
-% Darstellung von Pseudocode
+\usepackage{svg}
+
+\usepackage[]{algorithm2e}
+
+%für pseudocode:
+\SetKwProg{Fn}{Function}{}{end}\SetKwFunction{FRecurs}{FnRecursive}%
+\SetAlgoLongEnd
 
 % Benötigte Angaben für die Titelseite
 \title{ Moment Shadow Mapping, Moment Based Volumetric Obscurance und Sample Distribution Shadow Maps }
@@ -37,10 +43,9 @@
 
 \begin{abstract}
 Dieser Bericht ist Teil einer Projektgruppe am Institut für Informatik der Universität Bonn,
-die sich mit der Implementierung drei verschiedener Echtzeit-Renderingtechniken für Schatten 
-beschäftigt. In diesem Bericht wird die Funktionsweise und Implementierung von Sample Distribution Shadow Maps, 
-Volumetric-Obscurance und Moment Shadow Mapping. Alle drei Techniken werden in einer eigenen Engine implementiert und
-durch ein Demo-Spiel dargestellt.
+die sich mit der Implementierung drei verschiedener Echtzeit-Renderingtechniken für Schatten beschäftigt.
+In diesem Bericht wird die Funktionsweise und Implementierung von Sample Distribution Shadow Maps, Volumetric-Obscurance und Moment Shadow Mapping behandelt.
+Alle drei Techniken werden in einer kleinen Engine implementiert und in einem Demo-Spiel verwendet.
 \end{abstract}
 
 
@@ -55,7 +60,7 @@ Zusätzlich implementieren wir alles in einer eigenen 3D Engine und generieren d
 % Introduction
 \subsection{Sample Distribution Shadow Maps}
 
-Ein häufiges Problem bei der Shadow Map generierung ist Aliasing durch Over und Under Sampling.
+Ein häufiges Problem bei der Shadow Map Generierung ist Aliasing durch Over und Under Sampling.
 Sample Distribution Shadow Maps (SDSMs) \cite{sdsm} sind ein voll automatisches Verfahren mit konstantem Speicherbedarf und einer vorhersagbaren Worst-Case Laufzeit, die nicht von der Szenenkomplexität abhängt.
 Das Verfahren ist dadurch sehr gut für den Einsatz in Echtzeit Grafikanwendungen geeignet.
 SDSM ist ein Screen Space Verfahren, welches adaptiv in jedem Frame Z-Partitionen \cite{zpart} (Hier auch Kaskaden \cite{csm}) erstellt.
@@ -65,7 +70,9 @@ Des Weiteren werden die Shadow Map Frusta von SDSMs eng um die tatsächlich sich
 
 % Introduction
 \subsection{Volumetric Obscurance}
-Hier könnte ein Text stehen
+Obscurance (= Umgebungsverdeckung) ist eine Technik zur Berechnung von Schatten basierend auf der Annahme,
+dass sich gegenseiteg verdeckende Geometrie zu einem verringertem Lichteinfall führt. In diesem Paper werden
+wir verschiedene Screenspace Algorithmen für Volumetric Obscurance erläutern und kurz unsere Implementationen vorstellen.
 
 
 % Introduction
@@ -77,24 +84,35 @@ Desweiteren versuchen wir Volumetric Obscurance mit Momenten zu versehen und so 
 
 \section{Related Work}
 
-Es gibt bereits Verfahren \cite{csm} \cite{pssm} um Perspektivisches Aliasing zu minimieren.
-Allerdings liefern diese nicht immer gute Ergebnisse.
-
-Andere Verfahren wie Adaptive Shadow Maps \cite{asm}
-
-
 % Related Work
 \subsection{Sample Distribution Shadow Maps}
 
-Sample Distribution Shadow Maps \cite{sdsm}
+Parallel Split Shadow Maps (PSSMs) \cite{pssm} ist ein existierendes Verfahren um Perspektivisches Aliasing zu minimieren.
+Allerdings liefert es nicht immer gute Ergebnisse und hängt von Parametern ab, deren optimaler Wert unbekannt ist.
+
+Andere Verfahren wie Adaptive Shadow Maps \cite{asm} und Resolution-Matched Shadow Maps \cite{rmsm} verwalten eine komplexe Baumstruktur von Shadow Maps um die Shadow Map Auflösung adaptiv in der Szene zu verteilen.
+Sie erreichen eine hohe Qualität auf Kosten von Performanz, wodurch sie für Echtzeitanwendungen eher ungeeignet sind.
 
 
 % Related Work
 \subsection{Volumetric Obscurance}
 
-Volumetric Obscurance \cite{loos2010volumetric}
-Moment Based Volumetric Obscurance \cite{mbvo}
+Ambient Occlusion (= Umgebungsverdeckung) ist eine weit verbreitete Technik um Schatten in 3D-Szenen
+zu approximieren[citation needed]. Dafür gibt es allgemein 2 Ansätze:
+\begin{enumerate}
+	\item "Global Ambient Occlusion": für jeden Punkt in der Szene wird geprüft, ob der Himmel von diesem
+		Punkt aus sichtbar ist (bzw. ob eine maximale Distanz ohne Kollision erreicht werden kann bei geschlossenen
+		Szenen). Dieses Verfahren ist relativ teuer, kann aber z.B. für statische Szenen vorberechnet werden.
+	\item Screenspace Ambient Occlusion (SSAO): für jeden Pixel im Screenspace [klingt blöd] werden Point Samples
+		innerhalb einer bestimmten Umgebung erstellt. Mit Hilfe der Tiefeninformationen des Depth Buffers
+		wird die Anzahl der Samples, die hinter der Szenengeometrie liegen müssen bestimmt. Anhand dieser Anzahl
+		kann der Pixel entsprechend abgedunkelt werden. 
+	[TODO: citation needed]
+\end{enumerate}  
+Volumetric Obscurance ist eine Alternative zum Screenspace Volumetric Obscurance, welche wir im folgenden
+Erläutern werden
 
+\cite{loos2010volumetric}
 
 % Related Work
 \subsection{Moment Shadow Mapping}
@@ -118,16 +136,24 @@ Sample Distribution Shadow Maps (SDSMs) ist ein Verfahren zur adaptiven Optimier
 \subsection{Algorithmus}
 
 % Cascaded Shadow Maps aka Z-Partitioning
-SDSMs basieren auf Z-Partitoning, wobei das Kamera Frustum entlang der Blickrichtung in mehrere Teilfrusta partitioniert wird. Für jedes Teilfrustum wird eine eigene Shadow Map generiert.
+SDSMs basieren auf Z-Partitoning, wobei das Kamera Frustum entlang der Blickrichtung in mehrere Kaskaden partitioniert wird. Für jedes Kaskade wird eine eigene Shadow Map generiert.
 Auf diese Weise kann mehr Shadow Map Auflösung für nahe Objekte verwendet werden, und weniger Auflösung für weit entfernte Objekte.
+
+
+% Betrachte Punkte in Light-Space TODO
+Der Algorithmus betrachtet die Verteilung aller sichtbaren Punkte der Szene aus der Sicht des Lichtes (im Light Space).
+Hierzu wird für jedes Sample aus dem Camera Depth Buffer die Position in der Welt rekonstruiert und in den Light Space transformiert.
+Die so erhaltenen Punkte sind genau die, für die beim Rendern der Szene aus der Sicht der Kamera auf die Shadow Map zugegriffen wird.
+
 
 % Partitionierung
 Für gute Ergebnisse ist eine geeignete Wahl der Partition ausschlaggebend.
-Anstatt auf eine statische Partitionierung des Kamera Frustums zu setzen wird die Partitionierung von SDSMs in jedem Frame neu berechnet.
+Anstatt auf eine statische Partitionierung des Kamera Frustums \cite{pssm} zu setzen, wird die Partitionierung von SDSMs in jedem Frame neu berechnet, so dass sie die sichtbare Geometrie optimal abdeckt.
 
 % - Min/Max Reduktion
 % - Logarithmische Partitionierung
-Zunächst wird die tatsächliche Near und Far Distanz der sichtbaren Geometrie im Kamera Frustums ermittelt. Dies geschieht mittels Min/Max Reduktion der Tiefenwerte im Kamera Depth Buffer.
+Zunächst wird die tatsächliche Near und Far Distanz der sichtbaren Geometrie im Kamera Frustums ermittelt.
+Dies geschieht mittels Min/Max Reduktion der Tiefenwerte im Kamera Depth Buffer.
 Anschließend wird das Kamera Frustum zwischen tatsächlicher Near und Far Distanz logarithmisch partitioniert um das perspektivische Aliasing zu minimieren.
 
 % Abgrenzung PSSM Logarithmic/Linear
@@ -137,18 +163,21 @@ PSSMs konvexkombinieren die Partitionsgrenzen der linearen und logarithmischen P
 Optimale Koeffizienten müssen meist von Hand ermittelt werden.
 
 % (K-Means and friends)
-Weitere Möglichkeiten das Kamera Frustum intelligent zu partitionieren sind ein adaptiv logarithmisches und ein K-Means Verfahren.
+Weitere Möglichkeiten das Kamera Frustum intelligent zu partitionieren, sind ein adaptiv logarithmisches und ein K-Means Verfahren.
 Das adaptiv logarithmische Verfahren vermeidet Lücken im Histogramm des Kamera Depth Buffers, indem es die Partitionsgrenzen an das Ende von diesen schiebt.
 Das K-Means Verfahren sucht zunächst Maxima im Histogramm des Kamera Depth Buffers und legt dann die Partition entsprechend um die gefundenen Maxima.
-Für beide Verfahren muss zunächst ein Histogramm berechnet werden.
-
-
-% Betrachte Punkte in Light-Space TODO
-Der Algorithmus betrachtet die Verteilung aller sichtbaren Punkte der Szene aus der Sicht des Lichtes.
-Hierzu wird für jedes Sample aus dem Kamera Depth Buffer die Position in der Welt rekonstruiert und in den Light Space transformiert.
+Für beide Verfahren muss zunächst das Histogramm des Camera Depth Buffers berechnet werden.
 
 
 % Tight Partition Frusta
+Andere Algorithmen wie PSSM \cite{pssm} projizieren die Ecken des Kamera Frustums bzw. der Kaskaden in den Light Space um das Frustum für die Shadow Map zu erhalten.
+Um das Frustum möglichst klein zu wählen kann dort eine Oriented Bounding Box anstelle einer Axis Aligned Bounding Box (AABB) berechnet werden.
+Die Konvexe Hülle der in den Light Space projizierten Punkte kann ein sehr komplexes Polygon werden, weshalb es sich für SDSMs nicht lohnt diese zu berechnen.
+
+SDSMs berechnen für jede Kaskade eine AABB, die dann das Frustum für die Shadow Map bildet.
+Damit die AABBs die sichtbare Geometrie sinnvoll einschließen, wird der Light Space so rotiert, dass die Z-Achse des Camera Spaces sich an der X-Achse des Light Spaces ausgerichtet.
+
+Die AABBs für die 
 
 % Andere Algorithmen benutzen Ecken von jedem Frustum um Shadow Map Frustum zu definieren
 TODO
@@ -159,43 +188,59 @@ TODO
 
 % Rendern der Shadow Map
 Die Shadow Maps für die Kaskaden werden mittels Texture Arrays realisiert, wobei jede Kaskade einen eigenen Layer in dem Array erhält.
-Beim Rendern der Shadow Map transformiert der Vertex Shader die Geometrie zunächst nur in das Welt Koordinatensystem und nicht direkt in das Frustum der Shadow Map.
+Beim Rendern der Shadow Map transformiert der Vertex Shader die Geometrie zunächst nur in den World Space und nicht direkt in das Frustum der Shadow Map.
 Der Geometry Shader klont dann die Geometrie und transformiert sie für jede Kaskade mit der dazugehörigen Projektionsmatrix in das Shadow Map Frustum um sie in den entsprechenden Layer der Shadow Map zu rendern.
-Anstatt die Near Plane des Shadow Map Frustums zu verschieben, um Geometrie die aus der Sicht des Lichtes vor dem Kamera Frustum liegt zu berücksichtigen, wird an der Near Plane des Shadow Map Frustums der Tiefenwert geclampt.
-
-% Light Space (to detailed?)
-% Um eine Transformation in den Light Space zu bekommen, der analog zum Camera Space die Szene aus der Sicht des Lichtes betrachtet, wird zunächst die Licht Richtung auf die Z Achse rotiert und anschließend die Z-Achse des Camera Spaces an der X-Achse ausgerichtet.
+Anstatt die Near Plane des Shadow Map Frustums zu verschieben, um Geometrie die aus der Sicht des Lichtes vor dem Camera Frustum liegt zu berücksichtigen, wird an der Near Plane des Shadow Map Frustums der Tiefenwert geclampt.
 
 % Temporäre Licht Projektion
 Um die Bounding Boxen der Geometrie in den einzelnen Kaskaden zu berechnen, müssen die Koordinaten im Light Space auf den Bereich $[0, 1]$ gemappt werden.
 Hierzu werden die Eckpunkte im Screen Space in die Welt, und anschließend in den Light Space transformiert, wo dann deren Axis Aligned Bounding Box auf $[0, 1]^3$ projiziert wird.
-So ist es garantiert, dass die Koordinaten sämmtlicher sichtbarer Geometrie im Light Space clamping in einer Textur gespeichert werden können.
+So ist es garantiert, dass die Koordinaten sämmtlicher sichtbarer Geometrie im Light Space ohne clamping in einer Textur gespeichert werden können.
 
 % Reduktion 1 & 2
-Die beiden Reduktionen werden jeweils in einem Compute Shader ausgeführt. Jeder Thread liest 1 bis 4 Einträge pro zu reduzierendem Wert ein. Jede Thread Gruppe (von 256 Threads) generiert einen neuen Eintrag pro Wert.
+Die beiden Reduktionen werden jeweils in einem Compute Shader ausgeführt.
+Jeder Thread liest 1 bis 4 Einträge pro zu reduzierendem Wert ein.
+Jede Thread Gruppe (von 256 Threads) generiert einen neuen Eintrag pro Wert.
 Ausserdem versuchen wir die Zugriffsmuster auf den Shared Memory so weit es geht zu optimieren und Bank Conflicts zu vermeiden \cite{reduction}.
-Um so mehr verschiedene Werte auf einmal reduziert werden, um so mehr können idle Zeiten von Threads in den Thread Gruppen vermieden werden.
-Anstatt dass nach einer halbierung der Daten die eine Hälfte der Threads ihre Arbeit beendigt, wird der erste zu reduzierende Wert von der ersten Hälfte der Threads, und die zweite zu reduzierende Variable von der zweiten Hälfte der Threads bearbeitet, und so weiter bis jeder Thread sich nur noch um höchstens einen Wert kümmern muss (z.B. Minimale X Koordinate der zweiten Kaskade).
-Die Reduktionsergebnisse werden in 1D Texturen gespeichert, um die Anzahl der Threads die in einem Reduktionsschritt keine sinnvollen Daten einlesen zu minimieren.
+Um so mehr verschiedene Werte auf einmal reduziert werden, desto mehr können idle Zeiten von Threads in den Thread Gruppen vermieden werden.
+
+Anstatt nach einer halbierung der Daten die eine Hälfte der Threads ihre Arbeit beendigen zu lassen, wird der erste zu reduzierende Wert von der ersten Hälfte der Threads, und die zweite zu reduzierende Wert von der zweiten Hälfte der Threads weiter bearbeitet und so weiter, bis jeder Thread sich nur noch um höchstens einen Wert kümmern muss.
+Damit die Arbeit so aufgeteilt werden kann, müssen alle Reduktionsprobleme vom selben Typ sein.
+\begin{equation}
+  far = \max\{ depth \} = 1 - \min \{ 1 - depth \}
+\end{equation}
+Maximierungsprobleme werden während der Reduktionen Minimierungsprobleme betrachtet.
+Durch die Addition von $1$ verlässt der zu reduzierende Wert den Wertebereich $[0, 1]$ nicht.
+Dies gilt analog für die Max-Corners der Bounding Boxen.
+
+Die Reduktionsergebnisse werden in 1D Texturen gespeichert.
+So wird die Anzahl der Threads, die in einem Reduktionsschritt keine sinnvollen Daten einlesen, minimiert.
+
+% In der zweiten Reduktion werden insgesammt $| \{min, max\} \times \{X, Y, Z\} \times \{0, 1, 2, 3\} | = 24$ Werte berechnet.
+% Um die Vektorarithmetik der GPU auszunutzen empfiehlt es sich jeweils die vier Kaskaden in einen Vektor zusammen zu fassen, so dass noch 6 Vektoren reduziert werden, die jeweils in einer 4 Kanal Textur gespeichert werden.
+
 
 
 % Keks
+TODO irgendwas vergessen?
+
 
 % SDSM
 \paragraph{Erster Versuch}
 Im ersten Ansatz haben wir die Reduktionen für die tatsächliche Near und Far Distanz sowie die Bounding Boxen der Geometrie in den Kaskaden auf der GPU berechnet.
 Das Ergebnis haben wir auf die CPU zurück gelesen um aus den Near und Far Distanzen die Partition zu berechnen, bzw. aus den Bounding Boxen das Frustum für die entsprechende Shadow Map.
 Um zu vermeiden, dass der CPU auf die GPU warten muss, haben wir die Ergebnisse aus dem vorherigen Frame, bzw. von vor zwei Frames genutzt, da deren Berechnung dann schon abgeschlossen sein sollte.
-Um Bewegungen der Kamera zu kompensieren, haben wir die Ergebnisse aus dem Kamera Koordinatensystem des vergangenen Frames in die Welt transformiert und von dort in das aktuelle Kamera Koordinatensystem.
+Um Bewegungen der Kamera zu kompensieren, haben wir die Ergebnisse aus dem Camera Space des vergangenen Frames in die Welt transformiert und von dort in den aktuelle Camera Space.
 Was wir nicht kompensieren konnten, war das erscheinen neuer Geometrie, die durch die Bewegung der Kamera sichtbar wurde.
 Das hat z.B. zu Bereichen zwischen den Kaskaden geführt, die nicht von einer Shadow Map abgedeckt wurden.
+Selbst wenn wir zur Sicherheit einen Rand in die Shadow Map einbauen, was nicht im Sinne von SDSM ist, können schnelle Bewegungen nicht kompensiert werden.
 
 % SDSM
 \paragraph{Zweiter Versuch}
-Dieses Problem haben wir gelöst indem wir am Anfang jedes Frames einmal nur die Tiefe gerendert haben.
-Anschließend haben wir darauf die Near und Far Distanz berechnet.
-Anstatt auf die CPU zurück zu lesen, haben wir die Partition in einem Compute Shader auf der GPU berechnet.
-Nachdem dann die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus ebenfalls auf der GPU die Projektionsmatrizen für die Shadow Maps berechnet.
+Dieses Problem haben wir gelöst, indem wir am Anfang jedes Frames einen Depth Only Pass gerendert haben.
+Anschließend haben wir darauf die Near und Far Distanz wie zu vor berechnet.
+Anstatt diese auf die CPU zurück zu lesen, haben wir die Partition in einem Compute Shader auf der GPU berechnet.
+Nachdem die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus ebenfalls auf der GPU die Projektionsmatrizen für die Shadow Maps berechnet.
 
 
 
@@ -203,9 +248,104 @@ Nachdem dann die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus e
 % Main
 \section{Volumetric Obscurance}
 
-	TODO
-	
+Volumentric Obscurance wird aus dem Screenspace[denglish] berechnet. Allgemein wird für jeden Punkt der Szene, der auf
+dem Bildschirm gezeichnet wird, eine gegebene Umgebung (z.B. eine Einheitskugel um diesen Punkt) betrachtet.
+Für diese Umgebung wird der Anteil an Geometrie berechnet, die für den Beobachter sichtbar ist. Je mehr Geometrie
+verdeckt ist, umso mehr wird der korrespondierende Pixel abgedunkelt um so den ausbleibenden Lichteinfall
+[aka Schatten?] zu simulieren.
+Das entsprechnde mathematische Modell sieht wie folgt aus [paper vo]:
+$$
+V(P) = \int_{X} \rho (d(P,x))O(x)dx
+$$
+Dabei ist $X$ die Nachbarschaft um den Punkt $P$, $O$ ist die Verdeckungs-Funktion. Diese
+ist 0, falls Verdeckung stattfindet, sonst 1. $\rho$ ist eine abfallende Funktion
+die 1 bei P ist und mit der Distanz abfällt. Wie in [paper vo] beschrieben ist der 
+sichtbare Effekt jedoch nur sehr minimal, weshalb diese Funktion als konstant angesehen 
+wird \cite{voPaper}
 
+\subsection{Line Sampling}
+Line Sampled Volumetric Obscurance nutzt (möglichst) zufallsverteilte Samples innerhalb auf der auf den
+Screenspace projezierten Umgebung des Punktes. In der hier implementierten Version (die ebenfalls in
+\cite{voPaper} beschrieben wird) wird die Einheitskugel um den Punkt P in der Szene betrachtet.
+Sei nun $d$ die Tiefe des Punktes $P$. Dann ist die allgemeine Verdeckungsfunktion für eine andere Tiefe
+$z$ :
+$$
+f(z) = \begin{cases} 1 &  \text{für } z \leq d \\ 0 & \text{für } z > d \end{cases}
+$$
+Für die hier vorgestellte Implementierung wird eine feste Anzahl $N$ an Samples verwendet.
+Dann ergibt sich daraus:
+$$
+F_{N}(z_0, \dots, z_N) = \sum_i^N \frac{v_i}{2 \cdot z_{s_i}} \max{(\min{(z_{s_i}, d_{r_i})} + z_{s_i}, 0)}
+$$
+Dabei ist $z_i$ die Tiefe des i-ten Samples im Depth-Buffer, $d_{r_i}$ ist die Tiefe $z_i$ gemapped in die
+betrachtete Umgebung des Punktes $P$, $z_{s_i} = \sqrt{1 - x_i^2 - y_i^2}$. $(x_i, y_i)$ ist die Position des
+i-ten Samples auf der Einheitsscheibe (also der Querschnitt der Einheitskugel, die den Punkt P 
+beinhaltet und dessen normale parallel zur Blickrichtung liegt). \newline
+
+\begin{figure}
+	\centering
+
+	\includesvg{LineSamples}
+	\label{ref:lineSample}
+
+	\caption{Line Sampling}
+\end{figure}
+
+\subsubsection{Implementierung}
+	\textbf{Line Sampling Pseudo Code}\\
+	\begin{algorithm}[H]
+		
+		\Fn{LineSampling(nSamples, depth)}{
+			sumSamples = 0\;
+			sumVolume = 0\;
+		    \For{i = 0 $\rightarrow$ nSamples - 1}{
+		    	radius = rand()\;
+		    	$\alpha$ = rand()$\cdot 2\pi$\;
+		    	weight = $\sqrt{1 - radius^2}$\;
+		    	p = $(\cos{(\alpha)} \cdot radius,\sin{(\alpha)} \cdot radius)^T$\;
+		    	sumSamples = sumSamples + weight $\cdot$ SamplePoint(p, depth)\;
+		    	sumVolume = sumVolume + weight\;
+		    }
+		    return $\frac{sumSamples}{sumVolume}$ \;
+		}
+		
+		\Fn{SamplePoint(p, depth)}{
+			\textit{hier wird ein einzelner Punkt gesampled, wie oben beschrieben [TODO?]}
+		}
+		
+		\Fn{rand()}{
+			return \textit{zufälliger Wert im Intervall [0,1]}\;
+		}
+		
+	\end{algorithm}
+
+\subsubsection{Ergebnisse}
+TODO
+
+\subsection{Area Sampling}
+Line Sampling Volumetric Obscurance nutzt zufallsverteilte Samples um die Verdeckung einer
+Raumregion zu approximieren. Ein alternativer Ansatz ist Area Sampling. Anstatt zufallsverteilter Samples
+versucht Area Sampling die Verteilung über das Mittel statistischer Größen zu ermitteln. Dafür
+wird der selbe Ansatz wie bei Variance Shadow Maps \cite{vsmPaper} verwendet. Beim Line Sampling
+nutzten wir samples auf dem DepthBuffer, beim Area Sampling schreiben wir stattdessen die ersten beiden
+Momente $(z^1, z^2)$ für jeden Pixel im Screenspace heraus und filtern diese Größe über einen Bereich, der
+Abhängig von der Tiefe ist (analog zu der von der Tiefe abhängigen, auf den Screenspace projezierten Umgebung
+im Abschnitt Line Sampling). In unserer Implementierung bestimmen wir in einem Renderschritt [blödes Wort]
+die Tiefe der Szene $(z)$ aus Sicht der Kamera und schreiben das Tupel $(z, z^2)$ in den ersten beiden
+Farbkanälen einer Textur. Bevor wir die finale Szene rendern mipmappen [ist das ein Verb?] wir die Textur.
+In der Nachbearbeitung (Compose Schritt) der gerenderten Szene greifen wir abhängig von der Tiefe an jedem
+Pixel auf die entsprechende Mipmap-Ebene zu, welche die so gefilterten Momente enthält [kein Schöner Satz!].
+Über das abgegriffene[?!?] Tupel $t = (z_f, z_f^2)$ bekommen wir dann einen Approximierten Mittelwert 
+$\mu = t[0]$ und die gemittelte Varianz $\sigma^2 = t[1] - t[0]^2$. Dann lässt sich der Verdeckungsfaktor 
+folgendermaßen abschätzen:
+$$
+V_c = a\cdot(z_1^2 - z_0^2) / 2 + b \cdot (z_1 - z_0)
+$$
+wobei $z_0$ und $z_1$ die Start- und Endtiefe der Umgebung des betrachteten Punktes P sind und die 
+Koeffizienten $a$ und $b$ definiert sind als:
+$$
+a = \frac{-1}{2 \cdot \sigma}; \quad b = -a \cdot (\mu + \sigma)
+$$
 
 
 % Main
@@ -257,10 +397,11 @@ Die MBVO färbt Konturen der Geometrie sehr dunkel ein und hat Ähnlichkeiten mi
 % Fazit
 \subsection{Sample Distribution Shadow Maps}
 SDSMs sind sehr robust und benötigen keine möglicherweise von Hand zu optimierenden Parameter um gute Ergebnisse zu liefern.
-PSSMs können oft ähnlich gute Ergebnisse liefern, wenn sie optimal eingestellt sind, allerdings gilt dies meist nur für eine konkrete Sicht auf die Szene.
+PSSMs können oft ähnlich gute Ergebnisse liefern wenn sie optimal eingestellt sind.
+Allerdings gilt dies meist nur für eine bestimmte Sicht auf die Szene.
 Befindet sich mehr oder weniger Geometrie in unmittelbarer nähe zur Kamera, so liefert PSSM keine guten Ergebnisse mehr.
 SDSM passt ihre Z-Partitionen adaptiv an die veränderte Sichtbarkeit an.
-Dies ist möglich, da SDSMs die tatsächliche Near Plane kennen, wo PSSMs nur eine untere Schranke hierfür kennen, die sich aus der Kamera Projektion ergibt.
+Dies ist möglich, da SDSMs die tatsächliche Near Plane kennen, wo PSSMs nur eine untere Schranke hierfür kennen, die sich aus der Camera Projektion ergibt.
 
 % Verbesserung der MSM durch SDSM
 % TODO erstmal nur skizziert!

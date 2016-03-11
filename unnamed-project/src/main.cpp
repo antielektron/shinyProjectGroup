@@ -134,7 +134,7 @@ int main(int argc, char **argv)
         if (parser.isSet(shaderEditorOption))
         {
             EditorWindow editorWindow(
-                        new OpenGLWidget(std::make_shared<PrimitiveGame>()));
+                        new OpenGLWidget(std::make_shared<PrimitiveGame>(levelFile)));
             editorWindow.show();
 
             return app.exec();
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
         else
         {
             // Start the regular primitive game ..
-            OpenGLWidget widget(std::make_shared<PrimitiveGame>());
+            OpenGLWidget widget(std::make_shared<PrimitiveGame>(levelFile));
             widget.show();
 
             return app.exec();

@@ -4,8 +4,10 @@
 #include <QWidget>
 
 #include <QRadioButton>
+#include <QPushButton>
 #include <QSlider>
 #include <QCheckBox>
+#include <QButtonGroup>
 
 class Renderer;
 
@@ -19,8 +21,11 @@ public:
 protected slots:
     void onColorCascadesChanged();
     void onCascadedShadowMapsLambdaChanged();
+    void onLightSheeringChanged();
     void onCascadesStrategyChanged();
+    void onAwesomeCaptureCapture();
     void onAwesomeCaptureChanged();
+    void onAwesomeSlotChanged(int slot);
     void onLightViewChanged();
 
     void onVolumetricObscuranceChanged();
@@ -42,18 +47,24 @@ private:
     QRadioButton *m_cascadedShadowMaps;
     QRadioButton *m_sampleDistributionShadowMaps;
 
-    QRadioButton *m_lineVO;
-    QRadioButton *m_varianceVO;
-    QRadioButton *m_momentVO;
-
     QSlider *m_cascadedShadowMapsLambda;
 
-    QCheckBox *m_awesomeCapture;
+    QCheckBox *m_lightSheering;
+
+    QPushButton *m_awesomeCapture;
+    QCheckBox *m_awesomeCaptureEnabled;
+    QRadioButton *m_awesomeCaptureSlot[4];
+    QButtonGroup *m_awesomeSlotGroup;
+
     QCheckBox *m_lightView;
 
     QCheckBox *m_filterShadowMap;
 
     QRadioButton *m_shadowMapMsaa[5];
+
+    QRadioButton *m_lineVO;
+    QRadioButton *m_varianceVO;
+    QRadioButton *m_momentVO;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_DEBUG_WIDGET_H

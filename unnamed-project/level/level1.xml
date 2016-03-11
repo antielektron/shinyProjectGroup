@@ -600,7 +600,7 @@
             <Rotation x="0" y="90" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <Object name="tree001" model="tree001" interactionEvent="">
-                <Position x="0" y="0" z="0"/>
+                <Position x="7" y="0" z="7"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -616,7 +616,7 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
             <Object name="leaves001" model="leaves001" interactionEvent="">
-                <Position x="0" y="0" z="0"/>
+                <Position x="7" y="0" z="7"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -632,7 +632,7 @@
                 <AmbientColor x="0.5" y="0.7" z="0.5"/>
             </Object>
             <Object name="tree003" model="tree001" interactionEvent="">
-                <Position x="15" y="0" z="0"/>
+                <Position x="22" y="-0.3" z="7"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -648,7 +648,7 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
             <Object name="leaves003" model="leaves001" interactionEvent="">
-                <Position x="15" y="0" z="0"/>
+                <Position x="22" y="-0.3" z="7"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -669,7 +669,7 @@
             <Rotation x="0" y="-90" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <Object name="tree001" model="tree001" interactionEvent="">
-                <Position x="0" y="-0.9" z="0"/>
+                <Position x="7" y="-0.9" z="7"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -685,7 +685,7 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
             <Object name="leaves001" model="leaves001" interactionEvent="">
-                <Position x="0" y="-0.9" z="0"/>
+                <Position x="7" y="-0.9" z="7"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -701,7 +701,7 @@
                 <AmbientColor x="0.5" y="0.7" z="0.5"/>
             </Object>
             <Object name="tree003" model="tree001" interactionEvent="">
-                <Position x="15" y="0" z="0"/>
+                <Position x="22" y="0" z="7"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -717,7 +717,7 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
             <Object name="leaves003" model="leaves001" interactionEvent="">
-                <Position x="15" y="0" z="0"/>
+                <Position x="22" y="0" z="7"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>

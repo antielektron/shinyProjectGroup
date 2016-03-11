@@ -33,6 +33,7 @@
 #define KEYSTR_PROGRAM_CREATE_CAPTURE           "Create Capture"
 #define KEYSTR_PROGRAM_RENDER_CAPTURE           "Render Capture"
 #define KEYSTR_PROGRAM_RENDER_LIGHTVIEW         "Render Light View"
+#define KEYSTR_PROGRAM_RENDER_VISIBLE_SAMPLES   "Render Visible Samples"
 
 #define NUM_VO_MIPMAP_LEVELS 10 //so there's a height of 1 pixel @toplevel for full-HD
 
@@ -60,6 +61,9 @@ public:
     void setCascadedShadowMapsLambda(float lambda);
     float getCascadedShadowMapsLambda();
 
+    void setLightSheering(bool enabled);
+    bool getLightSheering();
+
     void setCascadeStrategy(CascadeStrategy strategy);
     CascadeStrategy getCascadeStrategy();
 
@@ -68,6 +72,11 @@ public:
 
     void setFilterShadowMap(bool enabled);
     bool getFilterShadowMap();
+
+    void awesomeCapture();
+
+    void setCaptureSlot(int slot);
+    int getCaptureSlot();
 
     void setCapture(bool enabled);
     bool getCapture();
@@ -90,6 +99,7 @@ protected:
     // Options
     bool m_colorizeCascades;
     float m_cascadedShadowMapsLambda;
+    bool m_lightSheering;
     CascadeStrategy m_cascadeStrategy;
 
     int m_shadowMapSampleCount;
@@ -100,8 +110,10 @@ protected:
 
 
     /// CAPTURED information
-    enum { CAPTURE_NONE, CAPTURE_REQUESTED, CAPTURE_ACTIVE } m_captured;
-    GLuint m_capturedFrustumToWorldBuffer;
+    bool m_captureRequested;
+    bool m_captureEnabled;
+    int m_captureSlot;
+    GLuint m_capturedFrustumToWorldBuffer[4];
 
     bool m_renderLightView;
 
@@ -198,6 +210,7 @@ protected:
     int m_lightViewProjectionMatrixLoc;
     int m_lightViewDiffuseColorLoc;
     int m_lightViewAmbientColorLoc;
+    int m_visibleSamplesScreenToLightLoc;
 
 
     QOpenGLVertexArrayObject m_quadVao;

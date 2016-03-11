@@ -31,7 +31,10 @@ Renderer::Renderer() : RendererBase(),
         m_cascadeStrategy(SampleDistributionShadowMaps),
         m_shadowMapSampleCount(1),
         m_filterShadowMap(false),
-        m_renderLightView(false)
+        m_renderLightView(false),
+        m_captureRequested(false),
+        m_captureEnabled(false),
+        m_captureSlot(0)
 {
     // nothing to do here
 }
@@ -161,6 +164,10 @@ void Renderer::initialize()
                     KEYSTR_PROGRAM_RENDER_LIGHTVIEW,
                     QOpenGLShader::Fragment);
 
+    setShaderSource(loadTextFile("shaders/lightview/lightview_samples.glsl"),
+                    KEYSTR_PROGRAM_RENDER_VISIBLE_SAMPLES,
+                    QOpenGLShader::Compute);
+
 
     // Generate attrib and uniform locations
 
@@ -251,6 +258,9 @@ void Renderer::initialize()
     m_attribLocs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].emplace_back(0, "v_position");
     m_attribLocs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].emplace_back(1, "v_normal");
 
+    m_uniformLocs[KEYSTR_PROGRAM_RENDER_VISIBLE_SAMPLES].emplace_back(&m_visibleSamplesScreenToLightLoc, "screenToLightTransformation");
+
+
     // create Programs:
     createProgram(KEYSTR_PROGRAM_RENDER);
     createProgram(KEYSTR_PROGRAM_RENDER_DEPTH);
@@ -270,6 +280,7 @@ void Renderer::initialize()
     createProgram(KEYSTR_PROGRAM_CREATE_CAPTURE);
     createProgram(KEYSTR_PROGRAM_RENDER_CAPTURE);
     createProgram(KEYSTR_PROGRAM_RENDER_LIGHTVIEW);
+    createProgram(KEYSTR_PROGRAM_RENDER_VISIBLE_SAMPLES);
 
     // make stuff
     // --> default program (nothing to do) <------------------------------------
@@ -353,10 +364,13 @@ void Renderer::initialize()
 
 
     // Capture Buffer
-    glGenBuffers(1, &m_capturedFrustumToWorldBuffer);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_capturedFrustumToWorldBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float)*16 * 5, NULL, GL_DYNAMIC_COPY);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glGenBuffers(4, m_capturedFrustumToWorldBuffer);
+    for (int i = 0; i < 4; i++)
+    {
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_capturedFrustumToWorldBuffer[i]);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(float)*16 * 5, NULL, GL_DYNAMIC_COPY);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    }
 }
 
 void Renderer::createShadowMap()
@@ -454,7 +468,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     QOpenGLShaderProgram *createMomentsProgram = m_programs[KEYSTR_PROGRAM_CREATE_MOMENTS].get();
     QOpenGLShaderProgram *createCaptureProgram = m_programs[KEYSTR_PROGRAM_CREATE_CAPTURE].get();
     QOpenGLShaderProgram *renderLightView = m_programs[KEYSTR_PROGRAM_RENDER_LIGHTVIEW].get();
-
+    QOpenGLShaderProgram *renderVisibleSamples = m_programs[KEYSTR_PROGRAM_RENDER_VISIBLE_SAMPLES].get();
 
     // Check if we have to recreate the shadow map depth buffer, because sample count changed
     if (m_recreateShadowMap)
@@ -577,6 +591,15 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             QMatrix4x4 lightViewMatrix;
             createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
 
+            if (m_lightSheering)
+            {
+                auto cameraXDir = lightViewMatrix * inverseCameraView * QVector4D(1, 0, 0, 0);
+                // sheer light Y to camera X
+                QMatrix4x4 sheering;
+                sheering.setColumn(1, cameraXDir);
+                lightViewMatrix = sheering.inverted() * lightViewMatrix;
+            }
+
             // Compute view frustum of camera in light view
             auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
 
@@ -672,6 +695,15 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             // Compute view matrix for light (light direction -> Z, camera Z -> X)
             QMatrix4x4 lightViewMatrix;
             createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
+
+            if (m_lightSheering)
+            {
+                auto cameraXDir = lightViewMatrix * inverseCameraView * QVector4D(1, 0, 0, 0);
+                // sheer light Y to camera X
+                QMatrix4x4 sheering;
+                sheering.setColumn(1, cameraXDir);
+                lightViewMatrix = sheering.inverted() * lightViewMatrix;
+            }
 
             // Compute view frustum of camera in light view
             auto screenToLightTransformation = lightViewMatrix * inverseCameraTransformation;
@@ -794,7 +826,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     // DEBUG
     // Create Capture
-    if (m_captured == CAPTURE_REQUESTED)
+    if (m_captureRequested || m_renderLightView)
     {
         createCaptureProgram->bind();
 
@@ -802,30 +834,19 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         createCaptureProgram->setUniformValue(m_createCaptureInverseCameraProjectionLoc, inverseCameraProjection);
 
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeViewBuffer);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_capturedFrustumToWorldBuffer);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_capturedFrustumToWorldBuffer[m_captureSlot]);
 
         glDispatchCompute(1, 1, 1);
 
         createCaptureProgram->release();
 
-        m_captured = CAPTURE_ACTIVE;
+        m_captureRequested = false;
     }
 
 
     if (m_renderLightView)
     {
         // Use the captured information to display frustum stuff
-        createCaptureProgram->bind();
-
-        createCaptureProgram->setUniformValue(m_createCaptureInverseCameraViewLoc, inverseCameraView);
-        createCaptureProgram->setUniformValue(m_createCaptureInverseCameraProjectionLoc, inverseCameraProjection);
-
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeViewBuffer);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_capturedFrustumToWorldBuffer);
-
-        glDispatchCompute(1, 1, 1);
-
-        createCaptureProgram->release();
 
         // Compute view matrix for light (light direction -> Z, camera Z -> X)
         QMatrix4x4 lightViewMatrix;
@@ -837,6 +858,9 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         // Projection matrix that wraps whole camera frustum
         QMatrix4x4 tempLightProjection;
         createFrustumProjectionMatrix(screenToLightTransformation, tempLightProjection);
+        QMatrix4x4 scaling;
+        scaling.scale(0.99, 0.99, 0.99);
+        tempLightProjection = scaling*tempLightProjection;
 
         // Render Light View
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -873,6 +897,21 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
         renderLightView->release();
 
+        renderVisibleSamples->bind();
+
+        renderVisibleSamples->setUniformValue(m_visibleSamplesScreenToLightLoc, tempLightProjection * screenToLightTransformation);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+
+        GLint windowTexture;
+        glGetFramebufferAttachmentParameteriv(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, &windowTexture);
+        glBindImageTexture(1, windowTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+        glDispatchCompute((m_width - 1) / 16 + 1, (m_height - 1) / 16 + 1, 1);
+
+        renderVisibleSamples->release();
+
         renderCapture(lightViewMatrix, tempLightProjection);
     }
     else
@@ -890,7 +929,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_DEPTH_CLAMP);
         glEnable(GL_MULTISAMPLE);
-        glEnable(GL_CULL_FACE);
+        // glEnable(GL_CULL_FACE);
 
         shadowMapProgram->bind();
 
@@ -909,7 +948,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_DEPTH_CLAMP);
         glDisable(GL_MULTISAMPLE);
-        glDisable(GL_CULL_FACE);
+        // glDisable(GL_CULL_FACE);
 
         shadowMapProgram->release();
 
@@ -985,7 +1024,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         // NOTE: do not clear, as we already wrote to depth buffer!
 
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        // glEnable(GL_CULL_FACE);
         // Draw closest pixel
         glDepthFunc(GL_LEQUAL);
 
@@ -1041,14 +1080,14 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         // Unbind shadow map texture
         glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-        glDisable(GL_CULL_FACE);
+        // glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
 
         renderProgram->release();
 
 
         // View Capture if enabled
-        if (m_captured == CAPTURE_ACTIVE)
+        if (m_captureEnabled)
         {
             renderCapture(cameraView, cameraProjection);
         }
@@ -1231,13 +1270,12 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
         glEnd();
     }
-    */
-
 
     // Unbind shadow map texture
     glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
     renderProgram->release();
+    */
 
     /*
     GLint windowTexture;
@@ -1511,7 +1549,7 @@ void Renderer::renderCapture(const QMatrix4x4 &cameraView, const QMatrix4x4 &cam
     renderCaptureProgram->setUniformValue(m_renderCaptureCameraProjectionLoc, cameraProjection);
     renderCaptureProgram->setUniformValue(m_renderCaptureCameraViewLoc, cameraView);
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_capturedFrustumToWorldBuffer);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_capturedFrustumToWorldBuffer[m_captureSlot]);
 
     // faces
     for (int i = 0; i < 4; i++)
@@ -1525,6 +1563,8 @@ void Renderer::renderCapture(const QMatrix4x4 &cameraView, const QMatrix4x4 &cam
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 
+    glEnable(GL_DEPTH_CLAMP);
+
     // wireframes (also camera frustum)
     for (int i = 0; i < 5; i++)
     {
@@ -1533,6 +1573,8 @@ void Renderer::renderCapture(const QMatrix4x4 &cameraView, const QMatrix4x4 &cam
         renderCaptureProgram->setUniformValue(m_renderCaptureColorLoc, QVector4D(cascadeColors[i], 1));
         drawWireframe();
     }
+
+    glDisable(GL_DEPTH_CLAMP);
 
     renderCaptureProgram->release();
 }
@@ -1562,6 +1604,16 @@ void Renderer::setCascadedShadowMapsLambda(float lambda)
 float Renderer::getCascadedShadowMapsLambda()
 {
     return m_cascadedShadowMapsLambda;
+}
+
+void Renderer::setLightSheering(bool enabled)
+{
+    m_lightSheering = enabled;
+}
+
+bool Renderer::getLightSheering()
+{
+    return m_lightSheering;
 }
 
 void Renderer::setCascadeStrategy(CascadeStrategy strategy)
@@ -1595,14 +1647,29 @@ bool Renderer::getFilterShadowMap()
     return m_filterShadowMap;
 }
 
+void Renderer::awesomeCapture()
+{
+    m_captureRequested = true;
+}
+
+void Renderer::setCaptureSlot(int slot)
+{
+    m_captureSlot = slot;
+}
+
+int Renderer::getCaptureSlot()
+{
+    return m_captureSlot;
+}
+
 void Renderer::setCapture(bool enabled)
 {
-    m_captured = enabled ? CAPTURE_REQUESTED : CAPTURE_NONE;
+    m_captureEnabled = enabled;
 }
 
 bool Renderer::getCapture()
 {
-    return m_captured != CAPTURE_NONE;
+    return m_captureEnabled;
 }
 
 void Renderer::setRenderLightView(bool enabled)

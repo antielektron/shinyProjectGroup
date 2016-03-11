@@ -10,7 +10,7 @@
 class PrimitiveGame : public IGame
 {
 public:
-	PrimitiveGame();
+	PrimitiveGame(const QString &scenefile);
 
     virtual void initialize() override;
     virtual void resize(int width, int height) override;
@@ -19,7 +19,9 @@ public:
     virtual Scene *getScene() override;
 
 private:
-    std::unique_ptr<Scene> m_scene;
+
+	QString m_scenefile;
+	std::unique_ptr<Scene> m_scene;
 
 	float rotY = 0;
 	float rotX = 0;
