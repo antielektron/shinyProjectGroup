@@ -184,6 +184,34 @@ Die AABBs für die
 % Andere Algorithmen benutzen Ecken von jedem Frustum um Shadow Map Frustum zu definieren
 TODO
 
+\begin{figure}
+	\centering
+	\subfloat[PSSM] {
+		\includegraphics[width=5.5cm]{sdsm_assets/pssm_scene.png}
+		\label{ref:pssm_scene}
+	}
+	\subfloat[SDSM] {
+		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_scene.png}
+		\label{ref:sdsm_scene}
+	}
+	\caption{Eine Szene die weit entfernte und sehr nahe Schatten enthält.}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\subfloat[PSSM] {
+		\includegraphics[width=5.5cm]{sdsm_assets/pssm_light_view.png}
+		\label{ref:pssm_light}
+	}
+	\subfloat[SDSM] {
+		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_light_view.png}
+		\label{ref:sdsm_light}
+	}
+
+	\caption{Visulaisierung der von den Shadow Maps abgedeckten Bereichen mit PSSM und SDSM aus der Sicht des Lichtes.}
+\end{figure}
+
+
 
 % SDSM
 \subsection{Implementierung}

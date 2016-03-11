@@ -38,6 +38,8 @@ RendererDebugWidget::RendererDebugWidget(Renderer *renderer, QWidget *parent) :
             m_shadowMapMsaa[i]->setChecked(true);
         }
     }
+
+    m_lineVO->setChecked(true);
 }
 
 RendererDebugWidget::~RendererDebugWidget()
@@ -118,6 +120,9 @@ QWidget *RendererDebugWidget::generateVOOptions()
     m_momentVO = new QRadioButton("moment area sampling", voOptions);
     layout->addWidget(m_momentVO);
 
+    m_noVO = new QRadioButton("plain copy", voOptions);
+    layout->addWidget(m_noVO);
+
     return voOptions;
 }
 
@@ -157,6 +162,7 @@ void RendererDebugWidget::connectStuff()
     connect(m_lineVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_varianceVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_momentVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
+    connect(m_noVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
 
     connect(m_filterShadowMap, SIGNAL(stateChanged(int)), this, SLOT(onFilterShadowMapChanged()));
     for (int i = 0; i < 5; i++)
@@ -230,6 +236,10 @@ void RendererDebugWidget::onVolumetricObscuranceChanged()
     else if(m_momentVO->isChecked())
     {
         m_renderer->loadConfiguration("shaders/configurations/MomentVO.xml");
+    }
+    else if (m_noVO->isChecked())
+    {
+        m_renderer->loadConfiguration("shaders/configurations/plainConfig.xml");
     }
 }
 
