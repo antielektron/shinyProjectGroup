@@ -83,16 +83,14 @@ Wir wollen eine Schattentechnik verwenden, die möglichst hohe Qualität liefert
 
 \section{Related Work}
 
-Es gibt bereits Verfahren \cite{csm} \cite{pssm} um Perspektivisches Aliasing zu minimieren.
-Allerdings liefern diese nicht immer gute Ergebnisse.
-
-Andere Verfahren wie Adaptive Shadow Maps \cite{asm}
-
-
 % Related Work
 \subsection{Sample Distribution Shadow Maps}
 
-Sample Distribution Shadow Maps \cite{sdsm}
+Parallel Split Shadow Maps (PSSMs) \cite{pssm} ist ein existierendes Verfahren um Perspektivisches Aliasing zu minimieren.
+Allerdings liefert es nicht immer gute Ergebnisse und hängt von Parametern ab, deren optimaler Wert unbekannt ist.
+
+Andere Verfahren wie Adaptive Shadow Maps \cite{asm} und Resolution-Matched Shadow Maps \cite{rmsm} verwalten eine komplexe Baumstruktur von Shadow Maps um die Shadow Map Auflösung adaptiv in der Szene zu verteilen.
+Sie erreichen eine hohe Qualität auf Kosten von Performanz, wodurch sie für Echtzeitanwendungen eher ungeeignet sind.
 
 
 % Related Work
