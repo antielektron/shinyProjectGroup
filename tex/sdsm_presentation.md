@@ -11,7 +11,7 @@
 - Verschiebe Near- und Far-Plane dicht an die Geometrie
 // gerade das kennen der tatsächlichen Near-Plane ist bei logarithmischer Partitionierung wichtig
 - Min/Max Reduktion auf Depth-Buffer
-
+// Diagramm
 
 ## Depth Partitioning
 - Logarithmisch
