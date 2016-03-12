@@ -224,11 +224,11 @@ void main()
 	
 	// aaaand i have no idea what i'm doing now:
 	float sum =  a * (pow(z1,2) - pow(z0,2)) / 2.0 + b * (z1 - z0);	
-	sum = sum * 0.7 + 0.6;//sum = clamp(sum * 10, 0,1) * 0.7 + 0.3;
+	//sum =sum * 0.5 + 0.5;
 	
 	if (depth != 1)
 	{
-		defaultColor =  sum * defaultColor;
+		defaultColor =  sum* vec3(1,1,1);// * defaultColor;
 	}
 	else
 	{
