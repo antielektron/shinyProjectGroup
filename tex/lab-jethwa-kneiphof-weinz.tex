@@ -178,8 +178,8 @@ Alle drei Techniken werden in einer kleinen Engine implementiert und in einem De
 
 
 \section{Einleitung}
-Rendern von Schatten ist ein wichtiger Aspekt der interaktiven 3D Grafik.
-Die Struktur einer Szene wirkt erst durch Schatten realisitisch und hilft dem Betrachter dabei, Relationen zwischen Objekten besser zu verstehen.
+Das Rendern von Schatten ist ein wichtiger Aspekt der interaktiven 3D Grafik.
+Die Struktur einer Szene wirkt durch Schatten realisitischer und hilft dem Betrachter dabei, Relationen zwischen Objekten besser zu verstehen.
 Allerdings ist das Berechnen der verschiedenen Schattentechniken aufwendig und oft anfällig für Fehlerartefakte.
 Deshalb untersuchen wir in diesem Paper 3 Techniken, welche verschiedene Lösungsansätze und Vorteile bieten.
 Zusätzlich implementieren wir alles in einer eigenen 3D Engine und generieren daraus ein kurzes Spiel um die Techniken zu demonstrieren.
@@ -192,33 +192,38 @@ Ein häufiges Problem bei der Shadow Map Generierung ist Aliasing durch Over und
 Sample Distribution Shadow Maps (SDSMs) \cite{sdsm} sind ein voll automatisches Verfahren mit konstantem Speicherbedarf und einer vorhersagbaren Worst-Case Laufzeit, die nicht von der Szenenkomplexität abhängt.
 Das Verfahren ist dadurch sehr gut für den Einsatz in Echtzeit Grafikanwendungen geeignet.
 SDSM ist ein Screen Space Verfahren, welches adaptiv in jedem Frame Z-Partitionen \cite{zpart} (Hier auch Kaskaden \cite{csm}) erstellt.
-So wird mehr Shadow Map Auflösung für Bereiche in der nähe der Kamera zur Verfügung gestellt und weniger für weit entfernte Bereiche, wodurch Perspektivischem Aliasing entgegen gewirkt wird.
-Des Weiteren werden die Shadow Map Frusta von SDSMs eng um die tatsächlich sichtbare Geometrie gelegt, was die zur verfügung Stehende Auflösung in den Shadow Maps zusätzlich erhöht.
+So wird mehr Shadow Map Auflösung für Bereiche in der Nähe der Kamera zur Verfügung gestellt und weniger für weit entfernte Bereiche, wodurch perspektivischem Aliasing entgegen gewirkt wird.
+Des Weiteren werden die Shadow Map Frusta von SDSMs eng um die tatsächlich sichtbare Geometrie gelegt, was die zur Verfügung stehende Auflösung in den Shadow Maps zusätzlich erhöht.
 
 
 % Introduction
 \subsection{Volumetric Obscurance}
 Obscurance (= Umgebungsverdeckung) ist eine Technik zur Berechnung von Schatten basierend auf der Annahme,
-dass sich gegenseitig verdeckende Geometrie zu einem verringertem Lichteinfall führt. In diesem Paper werden
-wir verschiedene Screenspace-Algorithen für Volumetric Obscurance erläutern und kurz unsere Implementationen vorstellen.
+dass sich gegenseitig verdeckende Geometrie zu einem verringerten Lichteinfall führt.
+In diesem Paper werden wir verschiedene Screenspace-Algorithen für Volumetric Obscurance erläutern und kurz unsere Implementationen vorstellen.
 
 
 % Introduction
 \subsection{Moment Shadow Mapping}
-Wir wollen eine Schattentechnik verwenden, die möglichst hohe Qualität liefert und dabei performant bleibt. Wünschenswert wäre ebenfalls filterbare Shadow Maps.
-Moment Shadow Mapping(MSM) liefert uns dieses Verfahren und wird im weiteren Verlauf erläutert und implementiert. 
-Zusätzlich betrachen wir Moment Based Volumetric Obscurance (MBVO) um einen Term für die Volumetric Obscurance zu erhalten, welcher auf der MSM Technik basiert. Ziel ist es, ein ästhetisches Bild zu erhalten, auch wenn dieses physikalisch nicht unbedingt richtig ist.
+Wir wollen filterbare Schatten verwenden, die eine möglichst hohe Qualität liefert und dabei performant bleiben.
+Moment Shadow Mapping (MSM) liefert uns dieses Verfahren und wird im weiteren Verlauf erläutert und implementiert.
+Zusätzlich betrachen wir Moment Based Volumetric Obscurance (MBVO) um einen Term für die Volumetric Obscurance zu erhalten, welcher auf der MSM Technik basiert.
+Ziel ist es, ästhetisch ansprechende Schatten zu erhalten, auch wenn diese physikalisch nicht unbedingt korrekt sind.
 
 \section{Related Work}
 
 % Related Work
 \subsection{Sample Distribution Shadow Maps}
 
-Parallel Split Shadow Maps (PSSMs) \cite{pssm} ist ein existierendes Verfahren um Perspektivisches Aliasing zu minimieren.
-Allerdings liefert es nicht immer gute Ergebnisse und hängt von Parametern ab, deren optimaler Wert unbekannt ist.
+Parallel Split Shadow Maps (PSSMs) \cite{pssm} ist ein existierendes Verfahren um perspektivisches Aliasing zu minimieren.
+Allerdings liefert es nicht immer gute Ergebnisse und hängt von Parametern ab, deren optimaler Wert unbekannt ist und oft von der betrachteten Szene abhängt.
 
 Andere Verfahren wie Adaptive Shadow Maps \cite{asm} und Resolution-Matched Shadow Maps \cite{rmsm} verwalten eine komplexe Baumstruktur von Shadow Maps um die Shadow Map Auflösung adaptiv in der Szene zu verteilen.
 Sie erreichen eine hohe Qualität auf Kosten von Performanz, wodurch sie für Echtzeitanwendungen eher ungeeignet sind.
+
+The Irregular Z-Buffer \cite{irregular} ist ein Verfahren, das die Shadow Map an willkürlichen Punkten abtastet.
+Dadurch werden Aliasing Effekte gänzlich vermieden.
+Allerdings ist das Verfahren nicht oder nur schlecht auf heutigen GPU's implementierbar und läuft nur sehr langsam auf CPU's, wodurch es für das Echtzeit Rendering nicht geeignet ist.
 
 
 % Related Work
@@ -246,10 +251,12 @@ Erläutern werden
 \subsection{Moment Shadow Mapping}
 
 Im Gegensatz zu normalen Texturen, können Shadow Maps nicht einfach gefiltert werden um Aliasing zu verhindern. 
-Percentage Closer Filtering ist ein Ansatz um dies zu ermöglichen und Aliasing zu vermindern. Diese Technik versucht den Prozentwert eines Objekts zu erkennen, welcher näher an der Lichtquelle liegt und nicht im Schatten. 
-Mithilfe von Chebichev's Ungleichung, lässt sich so eine exaktere approximierung für PCF erreichen \cite{reeves1987rendering}
+Percentage Closer Filtering (PCF) ist ein Ansatz um dies zu ermöglichen und Aliasing zu vermindern. Diese Technik versucht den Anteil eines Texels zu erkennen, welcher von der Lichtquelle beleuchtet wird und nicht im Schatten liegt durch mehrfaches samplen der Shadow Map. 
+Mit Hilfe von Chebichev's Ungleichung ist eine gute Approximation für PCF erreichbar. \cite{reeves1987rendering}
 
-Variance Shadow Maps benutzt 2 Momente, also zwei Tiefenwerte. Ein Filtern ist möglich und PCF wird weiter verbessert bzw. approximiert. VSM ist hinsichtlich der MSM ein spezialfall für $m = 2$, also 2 statt 4 Momenten. Normalerweise betrachten wir die Tiefe um eine Shadow Map zu rendern. VSM nutzt die Tiefe und die quadrierte Tiefe und speichert diese in einem 2-Kanal Buffer. Der Vorteil liegt daran, dass nun Pre-Processing Effekte genutzt werden um die so erstellte Variance Shadow Map zu filtern.\cite{donnelly2006variance}
+Variance Shadow Maps (VSMs) benutzten 2 Momente, also den Tiefenwerte und sein Quadrat.
+VSM können gefiltert werden um PCF zu approximieren.
+VSM ist hinsichtlich der MSM ein spezialfall für $m = 2$, also 2 statt 4 Momenten. Normalerweise betrachten wir die Tiefe um eine Shadow Map zu rendern. VSM nutzt die Tiefe und die quadrierte Tiefe und speichert diese in einer 2-Kanal Textur. Der Vorteil liegt darin, dass nun Pre-Processing Effekte genutzt werden um die so erstellte Variance Shadow Map zu filtern. \cite{donnelly2006variance}
 
 Desweiteren betrachen wir Moment Based Volumetric Obscurance. Also eine Volumetric Obscurance die auf die Moment Shadow Mapping Technologie aufbaut. Die eigentliche Volumetric Obscurance wird in den entsprechen Abschnitten weiter erläutert.
 
@@ -262,14 +269,15 @@ Sample Distribution Shadow Maps (SDSMs) ist ein Verfahren zur adaptiven Optimier
 \subsection{Algorithmus}
 
 % Cascaded Shadow Maps aka Z-Partitioning
-SDSMs basieren auf Z-Partitoning, wobei das Kamera Frustum entlang der Blickrichtung in mehrere Kaskaden partitioniert wird. Für jedes Kaskade wird eine eigene Shadow Map generiert.
+SDSMs basieren auf Z-Partitoning, wobei das Kamera Frustum entlang der Blickrichtung in mehrere Kaskaden partitioniert wird.
+Für jedes Kaskade wird eine eigene Shadow Map generiert.
 Auf diese Weise kann mehr Shadow Map Auflösung für nahe Objekte verwendet werden, und weniger Auflösung für weit entfernte Objekte.
 
 
 % Betrachte Punkte in Light-Space TODO
-Der Algorithmus betrachtet die Verteilung aller sichtbaren Punkte der Szene aus der Sicht des Lichtes (im Light Space).
-Hierzu wird für jedes Sample aus dem Camera Depth Buffer die Position in der Welt rekonstruiert und in den Light Space transformiert.
-Die so erhaltenen Punkte sind genau die, für die beim Rendern der Szene aus der Sicht der Kamera auf die Shadow Map zugegriffen wird.
+Der Algorithmus betrachtet die Verteilung aller sichtbaren Punkte der Szene aus der Sicht des Lichtes (im Light-Space).
+Hierzu wird für jedes Sample aus dem Camera-Space Depth Buffer die Position in der Welt rekonstruiert und in den Light-Space transformiert.
+Die so erhaltenen Punkte sind genau die Punkte, für die beim Rendern der Szene aus der Sicht der Kamera auf die Shadow Map zugegriffen wird.
 
 
 % Partitionierung
@@ -278,30 +286,9 @@ Anstatt auf eine statische Partitionierung des Kamera Frustums \cite{pssm} zu se
 
 % - Min/Max Reduktion
 % - Logarithmische Partitionierung
-Zunächst wird die tatsächliche Near und Far Distanz der sichtbaren Geometrie im Kamera Frustums ermittelt.
-Dies geschieht mittels Min/Max Reduktion der Tiefenwerte im Kamera Depth Buffer.
+Zunächst wird die tatsächliche Near und Far Distanz der sichtbaren Geometrie im Kamera Frustum ermittelt.
+Dies geschieht mittels Min/Max Reduktion der Tiefenwerte im Camera-Space Depth Buffer.
 Anschließend wird das Kamera Frustum zwischen tatsächlicher Near und Far Distanz logarithmisch partitioniert um das perspektivische Aliasing zu minimieren.
-
-% Abgrenzung PSSM Logarithmic/Linear
-PSSMs kennen die tatsächliche Near und Far Distanz nicht, und müssen mit der Near und Far Distanz der Projektionsmatrix arbeiten.
-Eine logarithmische Partitionierung würde zu viel Shadow Map Auflösung in den sehr nahen Bereich verschieben, der oft leer ist.
-PSSMs konvexkombinieren die Partitionsgrenzen der linearen und logarithmischen Partitionierung um mehr Auflösung von der Near Plane weg zu bewegen.
-Optimale Koeffizienten müssen meist von Hand ermittelt werden.
-
-% (K-Means and friends)
-Weitere Möglichkeiten das Kamera Frustum intelligent zu partitionieren, sind ein adaptiv logarithmisches und ein K-Means Verfahren.
-Das adaptiv logarithmische Verfahren vermeidet Lücken im Histogramm des Kamera Depth Buffers, indem es die Partitionsgrenzen an das Ende von diesen schiebt.
-Das K-Means Verfahren sucht zunächst Maxima im Histogramm des Kamera Depth Buffers und legt dann die Partition entsprechend um die gefundenen Maxima.
-Für beide Verfahren muss zunächst das Histogramm des Camera Depth Buffers berechnet werden.
-
-
-% Tight Partition Frusta
-Andere Algorithmen wie PSSM \cite{pssm} projizieren die Ecken des Kamera Frustums bzw. der Kaskaden in den Light Space um das Frustum für die Shadow Map zu erhalten.
-Um das Frustum möglichst klein zu wählen kann dort eine Oriented Bounding Box anstelle einer Axis Aligned Bounding Box (AABB) berechnet werden.
-Die Konvexe Hülle der in den Light Space projizierten Punkte kann ein sehr komplexes Polygon werden, weshalb es sich für SDSMs nicht lohnt diese zu berechnen.
-
-SDSMs berechnen für jede Kaskade eine AABB, die dann das Frustum für die Shadow Map bildet.
-Damit die AABBs die sichtbare Geometrie sinnvoll umschließen, wird der Light Space so rotiert, dass die Z-Achse des Camera Spaces sich an der X-Achse des Light Spaces ausgerichtet
 
 
 % SDSM Cascades colorized
@@ -313,22 +300,44 @@ Damit die AABBs die sichtbare Geometrie sinnvoll umschließen, wird der Light Sp
 	\subfloat{
 		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_colorized_near.png}
 	}
-
+	
 	\subfloat{
 		\includegraphics[width=5.5cm]{sdsm_assets/pssm_colorized_far.png}
 	}
 	\subfloat{
 		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_colorized_far.png}
 	}
-
+	
 	\caption{
-Visualisierung der Kaskaden in den Farben rot (nah), grün, blau, gelb (fern).
-Links sind Partitionierungen durch Parallel Split Shadow Maps zu sehen.
-Rechts sind Partitionierungen durch Sample Distribution Shadow Maps zu sehen.
-Die Partitionierung der PSSMs ist für das obere linke Bild optimiert.
-Während SDSMs die Kaskaden unten rechts adaptiv anpassen können, versagen die PSSMs in dem unteren linken Bild.
-}
+		Visualisierung der Kaskaden in den Farben rot (nah), grün, blau, gelb (fern).
+		Links sind Partitionierungen durch Parallel Split Shadow Maps zu sehen.
+		Rechts sind Partitionierungen durch Sample Distribution Shadow Maps zu sehen.
+		Die Partitionierung der PSSMs ist für das obere linke Bild optimiert.
+		Während SDSMs die Kaskaden unten rechts adaptiv anpassen können, versagen die PSSMs in dem unteren linken Bild und.
+	}
 \end{figure}
+
+
+% Abgrenzung PSSM Logarithmic/Linear
+PSSMs kennen die tatsächliche Near und Far Distanz nicht, und müssen mit der Near und Far Distanz der Projektionsmatrix arbeiten.
+Eine logarithmische Partitionierung würde zu viel Shadow Map Auflösung in den sehr nahen Bereich verschieben, der oft leer ist.
+PSSMs konvexkombinieren die Partitionsgrenzen der linearen und logarithmischen Partitionierung um mehr Auflösung von der Near Plane weg zu bewegen.
+Optimale Koeffizienten müssen meist von Hand ermittelt werden und sind nicht universell gültig.
+
+% (K-Means and friends)
+Weitere Möglichkeiten das Kamera Frustum intelligent zu partitionieren, sind ein adaptiv logarithmisches und ein K-Means Verfahren.
+Das adaptiv logarithmische Verfahren vermeidet Lücken im Histogramm des Kamera Depth Buffers, indem es die Partitionsgrenzen an das Ende von diesen schiebt.
+Das K-Means Verfahren sucht zunächst Maxima im Histogramm des Kamera Depth Buffers und legt dann die Partition entsprechend um die gefundenen Maxima.
+Für beide Verfahren muss zunächst das Histogramm des Camera Depth Buffers berechnet werden.
+
+
+% Tight Partition Frusta
+Andere Algorithmen wie PSSM \cite{pssm} projizieren die Ecken des Kamera Frustums bzw. der Kaskaden in den Light=Space um das Frustum für die Shadow Map zu erhalten.
+Um das Frustum möglichst klein zu wählen, kann dort eine Oriented Bounding Box anstelle einer Axis Aligned Bounding Box (AABB) berechnet werden.
+Die Konvexe Hülle der in den Light-Space projizierten Punkte kann ein sehr komplexes Polygon werden, weshalb es sich für SDSMs nicht lohnt diese zu berechnen.
+
+SDSMs berechnen für jede Kaskade eine AABB, die dann das Frustum für die Shadow Map bildet.
+Damit die AABBs die sichtbare Geometrie sinnvoll umschließen, wird der Light-Space so rotiert, dass die Z-Achse des Camera-Spaces sich an der X-Achse des Light-Spaces ausrichtet.
 
 
 % SDSM Camera View
@@ -378,7 +387,7 @@ Während SDSMs die Kaskaden unten rechts adaptiv anpassen können, versagen die 
 		\label{ref:sdsm_light}
 	}
 
-	\caption{Visulaisierung der von den Shadow Maps abgedeckten Bereichen mit PSSM und SDSM aus der Sicht des Lichtes.}
+	\caption{Visulaisierung der von den Shadow Maps abgedeckten Bereiche mit PSSM und SDSM im Light-Space.}
 \end{figure}
 
 
@@ -388,14 +397,14 @@ Während SDSMs die Kaskaden unten rechts adaptiv anpassen können, versagen die 
 
 % Rendern der Shadow Map
 Die Shadow Maps für die Kaskaden werden mittels Texture Arrays realisiert, wobei jede Kaskade einen eigenen Layer in dem Array erhält.
-Beim Rendern der Shadow Map transformiert der Vertex Shader die Geometrie zunächst nur in den World Space und nicht direkt in das Frustum der Shadow Map.
+Beim Rendern der Shadow Map transformiert der Vertex Shader die Geometrie zunächst nur in den World-Space und nicht direkt in das Frustum der Shadow Map.
 Der Geometry Shader klont dann die Geometrie und transformiert sie für jede Kaskade mit der dazugehörigen Projektionsmatrix in das Shadow Map Frustum um sie in den entsprechenden Layer der Shadow Map zu rendern.
 Anstatt die Near Plane des Shadow Map Frustums zu verschieben, um Geometrie die aus der Sicht des Lichtes vor dem Camera Frustum liegt zu berücksichtigen, wird an der Near Plane des Shadow Map Frustums der Tiefenwert geclampt.
 
 % Temporäre Licht Projektion
-Um die Bounding Boxen der Geometrie in den einzelnen Kaskaden zu berechnen, müssen die Koordinaten im Light Space auf den Bereich $[0, 1]$ gemappt werden.
-Hierzu werden die Eckpunkte im Screen Space in die Welt, und anschließend in den Light Space transformiert, wo dann deren Axis Aligned Bounding Box auf $[0, 1]^3$ projiziert wird.
-So ist es garantiert, dass die Koordinaten sämmtlicher sichtbarer Geometrie im Light Space ohne clamping in einer Textur gespeichert werden können.
+Um die Bounding Boxen der Geometrie in den einzelnen Kaskaden zu berechnen, müssen die Koordinaten im Light-Space auf den Bereich $[0, 1]$ gemappt werden.
+Hierzu werden die Eckpunkte des Screen-Spaces in die Welt, und anschließend in den Light-Space transformiert, wo dann deren Axis Aligned Bounding Box auf $[0, 1]^3$ projiziert wird.
+So ist es garantiert, dass die Koordinaten sämtlicher sichtbarer Geometrie im Light-Space ohne clamping in einer Textur gespeichert werden können.
 
 % Reduktion 1 & 2
 Die beiden Reduktionen werden jeweils in einem Compute Shader ausgeführt.
@@ -409,7 +418,7 @@ Damit die Arbeit so aufgeteilt werden kann, müssen alle Reduktionsprobleme vom 
 \begin{equation}
   far = \max\{ depth \} = 1 - \min \{ 1 - depth \}
 \end{equation}
-Maximierungsprobleme werden während der Reduktionen Minimierungsprobleme betrachtet.
+Maximierungsprobleme werden während der Reduktionen als Minimierungsprobleme betrachtet.
 Durch die Addition von $1$ verlässt der zu reduzierende Wert den Wertebereich $[0, 1]$ nicht.
 Dies gilt analog für die Max-Corners der Bounding Boxen.
 
@@ -429,8 +438,8 @@ TODO irgendwas vergessen?
 \subsubsection{Erster Versuch}
 Im ersten Ansatz haben wir die Reduktionen für die tatsächliche Near und Far Distanz sowie die Bounding Boxen der Geometrie in den Kaskaden auf der GPU berechnet.
 Das Ergebnis haben wir auf die CPU zurück gelesen um aus den Near und Far Distanzen die Partition zu berechnen, bzw. aus den Bounding Boxen das Frustum für die entsprechende Shadow Map.
-Um zu vermeiden, dass der CPU auf die GPU warten muss, haben wir die Ergebnisse aus dem vorherigen Frame, bzw. von vor zwei Frames genutzt, da deren Berechnung dann schon abgeschlossen sein sollte.
-Um Bewegungen der Kamera zu kompensieren, haben wir die Ergebnisse aus dem Camera Space des vergangenen Frames in die Welt transformiert und von dort in den aktuelle Camera Space.
+Um zu vermeiden, dass der CPU auf die GPU warten muss, haben wir die Ergebnisse aus dem vorherigen Frame, bzw. von vor zwei Frames genutzt, da deren Berechnung beim Readback bereits abgeschlossen sein sollte.
+Um Bewegungen der Kamera zu kompensieren, haben wir die Ergebnisse aus dem Camera-Space des vergangenen Frames in die Welt transformiert und von dort in den aktuellen Camera-Space.
 Was wir nicht kompensieren konnten, war das erscheinen neuer Geometrie, die durch die Bewegung der Kamera sichtbar wurde.
 Das hat z.B. zu Bereichen zwischen den Kaskaden geführt, die nicht von einer Shadow Map abgedeckt wurden.
 Selbst wenn wir zur Sicherheit einen Rand in die Shadow Map einbauen, was nicht im Sinne von SDSM ist, können schnelle Bewegungen nicht kompensiert werden.
@@ -440,14 +449,14 @@ Selbst wenn wir zur Sicherheit einen Rand in die Shadow Map einbauen, was nicht 
 Dieses Problem haben wir gelöst, indem wir am Anfang jedes Frames einen Depth Only Pass gerendert haben.
 Anschließend haben wir darauf die Near und Far Distanz wie zu vor berechnet.
 Anstatt diese auf die CPU zurück zu lesen, haben wir die Partition in einem Compute Shader auf der GPU berechnet.
-Nachdem die Bounding Boxen der Kaskaden berechnet waren, haben wir daraus ebenfalls auf der GPU die Projektionsmatrizen für die Shadow Maps berechnet.
+Nachdem die Bounding Boxen der Kaskaden berechnet sind, werden daraus ebenfalls auf der GPU die Projektionsmatrizen für die Shadow Maps berechnet.
 
 
 % SDSM
 \subsubsection{Sheared Sample Distribution Shadow Maps}
-Wenn das Licht schräg (geneigt) von der Seite einfällt, sind die Shadow Map Frusta entlang ihrer Z-Achse oft sehr ausgedehnt.
+Wenn das Licht geneigt von der Seite einfällt, sind die Shadow Map Frusta entlang ihrer Z-Achse oft sehr ausgedehnt.
 % Auf der Licht zugewandten Seite des Frustums liegen abgetastet Punkte einer bestimmten Höhe oft näher am Licht, als die Punkte auf der Licht abgewandten Seite.
-Dadurch wird die Genauigkeit bei der Quantifizierung der Tiefe in der Shadow Map verschlechtert.
+Dadurch wird die Genauigkeit bei der Quantifizierung der Tiefe in der Shadow Map beeinträchtigt.
 
 \begin{figure}
 	\centering
@@ -517,15 +526,15 @@ Dadurch wird die Genauigkeit bei der Quantifizierung der Tiefe in der Shadow Map
 		\label{ref:sdsm_light}
 	}
 	
-	\caption{Visualisierung der Shadow Map Frusta. Die Roten Pfeile visualisieren exemplarisch die Länge der Shadow Map Frusta entlang der Light Space Z-Achse}
+	\caption{Visualisierung der Shadow Map Frusta. Die roten Pfeile visualisieren exemplarisch die Länge der Shadow Map Frusta entlang der Light-Space Z-Achse}
 \end{figure}
 
-Unsere Lösungsidee für dieses Problem ist eine einfache Scherung des Light Spaces.
-Die X-Achse des Camera Spaces wird im Light Space auf die Y-Achse abgebildet.
-So haben Koordinaten, die im Camera Space die gleiche Höhe (Y-Achse) haben, im Light Space die gleiche Tiefe (Z-Achse).
+Unsere Lösungsidee für dieses Problem ist eine einfache Scherung des Light-Spaces.
+Die X-Achse des Camera-Spaces wird im Light-Space auf die Y-Achse abgebildet.
+So haben Koordinaten, die im Camera-Space die gleiche Höhe (Y-Achse) haben, im Light-Space die gleiche Tiefe (Z-Achse).
 
-Auch wenn wir es so geschafft haben in vielen Situationen die Shadow Map Frusta weiter zu verkleinern, ist durch die Scherung die Filterbarkeit der Momente \cite{msm} nicht mehr gegeben.
-Es ist relativ einfach Situationen zu provozieren, in denen die Scherung keine sinnvolle Transformation erzeugt, da dort durch einen Wert nahe $0$ geteilt wird.
+Auch wenn wir es so schaffen in vielen Situationen die Shadow Map Frusta weiter zu verkleinern, ist durch die Scherung die Filterbarkeit der Momente \cite{msm} nicht mehr direkt gegeben.
+Es ist noch relativ einfach Situationen zu provozieren, in denen die Scherung keine sinnvolle Transformation erzeugt, da dort durch einen Wert nahe $0$ geteilt wird.
 
 \begin{equation}
 	S^{-1} = \left(\begin{array}{cccc}
@@ -881,7 +890,7 @@ Die MBVO färbt Konturen der Geometrie sehr dunkel ein und hat Ähnlichkeiten mi
 
 % Fazit
 \subsection{Sample Distribution Shadow Maps}
-SDSMs sind sehr robust und benötigen keine möglicherweise von Hand zu optimierenden Parameter um gute Ergebnisse zu liefern.
+SDSMs sind sehr robust und benötigen keine möglicherweise von Hand zu optimierenden Parameter um gute Ergebnisse zu erzielen.
 PSSMs können oft ähnlich gute Ergebnisse liefern wenn sie optimal eingestellt sind.
 Allerdings gilt dies meist nur für eine bestimmte Sicht auf die Szene.
 Befindet sich mehr oder weniger Geometrie in unmittelbarer nähe zur Kamera, so liefert PSSM keine guten Ergebnisse mehr.
@@ -891,10 +900,11 @@ Dies ist möglich, da SDSMs die tatsächliche Near Plane kennen, wo PSSMs nur ei
 % Verbesserung der MSM durch SDSM
 % TODO erstmal nur skizziert!
 SDSMs optimieren nicht nur die Ausnutzung der Shadow Map Auflösung, sondern auch die Ausnutzung der zur Verfügung stehenden Genauigkeit in der Shadow Map, da die Shadow Map Frusta in allen drei Dimensionen eng um die sichtbare Geometrie gelegt wird.
-Dies kommt dem Moment Shadow Mapping zu gute, da so feinere Abstufungen in den Momenten erlaubt werden können.
+Dies kommt dem Moment Shadow Mapping zu gute, da so feinere Abstufungen in den Momenten erlaubt werden.
 
 Sheared Sample Distribution Shadow Maps sind eine vielversprechende Methode um die Quantifizierung der Shadow Map in flachen Szenen besser auszunutzen.
-Es handelt sich jedoch bisher nur um eine Idee. Wie genau die Scherung bestimmt werden kann ohne in die Nähe von Singulatitäten zu gelangen muss noch evaluiert werden.
+Es handelt sich jedoch bisher nur um eine Idee.
+Wie genau die Scherung bestimmt werden kann ohne in die Nähe von Singulatitäten zu gelangen muss noch evaluiert werden.
 
 
 
