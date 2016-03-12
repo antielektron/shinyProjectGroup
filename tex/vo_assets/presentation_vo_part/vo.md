@@ -21,7 +21,7 @@
     * TODO: suche schöne Bilder
 
 ###Ansatz Volumetric Obscurance
-* TODO: vergleich Schema AO <-> VO
+* [Bild: AOvsSSAOvsVO]
 * zwei Techniken:
     * Line Sampling
     * Area Sampling
