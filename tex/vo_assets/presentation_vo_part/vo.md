@@ -58,7 +58,7 @@
 
 ###Area Sampling(3):
 * Mathematisch ausgedrückt:
-    * µ = R, σ = G - σ²
+    * µ = R, σ = G - µ²
     * [Bild: areaTerm01]
     * wobei a und b definiert sind als: [Bild: areaTerm02]
 
