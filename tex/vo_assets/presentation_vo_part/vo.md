@@ -31,9 +31,7 @@
 * betrachte für jeden vorgerenderten Texel den korrespondierenden Punkt in der Welt
 * sample Tiefenbuffer in der auf den Screenspace projezierten Umgebung
 * berechne verdecktes Volumen
-
-###Schematic Line Sampling
-[Bild: TODO]
+[Bild: AnnotatedSampleDisk]
 
 ###Algorithmus Line Sampling
 [Bild: pseudoLineSampling]
