@@ -449,34 +449,61 @@ Wenn das Licht schräg (geneigt) von der Seite einfällt, sind die Shadow Map Fr
 % Auf der Licht zugewandten Seite des Frustums liegen abgetastet Punkte einer bestimmten Höhe oft näher am Licht, als die Punkte auf der Licht abgewandten Seite.
 Dadurch wird die Genauigkeit bei der Quantifizierung der Tiefe in der Shadow Map verschlechtert.
 
-%\begin{figure}
-%	\centering
-%	\begin{tikzpicture}[x=1cm,y=1cm] 
-		
-%		\draw [] (-1.5, -1) rectangle (1.5, 1);
-%		\draw [] (-1.5*0.8, -1*0.8) rectangle (1.5*0.8, 1*0.8);
-%		\draw [] (-1.5, -1) -- (-1.5*0.8, -1*0.8);
-%		\draw [] ( 1.5, -1) -- ( 1.5*0.8, -1*0.8);
-%		\draw [] ( 1.5,  1) -- ( 1.5*0.8,  1*0.8);
-%		\draw [] (-1.5,  1) -- (-1.5*0.8,  1*0.8);
+\begin{figure}
+	\centering
+	\begin{tikzpicture}[x=1cm,y=1cm] 
 
-%		\draw [rotate around={45:(0,0)}] ({-sqrt(1.5^2 + 1^2)},{-sqrt(1.5^2 + 1^2)}) rectangle ({sqrt(1.5^2 + 1^2)}, {sqrt(1.5^2 + 1^2)});
+		% Sheared Frustum
+		\coordinate (sf1) at (-1.006842, -0.999997);
+		\coordinate (sf2) at (-2.161550, 1.000014);
+		\coordinate (sf5) at (2.161551, -1.000018);
+		\coordinate (sf6) at (1.006837, 1.000006);
+
+		% SDSM Frustum	
+		\coordinate (lf9) at (-0.502168, -1.874118);
+		\coordinate (lf10) at (-1.874118, 0.502168);
+		\coordinate (lf13) at (1.874118, -0.502168);
+		\coordinate (lf14) at (0.502168, 1.874118);
+
+		% Camera Frustum
+		\coordinate (cf17) at (0.524145, -0.524145);
+		\coordinate (cf18) at (-0.524146, -0.524145);
+		\coordinate (cf19) at (-1.000000, -1.000000);
+		\coordinate (cf20) at (1.000000, -1.000000);
+		\coordinate (cf21) at (0.524145, 0.524145);
+		\coordinate (cf22) at (-0.524146, 0.524145);
+		\coordinate (cf23) at (-1.000000, 1.000000);
+		\coordinate (cf24) at (1.000000, 1.000000);
+
+		\draw (cf19) rectangle (cf24);
+		\draw (cf18) rectangle (cf21);
+		\draw (cf17) -- (cf20);
+		\draw (cf18) -- (cf19);
+		\draw (cf21) -- (cf24);
+		\draw (cf22) -- (cf23);
+
+		% sdsm
+		\draw [] (lf9) -- (lf10) -- (lf14) -- (lf13) -- (lf9);
+
+		% shear
+		\draw [red] (sf1) -- (sf2) -- (sf6) -- (sf5) -- (sf1);
+
+		\draw [fill] (0, 0) circle[radius=1pt];
 		
-		% Light Ray
-%		\draw [->] (-3, 3) -- (-2, 2);
-%		\draw [->] (-3.5, 2.5) -- (-2.5, 1.5);
-%		\draw [->] (-2.5, 3.5) -- (-1.5, 2.5);
+		\begin{scope}[xshift=3cm]
 		
-%		\draw (1,1) -- (1,4) -- (5,4) -- (5,1) -- (1,1);
+		\draw [fill] (0, 0) circle[radius=1pt];
+						
+		\draw [->] (0, 0) -- (1, 0) node [right] {Camera X};
+		\draw [->] (0, 0) -- ({cos(30)}, {sin(30)}) node [right] {Light Y};
+		\draw [->] (0, 0) -- ({sin(30)}, {-cos(30)}) node [right] {Light Z};
+
+		\end{scope}
 		
-%		\draw [dotted, thick] (1,4) -- (1,5) node [above] {$x_1$};
-%		\draw [dotted, thick] (5,4) -- (5,5) node [above] {$x_2$};
-		
-%		\draw [dotted, thick] (5,1) -- (6,1) node [right] {$y_2$};
-%		\draw [dotted, thick] (5,4) -- (6,4) node [right] {$y_1$};
+	\end{tikzpicture}
 	
-%	\end{tikzpicture}
-%\end{figure}
+	\caption{Planare Darstellung der Scherung des Light Spaces. Die Light Space Y-Achse wird auf die Camera Space X-Achse geschert. Die Light Space Z-Achse muss dabei unbedingt erhalten bleiben.}
+\end{figure}
 
 %  SDSM Shear
 \begin{figure}
@@ -493,14 +520,28 @@ Dadurch wird die Genauigkeit bei der Quantifizierung der Tiefe in der Shadow Map
 	\caption{Visualisierung der Shadow Map Frusta. Die Roten Pfeile visualisieren exemplarisch die Länge der Shadow Map Frusta entlang der Light Space Z-Achse}
 \end{figure}
 
-Unsere Lösung für dieses Problem ist eine einfache Scherung des Light Spaces.
+Unsere Lösungsidee für dieses Problem ist eine einfache Scherung des Light Spaces.
 Die X-Achse des Camera Spaces wird im Light Space auf die Y-Achse abgebildet.
 So haben Koordinaten, die im Camera Space die gleiche Höhe (Y-Achse) haben, im Light Space die gleiche Tiefe (Z-Achse).
 
 Auch wenn wir es so geschafft haben in vielen Situationen die Shadow Map Frusta weiter zu verkleinern, ist durch die Scherung die Filterbarkeit der Momente \cite{msm} nicht mehr gegeben.
-Es war relativ einfach Situationen zu provozieren, in denen die Scherung keine Sinnvolle transformation erzeugt hat.
+Es ist relativ einfach Situationen zu provozieren, in denen die Scherung keine sinnvolle Transformation erzeugt, da dort durch einen Wert nahe $0$ geteilt wird.
 
-TODO soll das hier auch mit rein?
+\begin{equation}
+	S^{-1} = \left(\begin{array}{cccc}
+		1 & C_x & 0 & 0 \\
+		0 & C_y & 0 & 0 \\
+		0 & C_z & 1 & 0 \\
+		0 & 0 & 0 & 1 \\
+	\end{array}\right)
+	\qquad
+	S = \left(\begin{array}{cccc}
+	1 & \frac{-C_x}{C_y} & 0 & 0 \\
+	0 & \frac{1}{C_y} & 0 & 0 \\
+	0 & \frac{-C_z}{C_y} & 1 & 0 \\
+	0 & 0 & 0 & 1 \\
+	\end{array}\right)
+\end{equation}
 
 
 
@@ -851,6 +892,10 @@ Dies ist möglich, da SDSMs die tatsächliche Near Plane kennen, wo PSSMs nur ei
 % TODO erstmal nur skizziert!
 SDSMs optimieren nicht nur die Ausnutzung der Shadow Map Auflösung, sondern auch die Ausnutzung der zur Verfügung stehenden Genauigkeit in der Shadow Map, da die Shadow Map Frusta in allen drei Dimensionen eng um die sichtbare Geometrie gelegt wird.
 Dies kommt dem Moment Shadow Mapping zu gute, da so feinere Abstufungen in den Momenten erlaubt werden können.
+
+Sheared Sample Distribution Shadow Maps sind eine vielversprechende Methode um die Quantifizierung der Shadow Map in flachen Szenen besser auszunutzen.
+Es handelt sich jedoch bisher nur um eine Idee. Wie genau die Scherung bestimmt werden kann ohne in die Nähe von Singulatitäten zu gelangen muss noch evaluiert werden.
+
 
 
 % Fazit
