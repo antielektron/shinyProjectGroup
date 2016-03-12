@@ -61,8 +61,8 @@ public:
     void setCascadedShadowMapsLambda(float lambda);
     float getCascadedShadowMapsLambda();
 
-    void setLightSheering(bool enabled);
-    bool getLightSheering();
+    void setLightShearing(bool enabled);
+    bool getLightShearing();
 
     void setCascadeStrategy(CascadeStrategy strategy);
     CascadeStrategy getCascadeStrategy();
@@ -99,7 +99,7 @@ protected:
     // Options
     bool m_colorizeCascades;
     float m_cascadedShadowMapsLambda;
-    bool m_lightSheering;
+    bool m_lightShearing;
     CascadeStrategy m_cascadeStrategy;
 
     int m_shadowMapSampleCount;
