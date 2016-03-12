@@ -143,6 +143,9 @@ QWidget *RendererDebugWidget::generateMSMOptions()
         layout->addWidget(m_shadowMapMsaa[i]);
     }
 
+    m_momentView = new QCheckBox("Moment View", this);
+    layout->addWidget(m_momentView);
+
     return msmOptions;
 }
 
@@ -164,11 +167,13 @@ void RendererDebugWidget::connectStuff()
     connect(m_momentVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_noVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
 
+    // connect(m_colorizeMoments, SIGNAL(stateChanged(int)), this, SLOT(onColorMomentsChanged));
     connect(m_filterShadowMap, SIGNAL(stateChanged(int)), this, SLOT(onFilterShadowMapChanged()));
     for (int i = 0; i < 5; i++)
     {
         connect(m_shadowMapMsaa[i], SIGNAL(clicked()), this, SLOT(onShadowMapMsaaChanged()));
     }
+    connect(m_momentView, SIGNAL(stateChanged(int)), this, SLOT(onMomentViewChanged()));
 }
 
 void RendererDebugWidget::onColorCascadesChanged()
@@ -220,6 +225,11 @@ void RendererDebugWidget::onAwesomeSlotChanged(int slot)
 void RendererDebugWidget::onLightViewChanged()
 {
     m_renderer->setRenderLightView(m_lightView->isChecked());
+}
+
+void RendererDebugWidget::onMomentViewChanged()
+{
+    m_renderer->setRenderMomentView(m_momentView->isChecked());
 }
 
 

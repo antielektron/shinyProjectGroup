@@ -32,6 +32,7 @@ Renderer::Renderer() : RendererBase(),
         m_shadowMapSampleCount(1),
         m_filterShadowMap(false),
         m_renderLightView(false),
+        m_renderMomentView(false),
         m_captureRequested(false),
         m_captureEnabled(false),
         m_captureSlot(0),
@@ -1013,159 +1014,196 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         m_debugCount = 0;
         */
 
-        // 4. Render to Texture
-        glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
-
-        // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
-        glViewport(0, 0, m_width, m_height);
-
-        // Enable color output
-        GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
-        glDrawBuffers(1, attachments);
-
-        // NOTE: do not clear, as we already wrote to depth buffer!
-
-        glEnable(GL_DEPTH_TEST);
-        // glEnable(GL_CULL_FACE);
-        // Draw closest pixel
-        glDepthFunc(GL_LEQUAL);
-
-        renderProgram->bind();
-
-        renderProgram->setUniformValue(m_projectionMatrixLoc, cameraProjection);
-        renderProgram->setUniformValue(m_lightDirectionLoc, QVector3D(lightDirection));
-        renderProgram->setUniformValue(m_lightColorLoc, scene->getLightColor());
-        renderProgram->setUniformValue(m_colorizeCascadesLoc, m_colorizeCascades);
-
-        // defaultProgram->setUniformValueArray(m_cascadeViewMatrixLoc, cascadeViews.data(), m_cascades);
-        // defaultProgram->setUniformValueArray(m_cascadeFarLoc, cascadeFars.data(), m_cascades, 1);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeViewBuffer);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_cascadeFarBuffer);
-
-        // Bind shadow map
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapTexture);
-        renderProgram->setUniformValue(m_shadowMapSamplerLoc, 0);
-
-        // Render regular objects
-        for (auto &object : scene->getObjects())
+        if (m_renderMomentView)
         {
-            auto cameraModelView = cameraView * object->getWorld();
+            glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+            copyProgram->bind();
+
+            m_quadVao.bind();
+
+            copyProgram->setUniformValue(m_copyArraySamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
+            glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapTexture);
 
 
-            renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-            renderProgram->setUniformValue(m_specularColorLoc, object->getSpecularColor());
-            renderProgram->setUniformValue(m_diffuseColorLoc, object->getDiffuseColor());
-            renderProgram->setUniformValue(m_ambientColorLoc, object->getAmbientColor());
+            glViewport(m_width*0/2, m_height*0/2, m_width/2, m_height/2);
+            copyProgram->setUniformValue(m_copyArrayLayerLoc, 0);
+            glDrawArrays(GL_QUADS, 0, 4);
 
-            object->getModel()->draw();
+            glViewport(m_width*1/2, m_height*0/2, m_width/2, m_height/2);
+            copyProgram->setUniformValue(m_copyArrayLayerLoc, 1);
+            glDrawArrays(GL_QUADS, 0, 4);
+
+            glViewport(m_width*0/2, m_height*1/2, m_width/2, m_height/2);
+            copyProgram->setUniformValue(m_copyArrayLayerLoc, 2);
+            glDrawArrays(GL_QUADS, 0, 4);
+
+            glViewport(m_width*1/2, m_height*1/2, m_width/2, m_height/2);
+            copyProgram->setUniformValue(m_copyArrayLayerLoc, 3);
+            glDrawArrays(GL_QUADS, 0, 4);
+
+            glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+
+            m_quadVao.release();
+
+            copyProgram->release();
         }
-
-        // Render debug objects
-        for (auto editorObject : scene->getEditorObjects())
+        else
         {
-            if (!(static_cast<EditorObject *>(editorObject)->isVisible()))
+            // 4. Render to Texture
+            glBindFramebuffer(GL_FRAMEBUFFER, m_renderFrameBuffer);
+
+            // VIEWPORTS FOR SHADOW MAP AND WINDOW IS DIFFERENT!!!
+            glViewport(0, 0, m_width, m_height);
+
+            // Enable color output
+            GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
+            glDrawBuffers(1, attachments);
+
+            // NOTE: do not clear, as we already wrote to depth buffer!
+
+            glEnable(GL_DEPTH_TEST);
+            // glEnable(GL_CULL_FACE);
+            // Draw closest pixel
+            glDepthFunc(GL_LEQUAL);
+
+            renderProgram->bind();
+
+            renderProgram->setUniformValue(m_projectionMatrixLoc, cameraProjection);
+            renderProgram->setUniformValue(m_lightDirectionLoc, QVector3D(lightDirection));
+            renderProgram->setUniformValue(m_lightColorLoc, scene->getLightColor());
+            renderProgram->setUniformValue(m_colorizeCascadesLoc, m_colorizeCascades);
+
+            // defaultProgram->setUniformValueArray(m_cascadeViewMatrixLoc, cascadeViews.data(), m_cascades);
+            // defaultProgram->setUniformValueArray(m_cascadeFarLoc, cascadeFars.data(), m_cascades, 1);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_cascadeViewBuffer);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_cascadeFarBuffer);
+
+            // Bind shadow map
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D_ARRAY, m_shadowMapTexture);
+            renderProgram->setUniformValue(m_shadowMapSamplerLoc, 0);
+
+            // Render regular objects
+            for (auto &object : scene->getObjects())
             {
-                continue;
+                auto cameraModelView = cameraView * object->getWorld();
+
+
+                renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+                renderProgram->setUniformValue(m_specularColorLoc, object->getSpecularColor());
+                renderProgram->setUniformValue(m_diffuseColorLoc, object->getDiffuseColor());
+                renderProgram->setUniformValue(m_ambientColorLoc, object->getAmbientColor());
+
+                object->getModel()->draw();
             }
 
-            auto cameraModelView = cameraView * editorObject->getWorld();
+            // Render debug objects
+            for (auto editorObject : scene->getEditorObjects())
+            {
+                if (!(static_cast<EditorObject *>(editorObject)->isVisible()))
+                {
+                    continue;
+                }
 
-            renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
-            renderProgram->setUniformValue(m_specularColorLoc, editorObject->getSpecularColor());
-            renderProgram->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseColor());
-            renderProgram->setUniformValue(m_ambientColorLoc, editorObject->getAmbientColor());
+                auto cameraModelView = cameraView * editorObject->getWorld();
 
-            editorObject->getModel()->draw();
-        }
+                renderProgram->setUniformValue(m_modelViewMatrixLoc, cameraModelView);
+                renderProgram->setUniformValue(m_specularColorLoc, editorObject->getSpecularColor());
+                renderProgram->setUniformValue(m_diffuseColorLoc, editorObject->getDiffuseColor());
+                renderProgram->setUniformValue(m_ambientColorLoc, editorObject->getAmbientColor());
 
-        // Unbind shadow map texture
-        glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+                editorObject->getModel()->draw();
+            }
 
-        // glDisable(GL_CULL_FACE);
-        glDisable(GL_DEPTH_TEST);
+            // Unbind shadow map texture
+            glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-        renderProgram->release();
+            // glDisable(GL_CULL_FACE);
+            glDisable(GL_DEPTH_TEST);
 
-
-        // View Capture if enabled
-        if (m_captureEnabled)
-        {
-            renderCapture(cameraView, cameraProjection);
-        }
-
-        /*
-        // 5. Gauss moments of screenspace depth:
-        verticalVO->bind();
-
-        glBindImageTexture(0, m_voMomentsTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
-        glBindImageTexture(1, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
-        glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
-
-        verticalVO->release();
+            renderProgram->release();
 
 
-        horizontalVO->bind();
+            // View Capture if enabled
+            if (m_captureEnabled)
+            {
+                renderCapture(cameraView, cameraProjection);
+            }
 
-        glBindImageTexture(0, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
-        glBindImageTexture(1, m_voMomentsTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
-        glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
+            /*
+            // 5. Gauss moments of screenspace depth:
+            verticalVO->bind();
 
-        horizontalVO->release();
-        */
+            glBindImageTexture(0, m_voMomentsTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
+            glBindImageTexture(1, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
+            glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
 
-        // generate mipmaps:
-        glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // needed, to make mipmaps available!!!
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        // 6. Render to Screen, apply VO
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-        glViewport(0, 0, m_width, m_height);
-
-        glClearColor(0, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glEnable(GL_BLEND);
-        glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        composeProgram->bind();
+            verticalVO->release();
 
 
-        composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
+            horizontalVO->bind();
 
-        composeProgram->setUniformValue(m_composeMomentsSamplerLoc, 1);
-        composeProgram->setUniformValue(m_composeDepthBufferLoc,2);
-        composeProgram->setUniformValue(m_composeProjectionMatrixLoc, scene->getCameraProjection());
-        composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, scene->getCameraProjection().inverted());
-        composeProgram->setUniformValue(m_ratioLoc, m_ratio);
-        composeProgram->setUniformValue(m_composeLightDirectionLoc, lightDirection);
+            glBindImageTexture(0, m_voGaussedMomentsBufferTexture, 0, GL_FALSE, 0, GL_READ_ONLY, GL_RG16);
+            glBindImageTexture(1, m_voMomentsTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RG16);
+            glDispatchCompute((m_width - 1) / 8 + 1, (m_height - 1) / 8 + 1, 1);
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, m_renderTexture);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+            horizontalVO->release();
+            */
 
-        m_quadVao.bind();
-        glDrawArrays(GL_QUADS, 0, 4);
-        m_quadVao.release();
+            // generate mipmaps:
+            glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // needed, to make mipmaps available!!!
+            glBindTexture(GL_TEXTURE_2D, 0);
 
-        /*
-        glViewport(0, 0, m_width/4, m_height/4);
-        glBindTexture(GL_TEXTURE_2D, m_normalTexture);
-        glDrawArrays(GL_QUADS, 0, 4);
-        */
+            // 6. Render to Screen, apply VO
+            glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-        glBindTexture(GL_TEXTURE_2D, 0);
+            glViewport(0, 0, m_width, m_height);
 
-        glDisable(GL_BLEND);
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        composeProgram->release();
-    }
+            glEnable(GL_BLEND);
+            glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+            composeProgram->bind();
+
+
+            composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
+
+            composeProgram->setUniformValue(m_composeMomentsSamplerLoc, 1);
+            composeProgram->setUniformValue(m_composeDepthBufferLoc,2);
+            composeProgram->setUniformValue(m_composeProjectionMatrixLoc, scene->getCameraProjection());
+            composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, scene->getCameraProjection().inverted());
+            composeProgram->setUniformValue(m_ratioLoc, m_ratio);
+            composeProgram->setUniformValue(m_composeLightDirectionLoc, lightDirection);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, m_renderTexture);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
+
+            m_quadVao.bind();
+            glDrawArrays(GL_QUADS, 0, 4);
+            m_quadVao.release();
+
+            /*
+            glViewport(0, 0, m_width/4, m_height/4);
+            glBindTexture(GL_TEXTURE_2D, m_normalTexture);
+            glDrawArrays(GL_QUADS, 0, 4);
+            */
+
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            glDisable(GL_BLEND);
+
+            composeProgram->release();
+        } // render moment view
+    } // render light view
     // DONE
 
 
@@ -1679,7 +1717,7 @@ void Renderer::setRenderLightView(bool enabled)
     m_renderLightView = enabled;
 }
 
-bool Renderer::getRenderLightView()
+void Renderer::setRenderMomentView(bool enabled)
 {
-    return m_renderLightView;
+    m_renderMomentView = enabled;
 }

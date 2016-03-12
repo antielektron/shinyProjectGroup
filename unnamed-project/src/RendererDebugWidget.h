@@ -27,6 +27,7 @@ protected slots:
     void onAwesomeCaptureChanged();
     void onAwesomeSlotChanged(int slot);
     void onLightViewChanged();
+    void onMomentViewChanged();
 
     void onVolumetricObscuranceChanged();
 
@@ -58,9 +59,10 @@ private:
 
     QCheckBox *m_lightView;
 
+    QCheckBox *m_colorizeMoments;
     QCheckBox *m_filterShadowMap;
-
     QRadioButton *m_shadowMapMsaa[5];
+    QCheckBox *m_momentView;
 
     QRadioButton *m_noVO;
     QRadioButton *m_lineVO;

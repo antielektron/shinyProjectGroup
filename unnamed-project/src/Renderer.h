@@ -82,7 +82,8 @@ public:
     bool getCapture();
 
     void setRenderLightView(bool enabled);
-    bool getRenderLightView();
+
+    void setRenderMomentView(bool enabled);
 
 protected:
     virtual void onRenderingInternal(GLuint fbo, Scene *scene) override;
@@ -116,6 +117,7 @@ protected:
     GLuint m_capturedFrustumToWorldBuffer[4];
 
     bool m_renderLightView;
+    bool m_renderMomentView;
 
 
     // TODO shadowMapSize as option
