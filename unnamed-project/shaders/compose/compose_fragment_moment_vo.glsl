@@ -190,16 +190,17 @@ void main()
 	// step 2: calculate r:
     vec4 rVec1 = projectionMatrix * vec4(0., 2 * worldSpaceRadius, world_depth, 1.);
     vec4 rVec2 = projectionMatrix * vec4(0., 0, world_depth, 1.);
-
-    float r = abs(rVec1.y/rVec1.w - rVec2.y/rVec2.w);
 	
     // step 3: calculate mipMapLevel:1-r)) + 3.;
-    float mmLevel = log2(1 / (1 - r))* 3;
-    //float mmLevel = ((1 - depth) * 10);
-
-    // step 4: get filtered Moments
-    mmLevel = clamp (mmLevel, 2, 5);
-    vec4 moments = textureLod(momentsSampler, uv, mmLevel);
+	float r = abs(rVec1.y/rVec1.w - rVec2.y/rVec2.w);
+	//float r = (1 - depth) * 0.3;
+	// step 3: calculate mipMapLevel:1-r)) + 3.;
+	//float mmLevel = log2(1./(1.-r));
+	float mmLevel = ((1 - depth) * 10);
+	
+	// step 4: get filtered Moments
+	//mmLevel = clamp (mmLevel, 2, 5);
+	vec4 moments = textureLod(momentsSampler, uv, mmLevel);	
 	
 
 	// step 5: where the magic happens
@@ -217,9 +218,10 @@ void main()
 	{
 		sum +=  w[i] * f(z[i],z0, z1) * 0.1; 
 	}
-	sum = clamp(sum * 2, 0, 1);
+	//sum = 1 - (sum * 3);
+	sum = clamp((1 - (sum * 3)) * 0.5 + 0.5, 0, 1);
 	
-	if (depth >10e-4)
+	if (depth < 1 - 10e-9)
 	{
 		defaultColor =  sum * defaultColor;
 	}
@@ -232,7 +234,7 @@ void main()
 	//outputColor = vec4(momentMagic, 0, 0,1);
     //outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(sum * 0.5),1);
     outputColor = vec4(defaultColor, 1.0);
-    //outputColor = vec4(sum * vec3(1.,1.,1.),1.);
+    //outputColor = vec4(sum * vec3(1,1,1),1.);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
     
 }
