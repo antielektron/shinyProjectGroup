@@ -101,18 +101,18 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4"
-     inkscape:cx="-90.132557"
-     inkscape:cy="44.817207"
+     inkscape:zoom="0.7"
+     inkscape:cx="-339.9644"
+     inkscape:cy="245.05556"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      showguides="false"
      inkscape:snap-grids="true"
      inkscape:window-width="1920"
-     inkscape:window-height="1050"
+     inkscape:window-height="1023"
      inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:snap-text-baseline="false"
      fit-margin-top="0"
@@ -133,7 +133,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -146,112 +146,175 @@
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 244.99998,797.36222 c -10,10 -10,10 -10,10 l -15,10 15,10 5,10 -10,10 15,15 -10,15"
        id="path4144"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <circle
        style="fill:#ff0000;fill-opacity:1"
        id="path4140"
        cx="234.99998"
        cy="842.36224"
-       r="2.7271569" />
+       r="2.7271569"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <circle
        style="fill:#001cff;fill-opacity:1"
        id="path4140-2"
        cx="44.687756"
        cy="842.36224"
-       r="2.7271569" />
+       r="2.7271569"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.5, 2;stroke-dashoffset:0;stroke-opacity:1"
        d="m 234.99998,817.36222 -189.999995,25 189.999995,25"
        id="path4161"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:#000080;fill-rule:evenodd;stroke:#3031ae;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 84.999985,837.36222 0,10"
        id="path4163"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 84.999985,827.36222 0,10"
        id="path4165"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 84.999985,857.36222 0,-10"
        id="path4167"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#16ef00;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 214.99998,827.36222 20,0"
        id="path4169"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#16ef00;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 209.99998,837.36222 30,0"
        id="path4171"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#16ef00;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 209.99998,847.36222 20,0"
        id="path4173"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#16ef00;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 214.99998,857.36222 25,0"
        id="path4175"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#cd0000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 234.99998,827.36222 20,0"
        id="path4177"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#cd0000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 239.99998,837.36222 20,0"
        id="path4179"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#cd0000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 229.99998,847.36222 30,0"
        id="path4181"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#cd0000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 239.99998,857.36222 c 15,0 15,0 15,0"
        id="path4183"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.30000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 214.99998,857.36222 0,40"
        id="path4185"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.30000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 254.99998,857.36222 0,40"
        id="path4187"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.30000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 234.99998,817.36222 0,80"
        id="path4189"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#0506c5;stroke-width:0.40000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
        d="m 234.99998,897.36222 -20,0"
        id="path4191"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <path
        style="fill:none;fill-rule:evenodd;stroke:#0506c5;stroke-width:0.40000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend-7)"
        d="m 234.99998,897.36222 c 20,0 20,0 20,0"
        id="path5823"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.5px;line-height:0%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="239.74745"
        y="844.13"
        id="text5862"
-       sodipodi:linespacing="0%"><tspan
+       sodipodi:linespacing="0%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan5864"
          x="239.74745"
@@ -262,7 +325,10 @@
        x="222.52536"
        y="903.8775"
        id="text5870"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan5872"
          x="222.52536"
@@ -276,7 +342,10 @@
        x="240.96063"
        y="904.13007"
        id="text5870-0"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan5872-4"
          x="240.96063"
@@ -289,14 +358,20 @@
        id="path4142"
        cx="234.99998"
        cy="842.36224"
-       r="25" />
+       r="25"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:7.5px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="80.352776"
        y="826.7569"
        id="text5897"
-       sodipodi:linespacing="125%"><tspan
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/lineSampling.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
          sodipodi:role="line"
          id="tspan5899"
          x="80.352776"
