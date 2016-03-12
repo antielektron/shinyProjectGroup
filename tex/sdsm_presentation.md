@@ -28,7 +28,7 @@
 // Andere Verfahren benutzen die Ecken des Kamera Frustums
 - Rotiere Light Direction auf Z-Achse
 - Rotiere Kamera Z-Achse um die Z-Achse auf X-Achse
-// Rotiere so dass sie in der Projektion gleich sind.
+// Rotiere so dass sie in der Projektion gleich sind
 - Berechne AABB der sichtbaren Geometrie per Reduktion
 
 
@@ -40,3 +40,23 @@
 - Reduziere mehrere Werte simultan
 // Reduziere alle Bounding Box Corners simultan
 // TODO DIAGRAMM
+
+# Vergleich
+
+## Parallel Split Shadow Maps
+- Near- und Far-Plane unbekannt
+- Verschiebe Grenzen von der Kamera weg
+- Konvexkombiniere Kaskadengrenzen linearer und logarithmischer Partitionierung
+// kleine Visulaisierung, fiktiv
+
+## Parallel Split Shadow Maps vs Sample Distribution Shadow Maps
+- Screenshot
+
+## Schöne Screenshots die Partitionen zeigen
+- Screenshot
+
+# Aussicht
+
+## Sheared Sample Distribution Shadow Maps
+- Screenshot
+// Erzähle
