@@ -34,7 +34,8 @@ Renderer::Renderer() : RendererBase(),
         m_renderLightView(false),
         m_captureRequested(false),
         m_captureEnabled(false),
-        m_captureSlot(0)
+        m_captureSlot(0),
+        m_lightShearing(false)
 {
     // nothing to do here
 }
@@ -591,13 +592,14 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             QMatrix4x4 lightViewMatrix;
             createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
 
-            if (m_lightSheering)
+            if (m_lightShearing)
             {
-                auto cameraXDir = lightViewMatrix * inverseCameraView * QVector4D(1, 0, 0, 0);
+                // auto cameraXDir = lightViewMatrix * inverseCameraView * QVector4D(1, 0, 0, 0);
+                auto cameraXDir = lightViewMatrix * QVector4D(QVector3D(scene->getDirectionalLightDirection().x(), 0, scene->getDirectionalLightDirection().z()).normalized(), 0);
                 // sheer light Y to camera X
-                QMatrix4x4 sheering;
-                sheering.setColumn(1, cameraXDir);
-                lightViewMatrix = sheering.inverted() * lightViewMatrix;
+                QMatrix4x4 shearing;
+                shearing.setColumn(1, cameraXDir);
+                lightViewMatrix = shearing.inverted() * lightViewMatrix;
             }
 
             // Compute view frustum of camera in light view
@@ -696,13 +698,13 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             QMatrix4x4 lightViewMatrix;
             createLightViewMatrix(scene->getDirectionalLightDirection(), inverseCameraView, lightViewMatrix);
 
-            if (m_lightSheering)
+            if (m_lightShearing)
             {
                 auto cameraXDir = lightViewMatrix * inverseCameraView * QVector4D(1, 0, 0, 0);
                 // sheer light Y to camera X
-                QMatrix4x4 sheering;
-                sheering.setColumn(1, cameraXDir);
-                lightViewMatrix = sheering.inverted() * lightViewMatrix;
+                QMatrix4x4 shearing;
+                shearing.setColumn(1, cameraXDir);
+                lightViewMatrix = shearing.inverted() * lightViewMatrix;
             }
 
             // Compute view frustum of camera in light view
@@ -1606,14 +1608,14 @@ float Renderer::getCascadedShadowMapsLambda()
     return m_cascadedShadowMapsLambda;
 }
 
-void Renderer::setLightSheering(bool enabled)
+void Renderer::setLightShearing(bool enabled)
 {
-    m_lightSheering = enabled;
+    m_lightShearing = enabled;
 }
 
-bool Renderer::getLightSheering()
+bool Renderer::getLightShearing()
 {
-    return m_lightSheering;
+    return m_lightShearing;
 }
 
 void Renderer::setCascadeStrategy(CascadeStrategy strategy)
