@@ -21,7 +21,7 @@ public:
 protected slots:
     void onColorCascadesChanged();
     void onCascadedShadowMapsLambdaChanged();
-    void onLightSheeringChanged();
+    void onLightShearingChanged();
     void onCascadesStrategyChanged();
     void onAwesomeCaptureCapture();
     void onAwesomeCaptureChanged();
@@ -49,7 +49,7 @@ private:
 
     QSlider *m_cascadedShadowMapsLambda;
 
-    QCheckBox *m_lightSheering;
+    QCheckBox *m_lightShearing;
 
     QPushButton *m_awesomeCapture;
     QCheckBox *m_awesomeCaptureEnabled;

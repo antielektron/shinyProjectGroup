@@ -18,3 +18,4 @@ doxygen/
 *.bbl
 *.blg
 *.synctex.gz
+*.dvi
