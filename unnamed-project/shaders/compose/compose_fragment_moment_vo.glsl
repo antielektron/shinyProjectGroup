@@ -189,16 +189,15 @@ void main()
 	
 	float world_depth = get_world_depth(depth);
 	
-	// step 2: calculate r:
-    vec4 rVec1 = projectionMatrix * vec4(0., 2 * worldSpaceRadius, world_depth, 1.);
-    vec4 rVec2 = projectionMatrix * vec4(0., 0, world_depth, 1.);
+	// step 2: claculate r:
+	vec4 rVec1 = projectionMatrix * vec4(0., 2 * worldSpaceRadius, world_depth, 1.);
+	vec4 rVec2 = projectionMatrix * vec4(0., 0, world_depth, 1.);
 	
-    // step 3: calculate mipMapLevel:1-r)) + 3.;
 	float r = abs(rVec1.y/rVec1.w - rVec2.y/rVec2.w);
-	//float r = (1 - depth) * 0.3;
+	
 	// step 3: calculate mipMapLevel:1-r)) + 3.;
-	//float mmLevel = log2(1./(1.-r));
-	float mmLevel = ((1 - depth) * 10);
+	float mmLevel = log2(1./(1.-r)) * 10;
+	//float mmLevel = ((1 - depth) * 10);
 	
 	// step 4: get filtered Moments
 	//mmLevel = clamp (mmLevel, 2, 5);
