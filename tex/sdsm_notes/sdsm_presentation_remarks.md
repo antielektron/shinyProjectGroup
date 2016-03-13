@@ -2,7 +2,6 @@
 
 # Folie 3
 - Betrachte Screen Samples im Light-Space
-- Vollautomatische Partitionierung ~> Adaptive Partitionierung
 - Figure Z-Partitions from Side
 - Shadow Map Frustum eng um sichtbare Geometrie
 

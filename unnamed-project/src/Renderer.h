@@ -81,6 +81,9 @@ public:
     void setSky(bool b);
     bool isSky();
 
+    void setCursor(bool b);
+    bool isCursor();
+
     void awesomeCapture();
 
     void setCaptureSlot(int slot);
@@ -126,6 +129,7 @@ protected:
     int m_sky;
     bool m_glLinear;
     bool m_mmLinear;
+    int m_cursor;
 
 
     /// CAPTURED information
@@ -195,6 +199,7 @@ protected:
     int m_composePlainObscuranceLoc;
 
     int m_composeSkyLoc;
+    int m_composeCursorLoc;
 
     // Copy Shader for texture arrays
     int m_copyArraySamplerLoc;
