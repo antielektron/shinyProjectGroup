@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene name="Shiny Scene" version="42" author="Norby">
+    <Models>
+        <Model name="futurecity" path="models/futurecity.obj"/>
+    </Models>
+    <Objects>
+        <Object name="futurecity" model="futurecity" interactionEvent="">
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+    </Objects>
+    <Attributes/>
+    <Events/>
+    <Animators/>
+    <DirectionalLight x="-1.4" y="0.8" z="2.5" r="1" g="1" b="1"/>
+    <Player>
+        <Position x="0" y="0" z="0"/>
+        <Rotation x="0" y="0" z="0"/>
+    </Player>
+    <ShaderConfig file="shaders/configurations/VarianceVO.xml"/>
+</Scene>
