@@ -499,6 +499,8 @@ Dadurch wird die Genauigkeit bei der Quantifizierung der Tiefe in der Shadow Map
 		\draw [->] (0, 0) -- ({cos(30)}, {sin(30)}) node [right] {Light Y};
 		\draw [->] (0, 0) -- ({sin(30)}, {-cos(30)}) node [right] {Light Z};
 
+		\draw [dotted, ->] ({cos(30)}, {sin(30)}) --++({sin(30)*sin(30)}, {-sin(30)*cos(30)});
+
 		\end{scope}
 		
 	\end{tikzpicture}
