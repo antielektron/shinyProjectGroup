@@ -5,7 +5,6 @@
 #include <QBoxLayout>
 #include <QGroupBox>
 
-
 RendererDebugWidget::RendererDebugWidget(Renderer *renderer, QWidget *parent) :
         QWidget(parent),
         m_renderer(renderer)
@@ -21,6 +20,8 @@ RendererDebugWidget::RendererDebugWidget(Renderer *renderer, QWidget *parent) :
 
     m_cascadedShadowMapsLambda->setValue(min + value * (max - min));
 
+    m_plainVO->setChecked(m_renderer->isPlainObscurance());
+    m_sky->setChecked(m_renderer->isSky());
     m_sampleSlider->setValue(m_renderer->getSamples());
     m_sampleLabel->setText(QString("Samples: " ) + QString::number(m_renderer->getSamples()));
 
@@ -115,6 +116,12 @@ QWidget *RendererDebugWidget::generateVOOptions()
     auto layout = new QVBoxLayout(voOptions);
     voOptions->setLayout(layout);
 
+    m_sky = new QCheckBox("draw Sky", voOptions);
+    layout->addWidget(m_sky);
+
+    m_plainVO = new QCheckBox("plain Obscurance", voOptions);
+    layout->addWidget(m_plainVO);
+
     m_lineVO = new QRadioButton("line sampling", voOptions);
     layout->addWidget(m_lineVO);
 
@@ -179,6 +186,8 @@ void RendererDebugWidget::connectStuff()
     connect(m_varianceVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_momentVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_noVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
+    connect(m_plainVO, SIGNAL(stateChanged(int)), this, SLOT(onPlainObscuranceChanged(int)));
+    connect(m_sky, SIGNAL(stateChanged(int)), this, SLOT(onSkyChanged(int)));
 
     // connect(m_colorizeMoments, SIGNAL(stateChanged(int)), this, SLOT(onColorMomentsChanged));
     connect(m_filterShadowMap, SIGNAL(stateChanged(int)), this, SLOT(onFilterShadowMapChanged()));
@@ -292,4 +301,14 @@ void RendererDebugWidget::onSampleSliderChanged(int s)
 {
     m_renderer->setSamples(s);
     m_sampleLabel->setText(QString("Samples: " ) + QString::number(s));
+}
+
+void RendererDebugWidget::onPlainObscuranceChanged(int s)
+{
+    m_renderer->setPlainObscurance(s == 2);
+}
+
+void RendererDebugWidget::onSkyChanged(int s)
+{
+    m_renderer->setSky(s == 2);
 }

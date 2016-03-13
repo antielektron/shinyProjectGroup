@@ -13,7 +13,9 @@ uniform float ratio;
 
 out vec4 outputColor;
 
-uniform int samples = 10; //TODO, pass through shader
+uniform int samples;
+uniform int isPlainObscurance;
+uniform int isSky;
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
@@ -232,9 +234,16 @@ bool isCursor()
 void main()
 {
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
-	vec3 mixedColor = lineSampling(samples) * defaultColor;
-
-	if (texture2D(depthBuffer, uv).x == 1)
+	vec3 mixedColor;
+	if (isPlainObscurance != 1)
+	{
+		mixedColor = lineSampling(samples) * defaultColor;
+	}
+	else
+	{
+		mixedColor = lineSampling(samples) * vec3(0.5,0.5,0.5);
+	}
+	if (texture2D(depthBuffer, uv).x == 1 && isSky == 1)
 	{
 		mixedColor = get_sky();
 	}

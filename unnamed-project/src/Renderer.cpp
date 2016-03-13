@@ -37,7 +37,9 @@ Renderer::Renderer() : RendererBase(),
         m_captureEnabled(false),
         m_captureSlot(0),
         m_lightShearing(false),
-        m_samples(10)
+        m_samples(10),
+        m_plainObscurance(0),
+        m_sky(1)
 {
     // nothing to do here
 }
@@ -216,6 +218,9 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_ratioLoc, "ratio");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeLightDirectionLoc, "lightDirection");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeSamplesLoc, "samples");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composePlainObscuranceLoc, "isPlainObscurance");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeSkyLoc, "isSky");
+
 
     m_attribLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(0, "v_position");
 
@@ -1182,6 +1187,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             composeProgram->setUniformValue(m_ratioLoc, m_ratio);
             composeProgram->setUniformValue(m_composeLightDirectionLoc, lightDirection);
             composeProgram->setUniformValue(m_composeSamplesLoc, m_samples);
+            composeProgram->setUniformValue(m_composePlainObscuranceLoc, m_plainObscurance);
+            composeProgram->setUniformValue(m_composeSkyLoc, m_sky);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_renderTexture);
@@ -1733,4 +1740,24 @@ void Renderer::setSamples(int s)
 int Renderer::getSamples()
 {
     return m_samples;
+}
+
+void Renderer::setPlainObscurance(bool b)
+{
+    m_plainObscurance = b ? 1 : 0;
+}
+
+bool Renderer::isPlainObscurance()
+{
+    return m_plainObscurance == 1;
+}
+
+void Renderer::setSky(bool b)
+{
+    m_sky = b ? 1 : 0;
+}
+
+bool Renderer::isSky()
+{
+    return m_sky == 1;
 }

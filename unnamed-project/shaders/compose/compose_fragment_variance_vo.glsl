@@ -14,7 +14,9 @@ uniform vec4 lightDirection;
 
 out vec4 outputColor;
 
-const int samples = 10; //TODO, pass through shader
+uniform int samples; //TODO, pass through shader
+uniform int isPlainObscurance;
+uniform int isSky;
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
@@ -224,17 +226,26 @@ void main()
 	
 	// aaaand i have no idea what i'm doing now:
 	float sum =  a * (pow(z1,2) - pow(z0,2)) / 2.0 + b * (z1 - z0);	
-	sum = sum * 0.7 + 0.6;//sum = clamp(sum * 10, 0,1) * 0.7 + 0.3;
+	//sum = sum * 0.7 + 0.6;//sum = clamp(sum * 10, 0,1) * 0.7 + 0.3;
+	sum = sum *1.5 + 0.7 ;
 	
-	if (depth != 1)
+	if (depth != 1 || isSky == 0)
 	{
-		defaultColor =  sum * defaultColor;
+		if (isPlainObscurance != 1)
+		{
+			defaultColor =  sum * defaultColor;
+		}
+		else
+		{
+			defaultColor = sum * vec3(0.7,0.7,0.7);
+		}
 	}
 	else
 	{
 		defaultColor =  get_sky();
 	}
 	
+
 	//outputColor = vec4(0, defaultColor.y, 0,1);
 	//outputColor = vec4(momentMagic, 0, 0,1);
     //outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(r * 0.5),1);
