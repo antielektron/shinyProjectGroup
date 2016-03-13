@@ -514,7 +514,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
 
     // 1. Render depth only
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
     glDepthFunc(GL_LESS);
 
     renderDepthProgram->bind();
@@ -548,7 +548,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
         editorObject->getModel()->draw();
     }
 
-    glDisable(GL_CULL_FACE);
+    // glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 
     renderDepthProgram->release();
