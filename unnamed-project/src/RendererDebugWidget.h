@@ -8,7 +8,7 @@
 #include <QSlider>
 #include <QCheckBox>
 #include <QButtonGroup>
-
+#include <QLabel>
 class Renderer;
 
 class RendererDebugWidget : public QWidget
@@ -30,6 +30,7 @@ protected slots:
     void onMomentViewChanged();
 
     void onVolumetricObscuranceChanged();
+    void onSampleSliderChanged(int);
 
     void onFilterShadowMapChanged();
     void onShadowMapMsaaChanged();
@@ -66,6 +67,10 @@ private:
 
     QRadioButton *m_noVO;
     QRadioButton *m_lineVO;
+
+    QSlider *m_sampleSlider;
+    QLabel *m_sampleLabel;
+
     QRadioButton *m_varianceVO;
     QRadioButton *m_momentVO;
 };

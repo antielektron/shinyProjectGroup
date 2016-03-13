@@ -73,6 +73,9 @@ public:
     void setFilterShadowMap(bool enabled);
     bool getFilterShadowMap();
 
+    void setSamples(int s);
+    int getSamples();
+
     void awesomeCapture();
 
     void setCaptureSlot(int slot);
@@ -108,6 +111,9 @@ protected:
 
     // set if we need to recreate the shadow map..
     bool m_recreateShadowMap;
+
+    //compose stuff:
+    int m_samples;
 
 
     /// CAPTURED information
@@ -172,6 +178,8 @@ protected:
     int m_composeDepthBufferLoc;
     int m_ratioLoc;
     int m_composeLightDirectionLoc;
+
+    int m_composeSamplesLoc;
 
     // Copy Shader for texture arrays
     int m_copyArraySamplerLoc;

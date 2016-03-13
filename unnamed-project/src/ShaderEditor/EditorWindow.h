@@ -12,6 +12,7 @@
 #include "OpenGLWidget.h"
 #include "ShaderEditor/ShaderEditorWidget.h"
 #include "ShaderEditor/ObjectToolbox.h"
+#include "RendererDebugWidget.h"
 
 class EditorWindow : public QMainWindow
 {
@@ -54,6 +55,8 @@ protected:
     QAction     *m_requestSingleFrameAction;
     QAction     *m_saveShaderConfig;
     QAction     *m_loadShaderConfig;
+
+    RendererDebugWidget * m_debugWidget;
 
     std::map<RendererBase::ShaderSourcesKeyType,
              ShaderEditorWidget*> m_shaderEditorMap;

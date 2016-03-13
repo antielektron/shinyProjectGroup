@@ -13,7 +13,7 @@ uniform float ratio;
 
 out vec4 outputColor;
 
-const int samples = 10; //TODO, pass through shader
+uniform int samples = 10; //TODO, pass through shader
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 

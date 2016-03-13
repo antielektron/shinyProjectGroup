@@ -36,7 +36,8 @@ Renderer::Renderer() : RendererBase(),
         m_captureRequested(false),
         m_captureEnabled(false),
         m_captureSlot(0),
-        m_lightShearing(false)
+        m_lightShearing(false),
+        m_samples(10)
 {
     // nothing to do here
 }
@@ -214,6 +215,7 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeMomentsSamplerLoc, "momentsSampler");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_ratioLoc, "ratio");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeLightDirectionLoc, "lightDirection");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeSamplesLoc, "samples");
 
     m_attribLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(0, "v_position");
 
@@ -1179,6 +1181,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, scene->getCameraProjection().inverted());
             composeProgram->setUniformValue(m_ratioLoc, m_ratio);
             composeProgram->setUniformValue(m_composeLightDirectionLoc, lightDirection);
+            composeProgram->setUniformValue(m_composeSamplesLoc, m_samples);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_renderTexture);
@@ -1720,4 +1723,14 @@ void Renderer::setRenderLightView(bool enabled)
 void Renderer::setRenderMomentView(bool enabled)
 {
     m_renderMomentView = enabled;
+}
+
+void Renderer::setSamples(int s)
+{
+    m_samples = s;
+}
+
+int Renderer::getSamples()
+{
+    return m_samples;
 }

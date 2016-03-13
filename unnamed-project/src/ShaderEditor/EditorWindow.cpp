@@ -6,6 +6,7 @@
 #include <QFileDialog>
 
 #include "EditorWindow.h"
+#include "Renderer.h"
 
 //------------------------------------------------------------------------------
 EditorWindow::EditorWindow(OpenGLWidget* widget, QWidget *parent) :
@@ -34,7 +35,17 @@ EditorWindow::~EditorWindow()
 //------------------------------------------------------------------------------
 void EditorWindow::createDocks()
 {
+
     RendererBase *renderer = m_glWidget->getRenderer();
+
+    //add debug renderer widget:
+
+    QDockWidget *dock = new QDockWidget("debug widget", this);
+    m_debugWidget = new RendererDebugWidget(static_cast<Renderer*>(renderer), dock);
+    dock->setWidget(m_debugWidget);
+    addDockWidget(Qt::LeftDockWidgetArea,dock);
+
+    // add shader editors
     std::vector<std::string> programs;
 
     renderer->getPrograms(programs);

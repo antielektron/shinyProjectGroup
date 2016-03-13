@@ -5,6 +5,7 @@
 #include <QBoxLayout>
 #include <QGroupBox>
 
+
 RendererDebugWidget::RendererDebugWidget(Renderer *renderer, QWidget *parent) :
         QWidget(parent),
         m_renderer(renderer)
@@ -19,6 +20,9 @@ RendererDebugWidget::RendererDebugWidget(Renderer *renderer, QWidget *parent) :
     float value = m_renderer->getCascadedShadowMapsLambda();
 
     m_cascadedShadowMapsLambda->setValue(min + value * (max - min));
+
+    m_sampleSlider->setValue(m_renderer->getSamples());
+    m_sampleLabel->setText(QString("Samples: " ) + QString::number(m_renderer->getSamples()));
 
     switch (m_renderer->getCascadeStrategy())
     {
@@ -114,6 +118,14 @@ QWidget *RendererDebugWidget::generateVOOptions()
     m_lineVO = new QRadioButton("line sampling", voOptions);
     layout->addWidget(m_lineVO);
 
+    m_sampleSlider = new QSlider(Qt::Horizontal, voOptions);
+    layout->addWidget(m_sampleSlider);
+    m_sampleSlider->setRange(0,1000);
+    m_sampleSlider->setTickInterval(1);
+
+    m_sampleLabel = new QLabel("", voOptions);
+    layout->addWidget(m_sampleLabel);
+
     m_varianceVO = new QRadioButton("variance area sampling", voOptions);
     layout->addWidget(m_varianceVO);
 
@@ -163,6 +175,7 @@ void RendererDebugWidget::connectStuff()
     connect(m_awesomeSlotGroup, SIGNAL(buttonClicked(int)), this, SLOT(onAwesomeSlotChanged(int)));
 
     connect(m_lineVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
+    connect(m_sampleSlider, SIGNAL(valueChanged(int)), this, SLOT(onSampleSliderChanged(int)));
     connect(m_varianceVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_momentVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_noVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
@@ -267,4 +280,10 @@ void RendererDebugWidget::onShadowMapMsaaChanged()
             m_renderer->setShadowMapSampleCount(1<<i);
         }
     }
+}
+
+void RendererDebugWidget::onSampleSliderChanged(int s)
+{
+    m_renderer->setSamples(s);
+    m_sampleLabel->setText(QString("Samples: " ) + QString::number(s));
 }
