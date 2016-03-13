@@ -889,7 +889,7 @@ PSSMs können oft ähnlich gute Ergebnisse liefern wenn sie optimal eingestellt 
 Allerdings gilt dies meist nur für eine bestimmte Sicht auf die Szene.
 Befindet sich mehr oder weniger Geometrie in unmittelbarer nähe zur Kamera, so liefert PSSM keine guten Ergebnisse mehr.
 SDSM passt ihre Z-Partitionen adaptiv an die veränderte Sichtbarkeit an.
-Dies ist möglich, da SDSMs die tatsächliche Near Plane kennen, wo PSSMs nur eine untere Schranke hierfür kennen, die sich aus der Camera Projektion ergibt.
+Dies ist möglich, da SDSMs die tatsächliche Near Plane kennen, wo PSSMs nur eine untere Schranke hierfür kennen, die sich aus der Kamera Projektion ergibt.
 
 % Verbesserung der MSM durch SDSM
 % TODO erstmal nur skizziert!
@@ -919,7 +919,7 @@ Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch s
 		\label{ref:msm1}
 	}
 	
-	\subfloat[12xMSAA]{
+	\subfloat[2xMSAA]{
 		\includegraphics[width = 6cm]{msm_assets/baum2MSAA.png}
 		\label{ref:msm2}
 	}
@@ -935,6 +935,12 @@ Im direkten Verlgleich zu PCF fällt auf, das MSM weitere Artefakte unterbindet.
 Für die Zukunft wollen wir noch weiteres filtern testen, um das Aliasing weiter zu vermindern.
 (Füge Verlgeichsbilder für MSM mit Gauss, 2xMSAA, 4xMSAA, 16xxMSAA ein)
 (1xMSAA nutzt lineare Interpolation zwischen zwei Pixeln)
+
+Auch wenn MSM und SDSM zunächst wie orthogonale Verfahren aussehen, beeinflusst die variable Größe der Shadow Maps einer Kaskade die Filterbarkeit mit Gauss.
+Um eine gewisse Filter Größe der Shadow Map im Screen Space zu erreichen, muss die Shadow Map mit einem variablen Standardabweichung $\sigma$ gefiltert werden.
+Da die Shadow Map Frusta teilweise sehr kleine Bereiche abdecken werden die Filtermasken sehr groß.
+Mip-Mapping hat dieses Problem nicht.
+
 
 % Fazit
 \subsection{Volumetric Obscurance}
