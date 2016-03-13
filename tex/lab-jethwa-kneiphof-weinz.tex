@@ -13,6 +13,7 @@
 \usepackage{array}
 \usepackage{svg}
 \usepackage{setspace}
+\usepackage{float}
 \lstset{language=C++}
 
 \usepackage{tikz}
@@ -235,14 +236,34 @@ zu approximieren. Dafür gibt es allgemein 2 Ansätze:
 	\item "Global Ambient Occlusion": für jeden Punkt in der Szene wird geprüft, ob der Himmel von diesem
 		Punkt aus sichtbar ist (bzw. bei geschlossenen Szenen: ob eine maximale Distanz ohne Kollision erreicht
 		 werden kann). Dieses Verfahren ist relativ teuer, kann aber z.B. für statische Szenen vorberechnet
-		 werden.
+		 werden. (Abb. \ref{ref:aoImage})
 		\cite{aoPaper}
 	\item Screenspace Ambient Occlusion (SSAO): für jeden Pixel im Screenspace werden Point Samples
 		innerhalb einer bestimmten Umgebung erstellt. Mit Hilfe der Tiefeninformationen des Depth Buffers
 		wird die Anzahl der Samples, die hinter der Szenengeometrie liegen müssen bestimmt. Anhand dieser Anzahl
-		kann der Pixel entsprechend abgedunkelt werden.  \cite{cry2Paper}
+		kann der Pixel entsprechend abgedunkelt werden. (Abb. \ref{ref:ssaoImage})  \cite{cry2Paper}
 \end{enumerate}  
-Volumetric Obscurance ist eine Alternative zum Screenspace Volumetric Obscurance, welche wir im folgenden
+
+\begin{figure}[H]
+	\centering
+	\subfloat[Global Illumination Based Ambient Occlusion]{
+		\includegraphics[width=3cm]{vo_assets/aoScematic.png}
+		\label{ref:aoImage}
+	}\quad \quad
+	\subfloat[Screenspace Ambient Occlusion]{
+		\includegraphics[width=3cm]{vo_assets/ssaoSchematic.png}
+		\label{ref:ssaoImage}
+	}\quad \quad
+	\subfloat[Volumetric Obscurance]{
+	    \includegraphics[width=3cm]{vo_assets/voSchematic.png}
+		\label{ref:voImage}
+	}
+	\caption{
+		Umgebungsverdeckungstechnicken im Vergleich
+	}
+\end{figure}
+
+Volumetric Obscurance (Abb. \ref{ref:voImage}) ist eine Alternative zum Screenspace Volumetric Obscurance, welche wir im folgenden
 Erläutern werden
 
 \cite{loos2010volumetric}
@@ -292,7 +313,7 @@ Anschließend wird das Kamera Frustum zwischen tatsächlicher Near und Far Dista
 
 
 % SDSM Cascades colorized
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\subfloat{
 		\includegraphics[width=5.5cm]{sdsm_assets/pssm_colorized_near.png}
@@ -341,7 +362,7 @@ Damit die AABBs die sichtbare Geometrie sinnvoll umschließen, wird der Light-Sp
 
 
 % SDSM Camera View
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\subfloat[PSSM] {
 		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_pssm_comparision_2/pssm_scene_small.png}
@@ -368,7 +389,7 @@ Damit die AABBs die sichtbare Geometrie sinnvoll umschließen, wird der Light-Sp
 \end{figure}
 
 %  SDSM Light View
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\subfloat[PSSM] {
 		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_pssm_comparision_2/pssm_light_view_small.png}
@@ -450,7 +471,7 @@ Wenn das Licht geneigt von der Seite einfällt, sind die Shadow Map Frusta entla
 % Auf der Licht zugewandten Seite des Frustums liegen abgetastet Punkte einer bestimmten Höhe oft näher am Licht, als die Punkte auf der Licht abgewandten Seite.
 Dadurch wird die Genauigkeit bei der Quantifizierung der Tiefe in der Shadow Map beeinträchtigt.
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\begin{tikzpicture}[x=1cm,y=1cm] 
 
@@ -509,7 +530,7 @@ Dadurch wird die Genauigkeit bei der Quantifizierung der Tiefe in der Shadow Map
 \end{figure}
 
 %  SDSM Shear
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\subfloat [Sample Distribution Shadow Maps] {
 		\includegraphics[width=5.5cm]{sdsm_assets/sdsm_no_shear_volumes_small_arrow.png}
@@ -587,7 +608,7 @@ beinhaltet und dessen normale parallel zur Blickrichtung liegt). $v_i$ beschreib
 Volumen'', dass die zum Sample korrespondierende Linie füllt (z.B. hat bei einer Einheitskugel genau das Sample
 ein Volumen von 2, das durch $P$ geht) \newline
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 
 	\input{LineSamples.pdf_tex}
@@ -626,7 +647,7 @@ ein Volumen von 2, das durch $P$ geht) \newline
 \textit{LineSampling} gibt einen Koeffizienten für die Schattierung zurück, \textit{nSamples} ist
 die Anzahl der Samples, \textit{depth} die Tiefe des zum Punkt $P$ korrespondierenden Texel.
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\subfloat[1 Sample]{
 
@@ -906,7 +927,7 @@ Wie genau die Scherung bestimmt werden kann ohne in die Nähe von Singulatitäte
 \subsection{Moment Shadow Mapping}
 Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch sehr gut zur Geltung kommen. Artefakte wie Aliasing und Light Bleeding werden stärker gemindert als bei VSM möglich. Ausserdem funktiort die Implementierung sehr einfach. Das Verfahren ist schnell und bietet beim Filtern viele Freiheiten. Wir nutzen Gauss und 1xMSAA-16xMSAA welches verschiedene Ergebnisse liefert.
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\subfloat[Gauss Filter]{
 
@@ -944,11 +965,45 @@ Mip-Mapping hat dieses Problem nicht.
 
 % Fazit
 \subsection{Volumetric Obscurance}
-TODO
+Wie erwartet sehen SSAO und Line Sampled Volumetric Obscurance sich sehr ähnlich. Area Sampled Volumetric
+Obscurance lieferte in unserer Implementierung ebenfalls gute Resultate und bietet so eine Alternative 
+zum relativ teuren Line Sampled Volumetric Obscurance. Durch die Approximierung durch Mipmaps sind jedoch bei
+großflächiger Filterung mehr Artefakte zu sehen, sodass diese Technik im Gegensatz zum Line Sampled Volumetric
+Obscurance nur für kleinere Umgebungen genutzt werden sollte.
+
+\begin{figure}[H]
+	\centering
+	\subfloat[SSAO by Crytek \cite{cry2Paper}]
+	{
+
+		\includegraphics[width = 6cm]{vo_assets/crytekSSAO.png}
+		\label{ref:crytekSSAO}
+	}
+	\subfloat[LSVO mit 10 samples]
+	{
+
+		\includegraphics[width = 6cm]{vo_assets/presentaton_graphics/fazitLSVO010.png}
+		\label{ref:LSVO010}
+	}
+	
+	\subfloat[LSVO mit 100 samples]
+	{
+
+		\includegraphics[width = 6cm]{vo_assets/presentaton_graphics/fazitLSVO100.png}
+		\label{ref:LSVO100}
+	}
+	\subfloat[ASVO]
+	{
+
+		\includegraphics[width = 6cm]{vo_assets/presentaton_graphics/fazitASVO.png}
+		\label{ref:ASVO}
+	}
+	\caption{Resultate von Umgebungsverdeckungstechniken}
+\end{figure}
 
 % Fazit
 \subsection{Moment Based Volumetric Obscurance}
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\subfloat[MBVO Beispiel 1]{
 
