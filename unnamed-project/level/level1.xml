@@ -6,7 +6,10 @@
         <Model name="chessblack" path="models/chessblack.obj"/>
         <Model name="chesswhite" path="models/chesswhite.obj"/>
         <Model name="cloud1" path="models/cloud1.obj"/>
+        <Model name="cloud3" path="models/cloud3.obj"/>
         <Model name="dame" path="models/dame.obj"/>
+        <Model name="dome" path="models/landscape/dome.obj"/>
+        <Model name="dragon" path="models/dragon.obj"/>
         <Model name="floor" path="models/floor.obj"/>
         <Model name="floor2" path="models/floor2.obj"/>
         <Model name="horse" path="models/horse.obj"/>
@@ -31,6 +34,7 @@
         <Model name="planetSun" path="models/planetSun.obj"/>
         <Model name="step" path="models/step.obj"/>
         <Model name="table" path="models/table.obj"/>
+        <Model name="terrain" path="models/landscape/terrain.obj"/>
         <Model name="tower" path="models/tower.obj"/>
         <Model name="tree001" path="models/tree001.obj"/>
         <Model name="tree002" path="models/tree002.obj"/>
@@ -762,6 +766,85 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
         </ObjectGroup>
+        <ObjectGroup name="cloudGroup1">
+            <Position x="-63.2" y="11.1" z="-39.5"/>
+            <Rotation x="0" y="-15" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="cloud11" model="cloud1" interactionEvent="">
+                <Position x="0" y="2.3" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="cloud12" model="cloud1" interactionEvent="">
+                <Position x="1.6" y="-5.2" z="18.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="cloud13" model="cloud3" interactionEvent="">
+                <Position x="0" y="-1" z="11.5"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="cloudGroup2">
+            <Position x="-30" y="11.7" z="-200"/>
+            <Rotation x="0" y="90" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="cloud21" model="cloud1" interactionEvent="">
+                <Position x="0" y="2.3" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="cloud22" model="cloud1" interactionEvent="">
+                <Position x="1.6" y="-5.2" z="18.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="cloud23" model="cloud3" interactionEvent="">
+                <Position x="0" y="-1" z="11.5"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+        </ObjectGroup>
+        <!--<ObjectGroup name="terrain">
+            <Position x="0" y="-100" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="terrain1" model="terrain" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="dome1" model="dome" interactionEvent="">
+                <Position x="-200" y="-14.4" z="-100"/>
+                <Rotation x="16.1" y="0" z="-2.4"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+        </ObjectGroup>-->
         <Object name="octonorm" model="octonorm" interactionEvent="">
             <Position x="0" y="11.5" z="0.1"/>
             <Rotation x="0" y="180" z="0"/>
@@ -794,17 +877,9 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-        <Object name="cloud1" model="cloud1" interactionEvent="">
-            <Position x="-64.8" y="7.1" z="-49.9"/>
-            <Rotation x="0" y="-20" z="0"/>
-            <Scaling x="1" y="1" z="1"/>
-            <SpecularColor x="1" y="1" z="1"/>
-            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
-            <AmbientColor x="0.7" y="0.7" z="0.7"/>
-        </Object>
-        <Object name="cloud2" model="cloud1" interactionEvent="">
-            <Position x="-20" y="3.4" z="-150"/>
-            <Rotation x="0" y="-90" z="0"/>
+        <Object name="dragon" model="dragon" interactionEvent="">
+            <Position x="12.1" y="-3.6" z="-58.3"/>
+            <Rotation x="-1.7" y="-56.9" z="2.6"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -819,5 +894,5 @@
         <Position x="0" y="0" z="0"/>
         <Rotation x="0" y="0" z="0"/>
     </Player>
-    <ShaderConfig file="shaders/configurations/defaultConfig.xml"/>
+    <ShaderConfig file="shaders/configurations/VarianceVO.xml"/>
 </Scene>
