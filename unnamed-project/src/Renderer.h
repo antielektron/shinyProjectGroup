@@ -76,6 +76,9 @@ public:
     void setSamples(int s);
     int getSamples();
 
+    void setPlainObscurance(bool b);
+    bool isPlainObscurance();
+
     void awesomeCapture();
 
     void setCaptureSlot(int slot);
@@ -114,6 +117,7 @@ protected:
 
     //compose stuff:
     int m_samples;
+    int m_plainObscurance;
 
 
     /// CAPTURED information
@@ -180,6 +184,7 @@ protected:
     int m_composeLightDirectionLoc;
 
     int m_composeSamplesLoc;
+    int m_composePlainObscuranceLoc;
 
     // Copy Shader for texture arrays
     int m_copyArraySamplerLoc;
