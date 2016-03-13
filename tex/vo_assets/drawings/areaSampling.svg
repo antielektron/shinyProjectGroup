@@ -1,0 +1,815 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 1052.3622 744.09448"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="areaSampling.svg">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Send"
+       style="overflow:visible;"
+       inkscape:isstock="true">
+      <path
+         id="path4292"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1;fill:#040067;fill-opacity:1"
+         transform="scale(0.2) rotate(180) translate(6,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-0"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-0"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-0-4"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-0-3"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-0-6"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-0-7"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-0-8"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-0-76"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-0-9"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-0-8"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-0-9-7"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-0-8-9"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-0-8-9"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-0-76-1"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-0-6-2"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-0-7-7"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-0-4-5"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-0-3-4"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-0-64"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-0-2"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send-03"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4292-04"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z"
+         style="fill:#040067;fill-opacity:1;fill-rule:evenodd;stroke:#040067;stroke-width:1pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.5"
+     inkscape:cx="424.30573"
+     inkscape:cy="230.88923"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1023"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-308.26772)">
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:2;stroke-opacity:1"
+       d="M 766.50375,930.73984 817.41544,496.57627"
+       id="path8689"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:2;stroke-opacity:1"
+       d="M 789.83827,930.03273 817.41544,496.57627"
+       id="path8687"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:2;stroke-opacity:1"
+       d="m 818.12255,930.03273 0,-434.87067"
+       id="path8685"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:2;stroke-opacity:1"
+       d="M 844.9926,930.03273 818.82965,497.28338"
+       id="path8691"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:2;stroke-opacity:1"
+       d="M 869.03423,930.03273 818.12255,497.99049"
+       id="path8693"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:4.590271;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4159"
+       d="m 64.783902,922.64684 c 0.820716,-3.00731 2.301659,-5.64942 3.941483,-8.20725 1.626964,-2.61186 3.816554,-4.67416 6.110017,-6.58094 5.376943,-4.42235 11.627487,-7.24669 17.541478,-10.65707 2.36142,-1.0829 4.62058,-2.4216 7.04046,-3.35104 1.8669,-0.60251 3.83887,-0.66043 5.77454,-0.69082 2.34216,-0.009 4.68421,0.0158 7.02637,0.0166 2.41399,0.12392 4.70495,0.89277 7.00651,1.60338 2.13219,0.47793 4.1021,1.5048 6.00667,2.60768 2.19616,1.29324 4.03753,3.11808 5.86597,4.92907 1.98886,1.80764 3.9707,3.62184 5.89095,5.51366 1.48368,1.68096 2.85599,3.46923 4.30759,5.18224 1.49542,1.97715 2.95469,3.98946 4.65445,5.77025 1.66537,1.51741 3.53191,2.72986 5.3134,4.07353 1.74464,1.46318 3.62743,2.74271 5.59155,3.83673 1.97848,1.21821 4.10625,2.07458 6.32685,2.6085 2.27961,0.70581 4.63535,1.02883 6.96634,1.47421 2.31145,0.43494 4.65753,0.55888 6.99892,0.62553 2.39209,-0.20307 4.75286,-0.6007 7.07315,-1.25639 2.55699,-0.65997 5.1387,-1.34125 7.57199,-2.42481 0.99923,-0.27201 1.81269,-0.93942 2.70027,-1.44996 0.29985,-0.17247 1.22169,-0.63996 0.92799,-0.45568 -3.00161,1.88338 -12.0337,7.48168 -9.0557,5.55548 3.61559,-2.3386 7.31259,-4.52864 10.96888,-6.79294 -17.44262,11.5301 -7.10487,4.22786 -3.27023,1.18644 2.05613,-1.47282 4.16065,-2.84694 6.11736,-4.47394 1.72532,-1.6713 3.6718,-3.0267 5.60928,-4.38919 2.3131,-1.60996 4.61944,-3.23114 6.91596,-4.8683 2.2331,-1.62864 4.40038,-3.356 6.5779,-5.06819 1.96699,-1.61518 4.07784,-3.01932 6.16858,-4.44074 32.18163,-19.95974 -0.24364,0.15777 2.01654,-1.26698 5.13635,-3.2378 9.04884,-5.73735 13.93415,-8.33806 1.92757,-0.92959 3.92657,-1.67055 5.83005,-2.6562 1.80663,-0.86674 3.60377,-1.75626 5.49563,-2.39711 1.5309,-0.30375 3.00836,-0.79841 4.52857,-1.14208 1.54834,-0.29585 3.12472,-0.33519 4.69313,-0.34813 1.21898,0.14032 2.38381,-0.39641 3.58633,-0.47072 0.35854,-0.0222 1.41534,0.0765 1.78116,0.1063 1.85147,0.0393 3.64209,0.43759 5.45603,0.78566 1.87421,0.68361 3.71964,1.50972 5.50778,2.42947 1.83027,0.9282 3.43222,2.23202 5.10599,3.43 1.86581,1.20219 3.61231,2.59643 5.39912,3.92613 1.50742,1.25968 3.21343,2.18226 4.69735,3.4721 1.49743,1.443 2.9479,2.95167 4.25915,4.59138 1.22801,1.7178 2.47753,3.41551 3.71402,5.12726 0.93489,1.49445 1.89636,2.96439 2.98481,4.33457 0.59342,0.73275 1.21488,1.43804 1.87325,2.1036 0.28555,0.27917 0.10101,0.0629 0.35511,0.79346 0,0 -10.5918,5.65339 -10.5918,5.65339 l 0,0 c 0.30875,0.3532 0.35871,0.41451 0.1582,0.17571 -0.6221,-0.74014 -1.25683,-1.46997 -1.83823,-2.24779 -1.0602,-1.41104 -2.03803,-2.87885 -2.96913,-4.39207 -1.22118,-1.68883 -2.4316,-3.38489 -3.64487,-5.08005 -1.30919,-1.54923 -2.70864,-3.01622 -4.19733,-4.36636 -1.48973,-1.22396 -3.14165,-2.19469 -4.62524,-3.43123 -1.78432,-1.33217 -3.53068,-2.72419 -5.4066,-3.90832 -1.60362,-1.19913 -3.21804,-2.37076 -4.99565,-3.26191 -1.73731,-0.83562 -3.4982,-1.69508 -5.35863,-2.15377 -1.77775,-0.3552 -3.56028,-0.59426 -5.37142,-0.63635 -1.78545,-0.009 -3.52636,0.48365 -5.31705,0.42869 -1.53495,0.0709 -3.07824,0.15859 -4.57307,0.5735 -1.47234,0.41038 -2.97166,0.70054 -4.41801,1.21222 -1.84077,0.74451 -3.63055,1.61788 -5.42376,2.48433 -1.93512,0.88234 -3.89976,1.69255 -5.79596,2.67035 -0.65724,0.33622 -1.33423,0.67399 -1.9787,1.03813 -0.33809,0.19102 -1.33367,0.80098 -1.00373,0.59412 2.99461,-1.87756 11.98596,-7.49627 8.99805,-5.6064 -4.31888,2.73171 -22.39778,13.95272 -2.01416,1.28953 -1.0708,0.61798 -2.01474,1.36716 -3.0421,2.06169 -0.71382,0.48257 -1.47111,0.89126 -2.16667,1.40369 -0.35947,0.26482 -0.68767,0.57562 -1.0315,0.86343 -2.17503,1.73182 -4.35893,3.44866 -6.57198,5.12392 -2.27195,1.65821 -4.5799,3.25957 -6.88471,4.86403 -1.90871,1.37234 -3.93272,2.59936 -5.63091,4.27582 -1.91791,1.71083 -3.95988,3.22857 -6.14286,4.5279 -5.21164,4.27233 -10.67839,8.03927 -16.54921,11.26925 2.9801,-1.85942 11.93436,-7.41157 8.94031,-5.57824 -4.70933,2.88363 -9.41296,6.47925 -14.58975,8.57258 -2.50942,0.89946 -5.05749,1.66416 -7.63857,2.28939 -2.39544,0.56601 -4.82936,1.00232 -7.28933,1.00607 -2.36892,-0.11226 -4.73718,-0.30776 -7.07002,-0.78712 -2.35772,-0.45158 -4.73613,-0.79379 -7.03894,-1.52547 -2.26106,-0.67221 -4.43993,-1.6129 -6.47758,-2.87183 -1.97458,-1.17647 -3.8933,-2.46309 -5.68537,-3.9431 -1.83813,-1.36064 -3.71977,-2.66629 -5.38408,-4.27606 -1.70187,-1.8139 -3.16821,-3.84762 -4.71559,-5.81127 -1.42635,-1.68576 -2.77688,-3.4432 -4.22966,-5.10251 -1.91412,-1.89461 -3.88727,-3.71546 -5.8708,-5.52536 -1.77205,-1.73637 -3.59601,-3.43844 -5.74352,-4.62506 -1.87733,-1.01393 -3.79851,-1.9274 -5.86251,-2.41109 -2.22763,-0.69198 -4.48128,-1.31645 -6.81947,-1.32096 -2.34421,-0.0153 -4.68944,-0.0299 -7.03294,0.0433 -1.87741,0.10073 -3.77254,0.24223 -5.53242,1.02134 -2.330242,1.03876 -4.60587,2.21967 -6.877684,3.39659 -1.361604,0.75183 -2.739802,1.47126 -4.090753,2.2451 -0.418347,0.23964 -1.65533,0.9938 -1.246447,0.73598 11.68839,-7.36995 11.254487,-7.09769 7.566055,-4.69728 -2.319613,1.78704 -4.574317,3.73148 -6.269085,6.22896 -1.629171,2.40452 -3.205508,4.83951 -3.95176,7.74781 0,0 -10.590204,5.40611 -10.590204,5.40611 z"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:4.590271;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4161"
+       d="m 203.12452,819.53415 c -16.97893,10.29487 -9.68105,6.43013 -6.37719,3.55951 1.55208,-1.34855 2.98058,-2.85345 4.41941,-4.33631 3.39289,-3.64379 6.48455,-7.59252 9.47137,-11.62059 3.33313,-4.43875 6.72896,-8.81657 9.92793,-13.36894 2.4614,-3.22812 4.56572,-6.73504 6.82363,-10.12278 1.03512,-1.54914 1.92918,-3.20104 2.81891,-4.84935 0.25696,-0.5518 0.75409,-0.83817 1.06533,-1.33599 0.8295,-11.26163 8.37182,-7.64457 12.457,-5.63476 2.16299,1.19805 4.11028,2.83358 6.05934,4.39214 3.83604,3.32801 7.65631,6.64972 11.66568,9.742 4.35397,3.29884 8.76558,6.50278 13.1203,9.80055 3.50171,2.61652 6.77273,5.55947 10.20784,8.27034 2.44895,2.0351 5.0474,3.84801 7.55108,5.79778 1.39161,1.07211 2.64524,2.32149 3.96899,3.47963 0.46979,0.36118 0.92223,0.77433 1.44736,1.0438 0.40959,0.5498 0.63274,1.14391 0.12854,1.70917 -1.09143,0.82344 -2.06295,1.76413 -2.99648,2.80193 -1.64987,1.90965 -3.37932,3.73209 -5.13628,5.52657 -2.9625,2.80802 -5.58227,5.96729 -8.05694,9.26584 -3.13168,4.32692 -6.07343,8.79928 -8.73506,13.4751 -1.6508,3.32396 -3.82197,6.26171 -5.97856,9.21 -1.64129,2.05607 -3.30389,4.09063 -4.92757,6.16368 -0.76123,0.93458 -1.5283,1.89169 -2.38762,2.7249 -6.64542,4.88853 -7.3391,6.60055 -12.50701,6.48625 -1.28228,0.10605 -2.39412,-0.63451 -3.48073,-1.28315 -2.44014,-1.62237 -4.76452,-3.44907 -7.12279,-5.2088 -3.13268,-2.14528 -6.14793,-4.47218 -9.08554,-6.91463 -2.26344,-1.90886 -4.66312,-3.64343 -6.81674,-5.69591 -1.80928,-1.88378 -3.63503,-3.76599 -5.27838,-5.82049 -1.04712,-1.40513 -2.08836,-2.81756 -3.353,-4.00431 -1.12587,-0.98108 -2.38726,-1.75181 -3.5198,-2.73051 -1.21315,-0.84458 -2.36297,-1.78269 -3.50621,-2.73118 -0.69193,-0.72396 -1.48005,-1.32907 -2.17359,-2.04068 -0.95207,-0.73895 -1.87044,-1.52691 -2.74295,-2.37177 -0.6179,-0.84453 -1.42155,-1.44052 -2.15614,-2.1348 -0.75023,-0.62045 -1.51663,-1.2307 -2.2718,-1.85634 -0.5745,-0.59435 -1.14825,-1.1947 -1.75086,-1.77085 -0.37918,-0.6048 -0.90633,-1.07529 -1.45325,-1.49735 -0.0408,-0.0618 -0.13434,-0.0693 -0.20423,-0.0592 0,0 9.87212,-7.06082 9.87212,-7.06082 l 0,0 c 0.10088,0.13889 0.21983,0.25524 0.3469,0.36764 0.51125,0.49439 1.00877,1.00704 1.44843,1.57696 0.57355,0.55861 1.11684,1.14865 1.6941,1.69904 0.76126,0.63405 1.53854,1.24595 2.29638,1.88487 0.79822,0.64763 1.44093,1.43465 2.14686,2.18852 0.89866,0.82373 1.8317,1.59709 2.7679,2.37023 0.72599,0.64477 1.42238,1.31936 2.13193,1.9846 1.10599,0.98287 2.28215,1.86126 3.45938,2.74186 1.18685,0.95208 2.48014,1.7502 3.58652,2.81332 1.23396,1.28639 2.3097,2.71138 3.35411,4.1768 1.59384,2.01543 3.36768,3.86632 5.1446,5.69331 2.16937,1.99132 4.51215,3.75668 6.74229,5.66849 2.89128,2.45558 5.8844,4.75982 9.00002,6.87661 2.37391,1.70359 4.70574,3.50874 7.2301,4.94682 1.05458,0.52404 2.0191,0.90844 3.19943,0.73287 4.12947,-0.30417 10.50854,-6.54546 -7.9633,5.60822 1.0419,-0.57582 1.7742,-1.60198 2.60632,-2.47115 1.67224,-2.06423 3.29429,-4.17301 5.05065,-6.15658 2.1424,-2.98864 4.50381,-5.80866 6.18095,-9.15159 2.66327,-4.71106 5.59654,-9.21845 8.68973,-13.61557 2.38683,-3.31527 4.8728,-6.56974 7.82259,-9.33307 1.68451,-1.81213 3.47231,-3.51194 5.05282,-5.43788 0.86439,-0.99489 1.66482,-2.32144 2.85955,-2.83933 0.0374,-0.0313 0.27557,-0.29371 0.40052,-0.2221 0.0188,0.0108 0.83049,0.94302 0.43562,0.60122 -0.48816,-0.40944 -0.9766,-0.81881 -1.44323,-1.25675 -1.25054,-1.19165 -2.50463,-2.3756 -3.83671,-3.46354 -2.46395,-1.97713 -4.99924,-3.85274 -7.419,-5.89505 -3.39349,-2.74161 -6.669,-5.64914 -10.13107,-8.29429 -4.3109,-3.344 -8.70305,-6.55948 -13.04738,-9.85269 -4.03498,-3.09425 -7.89577,-6.41245 -11.84252,-9.62674 -1.96073,-1.47265 -3.92389,-3.02764 -6.13597,-4.03714 -0.42886,-0.20365 -0.46235,-0.25008 -0.87812,-0.3516 -0.23016,-0.0562 -0.91028,0.0878 -0.70703,-0.0412 9.84841,-6.2492 13.16855,-3.96097 9.67036,-6.2603 -0.19128,0.70367 -0.42681,1.24141 -1.02742,1.63944 -1.25942,1.39037 -1.79812,3.44119 -2.98153,4.9136 -2.37858,3.37833 -4.49459,6.96301 -7.01471,10.22805 -3.20557,4.55488 -6.5637,8.96964 -9.92423,13.39357 -2.94041,4.06186 -6.01836,8.01005 -9.32755,11.73304 -6.03314,6.36566 -8.98354,8.7333 -17.78805,13.34624 0,0 9.16365,-7.87841 9.16365,-7.87841 z"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:bold;font-size:30px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;-inkscape-font-specification:'sans-serif Bold';font-stretch:normal;font-variant:normal;"
+       x="171.42857"
+       y="965.21936"
+       id="text4211"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan4213"
+         x="171.42857"
+         y="965.21936">p</tspan></text>
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2"
+       cx="216.07143"
+       cy="854.86218"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-6"
+       cx="194.28571"
+       cy="835.2193"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-5"
+       cx="235.71428"
+       cy="870.93365"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-4"
+       cx="141.42857"
+       cy="908.07654"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 170,926.64792 Z"
+       id="path4269"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#040067;fill-opacity:1;stroke:#040067;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow1Send)"
+       d="M 174.28571,918.07649 190,849.50506"
+       id="path4271"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#040067;fill-opacity:1;stroke:#040067;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow1Send-0)"
+       d="m 177.46095,921.68766 31.42857,-55.71429"
+       id="path4271-0"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#040067;fill-opacity:1;stroke:#040067;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow1Send-0-4)"
+       d="M 178.92376,924.71501 224.63804,880.4293"
+       id="path4271-0-9"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#040067;fill-opacity:1;stroke:#040067;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow1Send-0-6)"
+       d="m 166.06662,924.71497 -11.42857,-9.99995"
+       id="path4271-0-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#040067;fill-opacity:1;stroke:#040067;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow1Send-0-8)"
+       d="M 168.92376,923.28645 70.352327,714.71502"
+       id="path4271-0-5"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#040067;fill-opacity:1;stroke:#040067;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker-end:url(#Arrow1Send-0-9)"
+       d="M 171.7809,923.28645 140.35233,681.85787"
+       id="path4271-0-3"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#ff0000;fill-opacity:1;stroke:#ff0000;stroke-width:4.07140923;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209"
+       cx="171.71429"
+       cy="926.36218"
+       r="7.9642954"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:4.590271;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4159-3"
+       d="m 389.48503,922.87149 c 0.82071,-3.00731 2.30165,-5.64942 3.94148,-8.20725 1.62696,-2.61186 3.81655,-4.67416 6.11001,-6.58094 5.37695,-4.42235 11.62749,-7.24669 17.54148,-10.65707 2.36142,-1.0829 4.62058,-2.4216 7.04046,-3.35104 1.8669,-0.60251 3.83887,-0.66043 5.77454,-0.69082 2.34216,-0.009 4.68421,0.0158 7.02637,0.0166 2.41399,0.12392 4.70495,0.89277 7.00651,1.60338 2.13219,0.47793 4.1021,1.5048 6.00667,2.60768 2.19616,1.29324 4.03753,3.11808 5.86597,4.92907 1.98886,1.80764 3.9707,3.62184 5.89095,5.51366 1.48368,1.68096 2.85599,3.46923 4.30759,5.18224 1.49542,1.97715 2.95469,3.98946 4.65445,5.77025 1.66537,1.51741 3.53191,2.72986 5.3134,4.07353 1.74464,1.46318 3.62743,2.74271 5.59155,3.83673 1.97848,1.21821 4.10625,2.07458 6.32685,2.6085 2.27961,0.70581 4.63535,1.02883 6.96634,1.47421 2.31145,0.43494 4.65753,0.55888 6.99892,0.62553 2.39209,-0.20307 4.75286,-0.6007 7.07315,-1.25639 2.55699,-0.65997 5.1387,-1.34125 7.57199,-2.42481 0.99923,-0.27201 1.81269,-0.93942 2.70027,-1.44996 0.29985,-0.17247 1.22169,-0.63996 0.92799,-0.45568 -3.00161,1.88338 -12.0337,7.48168 -9.0557,5.55548 3.61559,-2.3386 7.31259,-4.52864 10.96888,-6.79294 -17.44262,11.5301 -7.10487,4.22786 -3.27023,1.18644 2.05613,-1.47282 4.16065,-2.84694 6.11736,-4.47394 1.72532,-1.6713 3.6718,-3.0267 5.60928,-4.38919 2.3131,-1.60996 4.61944,-3.23114 6.91596,-4.8683 2.2331,-1.62864 4.40038,-3.356 6.5779,-5.06819 1.96699,-1.61518 4.07784,-3.01932 6.16858,-4.44074 32.18163,-19.95974 -0.24364,0.15777 2.01654,-1.26698 5.13635,-3.2378 9.04884,-5.73735 13.93415,-8.33806 1.92757,-0.92959 3.92657,-1.67055 5.83005,-2.6562 1.80663,-0.86674 3.60377,-1.75626 5.49563,-2.39711 1.5309,-0.30375 3.00836,-0.79841 4.52857,-1.14208 1.54834,-0.29585 3.12472,-0.33519 4.69313,-0.34813 1.21898,0.14032 2.38381,-0.39641 3.58633,-0.47072 0.35854,-0.0222 1.41534,0.0765 1.78116,0.1063 1.85147,0.0393 3.64209,0.43759 5.45603,0.78566 1.87421,0.68361 3.71964,1.50972 5.50778,2.42947 1.83027,0.9282 3.43222,2.23202 5.10599,3.43 1.86581,1.20219 3.61231,2.59643 5.39912,3.92613 1.50742,1.25968 3.21343,2.18226 4.69735,3.4721 1.49743,1.443 2.9479,2.95167 4.25915,4.59138 1.22801,1.7178 2.47753,3.41551 3.71402,5.12726 0.93489,1.49445 1.89636,2.96439 2.98481,4.33457 0.59342,0.73275 1.21488,1.43804 1.87325,2.1036 0.28555,0.27917 0.10101,0.0629 0.35511,0.79346 0,0 -10.5918,5.65339 -10.5918,5.65339 l 0,0 c 0.30875,0.3532 0.35871,0.41451 0.1582,0.17571 -0.6221,-0.74014 -1.25683,-1.46997 -1.83823,-2.24779 -1.0602,-1.41104 -2.03803,-2.87885 -2.96913,-4.39207 -1.22118,-1.68883 -2.4316,-3.38489 -3.64487,-5.08005 -1.30919,-1.54923 -2.70864,-3.01622 -4.19733,-4.36636 -1.48973,-1.22396 -3.14165,-2.19469 -4.62524,-3.43123 -1.78432,-1.33217 -3.53068,-2.72419 -5.4066,-3.90832 -1.60362,-1.19913 -3.21804,-2.37076 -4.99565,-3.26191 -1.73731,-0.83562 -3.4982,-1.69508 -5.35863,-2.15377 -1.77775,-0.3552 -3.56028,-0.59426 -5.37142,-0.63635 -1.78545,-0.009 -3.52636,0.48365 -5.31705,0.42869 -1.53495,0.0709 -3.07824,0.15859 -4.57307,0.5735 -1.47234,0.41038 -2.97166,0.70054 -4.41801,1.21222 -1.84077,0.74451 -3.63055,1.61788 -5.42376,2.48433 -1.93512,0.88234 -3.89976,1.69255 -5.79596,2.67035 -0.65724,0.33622 -1.33423,0.67399 -1.9787,1.03813 -0.33809,0.19102 -1.33367,0.80098 -1.00373,0.59412 2.99461,-1.87756 11.98596,-7.49627 8.99805,-5.6064 -4.31888,2.73171 -22.39778,13.95272 -2.01416,1.28953 -1.0708,0.61798 -2.01474,1.36716 -3.0421,2.06169 -0.71382,0.48257 -1.47111,0.89126 -2.16667,1.40369 -0.35947,0.26482 -0.68767,0.57562 -1.0315,0.86343 -2.17503,1.73182 -4.35893,3.44866 -6.57198,5.12392 -2.27195,1.65821 -4.5799,3.25957 -6.88471,4.86403 -1.90871,1.37234 -3.93272,2.59936 -5.63091,4.27582 -1.91791,1.71083 -3.95988,3.22857 -6.14286,4.5279 -5.21164,4.27233 -10.67839,8.03927 -16.54921,11.26925 2.9801,-1.85942 11.93436,-7.41157 8.94031,-5.57824 -4.70933,2.88363 -9.41296,6.47925 -14.58975,8.57258 -2.50942,0.89946 -5.05749,1.66416 -7.63857,2.28939 -2.39544,0.56601 -4.82936,1.00232 -7.28933,1.00607 -2.36892,-0.11226 -4.73718,-0.30776 -7.07002,-0.78712 -2.35772,-0.45158 -4.73613,-0.79379 -7.03894,-1.52547 -2.26106,-0.67221 -4.43993,-1.6129 -6.47758,-2.87183 -1.97458,-1.17647 -3.8933,-2.46309 -5.68537,-3.9431 -1.83813,-1.36064 -3.71977,-2.66629 -5.38408,-4.27606 -1.70187,-1.8139 -3.16821,-3.84762 -4.71559,-5.81127 -1.42635,-1.68576 -2.77688,-3.4432 -4.22966,-5.10251 -1.91412,-1.89461 -3.88727,-3.71546 -5.8708,-5.52536 -1.77205,-1.73637 -3.59601,-3.43844 -5.74352,-4.62506 -1.87733,-1.01393 -3.79851,-1.9274 -5.86251,-2.41109 -2.22763,-0.69198 -4.48128,-1.31645 -6.81947,-1.32096 -2.34421,-0.0153 -4.68944,-0.0299 -7.03294,0.0433 -1.87741,0.10073 -3.77254,0.24223 -5.53242,1.02134 -2.33024,1.03876 -4.60587,2.21967 -6.87768,3.39659 -1.36161,0.75183 -2.7398,1.47126 -4.09075,2.2451 -0.41835,0.23964 -1.65533,0.9938 -1.24645,0.73598 11.68839,-7.36995 11.25449,-7.09769 7.56605,-4.69728 -2.31961,1.78704 -4.57431,3.73148 -6.26908,6.22896 -1.62917,2.40452 -3.20551,4.83951 -3.95176,7.74781 0,0 -10.5902,5.40611 -10.5902,5.40611 z"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:4.590271;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4161-2"
+       d="m 527.82564,819.7588 c -16.97893,10.29487 -9.68105,6.43013 -6.37719,3.55951 1.55208,-1.34855 2.98058,-2.85345 4.41941,-4.33631 3.39289,-3.64379 6.48455,-7.59252 9.47137,-11.62059 3.33313,-4.43875 6.72896,-8.81657 9.92793,-13.36894 2.4614,-3.22812 4.56572,-6.73504 6.82363,-10.12278 1.03512,-1.54914 1.92918,-3.20104 2.81891,-4.84935 0.25696,-0.5518 0.75409,-0.83817 1.06533,-1.33599 0.8295,-11.26163 8.37182,-7.64457 12.457,-5.63476 2.16299,1.19805 4.11028,2.83358 6.05934,4.39214 3.83604,3.32801 7.65631,6.64972 11.66568,9.742 4.35397,3.29884 8.76558,6.50278 13.1203,9.80055 3.50171,2.61652 6.77273,5.55947 10.20784,8.27034 2.44895,2.0351 5.0474,3.84801 7.55108,5.79778 1.39161,1.07211 2.64524,2.32149 3.96899,3.47963 0.46979,0.36118 0.92223,0.77433 1.44736,1.0438 0.40959,0.5498 0.63274,1.14391 0.12854,1.70917 -1.09143,0.82344 -2.06295,1.76413 -2.99648,2.80193 -1.64987,1.90965 -3.37932,3.73209 -5.13628,5.52657 -2.9625,2.80802 -5.58227,5.96729 -8.05694,9.26584 -3.13168,4.32692 -6.07343,8.79928 -8.73506,13.4751 -1.6508,3.32396 -3.82197,6.26171 -5.97856,9.21 -1.64129,2.05607 -3.30389,4.09063 -4.92757,6.16368 -0.76123,0.93458 -1.5283,1.89169 -2.38762,2.7249 -6.64542,4.88853 -7.3391,6.60055 -12.50701,6.48625 -1.28228,0.10605 -2.39412,-0.63451 -3.48073,-1.28315 -2.44014,-1.62237 -4.76452,-3.44907 -7.12279,-5.2088 -3.13268,-2.14528 -6.14793,-4.47218 -9.08554,-6.91463 -2.26344,-1.90886 -4.66312,-3.64343 -6.81674,-5.69591 -1.80928,-1.88378 -3.63503,-3.76599 -5.27838,-5.82049 -1.04712,-1.40513 -2.08836,-2.81756 -3.353,-4.00431 -1.12587,-0.98108 -2.38726,-1.75181 -3.5198,-2.73051 -1.21315,-0.84458 -2.36297,-1.78269 -3.50621,-2.73118 -0.69193,-0.72396 -1.48005,-1.32907 -2.17359,-2.04068 -0.95207,-0.73895 -1.87044,-1.52691 -2.74295,-2.37177 -0.6179,-0.84453 -1.42155,-1.44052 -2.15614,-2.1348 -0.75023,-0.62045 -1.51663,-1.2307 -2.2718,-1.85634 -0.5745,-0.59435 -1.14825,-1.1947 -1.75086,-1.77085 -0.37918,-0.6048 -0.90633,-1.07529 -1.45325,-1.49735 -0.0408,-0.0618 -0.13434,-0.0693 -0.20423,-0.0592 0,0 9.87212,-7.06082 9.87212,-7.06082 l 0,0 c 0.10088,0.13889 0.21983,0.25524 0.3469,0.36764 0.51125,0.49439 1.00877,1.00704 1.44843,1.57696 0.57355,0.55861 1.11684,1.14865 1.6941,1.69904 0.76126,0.63405 1.53854,1.24595 2.29638,1.88487 0.79822,0.64763 1.44093,1.43465 2.14686,2.18852 0.89866,0.82373 1.8317,1.59709 2.7679,2.37023 0.72599,0.64477 1.42238,1.31936 2.13193,1.9846 1.10599,0.98287 2.28215,1.86126 3.45938,2.74186 1.18685,0.95208 2.48014,1.7502 3.58652,2.81332 1.23396,1.28639 2.3097,2.71138 3.35411,4.1768 1.59384,2.01543 3.36768,3.86632 5.1446,5.69331 2.16937,1.99132 4.51215,3.75668 6.74229,5.66849 2.89128,2.45558 5.8844,4.75982 9.00002,6.87661 2.37391,1.70359 4.70574,3.50874 7.2301,4.94682 1.05458,0.52404 2.0191,0.90844 3.19943,0.73287 4.12947,-0.30417 10.50854,-6.54546 -7.9633,5.60822 1.0419,-0.57582 1.7742,-1.60198 2.60632,-2.47115 1.67224,-2.06423 3.29429,-4.17301 5.05065,-6.15658 2.1424,-2.98864 4.50381,-5.80866 6.18095,-9.15159 2.66327,-4.71106 5.59654,-9.21845 8.68973,-13.61557 2.38683,-3.31527 4.8728,-6.56974 7.82259,-9.33307 1.68451,-1.81213 3.47231,-3.51194 5.05282,-5.43788 0.86439,-0.99489 1.66482,-2.32144 2.85955,-2.83933 0.0374,-0.0313 0.27557,-0.29371 0.40052,-0.2221 0.0188,0.0108 0.83049,0.94302 0.43562,0.60122 -0.48816,-0.40944 -0.9766,-0.81881 -1.44323,-1.25675 -1.25054,-1.19165 -2.50463,-2.3756 -3.83671,-3.46354 -2.46395,-1.97713 -4.99924,-3.85274 -7.419,-5.89505 -3.39349,-2.74161 -6.669,-5.64914 -10.13107,-8.29429 -4.3109,-3.344 -8.70305,-6.55948 -13.04738,-9.85269 -4.03498,-3.09425 -7.89577,-6.41245 -11.84252,-9.62674 -1.96073,-1.47265 -3.92389,-3.02764 -6.13597,-4.03714 -0.42886,-0.20365 -0.46235,-0.25008 -0.87812,-0.3516 -0.23016,-0.0562 -0.91028,0.0878 -0.70703,-0.0412 9.84841,-6.2492 13.16855,-3.96097 9.67036,-6.2603 -0.19128,0.70367 -0.42681,1.24141 -1.02742,1.63944 -1.25942,1.39037 -1.79812,3.44119 -2.98153,4.9136 -2.37858,3.37833 -4.49459,6.96301 -7.01471,10.22805 -3.20557,4.55488 -6.5637,8.96964 -9.92423,13.39357 -2.94041,4.06186 -6.01836,8.01005 -9.32755,11.73304 -6.03314,6.36566 -8.98354,8.7333 -17.78805,13.34624 0,0 9.16365,-7.87841 9.16365,-7.87841 z"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-8"
+       cx="463.91537"
+       cy="965.58679"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 494.70112,926.87257 Z"
+       id="path4269-3"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-5-7-1"
+       cx="539"
+       cy="911.07654"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-5-7-0"
+       cx="502.64288"
+       cy="981.07648"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-5-7-7"
+       cx="443.21429"
+       cy="926.50507"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#040067;stroke-width:5.40220499;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path8526"
+       cx="496.03571"
+       cy="925.54077"
+       r="64.798897"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:4.590271;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4159-3-2"
+       d="m 711.05645,925.9337 c 0.82071,-3.0073 2.30165,-5.6494 3.94148,-8.2073 1.62696,-2.6118 3.81655,-4.6741 6.11001,-6.5809 5.37695,-4.4223 11.62749,-7.2467 17.54148,-10.6571 2.36142,-1.0829 4.62058,-2.4216 7.04046,-3.351 1.8669,-0.6025 3.83887,-0.6604 5.77454,-0.6908 2.34216,-0.01 4.68421,0.016 7.02637,0.017 2.41399,0.1239 4.70495,0.8927 7.00651,1.6034 2.13219,0.4779 4.1021,1.5048 6.00667,2.6076 2.19616,1.2933 4.03753,3.1181 5.86597,4.9291 1.98886,1.8076 3.9707,3.6218 5.89095,5.5137 1.48368,1.6809 2.85599,3.4692 4.30759,5.1822 1.49542,1.9772 2.95469,3.9895 4.65445,5.7703 1.66537,1.5174 3.53191,2.7298 5.3134,4.0735 1.74464,1.4632 3.62743,2.7427 5.59155,3.8367 1.97848,1.2182 4.10625,2.0746 6.32686,2.6085 2.27961,0.7058 4.63535,1.0288 6.96634,1.4742 2.31145,0.435 4.65753,0.5589 6.99892,0.6256 2.39209,-0.2031 4.75286,-0.6007 7.07315,-1.2564 2.55699,-0.66 5.1387,-1.3413 7.57199,-2.4248 0.99923,-0.2721 1.81269,-0.9395 2.70027,-1.45 0.29985,-0.1725 1.22169,-0.64 0.92799,-0.4557 -3.00161,1.8834 -12.0337,7.4817 -9.0557,5.5555 3.61559,-2.3386 7.31259,-4.5286 10.96888,-6.7929 -17.44262,11.5301 -7.10487,4.2278 -3.27023,1.1864 2.05613,-1.4728 4.16065,-2.8469 6.11736,-4.4739 1.72532,-1.6713 3.6718,-3.0267 5.60928,-4.3892 2.3131,-1.61 4.61944,-3.2312 6.91596,-4.8683 2.2331,-1.6287 4.40038,-3.356 6.5779,-5.0682 1.96699,-1.6152 4.07784,-3.0193 6.16858,-4.4408 32.18163,-19.9597 -0.24364,0.1578 2.01654,-1.2669 5.13635,-3.2378 9.04884,-5.7374 13.93415,-8.3381 1.92757,-0.9296 3.92657,-1.6706 5.83005,-2.6562 1.80663,-0.8667 3.60377,-1.7563 5.49563,-2.3971 1.5309,-0.3038 3.00836,-0.7984 4.52857,-1.1421 1.54834,-0.2958 3.12472,-0.3352 4.69313,-0.3481 1.21898,0.1403 2.38381,-0.3964 3.58633,-0.4707 0.35854,-0.022 1.41534,0.077 1.78116,0.1063 1.85147,0.039 3.64209,0.4375 5.45603,0.7856 1.87421,0.6836 3.71964,1.5097 5.50778,2.4295 1.83027,0.9282 3.43222,2.232 5.10599,3.43 1.86581,1.2022 3.61231,2.5964 5.39912,3.9261 1.50742,1.2597 3.21343,2.1823 4.69735,3.4721 1.49743,1.443 2.9479,2.9517 4.25915,4.5914 1.22801,1.7178 2.47753,3.4155 3.71402,5.1273 0.93489,1.4944 1.89636,2.9643 2.98481,4.3345 0.59342,0.7328 1.21488,1.4381 1.87325,2.1036 0.28555,0.2792 0.10101,0.063 0.35511,0.7935 0,0 -10.5918,5.6534 -10.5918,5.6534 l 0,0 c 0.30875,0.3532 0.35871,0.4145 0.1582,0.1757 -0.6221,-0.7402 -1.25683,-1.47 -1.83823,-2.2478 -1.0602,-1.411 -2.03803,-2.8789 -2.96913,-4.3921 -1.22118,-1.6888 -2.4316,-3.3849 -3.64487,-5.08 -1.30919,-1.5493 -2.70864,-3.0162 -4.19733,-4.3664 -1.48973,-1.2239 -3.14165,-2.1947 -4.62524,-3.4312 -1.78432,-1.3322 -3.53068,-2.7242 -5.4066,-3.9083 -1.60362,-1.1992 -3.21804,-2.3708 -4.99565,-3.2619 -1.73731,-0.8357 -3.4982,-1.6951 -5.35863,-2.1538 -1.77775,-0.3552 -3.56028,-0.5943 -5.37142,-0.6364 -1.78545,-0.01 -3.52636,0.4837 -5.31705,0.4287 -1.53495,0.071 -3.07824,0.1586 -4.57307,0.5735 -1.47234,0.4104 -2.97166,0.7006 -4.41801,1.2122 -1.84077,0.7446 -3.63055,1.6179 -5.42376,2.4844 -1.93512,0.8823 -3.89976,1.6925 -5.79596,2.6703 -0.65724,0.3362 -1.33423,0.674 -1.9787,1.0382 -0.33809,0.191 -1.33367,0.8009 -1.00373,0.5941 2.99461,-1.8776 11.98596,-7.4963 8.99805,-5.6064 -4.31888,2.7317 -22.39778,13.9527 -2.01416,1.2895 -1.0708,0.618 -2.01474,1.3672 -3.0421,2.0617 -0.71382,0.4826 -1.47111,0.8913 -2.16667,1.4037 -0.35947,0.2648 -0.68767,0.5756 -1.0315,0.8634 -2.17503,1.7318 -4.35893,3.4487 -6.57198,5.1239 -2.27195,1.6582 -4.5799,3.2596 -6.88471,4.8641 -1.90871,1.3723 -3.93272,2.5993 -5.63091,4.2758 -1.91791,1.7108 -3.95988,3.2286 -6.14286,4.5279 -5.21164,4.2723 -10.67839,8.0393 -16.54921,11.2692 2.9801,-1.8594 11.93436,-7.4115 8.94031,-5.5782 -4.70933,2.8836 -9.41296,6.4792 -14.58975,8.5726 -2.50942,0.8994 -5.05749,1.6641 -7.63857,2.2894 -2.39544,0.566 -4.82936,1.0023 -7.28933,1.006 -2.36892,-0.1122 -4.73718,-0.3077 -7.07003,-0.7871 -2.35772,-0.4516 -4.73613,-0.7938 -7.03894,-1.5255 -2.26106,-0.6722 -4.43993,-1.6129 -6.47758,-2.8718 -1.97458,-1.1765 -3.8933,-2.4631 -5.68537,-3.9431 -1.83813,-1.3606 -3.71977,-2.6663 -5.38408,-4.276 -1.70187,-1.8139 -3.16821,-3.8477 -4.71559,-5.8113 -1.42635,-1.6858 -2.77688,-3.4432 -4.22966,-5.1025 -1.91412,-1.8946 -3.88727,-3.7155 -5.8708,-5.5254 -1.77205,-1.7364 -3.59601,-3.4384 -5.74352,-4.625 -1.87733,-1.014 -3.79851,-1.9274 -5.86251,-2.4111 -2.22763,-0.692 -4.48128,-1.3165 -6.81947,-1.321 -2.34421,-0.015 -4.68944,-0.03 -7.03294,0.043 -1.87741,0.1007 -3.77254,0.2422 -5.53242,1.0213 -2.33024,1.0388 -4.60587,2.2197 -6.87768,3.3966 -1.36161,0.7519 -2.7398,1.4713 -4.09075,2.2451 -0.41835,0.2397 -1.65533,0.9938 -1.24645,0.736 11.68839,-7.3699 11.25449,-7.0977 7.56605,-4.6973 -2.31961,1.7871 -4.57431,3.7315 -6.26908,6.229 -1.62917,2.4045 -3.20551,4.8395 -3.95176,7.7478 0,0 -10.5902,5.4061 -10.5902,5.4061 z"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:4.590271;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4161-2-6"
+       d="m 849.39707,822.82101 c -16.97893,10.29487 -9.68105,6.43013 -6.37719,3.55951 1.55208,-1.34855 2.98058,-2.85345 4.41941,-4.33631 3.39289,-3.64379 6.48455,-7.59252 9.47137,-11.62059 3.33313,-4.43875 6.72896,-8.81657 9.92793,-13.36894 2.4614,-3.22812 4.56572,-6.73504 6.82363,-10.12278 1.03512,-1.54914 1.92918,-3.20104 2.81891,-4.84935 0.25696,-0.5518 0.75409,-0.83817 1.06533,-1.33599 0.8295,-11.26163 8.37182,-7.64457 12.457,-5.63476 2.16299,1.19805 4.11028,2.83358 6.05934,4.39214 3.83604,3.32801 7.65631,6.64972 11.66568,9.742 4.35397,3.29884 8.76558,6.50278 13.1203,9.80055 3.50171,2.61652 6.77273,5.55947 10.20784,8.27034 2.44895,2.0351 5.0474,3.84801 7.55108,5.79778 1.39161,1.07211 2.64524,2.32149 3.96899,3.47963 0.46979,0.36118 0.92223,0.77433 1.44736,1.0438 0.40959,0.5498 0.63274,1.14391 0.12854,1.70917 -1.09143,0.82344 -2.06295,1.76413 -2.99648,2.80193 -1.64987,1.90965 -3.37932,3.73209 -5.13628,5.52657 -2.9625,2.80802 -5.58227,5.96729 -8.05694,9.26584 -3.13168,4.32692 -6.07343,8.79928 -8.73506,13.4751 -1.6508,3.32396 -3.82197,6.26171 -5.97856,9.21 -1.64129,2.05607 -3.30389,4.09063 -4.92757,6.16368 -0.76123,0.93458 -1.5283,1.89167 -2.38762,2.72487 -6.64542,4.8886 -7.3391,6.6006 -12.50701,6.4863 -1.28228,0.106 -2.39412,-0.6345 -3.48073,-1.2832 -2.44014,-1.6223 -4.76452,-3.449 -7.12279,-5.2088 -3.13268,-2.14525 -6.14793,-4.47215 -9.08554,-6.9146 -2.26344,-1.90886 -4.66312,-3.64343 -6.81674,-5.69591 -1.80928,-1.88378 -3.63503,-3.76599 -5.27838,-5.82049 -1.04712,-1.40513 -2.08836,-2.81756 -3.353,-4.00431 -1.12587,-0.98108 -2.38726,-1.75181 -3.5198,-2.73051 -1.21315,-0.84458 -2.36297,-1.78269 -3.50621,-2.73118 -0.69193,-0.72396 -1.48005,-1.32907 -2.17359,-2.04068 -0.95207,-0.73895 -1.87044,-1.52691 -2.74295,-2.37177 -0.6179,-0.84453 -1.42155,-1.44052 -2.15614,-2.1348 -0.75023,-0.62045 -1.51663,-1.2307 -2.2718,-1.85634 -0.5745,-0.59435 -1.14825,-1.1947 -1.75086,-1.77085 -0.37918,-0.6048 -0.90633,-1.07529 -1.45325,-1.49735 -0.0408,-0.0618 -0.13434,-0.0693 -0.20423,-0.0592 0,0 9.87212,-7.06082 9.87212,-7.06082 l 0,0 c 0.10088,0.13889 0.21983,0.25524 0.3469,0.36764 0.51125,0.49439 1.00877,1.00704 1.44843,1.57696 0.57355,0.55861 1.11684,1.14865 1.6941,1.69904 0.76126,0.63405 1.53854,1.24595 2.29638,1.88487 0.79822,0.64763 1.44093,1.43465 2.14686,2.18852 0.89866,0.82373 1.8317,1.59709 2.7679,2.37023 0.72599,0.64477 1.42238,1.31936 2.13193,1.9846 1.10599,0.98287 2.28215,1.86126 3.45938,2.74186 1.18685,0.95208 2.48014,1.7502 3.58652,2.81332 1.23396,1.28639 2.3097,2.71138 3.35411,4.1768 1.59384,2.01543 3.36768,3.86632 5.1446,5.69331 2.16937,1.99132 4.51215,3.75668 6.74229,5.66849 2.89128,2.45558 5.8844,4.75982 9.00002,6.87661 2.37391,1.70359 4.70574,3.50874 7.2301,4.94682 1.05458,0.52404 2.0191,0.90844 3.19943,0.73284 4.12947,-0.3041 10.50854,-6.54543 -7.9633,5.6082 1.0419,-0.5758 1.7742,-1.6019 2.60632,-2.4711 1.67224,-2.0642 3.29429,-4.17301 5.05065,-6.15658 2.1424,-2.98864 4.50381,-5.80866 6.18095,-9.15159 2.66327,-4.71106 5.59654,-9.21845 8.68973,-13.61557 2.38683,-3.31527 4.8728,-6.56974 7.82259,-9.33307 1.68451,-1.81213 3.47231,-3.51194 5.05282,-5.43788 0.86439,-0.99489 1.66482,-2.32144 2.85955,-2.83933 0.0374,-0.0313 0.27557,-0.29371 0.40052,-0.2221 0.0188,0.0108 0.83049,0.94302 0.43562,0.60122 -0.48816,-0.40944 -0.9766,-0.81881 -1.44323,-1.25675 -1.25054,-1.19165 -2.50463,-2.3756 -3.83671,-3.46354 -2.46395,-1.97713 -4.99924,-3.85274 -7.419,-5.89505 -3.39349,-2.74161 -6.669,-5.64914 -10.13107,-8.29429 -4.3109,-3.344 -8.70305,-6.55948 -13.04738,-9.85269 -4.03498,-3.09425 -7.89577,-6.41245 -11.84252,-9.62674 -1.96073,-1.47265 -3.92389,-3.02764 -6.13597,-4.03714 -0.42886,-0.20365 -0.46235,-0.25008 -0.87812,-0.3516 -0.23016,-0.0562 -0.91028,0.0878 -0.70703,-0.0412 9.84841,-6.2492 13.16855,-3.96097 9.67036,-6.2603 -0.19128,0.70367 -0.42681,1.24141 -1.02742,1.63944 -1.25942,1.39037 -1.79812,3.44119 -2.98153,4.9136 -2.37858,3.37833 -4.49459,6.96301 -7.01471,10.22805 -3.20557,4.55488 -6.5637,8.96964 -9.92423,13.39357 -2.94041,4.06186 -6.01836,8.01005 -9.32755,11.73304 -6.03314,6.36566 -8.98354,8.7333 -17.78805,13.34624 0,0 9.16365,-7.87841 9.16365,-7.87841 z"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:30px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="817.70111"
+       y="968.50623"
+       id="text4211-6-0"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan4213-9-7"
+         x="817.70111"
+         y="968.50623">p</tspan></text>
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-4-5-7"
+       cx="766.34399"
+       cy="930.29211"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:8;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 816.27255,929.9348 Z"
+       id="path4269-3-1"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#ff0000;fill-opacity:1;stroke:#ff0000;stroke-width:4.07140923;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-8-0"
+       cx="817.98682"
+       cy="929.64905"
+       r="7.9642954"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#040067;stroke-width:5.40220499;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path8526-2"
+       cx="817.60712"
+       cy="928.60303"
+       r="64.798897"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 387,589.3622 233,0"
+       id="path8593"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 444,919.3622 50,-404"
+       id="path8595"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:2.75732303;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 442.87934,921.48418 494.12066,489.42204"
+       id="path8597"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 474,871.3622 21,-382"
+       id="path8599"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 463,958.3622 31,-470"
+       id="path8601"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 502,890.3622 -9,-401"
+       id="path8603"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 502,975.3622 -8,-484"
+       id="path8605"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 534,954.3622 -39,-464"
+       id="path8607"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 538,904.3622 -44,-414"
+       id="path8609"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 550,928.3622 -56,-437"
+       id="path8611"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#ff0000;fill-opacity:1;stroke:#ff0000;stroke-width:4.07140923;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-8"
+       cx="496.41541"
+       cy="926.58685"
+       r="7.9642954"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:30px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="496.1297"
+       y="965.44403"
+       id="text4211-6"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan4213-9"
+         x="496.1297"
+         y="965.44403">p</tspan></text>
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-6-5"
+       cx="534.34393"
+       cy="961.80103"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-5-7"
+       cx="550.27252"
+       cy="933.76538"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-5-7-2"
+       cx="503.28571"
+       cy="898.21936"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-4-5"
+       cx="473.27258"
+       cy="879.7298"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:25px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="514"
+       y="578.36218"
+       id="text8613"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan8615"
+         x="514"
+         y="578.36218"
+         style="font-size:20px">Image Plane</tspan></text>
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 717.5,588.36221 233,0"
+       id="path8593-6"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:25px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="857.79492"
+       y="579.80164"
+       id="text8613-9"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan8615-9"
+         x="857.79492"
+         y="579.80164"
+         style="font-size:20px">Image Plane</tspan></text>
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-4-5-7-1"
+       cx="818"
+       cy="929.86218"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-4-5-7-7"
+       cx="869"
+       cy="930.11218"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-4-5-7-4"
+       cx="844.25"
+       cy="930.61218"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <circle
+       style="fill:#060093;fill-opacity:1;stroke:#00a6ff;stroke-width:3.05355692;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4209-2-4-5-7-2"
+       cx="790.25"
+       cy="930.61218"
+       r="5.9732218"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#ff6a00;stroke-width:2;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:12, 2;stroke-dashoffset:2;stroke-opacity:1"
+       d="m 751.75,930.3622 130,0"
+       id="path8650"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:22.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="42"
+       y="366.36221"
+       id="text8695"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan8697"
+         x="42"
+         y="366.36221">Ambient Occlusion </tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:22.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="381.51245"
+       y="365.75027"
+       id="text8695-0"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan8697-7"
+         x="381.51245"
+         y="365.75027">Screenspace Ambient </tspan><tspan
+         sodipodi:role="line"
+         x="381.51245"
+         y="393.87527"
+         id="tspan8717">        Occlusion</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:22.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="697.51245"
+       y="365.75027"
+       id="text8695-3"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/jonas/Dokumente/gitRepos/shinyprojectgroup/tex/vo_assets/presentaton_graphics/AOvsSSAOvsVO.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan8697-9"
+         x="697.51245"
+         y="365.75027">Volumetric Obscurance</tspan></text>
+  </g>
+</svg>
