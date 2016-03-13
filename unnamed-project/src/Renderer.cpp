@@ -567,6 +567,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             GLsizei initWidth = (m_width-1) / 2 / 16 + 1;
             GLsizei initHeight = (m_height-1) / 2 / 16 + 1;
 
+            glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
             reduceDepthSamplerProgram->bind();
 
             glActiveTexture(GL_TEXTURE0);
