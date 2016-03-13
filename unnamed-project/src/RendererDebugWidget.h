@@ -18,6 +18,9 @@ public:
     RendererDebugWidget(Renderer *renderer, QWidget *parent = nullptr);
     ~RendererDebugWidget();
 
+signals:
+    void shaderChanged();
+
 protected slots:
     void onColorCascadesChanged();
     void onCascadedShadowMapsLambdaChanged();

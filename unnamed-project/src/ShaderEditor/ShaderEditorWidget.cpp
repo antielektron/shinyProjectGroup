@@ -92,6 +92,13 @@ const QString &ShaderEditorWidget::getFilename()
 }
 
 //------------------------------------------------------------------------------
+
+CodeEditor *ShaderEditorWidget::getEditor()
+{
+    return m_editor;
+}
+
+//------------------------------------------------------------------------------
 void ShaderEditorWidget::setShaderName(QOpenGLShader::ShaderTypeBit type,
                                        const QString &progName)
 {

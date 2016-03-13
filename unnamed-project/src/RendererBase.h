@@ -139,6 +139,7 @@ public:
     virtual QWidget *createDebugWidget(QWidget *parent = nullptr) = 0;
 
 protected:
+
     virtual void onRenderingInternal(GLuint fbo, Scene *scene) = 0;
 
     // map for shader programs:

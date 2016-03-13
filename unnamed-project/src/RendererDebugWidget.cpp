@@ -238,11 +238,13 @@ void RendererDebugWidget::onAwesomeSlotChanged(int slot)
 void RendererDebugWidget::onLightViewChanged()
 {
     m_renderer->setRenderLightView(m_lightView->isChecked());
+    emit shaderChanged();
 }
 
 void RendererDebugWidget::onMomentViewChanged()
 {
     m_renderer->setRenderMomentView(m_momentView->isChecked());
+    emit shaderChanged();
 }
 
 
@@ -251,18 +253,22 @@ void RendererDebugWidget::onVolumetricObscuranceChanged()
     if (m_lineVO->isChecked())
     {
         m_renderer->loadConfiguration("shaders/configurations/defaultConfig.xml");
+        emit shaderChanged();
     }
     else if(m_varianceVO->isChecked())
     {
         m_renderer->loadConfiguration("shaders/configurations/VarianceVO.xml");
+        emit shaderChanged();
     }
     else if(m_momentVO->isChecked())
     {
         m_renderer->loadConfiguration("shaders/configurations/MomentVO.xml");
+        emit shaderChanged();
     }
     else if (m_noVO->isChecked())
     {
         m_renderer->loadConfiguration("shaders/configurations/plainConfig.xml");
+        emit shaderChanged();
     }
 }
 

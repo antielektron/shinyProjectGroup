@@ -45,6 +45,9 @@ void EditorWindow::createDocks()
     dock->setWidget(m_debugWidget);
     addDockWidget(Qt::LeftDockWidgetArea,dock);
 
+    connect(m_debugWidget, SIGNAL(shaderChanged()),
+            this, SLOT(onShaderConfigChanged()));
+
     // add shader editors
     std::vector<std::string> programs;
 
@@ -185,6 +188,7 @@ void EditorWindow::onLoadShaderConfigClicked()
     if (filename.length() > 0)
     {
         m_glWidget->getRenderer()->loadConfiguration(filename.toStdString());
+        this->onShaderConfigChanged();
     }
 }
 
@@ -218,6 +222,27 @@ void EditorWindow::onFpsChanged(float fps)
     this->statusBar()->showMessage(QString("FPS: ") + QString::number(fps));
 }
 
+//------------------------------------------------------------------------------
+void EditorWindow::onShaderConfigChanged()
+{
+    RendererBase *renderer = m_glWidget->getRenderer();
+
+    std::vector<std::string> programs;
+
+    renderer->getPrograms(programs);
+
+    for (const auto &prog : programs)
+    {
+        RendererBase::ShaderSourcesType sources;
+        renderer->getShadersForProgram(prog, sources);
+        for (const auto &pair : sources)
+        {
+            ShaderEditorWidget *editorWidget = m_shaderEditorMap[std::make_pair(prog, pair.first)];
+            editorWidget->onShaderChanged(QString::fromStdString(pair.second));
+        }
+
+    }
+}
 //------------------------------------------------------------------------------
 void EditorWindow::onShaderChanged(const QString &src,
                                    QOpenGLShader::ShaderTypeBit type,
