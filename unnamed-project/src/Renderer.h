@@ -37,7 +37,6 @@
 
 #define NUM_VO_MIPMAP_LEVELS 10 //so there's a height of 1 pixel @toplevel for full-HD
 
-
 class Renderer : public RendererBase
 {
 public:
@@ -94,6 +93,9 @@ public:
 
     void setRenderMomentView(bool enabled);
 
+    void setMipMapStrategy(bool glLin, bool mmLin);
+    void getMipMapStrategy(bool &glLine, bool &mmLin);
+
 protected:
     virtual void onRenderingInternal(GLuint fbo, Scene *scene) override;
     void rotateVectorToVector(const QVector3D &source,
@@ -122,6 +124,8 @@ protected:
     int m_samples;
     int m_plainObscurance;
     int m_sky;
+    bool m_glLinear;
+    bool m_mmLinear;
 
 
     /// CAPTURED information

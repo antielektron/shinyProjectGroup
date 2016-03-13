@@ -24,6 +24,10 @@ RendererDebugWidget::RendererDebugWidget(Renderer *renderer, QWidget *parent) :
     m_sky->setChecked(m_renderer->isSky());
     m_sampleSlider->setValue(m_renderer->getSamples());
     m_sampleLabel->setText(QString("Samples: " ) + QString::number(m_renderer->getSamples()));
+    bool mmLin, glLin;
+    m_renderer->getMipMapStrategy(mmLin, glLin);
+    m_GL_LINEAR->setChecked(glLin);
+    m_MIPMAP_LINEAR->setChecked(mmLin);
 
     switch (m_renderer->getCascadeStrategy())
     {
@@ -139,6 +143,12 @@ QWidget *RendererDebugWidget::generateVOOptions()
     m_momentVO = new QRadioButton("moment area sampling", voOptions);
     layout->addWidget(m_momentVO);
 
+    m_GL_LINEAR = new QCheckBox("GL_LINEAR", voOptions);
+    layout->addWidget(m_GL_LINEAR);
+
+    m_MIPMAP_LINEAR = new QCheckBox("MIPMAP_LINEAR", voOptions);
+    layout->addWidget(m_MIPMAP_LINEAR);
+
     m_noVO = new QRadioButton("plain copy", voOptions);
     layout->addWidget(m_noVO);
 
@@ -188,6 +198,8 @@ void RendererDebugWidget::connectStuff()
     connect(m_noVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_plainVO, SIGNAL(stateChanged(int)), this, SLOT(onPlainObscuranceChanged(int)));
     connect(m_sky, SIGNAL(stateChanged(int)), this, SLOT(onSkyChanged(int)));
+    connect(m_GL_LINEAR, SIGNAL(stateChanged(int)), this, SLOT(onMipMapStrategyChanged()));
+    connect(m_MIPMAP_LINEAR, SIGNAL(stateChanged(int)), this, SLOT(onMipMapStrategyChanged()));
 
     // connect(m_colorizeMoments, SIGNAL(stateChanged(int)), this, SLOT(onColorMomentsChanged));
     connect(m_filterShadowMap, SIGNAL(stateChanged(int)), this, SLOT(onFilterShadowMapChanged()));
@@ -311,4 +323,10 @@ void RendererDebugWidget::onPlainObscuranceChanged(int s)
 void RendererDebugWidget::onSkyChanged(int s)
 {
     m_renderer->setSky(s == 2);
+}
+
+void RendererDebugWidget::onMipMapStrategyChanged()
+{
+    m_renderer->setMipMapStrategy(m_GL_LINEAR->isChecked(),
+                                  m_MIPMAP_LINEAR->isChecked());
 }
