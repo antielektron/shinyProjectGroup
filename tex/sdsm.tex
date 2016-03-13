@@ -1,0 +1,42 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage[ngerman]{babel}
+\usepackage{graphicx}
+%Darstellung deutscher Sonderzeichen (Umlaute etc)
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+%Darstellung von URLs
+\usepackage{url}
+\usepackage{amsmath,amssymb} 
+\usepackage{listings}
+\usepackage{subfig}
+
+\begin{document}
+
+\section{Einleitung}
+
+Schatten liefern wichtige Informationen über die Relation zwischen Objekten in der Computergrapfik.
+Shadow Maps sind eine weit verbreitete Technik um Schatten zu rendern.
+
+
+
+\section{Related Work}
+
+Parallel Split Shadow Maps ist eine Technik zur Generierung von Z-Partitionen, bei der die Tiefe linear oder logarithmisch zwichen Near- und Far-Plane des View-Frustums interpoliert wird. Diese Methode benötigt einen zusätzlichen Parameter um festzulegen, wie zwischen linearer und logarithmischer Tiefe linearkombiniert werden soll, da eine rein lineare Interpolation meistens die nahen Z-Partitionen zu groß wählt, und eine rein logarithmische Interpolation diese zu klein werden lässt.
+
+
+\section{Algorithmus}
+
+Sample Distribution Shadow Maps ist eine Technik, die den Depthbuffer benutzt, um sinnvolle Z-Partitionen zu generieren.
+
+
+Zunächst werden zwei Reduktion auf dem Depthbuffer durchgeführt um die Near- und Far-Plane des Kamerafrustums dicht an die sichtbare Szenengeometrie zu schieben.
+
+
+
+\section{Implementierung}
+
+
+
+
+\end{document}

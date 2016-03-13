@@ -25,10 +25,11 @@
 # Folie einfügen (Reduktionsschritt)
 - Diagramm?
 
-# Folie 8
+# Folie 8 -> Nach Folie 3 einfügen
 - Parallel Split Shadow Maps näher beschreiben!!!!
-- Folie verschieben
-
+- Partitionierung zwischen Near und Far Plane der Kamera Projektion
+- Logarithmisch doof, Interpoliere!
+- GRAFIK!
 
 # Folie 11 einfügen (SSDSM)
 - Zeichnung!
