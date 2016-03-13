@@ -15,6 +15,7 @@ out vec4 outputColor;
 
 uniform int samples;
 uniform int isPlainObscurance;
+uniform int isSky;
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
@@ -242,7 +243,7 @@ void main()
 	{
 		mixedColor = lineSampling(samples) * vec3(0.5,0.5,0.5);
 	}
-	if (texture2D(depthBuffer, uv).x == 1)
+	if (texture2D(depthBuffer, uv).x == 1 && isSky == 1)
 	{
 		mixedColor = get_sky();
 	}

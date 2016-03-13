@@ -35,6 +35,7 @@ protected slots:
     void onVolumetricObscuranceChanged();
     void onSampleSliderChanged(int);
     void onPlainObscuranceChanged(int);
+    void onSkyChanged(int);
 
     void onFilterShadowMapChanged();
     void onShadowMapMsaaChanged();
@@ -70,6 +71,7 @@ private:
     QCheckBox *m_momentView;
 
     QCheckBox *m_plainVO;
+    QCheckBox *m_sky;
     QRadioButton *m_noVO;
     QRadioButton *m_lineVO;
 

@@ -16,6 +16,7 @@ out vec4 outputColor;
 
 uniform int samples; //TODO, pass through shader
 uniform int isPlainObscurance;
+uniform int isSky;
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
@@ -228,7 +229,7 @@ void main()
 	//sum = sum * 0.7 + 0.6;//sum = clamp(sum * 10, 0,1) * 0.7 + 0.3;
 	sum = sum *1.5 + 0.7 ;
 	
-	if (depth != 1)
+	if (depth != 1 || isSky == 0)
 	{
 		if (isPlainObscurance != 1)
 		{
