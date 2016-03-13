@@ -1,0 +1,832 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scene name="Shiny Scene" version="42" author="Norby">
+    <Models>
+        <Model name="bauer" path="models/bauer.obj"/>
+        <Model name="bishop" path="models/bishop.obj"/>
+        <Model name="chessblack" path="models/chessblack.obj"/>
+        <Model name="chesswhite" path="models/chesswhite.obj"/>
+        <Model name="cloud1" path="models/cloud1.obj"/>
+        <Model name="dame" path="models/dame.obj"/>
+        <Model name="floor" path="models/floor.obj"/>
+        <Model name="floor2" path="models/floor2.obj"/>
+        <Model name="horse" path="models/horse.obj"/>
+        <Model name="island" path="models/island.obj"/>
+        <Model name="islandC" path="models/islandC.obj"/>
+        <Model name="islandS" path="models/islandS.obj"/>
+        <Model name="islandSmaller" path="models/islandSmaller.obj"/>
+        <Model name="king" path="models/king.obj"/>
+        <Model name="leaves001" path="models/leaves001.obj"/>
+        <Model name="leaves002" path="models/leaves002.obj"/>
+        <Model name="meditatipnchamberDownFinal" path="models/meditatipnchamberDownFinal.obj"/>
+        <Model name="meditatipnchamberUpFinal" path="models/meditatipnchamberUpFinal.obj"/>
+        <Model name="octonorm" path="models/octonorm.obj"/>
+        <Model name="planetAlpha" path="models/planetAlpha.obj"/>
+        <Model name="planetEarth" path="models/planetEarth.obj"/>
+        <Model name="planetEarthSurface" path="models/planetEarthSurface.obj"/>
+        <Model name="planetSaturn" path="models/planetSaturn.obj"/>
+        <Model name="planetSaturnRing" path="models/planetSaturnRing.obj"/>
+        <Model name="planetSekundus" path="models/planetSekundus.obj"/>
+        <Model name="planetSekundusMoon" path="models/planetSekundusMoon.obj"/>
+        <Model name="planetSekundusMoonSurface" path="models/planetSekundusMoonSurface.obj"/>
+        <Model name="planetSun" path="models/planetSun.obj"/>
+        <Model name="step" path="models/step.obj"/>
+        <Model name="table" path="models/table.obj"/>
+        <Model name="terrain" path="models/landscape/terrain.obj"/>
+        <Model name="tower" path="models/tower.obj"/>
+        <Model name="tree001" path="models/tree001.obj"/>
+        <Model name="tree002" path="models/tree002.obj"/>
+    </Models>
+    <Objects>
+        <ObjectGroup name="Planetfloor">
+            <Position x="-18" y="-30.6" z="-96.8"/>
+            <Rotation x="0" y="-90" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="planetSun" model="planetSun" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="planetSekundusMoonSurface" model="planetSekundusMoonSurface" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="planetSekundusMoon" model="planetSekundusMoon" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="planetSekundus" model="planetSekundus" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="planetSaturnRing" model="planetSaturnRing" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="planetSaturn" model="planetSaturn" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="planetEarthSurface" model="planetEarthSurface" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="planetEarth" model="planetEarth" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="planetAlpha" model="planetAlpha" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="step1" model="step" interactionEvent="">
+                <Position x="-0.3" y="36.5" z="6.6"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="step2" model="step" interactionEvent="">
+                <Position x="-0.3" y="36.2" z="6.6"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="step3" model="step" interactionEvent="">
+                <Position x="-0.3" y="35.9" z="6.7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="step4" model="step" interactionEvent="">
+                <Position x="-0.3" y="35.6" z="6.7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="step5" model="step" interactionEvent="">
+                <Position x="-0.3" y="35.3" z="6.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="step6" model="step" interactionEvent="">
+                <Position x="-0.3" y="35" z="6.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="step7" model="step" interactionEvent="">
+                <Position x="-0.3" y="34.7" z="6.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="step8" model="step" interactionEvent="">
+                <Position x="-0.3" y="34.4" z="6.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="step9" model="step" interactionEvent="">
+                <Position x="-0.3" y="34.1" z="7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="step10" model="step" interactionEvent="">
+                <Position x="-0.3" y="33.8" z="7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="islandS" model="islandS" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="chessBoard">
+            <Position x="-121.4" y="0" z="-115.8"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="chessblack" model="chessblack" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.5" z="0.5"/>
+                <AmbientColor x="0.9" y="0.1" z="0.1"/>
+            </Object>
+            <Object name="chesswhite" model="chesswhite" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b1b" model="bauer" interactionEvent="">
+                <Position x="2.3" y="0" z="9.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="b2b" model="bauer" interactionEvent="">
+                <Position x="-5.7" y="0" z="9.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="b3b" model="bauer" interactionEvent="">
+                <Position x="-9.7" y="0" z="-6.1"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="b4b" model="bauer" interactionEvent="">
+                <Position x="-9.6" y="0" z="-9.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="b5b" model="bauer" interactionEvent="">
+                <Position x="-5.9" y="0" z="-14.1"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="l1b" model="bishop" interactionEvent="">
+                <Position x="-5.6" y="0" z="-5.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="k1b" model="king" interactionEvent="">
+                <Position x="-13.8" y="0" z="9.7"/>
+                <Rotation x="0" y="90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="t1b" model="tower" interactionEvent="">
+                <Position x="-13.7" y="0" z="-2.4"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="l2b" model="bishop" interactionEvent="">
+                <Position x="14.1" y="0" z="-5.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="d1b" model="dame" interactionEvent="">
+                <Position x="-9.7" y="0" z="1.8"/>
+                <Rotation x="0" y="90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="b1w" model="bauer" interactionEvent="">
+                <Position x="9.9" y="0" z="9.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b2w" model="bauer" interactionEvent="">
+                <Position x="6.1" y="0" z="13.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b3w" model="bauer" interactionEvent="">
+                <Position x="-5.6" y="0" z="1.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b4w" model="bauer" interactionEvent="">
+                <Position x="-9.8" y="0" z="-2.1"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b5w" model="bauer" interactionEvent="">
+                <Position x="-1.7" y="0" z="-5.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b6w" model="bauer" interactionEvent="">
+                <Position x="10.1" y="0" z="-9.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b7w" model="bauer" interactionEvent="">
+                <Position x="6" y="0" z="-13.7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="t1w" model="tower" interactionEvent="">
+                <Position x="14" y="0" z="5.7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="k1w" model="dame" interactionEvent="">
+                <Position x="14.1" y="0" z="9.8"/>
+                <Rotation x="0" y="-90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="d1w" model="king" interactionEvent="">
+                <Position x="-1.9" y="0" z="2"/>
+                <Rotation x="0" y="-90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="p1w" model="horse" interactionEvent="">
+                <Position x="6.1" y="0" z="-1.8"/>
+                <Rotation x="0" y="-90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="p1b" model="horse" interactionEvent="">
+                <Position x="-1.7" y="0" z="-9.9"/>
+                <Rotation x="0" y="90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="chessBoardSmall">
+            <Position x="-90.9" y="8.38" z="-101.6"/>
+            <Rotation x="0" y="17.9" z="0"/>
+            <Scaling x="0.05" y="0.05" z="0.05"/>
+            <Object name="chessblacks" model="chessblack" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.5" z="0.5"/>
+                <AmbientColor x="0.9" y="0.1" z="0.1"/>
+            </Object>
+            <Object name="chesswhites" model="chesswhite" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b1bs" model="bauer" interactionEvent="">
+                <Position x="2.3" y="0" z="9.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="b2bs" model="bauer" interactionEvent="">
+                <Position x="-5.7" y="0" z="9.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="b3bs" model="bauer" interactionEvent="">
+                <Position x="-9.7" y="0" z="-6.1"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="b4bs" model="bauer" interactionEvent="">
+                <Position x="-9.6" y="0" z="-9.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="b5bs" model="bauer" interactionEvent="">
+                <Position x="-5.9" y="0" z="-14.1"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="l1bs" model="bishop" interactionEvent="">
+                <Position x="-5.6" y="0" z="-5.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="k1bs" model="king" interactionEvent="">
+                <Position x="-13.8" y="0" z="9.7"/>
+                <Rotation x="0" y="90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="t1bs" model="tower" interactionEvent="">
+                <Position x="-13.7" y="0" z="-2.4"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="l2bs" model="bishop" interactionEvent="">
+                <Position x="14.1" y="0" z="-5.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="d1bs" model="dame" interactionEvent="">
+                <Position x="-9.7" y="0" z="1.8"/>
+                <Rotation x="0" y="90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="b1ws" model="bauer" interactionEvent="">
+                <Position x="9.9" y="0" z="9.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b2ws" model="bauer" interactionEvent="">
+                <Position x="6.1" y="0" z="13.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b3ws" model="bauer" interactionEvent="">
+                <Position x="-5.6" y="0" z="1.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b4ws" model="bauer" interactionEvent="">
+                <Position x="-9.8" y="0" z="-2.1"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b5ws" model="bauer" interactionEvent="">
+                <Position x="-1.7" y="0" z="-5.8"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b6ws" model="bauer" interactionEvent="">
+                <Position x="10.1" y="0" z="-9.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="b7ws" model="bauer" interactionEvent="">
+                <Position x="6" y="0" z="-13.7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="t1ws" model="tower" interactionEvent="">
+                <Position x="14" y="0" z="5.7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="k1ws" model="dame" interactionEvent="">
+                <Position x="14.1" y="0" z="9.8"/>
+                <Rotation x="0" y="-90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="d1ws" model="king" interactionEvent="">
+                <Position x="-1.9" y="0" z="2"/>
+                <Rotation x="0" y="-90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="p1ws" model="horse" interactionEvent="">
+                <Position x="6.1" y="0" z="-1.8"/>
+                <Rotation x="0" y="-90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="p1bs" model="horse" interactionEvent="">
+                <Position x="-1.7" y="0" z="-9.9"/>
+                <Rotation x="0" y="90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.3" z="0.3"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="Tree1">
+            <Position x="25.9" y="-0.5" z="0"/>
+            <Rotation x="0" y="90" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="tree001" model="tree001" interactionEvent="">
+                <Position x="7" y="0" z="7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="tree002" model="tree002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="leaves001" model="leaves001" interactionEvent="">
+                <Position x="7" y="0" z="7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.7" z="0.7"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="leaves002" model="leaves002" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.8" y="0.7" z="0.8"/>
+                <AmbientColor x="0.5" y="0.7" z="0.5"/>
+            </Object>
+            <Object name="tree003" model="tree001" interactionEvent="">
+                <Position x="22" y="-0.3" z="7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="tree004" model="tree002" interactionEvent="">
+                <Position x="15" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="leaves003" model="leaves001" interactionEvent="">
+                <Position x="22" y="-0.3" z="7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.7" y="0.9" z="0.7"/>
+                <AmbientColor x="0.5" y="0.7" z="0.5"/>
+            </Object>
+            <Object name="leaves004" model="leaves002" interactionEvent="">
+                <Position x="15" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.8" z="0.8"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="Tree2">
+            <Position x="30.4" y="-0.3" z="-50"/>
+            <Rotation x="0" y="-90" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="tree001" model="tree001" interactionEvent="">
+                <Position x="7" y="-0.9" z="7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="tree002" model="tree002" interactionEvent="">
+                <Position x="0" y="-2.7" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="leaves001" model="leaves001" interactionEvent="">
+                <Position x="7" y="-0.9" z="7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.7" z="0.7"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+            <Object name="leaves002" model="leaves002" interactionEvent="">
+                <Position x="0" y="-2.7" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.8" y="0.7" z="0.8"/>
+                <AmbientColor x="0.5" y="0.7" z="0.5"/>
+            </Object>
+            <Object name="tree003" model="tree001" interactionEvent="">
+                <Position x="22" y="0" z="7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="tree004" model="tree002" interactionEvent="">
+                <Position x="15" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="leaves003" model="leaves001" interactionEvent="">
+                <Position x="22" y="0" z="7"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.7" y="0.9" z="0.7"/>
+                <AmbientColor x="0.5" y="0.7" z="0.5"/>
+            </Object>
+            <Object name="leaves004" model="leaves002" interactionEvent="">
+                <Position x="15" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.8" z="0.8"/>
+                <AmbientColor x="0.7" y="0.5" z="0.5"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="MiddleFloor">
+            <Position x="-57.9" y="1.9" z="-96.4"/>
+            <Rotation x="0" y="-90" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="islandC" model="islandC" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="islandSmaller" model="islandSmaller" interactionEvent="">
+                <Position x="-7.8" y="5.2" z="30"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="table" model="table" interactionEvent="">
+                <Position x="-6" y="5.4" z="33.3"/>
+                <Rotation x="0" y="108.2" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+        </ObjectGroup>
+        <Object name="octonorm" model="octonorm" interactionEvent="">
+            <Position x="0" y="11.5" z="0.1"/>
+            <Rotation x="0" y="180" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="0.5" y="0.5" z="1"/>
+            <DiffuseColor x="0.4" y="0.9" z="0.4"/>
+            <AmbientColor x="0.4" y="0.5" z="0.7"/>
+        </Object>
+        <Object name="medChamD" model="meditatipnchamberDownFinal" interactionEvent="">
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="medChamU" model="meditatipnchamberUpFinal" interactionEvent="">
+            <Position x="0" y="0" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="island" model="island" interactionEvent="">
+            <Position x="0" y="-7.5" z="-29.8"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="cloud1" model="cloud1" interactionEvent="">
+            <Position x="-64.8" y="7.1" z="-49.9"/>
+            <Rotation x="0" y="-20" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="cloud2" model="cloud1" interactionEvent="">
+            <Position x="-20" y="3.4" z="-150"/>
+            <Rotation x="0" y="-90" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+        <Object name="terrain" model="terrain" interactionEvent="">
+            <Position x="0" y="-200" z="0"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <SpecularColor x="1" y="1" z="1"/>
+            <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+            <AmbientColor x="0.7" y="0.7" z="0.7"/>
+        </Object>
+    </Objects>
+    <Attributes/>
+    <Events/>
+    <Animators/>
+    <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
+    <Player>
+        <Position x="0" y="0" z="0"/>
+        <Rotation x="0" y="0" z="0"/>
+    </Player>
+    <ShaderConfig file="shaders/configurations/defaultConfig.xml"/>
+</Scene>
