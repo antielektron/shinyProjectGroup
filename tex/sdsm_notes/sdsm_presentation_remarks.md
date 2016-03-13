@@ -1,3 +1,5 @@
+# PERSPECTIVE ALIASING IS WRONG WORD!!!!!!!!
+
 # Folie 3
 - Betrachte Screen Samples im Light-Space
 - Vollautomatische Partitionierung ~> Adaptive Partitionierung
