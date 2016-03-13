@@ -17,6 +17,7 @@ out vec4 outputColor;
 uniform int samples; //TODO, pass through shader
 uniform int isPlainObscurance;
 uniform int isSky;
+uniform int isCursor;
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
@@ -181,6 +182,27 @@ vec3 get_sky()
 	return vec3(r,g,b);
 }
 
+//cursor
+bool isInCursor()
+{
+
+	float dx = (uv.x - 0.5) * ratio;
+	float dy = (uv.y - 0.5);
+	float dx2 = dx * dx;
+	float dy2 = dy * dy;
+	
+	if (dx2 < 0.0001)
+	{
+		return false;
+	}
+	
+	if (dx2 + dy2 > 0.0005 && dx2 + dy2 < 0.001)
+	{
+		return true;
+	}
+	return false;
+}
+
 void main()
 {	
 	vec3 defaultColor = dfShadingAmount * texture2D(sampler, uv).xyz;
@@ -244,6 +266,11 @@ void main()
 	{
 		defaultColor =  get_sky();
 	}
+	
+	if (isCursor == 1 && isInCursor())
+	{
+		defaultColor = vec3(1.,1.,1.) - defaultColor;
+	}	
 	
 
 	//outputColor = vec4(0, defaultColor.y, 0,1);

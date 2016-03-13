@@ -16,6 +16,7 @@ out vec4 outputColor;
 uniform int samples;
 uniform int isPlainObscurance;
 uniform int isSky;
+uniform int isCursor;
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
@@ -204,7 +205,7 @@ bool isInCenterEpsilonArea(vec2 centerPoint)
 }
 
 //cursor
-bool isCursor()
+bool isInCursor()
 {
 
 	float kx = get_kx(0.5);
@@ -247,7 +248,7 @@ void main()
 	{
 		mixedColor = get_sky();
 	}
-	if (isCursor())
+	if (isCursor == 1 && isInCursor())
 	{
 		mixedColor = vec3(1.,1.,1.) - mixedColor;
 	}

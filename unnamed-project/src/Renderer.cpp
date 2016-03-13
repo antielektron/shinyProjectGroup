@@ -41,7 +41,8 @@ Renderer::Renderer() : RendererBase(),
         m_plainObscurance(0),
         m_sky(1),
         m_glLinear(true),
-        m_mmLinear(true)
+        m_mmLinear(true),
+        m_cursor(true)
 {
     // nothing to do here
 }
@@ -222,6 +223,7 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeSamplesLoc, "samples");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composePlainObscuranceLoc, "isPlainObscurance");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeSkyLoc, "isSky");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeCursorLoc, "isCursor");
 
 
     m_attribLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(0, "v_position");
@@ -1212,6 +1214,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             composeProgram->setUniformValue(m_composeSamplesLoc, m_samples);
             composeProgram->setUniformValue(m_composePlainObscuranceLoc, m_plainObscurance);
             composeProgram->setUniformValue(m_composeSkyLoc, m_sky);
+            composeProgram->setUniformValue(m_composeCursorLoc, m_cursor);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_renderTexture);
@@ -1415,7 +1418,7 @@ void Renderer::resize(int width, int height)
     m_width = width;
     m_height = height;
 
-    m_ratio = width/height;
+    m_ratio = float(width)/float(height);
 
     glDeleteFramebuffers(1, &m_renderFrameBuffer);
     glDeleteTextures(1, &m_renderTexture);
@@ -1795,4 +1798,14 @@ void Renderer::getMipMapStrategy(bool &glLin, bool &mmLin)
 {
     glLin = m_glLinear;
     mmLin = m_mmLinear;
+}
+
+void Renderer::setCursor(bool b)
+{
+    m_cursor = b ? 1 : 0;
+}
+
+bool Renderer::isCursor()
+{
+    return m_cursor == 1;
 }
