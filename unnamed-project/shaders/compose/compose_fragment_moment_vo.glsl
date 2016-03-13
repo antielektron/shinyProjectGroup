@@ -14,7 +14,7 @@ uniform vec4 lightDirection;
 
 out vec4 outputColor;
 
-uniform int samples; //TODO, pass through shader
+uniform int samples = 10; //TODO, pass through shader
 uniform int isPlainObscurance;
 uniform int isSky;
 const float PI = 3.1415926536;
@@ -27,7 +27,7 @@ const float dfShadingAmount = 1.;
 
 // TODO: pass this values to shader
 const float worldSpaceRadius = 1;
-const float sceneDepth = 100;
+const float sceneDepth = 200;
 const float verticalViewAngle = PI/4;
 
 
@@ -130,15 +130,10 @@ float computeMSMShadwowIntensity(out vec3 Weight, out vec3 outz, vec4 in4Moments
     return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
 }
 
-float f(vec4 moments, float z_a, float z_b)
+float f(float z, float z_a, float z_b)
 {
-	float mean = moments.x;
-	float sigma = sqrt(moments.y - pow(mean,2));	
-	
-	float a = (-1.)/(2* sigma);
-	float b = -a*(mean + sigma);
-	
-	return a*(z_b * z_b - z_a * z_a)/2 + b * (z_b - z_a);
+
+	return (z-z_a)/(z_b - z_a);
 }
 
 float get_angle(vec3 a, vec3 b)
@@ -187,8 +182,8 @@ void main()
 
 	// step 1: get depth
 	vec4 tmpmoment = textureLod(momentsSampler, uv,0);
-	vec4 tmpoutmoment = tmpmoment;
-	//sampleOptimized4MomentsShadowMap(tmpoutmoment, tmpmoment);
+	vec4 tmpoutmoment;
+	sampleOptimized4MomentsShadowMap(tmpoutmoment, tmpmoment);
 	
 	float depth = tmpoutmoment.x;
 	
@@ -206,52 +201,47 @@ void main()
 	
 	// step 4: get filtered Moments
 	//mmLevel = clamp (mmLevel, 2, 5);
-	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
+	vec4 moments = textureLod(momentsSampler, uv, mmLevel);	
 	
 
 	// step 5: where the magic happens
-	vec4 outMoments = moments;
-	//sampleOptimized4MomentsShadowMap(outMoments, moments);
-	
-	float mean = moments.x;
-	float variance = sqrt(moments.y - pow(mean,2));
-
-
-	float a = -1.0 / (2. * variance);
-	float b = -a * (mean + variance);
-	
-	// nonsense... but it could make almost valid results
+    vec4 outMoments = moments;
+    //sampleOptimized4MomentsShadowMap(outMoments, moments);
+	vec3 w;
+	vec3 z;
+    float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.005, 3e-5);	
+  
 	float z0 = depth - r;
-	float z1 = depth + r;
+	float z1 = depth + r;	
 	
-	// aaaand i have no idea what i'm doing now:
-	float sum =  a * (pow(z1,2) - pow(z0,2)) / 2.0 + b * (z1 - z0);	
-	//sum = sum * 0.7 + 0.6;//sum = clamp(sum * 10, 0,1) * 0.7 + 0.3;
-	sum = sum *1.5 + 0.7 ;
-	
-	if (depth != 1 || isSky == 0)
+	float sum = 0;
+	for (int i = 0; i < 3; i++)
 	{
-		if (isPlainObscurance != 1)
-		{
-			defaultColor =  sum * defaultColor;
+		sum +=  w[i] * f(z[i],z0, z1) * 0.1; 
+	}
+	//sum = 1 - (sum * 3);
+	sum = clamp((1 - (sum * 3)) * 0.5 + 0.5, 0, 1);
+	
+	if (depth < 1 - 10e-9 || isSky == 0)
+	{
+		if (isPlainObscurance == 1)
+		{ 
+			defaultColor =  sum * vec3(1.,1.,1.);
 		}
 		else
 		{
-			defaultColor = sum * vec3(0.7,0.7,0.7);
+			defaultColor =  sum * defaultColor;
 		}
 	}
 	else
 	{
-		defaultColor =  get_sky();
+		defaultColor = get_sky();
 	}
 	
-
 	//outputColor = vec4(0, defaultColor.y, 0,1);
 	//outputColor = vec4(momentMagic, 0, 0,1);
-    //outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(r * 0.5),1);
+    //outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(sum * 0.5),1);
     outputColor = vec4(defaultColor, 1.0);
-    //outputColor = vec4(0, mmLevel * 0.1, 0.,1.);
-   	//outputColor = vec4(sum * vec3(1.,1.,1.),1.);
+    //outputColor = vec4(sum * vec3(1,1,1),1.);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
-    
 }
