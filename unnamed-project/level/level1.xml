@@ -3,15 +3,18 @@
     <Models>
         <Model name="bauer" path="models/bauer.obj"/>
         <Model name="bishop" path="models/bishop.obj"/>
+        <Model name="chessBoardIsland" path="models/chessBoardIsland.obj"/>
         <Model name="chessblack" path="models/chessblack.obj"/>
         <Model name="chesswhite" path="models/chesswhite.obj"/>
         <Model name="cloud1" path="models/cloud1.obj"/>
         <Model name="cloud3" path="models/cloud3.obj"/>
+        <Model name="crossed_cogs" path="models/crossed_cogs.obj"/>
         <Model name="dame" path="models/dame.obj"/>
         <Model name="dome" path="models/landscape/dome.obj"/>
-        <Model name="dragon" path="models/dragon.obj"/>
         <Model name="floor" path="models/floor.obj"/>
         <Model name="floor2" path="models/floor2.obj"/>
+        <Model name="gateIsland" path="models/gateIsland.obj"/>
+        <Model name="gateIslandLong" path="models/gateIslandLong.obj"/>
         <Model name="horse" path="models/horse.obj"/>
         <Model name="island" path="models/island.obj"/>
         <Model name="islandC" path="models/islandC.obj"/>
@@ -20,6 +23,7 @@
         <Model name="king" path="models/king.obj"/>
         <Model name="leaves001" path="models/leaves001.obj"/>
         <Model name="leaves002" path="models/leaves002.obj"/>
+        <Model name="meditatipnchamberDiamant" path="models/meditatipnchamberDiamant.obj"/>
         <Model name="meditatipnchamberDownFinal" path="models/meditatipnchamberDownFinal.obj"/>
         <Model name="meditatipnchamberUpFinal" path="models/meditatipnchamberUpFinal.obj"/>
         <Model name="octonorm" path="models/octonorm.obj"/>
@@ -38,6 +42,7 @@
         <Model name="tower" path="models/tower.obj"/>
         <Model name="tree001" path="models/tree001.obj"/>
         <Model name="tree002" path="models/tree002.obj"/>
+        <Model name="tri_dome" path="models/tri_dome.obj"/>
     </Models>
     <Objects>
         <ObjectGroup name="Planetfloor">
@@ -117,7 +122,7 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
             <Object name="step1" model="step" interactionEvent="">
-                <Position x="-0.3" y="36.5" z="6.6"/>
+                <Position x="-10.9" y="27.4" z="-2.7"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -125,7 +130,7 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
             <Object name="step2" model="step" interactionEvent="">
-                <Position x="-0.3" y="36.2" z="6.6"/>
+                <Position x="-10.3" y="29.5" z="-0.1"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -133,7 +138,7 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
             <Object name="step3" model="step" interactionEvent="">
-                <Position x="-0.3" y="35.9" z="6.7"/>
+                <Position x="-9.4" y="31.9" z="4.8"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -141,7 +146,7 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
             <Object name="step4" model="step" interactionEvent="">
-                <Position x="-0.3" y="35.6" z="6.7"/>
+                <Position x="-7.9" y="34" z="7.4"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -149,7 +154,7 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
             <Object name="step5" model="step" interactionEvent="">
-                <Position x="-0.3" y="35.3" z="6.8"/>
+                <Position x="-7.2" y="33.1" z="9.7"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -198,6 +203,27 @@
             </Object>
             <Object name="islandS" model="islandS" interactionEvent="">
                 <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="obscuranceDome">
+            <Position x="10.4" y="-3.8" z="-53.4"/>
+            <Rotation x="0" y="80" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="tri_dome" model="tri_dome" interactionEvent="">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="crossed_cogs" model="crossed_cogs" interactionEvent="">
+                <Position x="0" y="0.6" z="0"/>
                 <Rotation x="0" y="0" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
@@ -401,10 +427,58 @@
                 <DiffuseColor x="0.9" y="0.3" z="0.3"/>
                 <AmbientColor x="0.7" y="0.5" z="0.5"/>
             </Object>
+            <Object name="chessBoardIsland" model="chessBoardIsland" interactionEvent="">
+                <Position x="-1.7" y="-1.42" z="-0.4"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="gateIsland" model="gateIsland" interactionEvent="">
+                <Position x="-22.9" y="12.5" z="0"/>
+                <Rotation x="0" y="90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="gateIslandL" model="gateIsland" interactionEvent="">
+                <Position x="-22.9" y="13.5" z="10.7"/>
+                <Rotation x="0" y="90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="gateIslandR" model="gateIsland" interactionEvent="">
+                <Position x="-22.9" y="13.5" z="-10.7"/>
+                <Rotation x="0" y="90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="gateIslandLong" model="gateIslandLong" interactionEvent="">
+                <Position x="-54.2" y="0" z="0"/>
+                <Rotation x="0" y="90" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="chessBoardIsland2" model="chessBoardIsland" interactionEvent="">
+                <Position x="-100" y="-1.2" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
         </ObjectGroup>
         <ObjectGroup name="chessBoardSmall">
-            <Position x="-90.9" y="8.38" z="-101.6"/>
-            <Rotation x="0" y="17.9" z="0"/>
+            <Position x="-90.5" y="8.47" z="-106.8"/>
+            <Rotation x="0" y="39.4" z="0"/>
             <Scaling x="0.05" y="0.05" z="0.05"/>
             <Object name="chessblacks" model="chessblack" interactionEvent="">
                 <Position x="0" y="0" z="0"/>
@@ -758,8 +832,8 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
             <Object name="table" model="table" interactionEvent="">
-                <Position x="-6" y="5.4" z="33.3"/>
-                <Rotation x="0" y="108.2" z="0"/>
+                <Position x="-10.7" y="5.5" z="32.4"/>
+                <Rotation x="0" y="40" z="0"/>
                 <Scaling x="1" y="1" z="1"/>
                 <SpecularColor x="1" y="1" z="1"/>
                 <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -824,7 +898,44 @@
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
         </ObjectGroup>
-        <!--<ObjectGroup name="terrain">
+        <ObjectGroup name="cloudGroup3">
+            <Position x="-34.9" y="-18.5" z="-104.9"/>
+            <Rotation x="0" y="-25.9" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="cloud31" model="cloud1" interactionEvent="">
+                <Position x="13.5" y="15.2" z="-6.2"/>
+                <Rotation x="0" y="-40" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="cloud32" model="cloud1" interactionEvent="">
+                <Position x="1.6" y="-5.1" z="18.9"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="cloud33" model="cloud3" interactionEvent="">
+                <Position x="0" y="-1.1" z="11.5"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+            <Object name="cloud34" model="cloud1" interactionEvent="">
+                <Position x="7.4" y="19.6" z="-1.6"/>
+                <Rotation x="0" y="-47.9" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.9" z="0.9"/>
+                <AmbientColor x="0.7" y="0.7" z="0.7"/>
+            </Object>
+        </ObjectGroup>
+        <ObjectGroup name="terrain">
             <Position x="0" y="-100" z="0"/>
             <Rotation x="0" y="0" z="0"/>
             <Scaling x="1" y="1" z="1"/>
@@ -844,7 +955,44 @@
                 <DiffuseColor x="0.9" y="0.9" z="0.9"/>
                 <AmbientColor x="0.7" y="0.7" z="0.7"/>
             </Object>
-        </ObjectGroup>-->
+        </ObjectGroup>
+        <ObjectGroup name="PlanetSchalter">
+            <Position x="-4.6" y="-5" z="-65.9"/>
+            <Rotation x="0" y="0" z="0"/>
+            <Scaling x="1" y="1" z="1"/>
+            <Object name="Diamant1" model="meditatipnchamberDiamant" interactionEvent="BlueDclicked">
+                <Position x="0" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.3" y="0.3" z="0.9"/>
+                <AmbientColor x="0.3" y="0.3" z="0.7"/>
+            </Object>
+            <Object name="Diamant2" model="meditatipnchamberDiamant" interactionEvent="YellowDclicked">
+                <Position x="0.5" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.4" z="0.4"/>
+                <AmbientColor x="0.7" y="0.5" z="0.3"/>
+            </Object>
+            <Object name="Diamant3" model="meditatipnchamberDiamant" interactionEvent="GreenDclicked">
+                <Position x="1" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.5" y="0.9" z="0.5"/>
+                <AmbientColor x="0.4" y="0.7" z="0.4"/>
+            </Object>
+            <Object name="Diamant4" model="meditatipnchamberDiamant" interactionEvent="RedDclicked">
+                <Position x="1.5" y="0" z="0"/>
+                <Rotation x="0" y="0" z="0"/>
+                <Scaling x="1" y="1" z="1"/>
+                <SpecularColor x="1" y="1" z="1"/>
+                <DiffuseColor x="0.9" y="0.4" z="0.3"/>
+                <AmbientColor x="0.7" y="0.3" z="0.3"/>
+            </Object>
+        </ObjectGroup>
         <Object name="octonorm" model="octonorm" interactionEvent="">
             <Position x="0" y="11.5" z="0.1"/>
             <Rotation x="0" y="180" z="0"/>
@@ -877,9 +1025,9 @@
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
             <AmbientColor x="0.7" y="0.7" z="0.7"/>
         </Object>
-        <Object name="dragon" model="dragon" interactionEvent="">
-            <Position x="12.1" y="-3.6" z="-58.3"/>
-            <Rotation x="-1.7" y="-56.9" z="2.6"/>
+        <Object name="tableSchalter" model="table" interactionEvent="">
+            <Position x="-6.6" y="-4.3" z="-66.8"/>
+            <Rotation x="0" y="90" z="0"/>
             <Scaling x="1" y="1" z="1"/>
             <SpecularColor x="1" y="1" z="1"/>
             <DiffuseColor x="0.9" y="0.9" z="0.9"/>
@@ -887,7 +1035,141 @@
         </Object>
     </Objects>
     <Attributes/>
-    <Events/>
+    <Events>
+        <Event name="BlueDclicked" description="active">
+            <Precondition type="ieq" lhs="[blueDiamant]" rhs="0"/>
+            <Action type="imov" lhs="blueDiamant" rhs="1"/>
+            <Action type="imov" lhs="blueDur" rhs="4"/>
+            <Action type="animrot" x="0" y="40" z="0" object="planetEarth">
+                <Interpolation type="linear" duration="[blueDur]"/>
+            </Action>
+            <Action type="animrot" x="0" y="40" z="0" object="planetEarthSurface">
+                <Interpolation type="linear" duration="[blueDur]"/>
+            </Action>
+            <Action type="animambientcolor" x="0.7" y="0.7" z="0.4" object="planetSun">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.9" y="0.9" z="0.3" object="planetSun">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animspecularcolor" x="1" y="1" z="0" object="planetSun">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animambientcolor" x="0.5" y="0.5" z="0.4" object="planetEarthSurface">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.4" object="planetEarthSurface">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animambientcolor" x="0.6" y="0.6" z="0.7" object="planetEarth">
+                <Interpolation type="sinus" duration="7"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.6" y="0.8" z="0.9" object="planetEarth">
+                <Interpolation type="sinus" duration="7"/>
+            </Action>
+        </Event>
+        <Event name="BlueDclicked" description="active">
+            <Precondition type="ieq" lhs="[blueDiamant]" rhs="0"/>
+            <Action type="imov" lhs="blueDiamant" rhs="1"/>
+            <Action type="imov" lhs="blueDur" rhs="4"/>
+            <Action type="animrot" x="0" y="40" z="0" object="planetEarth">
+                <Interpolation type="linear" duration="[blueDur]"/>
+            </Action>
+            <Action type="animrot" x="0" y="40" z="0" object="planetEarthSurface">
+                <Interpolation type="linear" duration="[blueDur]"/>
+            </Action>
+            <Action type="animambientcolor" x="0.7" y="0.7" z="0.4" object="planetSun">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.9" y="0.9" z="0.3" object="planetSun">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animspecularcolor" x="1" y="1" z="0" object="planetSun">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animambientcolor" x="0.5" y="0.5" z="0.4" object="planetEarthSurface">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.5" y="0.5" z="0.4" object="planetEarthSurface">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animambientcolor" x="0.6" y="0.6" z="0.7" object="planetEarth">
+                <Interpolation type="sinus" duration="7"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.6" y="0.8" z="0.9" object="planetEarth">
+                <Interpolation type="sinus" duration="7"/>
+            </Action>
+        </Event>
+        <Event name="YellowDclicked" description="active">
+            <Precondition type="ieq" lhs="[yellowDiamant]" rhs="0"/>
+            <Action type="imov" lhs="yellowDiamant" rhs="1"/>
+            <Action type="imov" lhs="yellowDur" rhs="5"/>
+            <Action type="animrot" x="0" y="75" z="0" object="planetSaturn">
+                <Interpolation type="linear" duration="[yellowDur]"/>
+            </Action>
+            <Action type="animrot" x="0" y="75" z="0" object="planetSaturnRing">
+                <Interpolation type="linear" duration="[yellowDur]"/>
+            </Action>
+            <Action type="animambientcolor" x="0.7" y="0.7" z="0.6" object="planetSaturn">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.9" y="0.5" z="0.4" object="planetSaturn">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animambientcolor" x="0.7" y="0.6" z="0.4" object="planetSaturnRing">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.9" y="0.5" z="0.5" object="planetSaturnRing">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+        </Event>
+        <Event name="GreenDclicked" description="active">
+            <Precondition type="ieq" lhs="[greenDiamant]" rhs="0"/>
+            <Action type="imov" lhs="greenDiamant" rhs="1"/>
+            <Action type="imov" lhs="greenDur" rhs="5"/>
+            <Action type="animrot" x="0" y="92" z="0" object="planetSekundus">
+                <Interpolation type="linear" duration="[greenDur]"/>
+            </Action>
+            <Action type="animrot" x="0" y="92" z="0" object="planetSekundusMoon">
+                <Interpolation type="linear" duration="[greenDur]"/>
+            </Action>
+            <Action type="animrot" x="0" y="92" z="0" object="planetSekundusMoonSurface">
+                <Interpolation type="linear" duration="[greenDur]"/>
+            </Action>
+            <Action type="animambientcolor" x="0.6" y="0.7" z="0.6" object="planetSekundus">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.5" y="0.8" z="0.8" object="planetSekundus">
+                <Interpolation type="sinus" duration="3"/>
+            </Action>
+            <Action type="animambientcolor" x="0.7" y="0.7" z="0.7" object="planetSekundusMoon">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.9" y="0.5" z="0.9" object="planetSekundusMoon">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animambientcolor" x="0.6" y="0.6" z="0.5" object="planetSekundusMoonSurface">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.7" y="0.9" z="0.7" object="planetSekundusMoonSurface">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+        </Event>
+        <Event name="RedDclicked" description="active">
+            <Precondition type="ieq" lhs="[redDiamant]" rhs="0"/>
+            <Action type="imov" lhs="redDiamant" rhs="1"/>
+            <Action type="imov" lhs="redDur" rhs="5"/>
+            <Action type="animrot" x="0" y="120" z="0" object="planetAlpha">
+                <Interpolation type="linear" duration="[redDur]"/>
+            </Action>
+            <Action type="animambientcolor" x="0.7" y="0.69" z="0.69" object="planetAlpha">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+            <Action type="animdiffusecolor" x="0.9" y="0.2" z="0.1" object="planetAlpha">
+                <Interpolation type="sinus" duration="5"/>
+            </Action>
+        </Event>
+    </Events>
     <Animators/>
     <DirectionalLight x="0.3" y="1" z="0.3" r="1" g="1" b="1"/>
     <Player>
