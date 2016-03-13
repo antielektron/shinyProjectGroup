@@ -22,6 +22,7 @@ RendererDebugWidget::RendererDebugWidget(Renderer *renderer, QWidget *parent) :
 
     m_plainVO->setChecked(m_renderer->isPlainObscurance());
     m_sky->setChecked(m_renderer->isSky());
+    m_drawCursor->setChecked(m_renderer->isCursor());
     m_sampleSlider->setValue(m_renderer->getSamples());
     m_sampleLabel->setText(QString("Samples: " ) + QString::number(m_renderer->getSamples()));
     bool mmLin, glLin;
@@ -152,6 +153,10 @@ QWidget *RendererDebugWidget::generateVOOptions()
     m_noVO = new QRadioButton("plain copy", voOptions);
     layout->addWidget(m_noVO);
 
+    m_drawCursor = new QCheckBox("draw Cursor", voOptions);
+    layout->addWidget(m_drawCursor);
+
+
     return voOptions;
 }
 
@@ -198,6 +203,7 @@ void RendererDebugWidget::connectStuff()
     connect(m_noVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_plainVO, SIGNAL(stateChanged(int)), this, SLOT(onPlainObscuranceChanged(int)));
     connect(m_sky, SIGNAL(stateChanged(int)), this, SLOT(onSkyChanged(int)));
+    connect(m_drawCursor, SIGNAL(stateChanged(int)), this, SLOT(onCursorChanged(int)));
     connect(m_GL_LINEAR, SIGNAL(stateChanged(int)), this, SLOT(onMipMapStrategyChanged()));
     connect(m_MIPMAP_LINEAR, SIGNAL(stateChanged(int)), this, SLOT(onMipMapStrategyChanged()));
 
@@ -323,6 +329,11 @@ void RendererDebugWidget::onPlainObscuranceChanged(int s)
 void RendererDebugWidget::onSkyChanged(int s)
 {
     m_renderer->setSky(s == 2);
+}
+
+void RendererDebugWidget::onCursorChanged(int s)
+{
+    m_renderer->setCursor(s == 2);
 }
 
 void RendererDebugWidget::onMipMapStrategyChanged()
