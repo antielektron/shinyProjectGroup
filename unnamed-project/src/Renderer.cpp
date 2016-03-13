@@ -39,7 +39,9 @@ Renderer::Renderer() : RendererBase(),
         m_lightShearing(false),
         m_samples(10),
         m_plainObscurance(0),
-        m_sky(1)
+        m_sky(1),
+        m_glLinear(true),
+        m_mmLinear(true)
 {
     // nothing to do here
 }
@@ -1161,7 +1163,28 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             // generate mipmaps:
             glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
             glGenerateMipmap(GL_TEXTURE_2D);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // needed, to make mipmaps available!!!
+            if (m_mmLinear)
+            {
+                if (m_glLinear)
+                {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // needed, to make mipmaps available!!!
+                }
+                else
+                {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR); // needed, to make mipmaps available!!!
+                }
+            }
+            else
+            {
+                if (m_glLinear)
+                {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); // needed, to make mipmaps available!!!
+                }
+                else
+                {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST); // needed, to make mipmaps available!!!
+                }
+            }
             glBindTexture(GL_TEXTURE_2D, 0);
 
             // 6. Render to Screen, apply VO
@@ -1760,4 +1783,16 @@ void Renderer::setSky(bool b)
 bool Renderer::isSky()
 {
     return m_sky == 1;
+}
+
+void Renderer::setMipMapStrategy(bool glLin, bool mmLin)
+{
+    m_glLinear = glLin;
+    m_mmLinear = mmLin;
+}
+
+void Renderer::getMipMapStrategy(bool &glLin, bool &mmLin)
+{
+    glLin = m_glLinear;
+    mmLin = m_mmLinear;
 }

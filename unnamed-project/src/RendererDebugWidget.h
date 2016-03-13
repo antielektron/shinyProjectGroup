@@ -36,6 +36,7 @@ protected slots:
     void onSampleSliderChanged(int);
     void onPlainObscuranceChanged(int);
     void onSkyChanged(int);
+    void onMipMapStrategyChanged();
 
     void onFilterShadowMapChanged();
     void onShadowMapMsaaChanged();
@@ -74,6 +75,8 @@ private:
     QCheckBox *m_sky;
     QRadioButton *m_noVO;
     QRadioButton *m_lineVO;
+    QCheckBox *m_GL_LINEAR;
+    QCheckBox *m_MIPMAP_LINEAR;
 
     QSlider *m_sampleSlider;
     QLabel *m_sampleLabel;
