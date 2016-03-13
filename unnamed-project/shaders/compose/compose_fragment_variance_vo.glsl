@@ -226,6 +226,8 @@ void main()
 	float mmLevel = log2(1./(1.-r)) * 10;
 	//float mmLevel = ((1 - depth) * 10);
 	
+	//reduce artefacts:
+	if (mmLevel <= 1 + 10e-3) mmLevel = 1 + 10e-3;
 	// step 4: get filtered Moments
 	//mmLevel = clamp (mmLevel, 2, 5);
 	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
