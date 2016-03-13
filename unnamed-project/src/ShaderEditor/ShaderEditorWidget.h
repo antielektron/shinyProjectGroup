@@ -29,6 +29,8 @@ public:
 
     const QString &getFilename();
 
+    CodeEditor *getEditor();
+
     static const QColor errorColor;
     static const QColor allFineColor;
 

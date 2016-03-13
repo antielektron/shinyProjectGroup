@@ -37,6 +37,7 @@ public slots:
                            const QString &progName);
 
     void onFpsChanged(float fps);
+    void onShaderConfigChanged();
 
 signals:
     void updateRequest();
