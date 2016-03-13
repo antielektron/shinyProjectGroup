@@ -149,7 +149,7 @@ stringstyle=\color[rgb]{0.639,0.082,0.082},
 \SetAlgoLongEnd
 
 % Benötigte Angaben für die Titelseite
-\title{ Moment Shadow Mapping, Moment Based Volumetric Obscurance und Sample Distribution Shadow Maps }
+\title{ Moment Shadow Mapping, (Moment Based) Volumetric Obscurance und Sample Distribution Shadow Maps }
 
 \author{
 	Akasha Jethwa 
@@ -233,7 +233,7 @@ Allerdings ist das Verfahren nicht oder nur schlecht auf heutigen GPU's implemen
 Ambient Occlusion (= Umgebungsverdeckung) ist eine Rendertechnik um Schatten in 3D-Szenen
 zu approximieren. Dafür gibt es allgemein 2 Ansätze:
 \begin{enumerate}
-	\item "Global Ambient Occlusion": für jeden Punkt in der Szene wird geprüft, ob der Himmel von diesem
+	\item "Global Illumination Based Ambient Occlusion": für jeden Punkt in der Szene wird geprüft, ob der Himmel von diesem
 		Punkt aus sichtbar ist (bzw. bei geschlossenen Szenen: ob eine maximale Distanz ohne Kollision erreicht
 		 werden kann). Dieses Verfahren ist relativ teuer, kann aber z.B. für statische Szenen vorberechnet
 		 werden. (Abb. \ref{ref:aoImage})
@@ -266,7 +266,7 @@ zu approximieren. Dafür gibt es allgemein 2 Ansätze:
 Volumetric Obscurance (Abb. \ref{ref:voImage}) ist eine Alternative zum Screenspace Volumetric Obscurance, welche wir im folgenden
 Erläutern werden
 
-\cite{loos2010volumetric}
+\cite{voPaper}
 
 % Related Work
 \subsection{Moment Shadow Mapping}
@@ -585,9 +585,14 @@ Dabei ist $X$ die Nachbarschaft um den Punkt $P$, $O$ ist die Verdeckungs-Funkti
 ist 0, falls Verdeckung stattfindet, sonst 1. $\rho$ ist eine abfallende Funktion
 die 1 bei P ist und mit der Distanz abfällt. Wie in \cite{voPaper} beschrieben, ist der 
 sichtbare Effekt jedoch nur sehr minimal, weshalb diese Funktion als konstant angesehen 
-wird \cite{voPaper}
+wird \cite{voPaper}.
+Im folgenden werden zwei implementierungen für Volumetric Obscurance vorgestellt:
+\begin{itemize}
+    \item Line Sampled Volumetric Obscurance (LSVO) (Kapitel \ref{ssec:LSVO})
+    \item Area Sampled Volumetric Obscurance (ASVO) (Kapitel \ref{ssec:ASVO})
+\end{itemize}
 
-\subsection{Line Sampling}
+\subsection{Line Sampling} \label{ssec:LSVO}
 Line Sampled Volumetric Obscurance nutzt (möglichst) zufallsverteilte Samples innerhalb auf der auf den
 Screenspace projezierten Umgebung des Punktes. In der hier implementierten Version (die ebenfalls in
 \cite{voPaper} beschrieben wird) wird die Einheitskugel um den Punkt P in der Szene betrachtet.
@@ -671,7 +676,7 @@ die Anzahl der Samples, \textit{depth} die Tiefe des zum Punkt $P$ korrespondier
 	\caption{LineSampling mit verschieden vielen Samples pro Pixel}
 \end{figure}
 
-\subsection{Area Sampling}
+\subsection{Area Sampling} \label{ssec:ASVO}
 Line Sampling Volumetric Obscurance nutzt zufallsverteilte Samples um die Verdeckung einer
 Raumregion zu approximieren. Ein alternativer Ansatz ist Area Sampling. Anstatt zufallsverteilter Samples
 versucht Area Sampling die Verteilung über das Mittel statistischer Größen zu ermitteln. Dafür
