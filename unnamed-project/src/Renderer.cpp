@@ -1418,7 +1418,7 @@ void Renderer::resize(int width, int height)
     m_width = width;
     m_height = height;
 
-    m_ratio = width/height;
+    m_ratio = float(width)/float(height);
 
     glDeleteFramebuffers(1, &m_renderFrameBuffer);
     glDeleteTextures(1, &m_renderTexture);
