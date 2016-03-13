@@ -262,17 +262,35 @@ void BulletGame::performJump()
     // player bottom is at -0.9
     // player eye  is at 0.9-0.2 = 0.7
     // bottom = -0.9-0.7 = -1.6
+
+    auto checkRay = [this](const btVector3 &start, const btVector3 &end) -> bool
+    {
+        btCollisionWorld::ClosestRayResultCallback callback(start, end);
+
+        // Perform raycast
+        m_bulletWorld->rayTest(start, end, callback);
+
+        return callback.hasHit();
+    };
+
     btVector3 start = toBulletVector3(m_position);
-    btVector3 end = toBulletVector3(m_position + QVector3D(0, -1.6f-0.1f, 0));
+    btVector3 end = toBulletVector3(m_position + QVector3D(0, -1.6f-0.2f, 0));
 
-    btCollisionWorld::ClosestRayResultCallback callback(start, end);
-
-    // Perform raycast
-    m_bulletWorld->rayTest(start, end, callback);
-
-    if(callback.hasHit())
+    if(checkRay(start, end))
     {
         m_playerBody->applyCentralImpulse(btVector3(0, 10, 0));
+        return;
+    }
+
+    for (int i = 0; i < 6; i++)
+    {
+        end = toBulletVector3(m_position + QVector3D(.5*cos(i/3.*M_PI), -1.6f-0.1f, .5*sin(i/3.*M_PI)));
+
+        if(checkRay(start, end))
+        {
+            m_playerBody->applyCentralImpulse(btVector3(0, 10, 0));
+            return;
+        }
     }
 }
 
