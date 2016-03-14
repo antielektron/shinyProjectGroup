@@ -172,7 +172,7 @@ float lineSampling(int nSamples)
 	{
 		// get a random angle and radius for sample point on the
 		// unit disk
-		float radius = rand(0.1);
+		float radius = sqrt(rand(0.1));
 		float angle = rand(0.1) * 2 * PI;
 		
 		// weight samples:
