@@ -89,7 +89,7 @@ QWidget *RendererDebugWidget::generateSDSMOptions()
     m_lightShearing = new QCheckBox("Light Shearing");
     layout->addWidget(m_lightShearing);
 
-    m_cascadedShadowMaps = new QRadioButton("CSM", sdsmOptions);
+    m_cascadedShadowMaps = new QRadioButton("PSSM", sdsmOptions);
     layout->addWidget(m_cascadedShadowMaps);
 
     m_sampleDistributionShadowMaps = new QRadioButton("SDSM", sdsmOptions);
@@ -122,10 +122,10 @@ QWidget *RendererDebugWidget::generateVOOptions()
     auto layout = new QVBoxLayout(voOptions);
     voOptions->setLayout(layout);
 
-    m_sky = new QCheckBox("draw Sky", voOptions);
+    m_sky = new QCheckBox("draw sky", voOptions);
     layout->addWidget(m_sky);
 
-    m_plainVO = new QCheckBox("plain Obscurance", voOptions);
+    m_plainVO = new QCheckBox("plain obscurance", voOptions);
     layout->addWidget(m_plainVO);
 
     m_lineVO = new QRadioButton("line sampling", voOptions);
@@ -157,7 +157,7 @@ QWidget *RendererDebugWidget::generateVOOptions()
     m_noVO = new QRadioButton("plain copy", voOptions);
     layout->addWidget(m_noVO);
 
-    m_drawCursor = new QCheckBox("draw Cursor", voOptions);
+    m_drawCursor = new QCheckBox("draw cursor", voOptions);
     layout->addWidget(m_drawCursor);
 
 
