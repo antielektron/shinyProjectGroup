@@ -22,7 +22,7 @@ TODO Shadow Map Frustum!
 # Folie Partitionierung einfügen
 - Uniform
 - Logarithmisch
-+ TODO Diagramm!
++ Diagramm (partition_uniform.png partition_log.png)
 
 # Folie SDSM einfügen
 - Adaptive Partitionierung
