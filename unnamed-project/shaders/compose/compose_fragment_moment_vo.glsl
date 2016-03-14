@@ -28,7 +28,7 @@ const float dfShadingAmount = 1.;
 
 // TODO: pass this values to shader
 const float worldSpaceRadius = 1;
-const float sceneDepth = 200;
+const float sceneDepth = 100;
 const float verticalViewAngle = PI/4;
 
 
@@ -225,7 +225,7 @@ void main()
 	if (mmLevel <= 1 + 10e-3) mmLevel = 1 + 10e-3;	
 	
 	// step 4: get filtered Moments
-	mmLevel=3.0f;
+	//mmLevel=3.0f;
 	vec4 moments = textureLod(momentsSampler, uv, mmLevel);	
 	
 
@@ -234,6 +234,10 @@ void main()
     //sampleOptimized4MomentsShadowMap(outMoments, moments);
 	vec3 w;
 	vec3 z;
+	
+	//stupid workaround for wrong alpha mipmapping:
+	outMoments.a = outMoments.x * outMoments.y;
+	
     float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.0, 3e-5);	
   
 	float z0 = depth - r;
