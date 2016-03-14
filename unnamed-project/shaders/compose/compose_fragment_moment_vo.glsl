@@ -134,7 +134,7 @@ float computeMSMShadwowIntensity(out vec3 Weight, out vec3 outz, vec4 in4Moments
 float f(float z, float z_a, float z_b)
 {
 
-	return (z-z_a)/(z_b - z_a);
+	return clamp((z-z_a)/(z_b - z_a),0.0f,1.0f);
 }
 
 float get_angle(vec3 a, vec3 b)
@@ -204,8 +204,8 @@ void main()
 
 	// step 1: get depth
 	vec4 tmpmoment = textureLod(momentsSampler, uv,0);
-	vec4 tmpoutmoment;
-	sampleOptimized4MomentsShadowMap(tmpoutmoment, tmpmoment);
+	vec4 tmpoutmoment = tmpmoment;
+	//sampleOptimized4MomentsShadowMap(tmpoutmoment, tmpmoment);
 	
 	float depth = tmpoutmoment.x;
 	
@@ -221,8 +221,11 @@ void main()
 	float mmLevel = log2(1./(1.-r)) * 10;
 	//float mmLevel = ((1 - depth) * 10);
 	
+	//reduce artefacts:
+	if (mmLevel <= 1 + 10e-3) mmLevel = 1 + 10e-3;	
+	
 	// step 4: get filtered Moments
-	//mmLevel = clamp (mmLevel, 2, 5);
+	mmLevel=3.0f;
 	vec4 moments = textureLod(momentsSampler, uv, mmLevel);	
 	
 
@@ -231,7 +234,7 @@ void main()
     //sampleOptimized4MomentsShadowMap(outMoments, moments);
 	vec3 w;
 	vec3 z;
-    float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.005, 3e-5);	
+    float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.0, 3e-5);	
   
 	float z0 = depth - r;
 	float z1 = depth + r;	
@@ -239,10 +242,10 @@ void main()
 	float sum = 0;
 	for (int i = 0; i < 3; i++)
 	{
-		sum +=  w[i] * f(z[i],z0, z1) * 0.1; 
+		sum +=  w[i] * f(z[i],z0, z1); 
 	}
 	//sum = 1 - (sum * 3);
-	sum = clamp((1 - (sum * 3)) * 0.5 + 0.5, 0, 1);
+	//sum = clamp((1 - (sum * 3)) * 0.5 + 0.5, 0, 1);
 	
 	if (depth < 1 - 10e-9 || isSky == 0)
 	{
@@ -271,4 +274,6 @@ void main()
     outputColor = vec4(defaultColor, 1.0);
     //outputColor = vec4(sum * vec3(1,1,1),1.);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
+    //outputColor = pow(outMoments.w,0.25f).xxxx;
+    //outputColor.a = 1.0f;
 }
