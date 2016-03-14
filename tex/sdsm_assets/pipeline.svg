@@ -21,13 +21,28 @@
   <defs
      id="defs4">
     <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="marker4237"
+       style="overflow:visible;"
+       inkscape:isstock="true">
+      <path
+         id="path4239"
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round;stroke:#000000;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="scale(0.6) rotate(180) translate(0,0)" />
+    </marker>
+    <marker
        inkscape:isstock="true"
        style="overflow:visible;"
        id="marker5357"
        refX="0.0"
        refY="0.0"
        orient="auto"
-       inkscape:stockid="Arrow2Mend">
+       inkscape:stockid="Arrow2Mend"
+       inkscape:collect="always">
       <path
          transform="scale(0.6) rotate(180) translate(0,0)"
          d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
@@ -141,8 +156,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.1785437"
-     inkscape:cx="194.03033"
-     inkscape:cy="56.656728"
+     inkscape:cx="111.87258"
+     inkscape:cy="126.91996"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:window-width="2560"
@@ -199,7 +214,7 @@
        preserveAspectRatio="none"
        height="96"
        width="147.04684"
-       style="fill:#0000ff;fill-opacity:1;opacity:0.489"
+       style="fill:#0000ff;fill-opacity:1;opacity:0"
        clip-path="url(#clipPath4206)" />
     <path
        sodipodi:type="inkscape:offset"
@@ -404,5 +419,13 @@
        sodipodi:nodetypes="ccc"
        inkscape:export-xdpi="300.01999"
        inkscape:export-ydpi="300.01999" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.28200001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker4237)"
+       d="m 13.999996,764.0315 0,-3 76,0 0,3"
+       id="path4229"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
   </g>
 </svg>
