@@ -602,9 +602,13 @@ $$
 f(z) = \begin{cases} 1 &  \text{für } z \leq d \\ 0 & \text{für } z > d \end{cases}
 $$
 Für die hier vorgestellte Implementierung wird eine feste Anzahl $N$ an Samples verwendet.
-Dann ergibt sich daraus:
+Dann ergibt sich daraus für ein einzelnes LineSample:
 $$
-F_{N}(z_0, \dots, z_N) = \sum_i^N \frac{v_i}{2 \cdot z_{s_i}} \max{(\min{(z_{s_i}, d_{r_i})} + z_{s_i}, 0)}
+v_c = \max{(\min{(z_s, d_r)} + z_s, 0)}
+$$
+bzw. für eine Menge von $N$ samples:
+$$
+v_c = F_{N}(z_0, \dots, z_N) = \sum_i^N \frac{v_i}{2 \cdot z_{s_i}} \max{(\min{(z_{s_i}, d_{r_i})} + z_{s_i}, 0)}
 $$
 Dabei ist $z_i$ die Tiefe des i-ten Samples im Depth-Buffer, $d_{r_i}$ ist die Tiefe $z_i$ gemapped in die
 betrachtete Umgebung des Punktes $P$, $z_{s_i} = \sqrt{1 - x_i^2 - y_i^2}$. $(x_i, y_i)$ ist die Position des
@@ -630,7 +634,7 @@ ein Volumen von 2, das durch $P$ geht) \newline
 			sumSamples = 0\;
 			sumVolume = 0\;
 		    \For{i = 0 $\rightarrow$ nSamples - 1}{
-		    	radius = rand()\;
+		    	radius = $\sqrt{\text{rand()}}$\;
 		    	$\alpha$ = rand()$\cdot 2\pi$\;
 		    	$v_i$ = $\sqrt{1 - radius^2}$\;
 		    	p = $(\cos{(\alpha)} \cdot radius,\sin{(\alpha)} \cdot radius)^T$\;
