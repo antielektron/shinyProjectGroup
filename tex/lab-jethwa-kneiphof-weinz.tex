@@ -727,8 +727,9 @@ Dabei ist \textit{getMomentsFromLevel(mipmap, uv, level)} die Funktion, die von 
 an der Stelle \textit{uv} den Texel an gegebenem \textit{level} abgreift.
 \textit{getRadiusInScreenspace(depth)} rechnet das Ausmaß der auf den Screenspace projezierten Weltumgebung
 aus (in uv-Koordinaten).
-
-[TODO: make fancy screenshots]
+Der Koeffizient \textit{vCoeff} gibt dann einen Faktor zum Einschattieren des zum Punkt $P$ korrespondierenden 
+Pixels zurück. Dieser muss dann mit dem Farbwert der vorgerenderten Textur verrechnet werden (s. Abschnitt
+\ref{ssec:voResult})
 
 % Main
 \section{Moment Shadow Mapping}
@@ -973,12 +974,12 @@ Mip-Mapping hat dieses Problem nicht.
 
 
 % Fazit
-\subsection{Volumetric Obscurance}
-Wie erwartet sehen SSAO und Line Sampled Volumetric Obscurance sich sehr ähnlich. Area Sampled Volumetric
-Obscurance lieferte in unserer Implementierung ebenfalls gute Resultate und bietet so eine Alternative 
-zum relativ teuren Line Sampled Volumetric Obscurance. Durch die Approximierung durch Mipmaps sind jedoch bei
-großflächiger Filterung mehr Artefakte zu sehen, sodass diese Technik im Gegensatz zum Line Sampled Volumetric
-Obscurance nur für kleinere Umgebungen genutzt werden sollte.
+\subsection{Volumetric Obscurance} \label{ssec:voResult}
+Wie erwartet sehen SSAO (Abb \ref{ref:crytekSSAO}) und Line Sampled Volumetric Obscurance 
+(Abb. \ref{ref:LSVO010}, Abb. \ref{ref:LSVO100}) sich sehr ähnlich. 
+Area Sampled Volumetric Obscurance (Abb. \ref{ref:ASVO})
+lieferte in unserer Implementierung ebenfalls gute Resultate und bietet so eine Alternative 
+zum relativ teuren Line Sampled Volumetric Obscurance. 
 
 \begin{figure}[H]
 	\centering
@@ -988,27 +989,54 @@ Obscurance nur für kleinere Umgebungen genutzt werden sollte.
 		\includegraphics[width = 6cm]{vo_assets/crytekSSAO.png}
 		\label{ref:crytekSSAO}
 	}
-	\subfloat[LSVO mit 10 samples]
+	\subfloat[Line Sampled Obscurance Term mit 10 samples]
 	{
 
-		\includegraphics[width = 6cm]{vo_assets/presentaton_graphics/fazitLSVO010.png}
+		\includegraphics[width = 6cm]{vo_assets/presentaton_graphics/dome/LSVO_only_10.png}
 		\label{ref:LSVO010}
 	}
 	
-	\subfloat[LSVO mit 100 samples]
+	\subfloat[Line Sampled Obscurance Term mit 100 samples]
 	{
 
-		\includegraphics[width = 6cm]{vo_assets/presentaton_graphics/fazitLSVO100.png}
+		\includegraphics[width = 6cm]{vo_assets/presentaton_graphics/dome/LSVO_only_100.png}
 		\label{ref:LSVO100}
 	}
-	\subfloat[ASVO]
+	\subfloat[Area Sampled Obscurance Term]
 	{
 
-		\includegraphics[width = 6cm]{vo_assets/presentaton_graphics/fazitASVO.png}
+		\includegraphics[width = 6cm]{vo_assets/presentaton_graphics/dome/ASVO_only.png}
 		\label{ref:ASVO}
 	}
 	\caption{Resultate von Umgebungsverdeckungstechniken}
 \end{figure}
+In Abbildung \ref{ref:finalVO} sieht man gut im Vergleich, wie Volumetric Obscurance Objecte sichtbar macht,
+die bei einem Rendering nur mit Shadowmapping und ohne Global Illumination Techniques nicht sichtbar wären.
+\begin{figure}[H]
+	\centering
+	\subfloat[Rendering ohne VO: Zahnräder sind nicht sichtbar]
+	{
+
+		\includegraphics[width = 5.5cm]{vo_assets/presentaton_graphics/dome/plainResult.png}
+		\label{ref:plainRendering}
+	}\quad\quad
+	\centering
+	\subfloat[Rendering mit ASVO: Zahnräder sind sichtbar]
+	{
+
+		\includegraphics[width = 5.5cm]{vo_assets/presentaton_graphics/dome/ASVO.png}
+		\label{ref:ASVORendering}
+	}
+	\caption{Scene mit und ohne VO}
+	\label{ref:finalVO}
+\end{figure}
+Durch die Approximierung durch Mipmaps sind jedoch bei
+großflächiger Filterung durch Area Sampled Volumetric Obscurance mehr Artefakte zu sehen. Hier bietet es sich an in Zukunft noch alternative
+Mipmap-Filtertechniken auszuprobieren um diese Artefakte zu vermeiden. Wir experimentierten ebenfalls
+mit einer Konvexkombination von Momenten, die aus verschiedenen Mipmap-Ebenen entnommen wurden. Hier haben
+wir zwar in manchen Fällen die durch MipMap verursachten Artefakte reduzieren können, allerdings
+ist hier noch weitere Arbeit notwendig um eine optimale Verteilung der Koeffizienten zur Gewichtung
+der Mipmapebenen zu finden.
 
 % Fazit
 \subsection{Moment Based Volumetric Obscurance}
