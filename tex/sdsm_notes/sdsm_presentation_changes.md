@@ -3,12 +3,13 @@
 - Sonne ~> Punktlichtquelle
 - Rendere Tiefe aus sicht des Lichtes (~> Light Space)
 + TODO Diagramm und oder Depth Buffer
++ Image (depth_buffer.png)
 
 # Folie Light Space hierher verschieben
 
 - Bildbasierter Ansatz -> Aliasing!
-+ Image (depth_buffer.png)
-TODO Shadow Map Frustum!
++ Image (aliasing images)
+TODO Shadow Map Frustum!tat
 
 # Folie 3 SDSM
 + Entfernen
