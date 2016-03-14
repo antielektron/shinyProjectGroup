@@ -31,6 +31,7 @@ const float dfShadingAmount = 1.;
 const float worldSpaceRadius = 1;
 const float sceneDepth = 100;
 const float verticalViewAngle = PI/4;
+const float binomialKernel[5] = {0.0625, 0.25, 0.375, 0.25, 0.0625};
 
 
 //cursor
@@ -145,9 +146,12 @@ float f(vec4 moments, float z_a, float z_b)
 
 vec4 getBackfilteredMoments(sampler2D mipmap, vec2 uv, float lod)
 {
-	return 0.5 * textureLod(mipmap, uv, lod * 0.5)
-	      +0.4 * textureLod(mipmap, uv, lod * 1)
-	      +0.1 * textureLod(mipmap, uv, lod * 1.2);
+	vec4 sum = vec4(0.,0.,0.,0.);
+	for (int i = 0; i < 5; i++)
+	{
+		sum += binomialKernel[i] * textureLod(mipmap, uv, lod + (2 - i));
+	}
+	return sum;
 }
 
 float get_angle(vec3 a, vec3 b)

@@ -145,7 +145,7 @@ QWidget *RendererDebugWidget::generateVOOptions()
     m_momentVO = new QRadioButton("moment area sampling", voOptions);
     layout->addWidget(m_momentVO);
 
-    m_shinyFiltering = new QCheckBox("shiny MipMapBackFiltering", voOptions);
+    m_shinyFiltering = new QCheckBox("SBMF based VO", voOptions);
     layout->addWidget(m_shinyFiltering);
 
     m_GL_LINEAR = new QCheckBox("GL_LINEAR", voOptions);
