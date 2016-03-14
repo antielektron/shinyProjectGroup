@@ -36,6 +36,7 @@ protected slots:
     void onSampleSliderChanged(int);
     void onPlainObscuranceChanged(int);
     void onSkyChanged(int);
+    void onShinyFilterChanged(int);
     void onCursorChanged(int);
     void onMipMapStrategyChanged();
 
@@ -86,6 +87,7 @@ private:
     QRadioButton *m_momentVO;
 
     QCheckBox *m_drawCursor;
+    QCheckBox *m_shinyFiltering;
 };
 
 #endif // UNNAMED_PROJECT_RENDERER_DEBUG_WIDGET_H

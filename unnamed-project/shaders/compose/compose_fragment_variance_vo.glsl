@@ -18,6 +18,7 @@ uniform int samples; //TODO, pass through shader
 uniform int isPlainObscurance;
 uniform int isSky;
 uniform int isCursor;
+uniform int isShinyFilter;
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
@@ -142,6 +143,13 @@ float f(vec4 moments, float z_a, float z_b)
 	return a*(z_b * z_b - z_a * z_a)/2 + b * (z_b - z_a);
 }
 
+vec4 getBackfilteredMoments(sampler2D mipmap, vec2 uv, float lod)
+{
+	return 0.5 * textureLod(mipmap, uv, lod * 0.5)
+	      +0.4 * textureLod(mipmap, uv, lod * 1)
+	      +0.1 * textureLod(mipmap, uv, lod * 1.2);
+}
+
 float get_angle(vec3 a, vec3 b)
 {
 	// cross product's squared length:
@@ -230,8 +238,15 @@ void main()
 	if (mmLevel <= 1 + 10e-3) mmLevel = 1 + 10e-3;
 	// step 4: get filtered Moments
 	//mmLevel = clamp (mmLevel, 2, 5);
-	vec4 moments = textureLod(momentsSampler, uv, mmLevel);
-	
+	vec4 moments;
+	if (isShinyFilter == 0)
+	{
+		moments = textureLod(momentsSampler, uv, mmLevel);
+	}
+	else
+	{
+		moments = getBackfilteredMoments(momentsSampler, uv, mmLevel);
+	}
 
 	// step 5: where the magic happens
 	vec4 outMoments = moments;

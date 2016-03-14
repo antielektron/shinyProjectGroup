@@ -42,7 +42,8 @@ Renderer::Renderer() : RendererBase(),
         m_sky(1),
         m_glLinear(true),
         m_mmLinear(true),
-        m_cursor(true)
+        m_cursor(true),
+        m_shinyFilter(1)
 {
     // nothing to do here
 }
@@ -224,6 +225,7 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composePlainObscuranceLoc, "isPlainObscurance");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeSkyLoc, "isSky");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeCursorLoc, "isCursor");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeShinyFilterLoc, "isShinyFilter");
 
 
     m_attribLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(0, "v_position");
@@ -1221,6 +1223,7 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             composeProgram->setUniformValue(m_composePlainObscuranceLoc, m_plainObscurance);
             composeProgram->setUniformValue(m_composeSkyLoc, m_sky);
             composeProgram->setUniformValue(m_composeCursorLoc, m_cursor);
+            composeProgram->setUniformValue(m_composeShinyFilterLoc, m_shinyFilter);
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, m_renderTexture);
@@ -1814,4 +1817,14 @@ void Renderer::setCursor(bool b)
 bool Renderer::isCursor()
 {
     return m_cursor == 1;
+}
+
+void Renderer::setShinyFilter(bool b)
+{
+    m_shinyFilter = b ? 1 : 0;
+}
+
+bool Renderer::isShinyFilter()
+{
+    return m_shinyFilter == 1;
 }

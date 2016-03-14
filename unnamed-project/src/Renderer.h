@@ -84,6 +84,9 @@ public:
     void setCursor(bool b);
     bool isCursor();
 
+    void setShinyFilter(bool b);
+    bool isShinyFilter();
+
     void awesomeCapture();
 
     void setCaptureSlot(int slot);
@@ -127,6 +130,7 @@ protected:
     int m_samples;
     int m_plainObscurance;
     int m_sky;
+    int m_shinyFilter;
     bool m_glLinear;
     bool m_mmLinear;
     int m_cursor;
@@ -199,6 +203,7 @@ protected:
     int m_composePlainObscuranceLoc;
 
     int m_composeSkyLoc;
+    int m_composeShinyFilterLoc;
     int m_composeCursorLoc;
 
     // Copy Shader for texture arrays

@@ -29,6 +29,7 @@ RendererDebugWidget::RendererDebugWidget(Renderer *renderer, QWidget *parent) :
     m_renderer->getMipMapStrategy(mmLin, glLin);
     m_GL_LINEAR->setChecked(glLin);
     m_MIPMAP_LINEAR->setChecked(mmLin);
+    m_shinyFiltering->setChecked(m_renderer->isShinyFilter());
 
     switch (m_renderer->getCascadeStrategy())
     {
@@ -144,6 +145,9 @@ QWidget *RendererDebugWidget::generateVOOptions()
     m_momentVO = new QRadioButton("moment area sampling", voOptions);
     layout->addWidget(m_momentVO);
 
+    m_shinyFiltering = new QCheckBox("shiny MipMapBackFiltering", voOptions);
+    layout->addWidget(m_shinyFiltering);
+
     m_GL_LINEAR = new QCheckBox("GL_LINEAR", voOptions);
     layout->addWidget(m_GL_LINEAR);
 
@@ -203,6 +207,7 @@ void RendererDebugWidget::connectStuff()
     connect(m_noVO, SIGNAL(clicked()), this, SLOT(onVolumetricObscuranceChanged()));
     connect(m_plainVO, SIGNAL(stateChanged(int)), this, SLOT(onPlainObscuranceChanged(int)));
     connect(m_sky, SIGNAL(stateChanged(int)), this, SLOT(onSkyChanged(int)));
+    connect(m_shinyFiltering, SIGNAL(stateChanged(int)), this, SLOT(onShinyFilterChanged(int)));
     connect(m_drawCursor, SIGNAL(stateChanged(int)), this, SLOT(onCursorChanged(int)));
     connect(m_GL_LINEAR, SIGNAL(stateChanged(int)), this, SLOT(onMipMapStrategyChanged()));
     connect(m_MIPMAP_LINEAR, SIGNAL(stateChanged(int)), this, SLOT(onMipMapStrategyChanged()));
@@ -340,4 +345,9 @@ void RendererDebugWidget::onMipMapStrategyChanged()
 {
     m_renderer->setMipMapStrategy(m_GL_LINEAR->isChecked(),
                                   m_MIPMAP_LINEAR->isChecked());
+}
+
+void RendererDebugWidget::onShinyFilterChanged(int s)
+{
+    m_renderer->setShinyFilter(s == 2);
 }
