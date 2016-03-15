@@ -238,10 +238,8 @@ zu approximieren. Dafür gibt es allgemein 2 Ansätze:
 		 werden kann). Dieses Verfahren ist relativ teuer, kann aber z.B. für statische Szenen vorberechnet
 		 werden. (Abb. \ref{ref:aoImage})
 		\cite{aoPaper}
-	\item Screenspace Ambient Occlusion (SSAO): für jeden Pixel im Screenspace werden Point Samples
-		innerhalb einer bestimmten Umgebung erstellt. Mit Hilfe der Tiefeninformationen des Depth Buffers
-		wird die Anzahl der Samples, die hinter der Szenengeometrie liegen müssen bestimmt. Anhand dieser Anzahl
-		kann der Pixel entsprechend abgedunkelt werden. (Abb. \ref{ref:ssaoImage})  \cite{cry2Paper}
+	\item Screenspace Ambient Occlusion (SSAO): Es wird der Tiefenbuffer im Screenspace betrachtet. Für jeden Pixel innerhalb einer Umgebung wird die Verteilung im Tiefenbuffer evaluiert und anhand der Differenzen
+	ein Schattierungsfaktor berechnet. (Abb. \ref{ref:ssaoImage})  \cite{cry2Paper}
 \end{enumerate}  
 
 \begin{figure}[H]
@@ -683,17 +681,18 @@ die Anzahl der Samples, \textit{depth} die Tiefe des zum Punkt $P$ korrespondier
 \subsection{Area Sampling} \label{ssec:ASVO}
 Line Sampling Volumetric Obscurance nutzt zufallsverteilte Samples um die Verdeckung einer
 Raumregion zu approximieren. Ein alternativer Ansatz ist Area Sampling. Anstatt zufallsverteilter Samples
-versucht Area Sampling die Verteilung über das Mittel statistischer Größen zu ermitteln. Dafür
+versucht Area Sampling die Verteilung über das Mittel statistischer Größen zu ermitteln, wobei die
+ grundlegende Annahme ist, dass die Tiefenwerte uniform verteilt sind. Dafür
 wird der selbe Ansatz wie bei Variance Shadow Maps \cite{vsmPaper} verwendet. Beim Line Sampling
-nutzten wir samples auf dem DepthBuffer, beim Area Sampling schreiben wir stattdessen die ersten beiden
+nutzten wir Samples auf dem DepthBuffer, beim Area Sampling schreiben wir stattdessen die ersten beiden
 Momente $(z^1, z^2)$ für jeden Pixel im Screenspace heraus und filtern diese Größe über einen Bereich, der
 Abhängig von der Tiefe ist (analog zu der von der Tiefe abhängigen, auf den Screenspace projezierten Umgebung
-im Abschnitt Line Sampling). In unserer Implementierung bestimmen wir in einem Renderschritt [blödes Wort]
-die Tiefe der Szene $(z)$ aus Sicht der Kamera und schreiben das Tupel $(z, z^2)$ in den ersten beiden
+im Abschnitt Line Sampling). In unserer Implementierung bestimmen wir in einem Renderschritt
+die Tiefe der Szene $(z)$ aus Sicht der Kamera und schreiben das Tupel $(z, z^2)$ in die ersten beiden
 Farbkanälen einer Textur. Bevor wir die finale Szene rendern mipmappen wir die Textur.
 In der Nachbearbeitung (Compose Schritt) der gerenderten Szene greifen wir abhängig von der Tiefe an jedem
 Pixel auf die entsprechende Mipmap-Ebene zu, welche die so gefilterten Momente enthält.
-Über das abgegriffene Tupel $t = (z_f, z_f^2)$ bekommen wir dann einen Approximierten Mittelwert 
+Über das abgegriffene Tupel $t = (z_f, z_f^2)$ bekommen wir dann einen approximierten Mittelwert 
 $\mu = t[0]$ und die gemittelte Varianz $\sigma^2 = t[1] - t[0]^2$. Dann lässt sich der Verdeckungsfaktor 
 folgendermaßen abschätzen:
 $$
@@ -736,7 +735,8 @@ Werden die Mipmap-Level mit Standard Mipmapping Methoden heutiger Grafik-APIs (w
 Um diese Artefakte zu minimieren haben wir mit dem Filtern der Momente über verschiedene Mipmap-Ebenen
 experimentiert. Anstatt nur die vorgefilterten Momente über nur eine Mipmap-Ebene zu holen,
 nutzen wir einen Binomialfilter (als Näherung für einen Gaußfilter) über die Mipmapebenen, mit Erwartungswert
-an der Ebene, die ohne Binomialfilter gewählt wird. Sei $b_k$ das gefilterte Moment auf der k-ten Mipmapebene,
+an der Ebene, die ohne Binomialfilter gewählt werden würde. 
+Sei $b_k$ das gefilterte Moment auf der k-ten Mipmapebene,
 dann bekommen wir das binomail-gefilterte Moment bei einem Binomialfilter der Größe 5 mit: 
 
 $$
@@ -1033,8 +1033,8 @@ zum relativ teuren Line Sampled Volumetric Obscurance.
 	}
 	\caption{Resultate von Umgebungsverdeckungstechniken}
 \end{figure}
-In Abbildung \ref{ref:finalVO} sieht man gut im Vergleich, wie Volumetric Obscurance Objecte sichtbar macht,
-die bei einem Rendering nur mit Shadowmapping und ohne Global Illumination Techniques nicht sichtbar wären.
+In Abbildung \ref{ref:finalVO} sieht man gut im Vergleich, wie Volumetric Obscurance Objekte sichtbar macht,
+die bei einem Rendering nur mit Shadowmapping und ohne Global Illumination Techniken nicht sichtbar wären.
 \begin{figure}[H]
 	\centering
 	\subfloat[Rendering ohne VO: Zahnräder sind nicht sichtbar]
