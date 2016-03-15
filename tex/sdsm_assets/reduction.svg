@@ -333,10 +333,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2"
-     inkscape:cx="203.10597"
-     inkscape:cy="167.06363"
+     inkscape:cx="153.77469"
+     inkscape:cy="165.15723"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="text4362"
      inkscape:window-width="1920"
      inkscape:window-height="1031"
      inkscape:window-x="0"
@@ -356,7 +356,7 @@
      inkscape:snap-object-midpoints="false"
      inkscape:snap-center="false"
      inkscape:snap-others="true"
-     inkscape:snap-nodes="false">
+     inkscape:snap-nodes="true">
     <inkscape:grid
        id="GridFromPre046Settings"
        type="xygrid"
@@ -391,30 +391,30 @@
        style="opacity:1;fill:#ff0000;fill-opacity:0.70588237;stroke:#000000;stroke-width:0.99921262;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        d="M 53.150391 92.125 L 35.433594 92.125 L 35.433594 109.8418 L 53.150391 109.8418 L 53.150391 92.125 z "
        id="path4292"
-       transform="matrix(0.28222222,0,0,0.28222222,-4.149475e-6,698.0315)"
        inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
+       inkscape:export-ydpi="300"
+       transform="matrix(0.28222222,0,0,0.28222222,-4.149475e-6,698.0315)" />
     <path
        style="opacity:1;fill:#00ff00;fill-opacity:0.70588237;stroke:#000000;stroke-width:0.99921262;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        d="M 70.865234 92.125 L 53.150391 92.125 L 53.150391 109.8418 L 70.865234 109.8418 L 70.865234 92.125 z "
        id="path4295"
-       transform="matrix(0.28222222,0,0,0.28222222,-4.149475e-6,698.0315)"
        inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
+       inkscape:export-ydpi="300"
+       transform="matrix(0.28222222,0,0,0.28222222,-4.149475e-6,698.0315)" />
     <path
        style="opacity:1;fill:#0000ff;fill-opacity:0.70588237;stroke:#000000;stroke-width:0.99921262;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        d="M 88.582031 92.125 L 70.865234 92.125 L 70.865234 109.8418 L 88.582031 109.8418 L 88.582031 92.125 z "
        id="path4298"
-       transform="matrix(0.28222222,0,0,0.28222222,-4.149475e-6,698.0315)"
        inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
+       inkscape:export-ydpi="300"
+       transform="matrix(0.28222222,0,0,0.28222222,-4.149475e-6,698.0315)" />
     <path
        style="opacity:1;fill:#ffff00;fill-opacity:0.70588237;stroke:#000000;stroke-width:0.99921262;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        d="M 88.582031 92.125 L 88.582031 109.8418 L 106.29883 109.8418 L 106.29883 92.126953 L 88.582031 92.125 z "
        id="rect4239"
-       transform="matrix(0.28222222,0,0,0.28222222,-4.149475e-6,698.0315)"
        inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300" />
+       inkscape:export-ydpi="300"
+       transform="matrix(0.28222222,0,0,0.28222222,-4.149475e-6,698.0315)" />
     <path
        inkscape:connector-curvature="0"
        style="opacity:1;fill:#ff0000;fill-opacity:0.70588237;stroke:#000000;stroke-width:0.28200001;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -827,5 +827,28 @@
        style="fill:none;fill-rule:evenodd;stroke:#ffff00;stroke-width:0.28222221px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
+    <g
+       style="font-style:normal;font-weight:normal;font-size:11.28888893px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="text4362">
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.28222221px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         d="m 7.9999959,724.0315 -2,0 0,44.8 2,0"
+         id="path4374"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="cccc" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:11.28888893px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="-746.47906"
+         y="5.0090923"
+         id="text4376"
+         sodipodi:linespacing="125%"
+         transform="matrix(0,-1,1,0,0,0)"><tspan
+           sodipodi:role="line"
+           id="tspan4378"
+           x="-746.47906"
+           y="5.0090923"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.52777791px;line-height:125%;font-family:'Accanthis ADF Std';-inkscape-font-specification:'Accanthis ADF Std, Normal';text-align:center;writing-mode:lr-tb;text-anchor:middle">Reduction step on GPU</tspan></text>
+    </g>
   </g>
 </svg>
