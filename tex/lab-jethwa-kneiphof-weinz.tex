@@ -731,6 +731,46 @@ Der Koeffizient \textit{vCoeff} gibt dann einen Faktor zum Einschattieren des zu
 Pixels zurück. Dieser muss dann mit dem Farbwert der vorgerenderten Textur verrechnet werden (s. Abschnitt
 \ref{ssec:voResult})
 
+\subsubsection{} \textbf{Reduzierung von Artefakten} \label{sssec:SBMF}
+Werden die Mipmap-Level mit Standard Mipmapping Methoden heutiger Grafik-APIs (wie z.B. glGenerateMipmaps()) erstellt, kommt es zu Artefakten im berechneten Obscurance-Term (Abb \ref{ref:SBMF_off_close}).
+Um diese Artefakte zu minimieren haben wir mit dem Filtern der Momente über verschiedene Mipmap-Ebenen
+experimentiert. Anstatt nur die vorgefilterten Momente über nur eine Mipmap-Ebene zu holen,
+nutzen wir einen Binomialfilter (als Näherung für einen Gaußfilter) über die Mipmapebenen, mit Erwartungswert
+an der Ebene, die ohne Binomialfilter gewählt wird. Sei $b_k$ das gefilterte Moment auf der k-ten Mipmapebene,
+dann bekommen wir das binomail-gefilterte Moment bei einem Binomialfilter der Größe 5 mit: 
+
+$$
+b' = (\frac{1}{16}, \frac{4}{16},\frac{6}{16}, \frac{4}{16}, \frac{1}{16}) \left( \begin{array}{c} b_{(i-2)}
+ \\b_{(i-1)}\\b_{i}\\b_{(i+1)}\\b_{(i+1)} \end{array} \right)
+$$
+In Abbildung \ref{ref:SBMF} sieht man das Ergebnis für den daraus resultierenden Obscurance Term.
+\begin{figure}
+	\centering
+	\subfloat[Area Sampling ohne LoD-Filtering]{
+
+		\includegraphics[width = 6cm]{vo_assets/area/shinyMMFilter_off.png}
+		\label{ref:SBMF_off}
+	}
+    \subfloat[Area Sampling ohne LoD-Filtering]{
+
+		\includegraphics[width = 6cm]{vo_assets/area/zoomed/shinyMMFilter_off1.png}
+		\label{ref:SBMF_off_close}
+	}
+	
+	\subfloat[Area Sampling mit LoD-Filtering]{
+
+		\includegraphics[width = 6cm]{vo_assets/area/shinyMMFilter_on.png}
+		\label{ref:SBMF_on}
+	}
+    \subfloat[Area Sampling mit LoD-Filtering]{
+
+		\includegraphics[width = 6cm]{vo_assets/area/zoomed/shinyMMFilter_on1.png}
+		\label{ref:SBMF_on_close}
+	}
+	\caption{Ergebnisse mit binomialem LevelofDetail (LoD) Filtering}
+	\label{ref:SBMF}
+\end{figure}
+
 % Main
 \section{Moment Shadow Mapping}
 %Allgemeines MSM
@@ -1015,11 +1055,10 @@ die bei einem Rendering nur mit Shadowmapping und ohne Global Illumination Techn
 \end{figure}
 Durch die Approximierung durch Mipmaps sind jedoch bei
 großflächiger Filterung durch Area Sampled Volumetric Obscurance mehr Artefakte zu sehen. Hier bietet es sich an in Zukunft noch alternative
-Mipmap-Filtertechniken auszuprobieren um diese Artefakte zu vermeiden. Wir experimentierten ebenfalls
-mit einer Konvexkombination von Momenten, die aus verschiedenen Mipmap-Ebenen entnommen wurden. Hier haben
-wir zwar in manchen Fällen die durch MipMap verursachten Artefakte reduzieren können, allerdings
-ist hier noch weitere Arbeit notwendig um eine optimale Verteilung der Koeffizienten zur Gewichtung
-der Mipmapebenen zu finden.
+Mipmap-Filtertechniken auszuprobieren um diese Artefakte zu vermeiden. Unsere Technik mit Binomialem
+Filtering über die Mipmap-Ebenen eliminiert zwar schon eine große Anzahl an Artefakten, vollkommen
+Artefaktfrei ist das ergebnis jedoch noch nicht, hier können in Zukunft vielleicht noch bessere Ergebnisse
+erzielt werden, in dem die Filter noch optimiert werden.
 
 % Fazit
 \subsection{Moment Shadow Mapping}
