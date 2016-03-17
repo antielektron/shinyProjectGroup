@@ -17,7 +17,7 @@ TODO Shadow Map Frustum!tat
 # Folie 4 PSSM
 + Als Lösungsansatz für Aliasing Problem
 - Partitioniere Kamera Frustum entlang Z-Achse
-+ TODO Diagramm
++ Diagram (partiton_*.png) TODO Near/Far!!
 + Referenz
 
 # Folie Partitionierung einfügen
@@ -45,8 +45,12 @@ TODO
 # Folie 8 Tight Partition Frusta
 + Bild ersetzen (sdsm_light_view_aabb_small.png)
 
+# Folie 9 Reduction einfügen
+- Zahlenbeispiel 1920x1080 (2,073,600) => 8,160 => 32 => 1
+
 # Folie 9 Reduction
 + Diagramm
+TODO More annotations
 
 # Folie 13 Ergebnisse
 + Diagramm höher
