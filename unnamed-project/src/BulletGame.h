@@ -1,6 +1,6 @@
 #ifndef UNNAMED_PROJECT_BULLET_GAME_H
 #define UNNAMED_PROJECT_BULLET_GAME_H
-
+#define _USE_MATH_DEFINES
 #ifdef HAVE_BULLET
 
 #include <btBulletDynamicsCommon.h>
