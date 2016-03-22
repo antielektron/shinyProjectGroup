@@ -1199,6 +1199,36 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             }
             glBindTexture(GL_TEXTURE_2D, 0);
 
+            glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture2);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            if (m_mmLinear)
+            {
+                if (m_glLinear)
+                {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // needed, to make mipmaps available!!!
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                }
+                else
+                {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR); // needed, to make mipmaps available!!!
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                }
+            }
+            else
+            {
+                if (m_glLinear)
+                {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); // needed, to make mipmaps available!!!
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                }
+                else
+                {
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST); // needed, to make mipmaps available!!!
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                }
+            }
+            glBindTexture(GL_TEXTURE_2D, 0);
+
             // 6. Render to Screen, apply VO
             glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -1437,6 +1467,7 @@ void Renderer::resize(int width, int height)
     glDeleteFramebuffers(1, &m_renderFrameBuffer);
     glDeleteTextures(1, &m_renderTexture);
     glDeleteTextures(1, &m_voMomentsTexture);
+    glDeleteTextures(1, &m_voMomentsTexture2);
     glDeleteTextures(1, &m_renderDepthBuffer);
     glDeleteTextures(m_depthReduceTextures.size(), m_depthReduceTextures.data());
     glDeleteTextures(m_frustumReduceTextureArrays.size(), m_frustumReduceTextureArrays.data());
