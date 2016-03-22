@@ -6,6 +6,7 @@ uniform mat4 inverseProjectionMatrix;
 
 uniform sampler2D sampler;
 uniform sampler2D momentsSampler;
+uniform sampler2D momentsSampler2;
 uniform sampler2D depthBuffer;
 uniform vec4 lightDirection;
 uniform float ratio;

@@ -6,7 +6,6 @@ uniform mat4 inverseProjectionMatrix;
 
 uniform sampler2D sampler;
 uniform sampler2D momentsSampler;
-uniform sampler2D momentsSampler2;
 uniform sampler2D depthBuffer;
 
 uniform float ratio;
@@ -15,11 +14,10 @@ uniform vec4 lightDirection;
 
 out vec4 outputColor;
 
-uniform int samples; //TODO, pass through shader
+uniform int samples = 10; //TODO, pass through shader
 uniform int isPlainObscurance;
 uniform int isSky;
 uniform int isCursor;
-uniform int isShinyFilter;
 const float PI = 3.1415926536;
 const float eps = 10e-8;
 
@@ -32,7 +30,6 @@ const float dfShadingAmount = 1.;
 const float worldSpaceRadius = 1;
 const float sceneDepth = 100;
 const float verticalViewAngle = PI/4;
-const float binomialKernel[5] = {0.0625, 0.25, 0.375, 0.25, 0.0625};
 
 
 //cursor
@@ -134,27 +131,10 @@ float computeMSMShadwowIntensity(out vec3 Weight, out vec3 outz, vec4 in4Moments
     return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
 }
 
-float f(vec4 moments, float z_a, float z_b)
+float f(float z, float z_a, float z_b)
 {
-	float mean = moments.x;
-	float sigma = sqrt(moments.y - pow(mean,2));	
-	
-	float a = (-1.)/(2* sigma);
-	float b = -a*(mean + sigma);
-	
-	return a*(z_b * z_b - z_a * z_a)/2 + b * (z_b - z_a);
-}
 
-vec4 getBackfilteredMoments(sampler2D mipmap, vec2 uv, float lod)
-{
-	vec4 sum = vec4(0.,0.,0.,0.);
-	for (int i = 0; i < 5; i++)
-	{
-		float lod2 = lod + (2 - i);
-		lod2 = lod2 < 1+10e-6 ? 1+10e-6 : lod2;
-		sum += binomialKernel[i] * textureLod(mipmap, uv, lod2);
-	}
-	return sum;
+	return clamp((z-z_a)/(z_b - z_a),0.0f,1.0f);
 }
 
 float get_angle(vec3 a, vec3 b)
@@ -200,7 +180,7 @@ vec3 get_sky()
 //cursor
 bool isInCursor()
 {
-
+	
 	float dx = (uv.x - 0.5) * ratio;
 	float dy = (uv.y - 0.5);
 	float dx2 = dx * dx;
@@ -242,67 +222,62 @@ void main()
 	//float mmLevel = ((1 - depth) * 10);
 	
 	//reduce artefacts:
-	if (mmLevel <= 1 + 10e-3) mmLevel = 1 + 10e-3;
+	if (mmLevel <= 1 + 10e-3) mmLevel = 1 + 10e-3;	
+	
 	// step 4: get filtered Moments
-	//mmLevel = clamp (mmLevel, 2, 5);
-	vec4 moments;
-	if (isShinyFilter == 0)
-	{
-		moments = textureLod(momentsSampler, uv, mmLevel);
-	}
-	else
-	{
-		moments = getBackfilteredMoments(momentsSampler, uv, mmLevel);
-	}
+	//mmLevel=3.0f;
+	vec4 moments = textureLod(momentsSampler, uv, mmLevel);	
+	
 
 	// step 5: where the magic happens
-	vec4 outMoments = moments;
-	//sampleOptimized4MomentsShadowMap(outMoments, moments);
+    vec4 outMoments = moments;
+    //sampleOptimized4MomentsShadowMap(outMoments, moments);
+	vec3 w;
+	vec3 z;
 	
-	float mean = moments.x;
-	float variance = sqrt(moments.y - pow(mean,2));
-
-
-	float a = -1.0 / (2. * variance);
-	float b = -a * (mean + variance);
+	//stupid workaround for wrong alpha mipmapping:
+	outMoments.a = outMoments.x * outMoments.y;
 	
-	// nonsense... but it could make almost valid results
+    float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.0, 3e-5);	
+  
 	float z0 = depth - r;
-	float z1 = depth + r;
+	float z1 = depth + r;	
 	
-	// aaaand i have no idea what i'm doing now:
-	float sum =  a * (pow(z1,2) - pow(z0,2)) / 2.0 + b * (z1 - z0);	
-	//sum = sum * 0.7 + 0.6;//sum = clamp(sum * 10, 0,1) * 0.7 + 0.3;
-	sum = sum *1.5 + 0.7 ;
-	
-	if (depth != 1 || isSky == 0)
+	float sum = 0;
+	for (int i = 0; i < 3; i++)
 	{
-		if (isPlainObscurance != 1)
-		{
-			defaultColor =  sum * defaultColor;
+		sum +=  w[i] * f(z[i],z0, z1); 
+	}
+	//sum = 1 - (sum * 3);
+	//sum = clamp((1 - (sum * 3)) * 0.5 + 0.5, 0, 1);
+	sum = sum * 1.3 + 0.2 ;
+	if (depth < 1 - 10e-10 || isSky == 0)
+	{
+		if (isPlainObscurance == 1)
+		{ 
+			defaultColor =  sum * vec3(1.,1.,1.);
 		}
 		else
 		{
-			defaultColor = sum * vec3(0.7,0.7,0.7);
+			defaultColor =  sum * defaultColor;
 		}
 	}
 	else
 	{
-		defaultColor =  get_sky();
+		defaultColor = get_sky();
 	}
 	
 	if (isCursor == 1 && isInCursor())
 	{
 		defaultColor = vec3(1.,1.,1.) - defaultColor;
-	}	
+	}		
 	
-
 	//outputColor = vec4(0, defaultColor.y, 0,1);
 	//outputColor = vec4(momentMagic, 0, 0,1);
-    //outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(r * 0.5),1);
+    //outputColor = vec4(defaultColor.x,0.0,isInCenterEpsilonArea(sum * 0.5),1);
     outputColor = vec4(defaultColor, 1.0);
-    //outputColor = vec4(0, mmLevel * 0.1, 0.,1.);
-   	//outputColor = vec4(sum * vec3(1.,1.,1.),1.);
+    //outputColor = vec4(sum * vec3(1,1,1),1.);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
-    
+    //outputColor = pow(outMoments.w,0.25f).xxxx;
+    //outputColor.a = 1.0f;
 }

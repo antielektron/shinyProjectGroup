@@ -56,6 +56,7 @@ Renderer::~Renderer()
     glDeleteFramebuffers(1, &m_renderFrameBuffer);
     glDeleteTextures(1, &m_renderTexture);
     glDeleteTextures(1, &m_voMomentsTexture);
+    glDeleteTextures(1, &m_voMomentsTexture2);
     glDeleteTextures(1, &m_renderDepthBuffer);
 }
 
@@ -219,6 +220,7 @@ void Renderer::initialize()
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeDepthBufferLoc, "depthBuffer");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeSamplerLoc, "sampler");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeMomentsSamplerLoc, "momentsSampler");
+    m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeMomentsSampler2Loc, "momentsSampler2");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_ratioLoc, "ratio");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeLightDirectionLoc, "lightDirection");
     m_uniformLocs[KEYSTR_PROGRAM_COMPOSE].emplace_back(&m_composeSamplesLoc, "samples");
@@ -510,8 +512,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // color attachment
-    GLuint voAttachement[1] = { GL_COLOR_ATTACHMENT1 };
-    glDrawBuffers(1, voAttachement);
+    GLuint voAttachement[2] = { GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    glDrawBuffers(2, voAttachement);
 
     glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -1214,7 +1216,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             composeProgram->setUniformValue(m_composeSamplerLoc, 0); //set to 0 because the texture is bound to GL_TEXTURE0
 
             composeProgram->setUniformValue(m_composeMomentsSamplerLoc, 1);
-            composeProgram->setUniformValue(m_composeDepthBufferLoc,2);
+            composeProgram->setUniformValue(m_composeMomentsSampler2Loc, 2);
+            composeProgram->setUniformValue(m_composeDepthBufferLoc,3);
             composeProgram->setUniformValue(m_composeProjectionMatrixLoc, scene->getCameraProjection());
             composeProgram->setUniformValue(m_composeInverseProjectionMatrixLoc, scene->getCameraProjection().inverted());
             composeProgram->setUniformValue(m_ratioLoc, m_ratio);
@@ -1230,6 +1233,8 @@ void Renderer::onRenderingInternal(GLuint fbo, Scene *scene)
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
             glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture2);
+            glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, m_renderDepthBuffer);
 
             m_quadVao.bind();
@@ -1451,7 +1456,17 @@ void Renderer::resize(int width, int height)
     glGenTextures(1, &m_voMomentsTexture);
     glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture);
     // Give an empty image to OpenGL ( the last "0" )
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_SHORT, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG32F, m_width, m_height, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glGenTextures(1, &m_voMomentsTexture2);
+    glBindTexture(GL_TEXTURE_2D, m_voMomentsTexture2);
+    // Give an empty image to OpenGL ( the last "0" )
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RG32F, m_width, m_height, 0, GL_RG, GL_UNSIGNED_SHORT, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -1481,9 +1496,10 @@ void Renderer::resize(int width, int height)
     // Set "renderTexture" as our colour attachement #0
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_renderTexture, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_voMomentsTexture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, m_voMomentsTexture2, 0);
     // Set the list of draw buffers.
-    GLuint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_DEPTH_ATTACHMENT};
-    glDrawBuffers(2, attachments);
+    GLuint attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_DEPTH_ATTACHMENT};
+    glDrawBuffers(3, attachments);
 
     // round up
     GLsizei initWidth = (m_width-1) / 2 / 16 + 1;

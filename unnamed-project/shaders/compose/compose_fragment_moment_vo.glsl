@@ -6,6 +6,7 @@ uniform mat4 inverseProjectionMatrix;
 
 uniform sampler2D sampler;
 uniform sampler2D momentsSampler;
+uniform sampler2D momentsSampler2;
 uniform sampler2D depthBuffer;
 
 uniform float ratio;
@@ -225,8 +226,10 @@ void main()
 	if (mmLevel <= 1 + 10e-3) mmLevel = 1 + 10e-3;	
 	
 	// step 4: get filtered Moments
-	//mmLevel=3.0f;
-	vec4 moments = textureLod(momentsSampler, uv, mmLevel);	
+	//mmLevel=0.0f;
+	vec4 moments;
+	moments.xy = textureLod(momentsSampler, uv, mmLevel).xy;
+	moments.za = textureLod(momentsSampler2, uv, mmLevel).xy;
 	
 
 	// step 5: where the magic happens
@@ -236,7 +239,7 @@ void main()
 	vec3 z;
 	
 	//stupid workaround for wrong alpha mipmapping:
-	outMoments.a = outMoments.x * outMoments.y;
+	//outMoments.a = outMoments.x * outMoments.y;
 	
     float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.0, 3e-5);	
   
@@ -250,7 +253,9 @@ void main()
 	}
 	//sum = 1 - (sum * 3);
 	//sum = clamp((1 - (sum * 3)) * 0.5 + 0.5, 0, 1);
-	
+	//sum = sum * 1.5 + 0.05;
+	sum = clamp (sum, 0, 1);
+	//sum = 1 - sum;
 	if (depth < 1 - 10e-9 || isSky == 0)
 	{
 		if (isPlainObscurance == 1)
@@ -278,6 +283,6 @@ void main()
     outputColor = vec4(defaultColor, 1.0);
     //outputColor = vec4(sum * vec3(1,1,1),1.);
     //outputColor = vec4(0.,0.,1-result * 0.5, 1.);
-    //outputColor = pow(outMoments.w,0.25f).xxxx;
+    //outputColor = pow(outMoments.a,0.25f).xxxx;
     //outputColor.a = 1.0f;
 }

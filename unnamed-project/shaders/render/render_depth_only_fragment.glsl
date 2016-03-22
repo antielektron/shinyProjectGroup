@@ -1,6 +1,7 @@
 #version 150
 
-out vec4 moments;
+out vec2 moments;
+out vec2 moments2;
 uniform mat4 inverseProjectionMatrix;
 const float sceneDepth = 200;
 const float nearPlaneDepth = 3;
@@ -29,5 +30,6 @@ void main()
                                         9.7924062118,	-33.7652110555,	47.9456096605,	-23.9728048165))
 						    * tempmoments;
 	fragMoments.x += 0.035955884801;
-	moments = tempmoments;    
+	moments = tempmoments.xy;
+	moments2 = tempmoments.zw;   
 }
