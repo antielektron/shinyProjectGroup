@@ -239,7 +239,7 @@ void main()
 	vec3 z;
 	
 	//stupid workaround for wrong alpha mipmapping:
-	//outMoments.a = outMoments.x * outMoments.y;
+	outMoments.a = outMoments.x * outMoments.y;
 	
     float momentMagic =  computeMSMShadwowIntensity(w,z,outMoments, depth, 0.0, 3e-5);	
   
@@ -253,7 +253,7 @@ void main()
 	}
 	//sum = 1 - (sum * 3);
 	//sum = clamp((1 - (sum * 3)) * 0.5 + 0.5, 0, 1);
-	//sum = sum * 1.5 + 0.05;
+	sum = sum * 1.5 + 0.05;
 	sum = clamp (sum, 0, 1);
 	//sum = 1 - sum;
 	if (depth < 1 - 10e-9 || isSky == 0)
