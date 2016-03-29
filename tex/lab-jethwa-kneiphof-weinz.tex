@@ -782,7 +782,7 @@ Desweiteren ist eine Minimierung der Wahrscheinlichkeit an einer bestimmten Tief
 Dies wird durch eine Funktion mit verallgemeinerten Momenten gelöst. Die verallgemeinerten Momente werden durch eine zufällige Vektorvariable beschrieben. Diese definiert was in der Shadow Map gespeichert wird. Beispielsweise ist dies für VSM $b(z) = (z,z^2)$ oder für das angestrebe MSM $b(z) = (z,z^2,z^3,z^4)$. Die Werte der Momente dienen als Eingabe.\\
 Zusammengefasst möchten wir alsoe eine Auswahl eines Kandidaten aus der ShadowMap Heristik treffen. Desweiteren streben wir eine Verbesserung des Ergebnisses durch eine 4 Kanal Shadow Map an. Die beste Möglichkeit für Echtzeitrendering bietet hier das Hamburger Moment Shadow Mapping. Der vollständigkeithalber, sei gesagt, das etwa Trigonometrisches MSM optima gewesen wäre. Allerdings ist es zu kompliziert und unstabil, wenn auch besser gegen Light Leaking anwendbar. Dennoch ist es wünschenswert, ein Verfahren zu nutzen das auch für Echtzeitverfahren nutzbar ist.\cite{msm}\\
 % MSM
-\subsection{Algorithmus: Moment Shadow Mapping}
+\subsection{Algorithmus MSM}
 %untere Schranke
 Für jede Tiefe, benötigen wir eine Funktion mit Momenten, welche uns diese minimale Wahrscheinlichkeit an dieser Tiefe liefert. Diese wird jedesmal durch eine stückweise Konstante Funktion mit 3 Anstiegspunkten erreicht. Einer dieser Anstiegspunkte ist jener, den wir minimeren möchten. Dies folgt aus dem Markov-Krein Theorem.\cite{msm}\\
 Desweiteren müssn die bediden anderen Anstiegspunkte berechnet werden. Dies kann durch folgende Gleichung gelöst werden:
@@ -855,7 +855,7 @@ $$
 Der Algorithmus beginnt mit dem berechnen der beiden unbekannten Anstiegspunkten (1).
 Dies sind die Wurzeln aus der quadratischen Gleichung (2). Die Koeffizienten dieser Gleichung sind die Ergebnisse eines linearen 3x3 Gleichungssystems (3).
 Nach dem berechnen dieser 3 Anstiegspunkte, muss ein weiteres lineares 3x3 Gleichungssystem (3) gelöst werden, um die Gewichte $w$ zu erhalten, welchte die korrekten Momente produzieren. Schließlich nutzen wir die Gewichte und die Anstiegspunkte um die Wahrscheinlichkeit zu berechnen (4).\cite{msm}
-\subsection{Algorithmus: Moment Based Volumetric Obscurance}
+\subsection{Algorithmus MBVO}
 Moment Based Volumetric Obscurance funktioniert grundlegend wie das bereits beschriebene Volumetric Obscurance mit Area Sampling. Allerdings nutzen wir für als Filter Region den Tiefen Buffer, welcher uns eine wohldefinierte, aber unbekannte Z Funktion, mit linearen Tiefenwerten liefert. Hier machen wir uns die Moment Technik zunutze, da wir diese Funktion durch 4 Momente beschreiben können, welche uns zunächst wenige Informationen liefern. Ähnlich wie beim Moment Shadow Mapping können wir dies also folgendermaßen beschreiben:
 $$ b := E_z(b) \in \mathbb{R}^m $$
 Wir versuchen also einen Term für die Volumetric Obscurance, auf Basis der Tiefeninformationen zu approximieren. Ausserdem möchten wir den Obscuranceterm in einem Tiefeninterval von $z_a$ $\in$ $\mathbb{R}$ bis $z_b$ $\in$ $\mathbb{R}$ berechnen.
@@ -912,9 +912,6 @@ Die Funktionen rufen wir in der simpleShadowTerm() Funktion auf und geben diese 
 	\caption{Die Bilder zeigen den Tiefenwert aus Depth Buffer, generierte Momente aus create\_moment.glsl Shader und schließlich mit Gauss gefilterte Momente zum Verlgleich}
 \end{figure}
 \subsection{Implementierung: Moment Based Volumetric Obscurance}
-
-
-
 Für das Moment Based Volumetric Obscurance benutzen wir die gleiche Herangehensweise.
 Aus dem Algorithmus für das MSM haben wir die Gewichte $w_i$ ausgelesen und konnten hiermit den Term für die Volumetric Obscurance berechnen, wie im Abschnitt Algorithmus beschrieben. Hierfür waren nur wenig Anpassungen am gegeben HLSL Code nötig um diese in die beschrieben Volumetric Obscurance einzusetzen. Es werden ebenfalls 4 Momente aus dem Tiefenbuffer generiert. Allerdings aus Sicht der Kamera, da wir einen sichtbaren Bereich samplem wollen, welcher als Term für die Volumetric Obscurance diene soll. Das restliche Verfahren der Momente gleicht dem MSM. Der Shader für das Area Sampling wurde also um dieses eweitert umd den Term zu berechnen.\\
 Desweiteren haben wir 32-bit für die Momente genutzt. Deswegen war eine Quantifizierung nicht nötig.\\
@@ -1010,7 +1007,7 @@ erzielt werden, in dem die Filter noch optimiert werden.
 
 % Fazit
 \subsection{Moment Shadow Mapping}
-Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch sehr gut zur Geltung kommen. Artefakte wie Aliasing und Light Leaking werden stärker gemindert als bei VSM möglich. Ausserdem funktionierte die Implementierung sehr einfach durch den gegeben HLSL Code. Das Verfahren ist schnell und bietet beim Filtern viele Freiheiten. Wir nutzen Gauss und 1xMSAA-16xMSAA welches verschiedene Ergebnisse liefert.
+Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch sehr gut zur Geltung kommen. Artefakte wie Aliasing und Light Leaking werden stärker gemindert. Ausserdem funktionierte die Implementierung sehr einfach durch den gegeben HLSL Code. Das Verfahren ist schnell und bietet beim Filtern viele Freiheiten. Wir nutzen Gauss und 1xMSAA-16xMSAA welches verschiedene Ergebnisse liefert.
 
 \begin{figure}[H]
 	\centering
@@ -1037,9 +1034,7 @@ Das Moment Shadow Mapping bietet uns Schatten mit hoher Qualität, welche auch s
 \end{figure}
 
 Auch dies hat sich kaum auf die Performance ausgewirkt und wir sind mit dem Ergebniss sehr zufrieden.
-Im direkten Verlgleich zu PCF fällt auf, das MSM weitere Artefakte unterbindet. Im Verlgleich zu VSM bieten die 4 statt 2 Momente ebenfalls einen Vorteil. Light Leaking wird effektiv vermindert, was bei VSM nicht der Fall ist.
-Für die Zukunft wollen wir noch weiteres Filtern testen sowie weiter vermindern.
-
+Im direkten Verlgleich zu PCF fällt auf, das MSM weitere Artefakte unterbindet. Im Verlgleich zu VSM bieten die 4 statt 2 Momente ebenfalls einen Vorteil. Light Leaking wird effektiv vermindert und wir bekommen dunkle Schatten, auch bei komplexerer Geometrie.
 Auch wenn MSM und SDSM zunächst wie orthogonale Verfahren aussehen, beeinflusst die variable Größe der Shadow Maps einer Kaskade die Filterbarkeit mit Gauss.
 Um eine gewisse Filter Größe der Shadow Map im Screen Space zu erreichen, muss die Shadow Map mit einer variablen Standardabweichung $\sigma$ gefiltert werden.
 Da die Shadow Map Frusta teilweise sehr kleine Bereiche abdecken werden die Filtermasken sehr groß.
