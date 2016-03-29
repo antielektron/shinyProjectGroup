@@ -885,7 +885,7 @@ Für die Implementierung des MSM Algorithmuses hatten wir HLSL Code gegeben \cit
 Diesen haben wir für GLSL umgeschrieben, was nur wenig Anpassungen benötigte und leicht umseztbar war.\\
 Für das rendern der Shadow Map benötigten wir eine 4 Kanal Textur. Diese speichert die Momente $z,z^2,z^3,z^4$. Die Momente werden bei uns in einem eigenen Shader erstellt. Da diese nicht mit Double Precision Werten gespeichert werden können, denn dies würde zu unakzeptabler Speichernutzun führen, müssen diese noch komprimiert werden. Damit der Informationsverlust bei der Quantifizierung gemindert wird, nutzen wir einen Biased Moment Vektor. Ausserdem sind 16 bit pro gespeichertem Moment hierfür wünschenswert, was uns zu einer weiteren Quantifizierung führt. Beides hatten wir bereits im Algorithmus gegeben und konnten dies einfach übernehmen um das Hamburger Moment Shadow Mapping umzsetzen.\\
 Die gesampelten Momente werden im Fragment Shader eingelesen und weiter verarbeitet, wie im Algorithmus-Teil beschrieben. Nun hatten wir auch die Möglichkeit Filtern und Anti-Aliasing anzuwenden.˜˜
-Wir haben wir uns für Gauss Filtern, mit einem 9x9 Kernel, sowie Multi Sample Anti-Aliasing (MSAA) entschieden. Beides wird durch die Momente ermöglicht, da diese nun gefiltert und anti-aliased werden können. MSAA sorgt wie Super Sampling dafür, dass Kanten weicher erscheinen. MSAA kann auf der Grafikhardware berechnet werden und ermöglicht es, bei schrägen Linien, jeden benachbarten Pixel mit seinen Nachbarpixeln zu vergleichen. Die Farben werden so angepasst, das eine weichere Kante entsteht. Dadurch erreichen wir, das unsere Schatten nicht mehr so stark von der Treppchenbildung des Aliasing betroffen sind. \\Der Gauss Filter hat einen ähnlichen Effekt. Allerdings wirkt das Bild verwaschener und ähnelt eher Softshadows. Wir haben beides so implementiert, das es auch zusammen genutzt werden kann. Ausserdem kann MSAA von 1-fach bis 16-fach genutzt werden, was allerdings viel Leistung benötigt.\\
+Wir haben wir uns für Gauss Filtern, mit einem 9x9 Kernel, sowie Multi Sample Anti-Aliasing (MSAA) entschieden. Beides wird durch die Momente ermöglicht, da diese nun gefiltert und anti-aliased werden können. MSAA sorgt wie Super Sampling dafür, dass Kanten weicher erscheinen. MSAA kann auf der Grafikhardware berechnet werden und ermöglicht es, bei schrägen Linien, jeden benachbarten Pixel mit seinen Nachbarpixeln zu vergleichen. Die Farben werden so angepasst, das eine weichere Kante entsteht. Dadurch erreichen wir, das unsere Schatten nicht mehr so stark von der Treppchenbildung des Aliasing betroffen sind. \\Der Gauss Filter hat einen ähnlichen Effekt. Allerdings wirkt das Bild verwaschener und ähnelt eher Softshadows. Wir haben beides so implementiert, das es auch zusammen genutzt werden kann. Ausserdem kann MSAA von 1-fach bis 16-fach genutzt werden, was allerdings viel Leistung benötigt. 1xMSAA interpoliert einfach zwischen den Pixeln und bietet daher keine große Verbesserung des Bildes.\\
 Letzendlich können wir die Schattenintensität berechnen.
 Die Funktionen rufen wir in der simpleShadowTerm() Funktion auf und geben diese letzendlich als Wert für die Textur zurück.
 \begin{figure}[H]
@@ -916,9 +916,9 @@ Die Funktionen rufen wir in der simpleShadowTerm() Funktion auf und geben diese 
 
 
 Für das Moment Based Volumetric Obscurance benutzen wir die gleiche Herangehensweise.
-Aus dem Algorithmus für das MSM haben wir die Gewichte $w_i$ ausgelesen und konnten hiermit den Term für die Volumetric Obscurance berechnen, wie im Abschnitt Algorithmus beschrieben. Hierfür waren nur wenig Anpassungen am gegeben HLSL Code nötig um diese in die beschrieben Volumetric Obscurance einzusetzen. Das weitere Verfahren entspricht dem aus dem Abschnitt Area Sampling, welches nur durch die Momente angepasst wurde. \\
+Aus dem Algorithmus für das MSM haben wir die Gewichte $w_i$ ausgelesen und konnten hiermit den Term für die Volumetric Obscurance berechnen, wie im Abschnitt Algorithmus beschrieben. Hierfür waren nur wenig Anpassungen am gegeben HLSL Code nötig um diese in die beschrieben Volumetric Obscurance einzusetzen. Es werden ebenfalls 4 Momente aus dem Tiefenbuffer generiert. Allerdings aus Sicht der Kamera, da wir einen sichtbaren Bereich samplem wollen, welcher als Term für die Volumetric Obscurance diene soll. Das restliche Verfahren der Momente gleicht dem MSM. Der Shader für das Area Sampling wurde also um dieses eweitert umd den Term zu berechnen.\\
 Desweiteren haben wir 32-bit für die Momente genutzt. Deswegen war eine Quantifizierung nicht nötig.\\
-Allerdings hat es sich herausgestellt, dass die OpenGL beim Mip-Mappen der 4 Momente zu Artefakten führt. Dies entspricht dem samplen im Fragment Shader aus der Implementierung des Moment Shadow Mapping. Problematisch ist hier der Umgang mit dem Alpha Kanal, da dieser den 4. Moment nicht korrekt darstellt und so keinen  korrekten Wert für die Vomuletric Obscurance liefert. Deswegen mussten wir zwei 2-Kanal Texturen nutzen um die 4 Momenten auf diese aufzuteilen. Danach funktionierte das Mip-Mapping.
+Allerdings hat es sich herausgestellt, dass die OpenGL beim Mip-Mappen der 4 Momente zu Artefakten führt. Dies entspricht dem samplen im Fragment Shader aus der Implementierung des Moment Shadow Mapping. Problematisch ist hier der Umgang mit dem Alpha Kanal, da dieser den 4. Moment nicht korrekt darstellt und so keinen  korrekten Wert für die Vomuletric Obscurance liefert. Deswegen mussten wir zwei 2-Kanal Texturen nutzen um die 4 Momenten auf diese aufzuteilen. Danach funktionierte das Mip-Mapping und die Moment Based Volumetric Obscurance.
 
 
 
@@ -1050,29 +1050,30 @@ Mip-Mapping hat dieses Problem nicht.
 \subsection{Moment Based Volumetric Obscurance}
 \begin{figure}[H]
 	\centering
-	\subfloat[MBVO Beispiel 1]{
+	\subfloat[MBVO]{
 
-		\includegraphics[width = 6cm]{msm_assets/mbvo/scene_with_mvbo2.png}
+		\includegraphics[width = 6cm]{msm_assets/mbvo_moment.jpg}
 		\label{ref:mbvo1}
 	}
-    \subfloat[MBVO Beispiel 2]{
+    \subfloat[VO Area Sampling]{
 
-		\includegraphics[width = 6cm]{msm_assets/mbvo002.png}
+		\includegraphics[width = 6cm]{msm_assets/mbvo_area.jpg}
 		\label{ref:mbvo2}
 	}
 	
-	\subfloat[MBVO Beispiel 2]{
-		\includegraphics[width = 6cm]{msm_assets/mbvo003.png}
+	\subfloat[VO Line Sampling 10 Samples]{
+		\includegraphics[width = 6cm]{msm_assets/mbvo_line10.jpg}
 		\label{ref:mbvo3}
 	}
-	\subfloat[MBVO Beispiel 3]{
-		\includegraphics[width = 6cm]{msm_assets/mbvo004.png}
+	\subfloat[VO Line Sampling 100 Samples]{
+		\includegraphics[width = 6cm]{msm_assets/mbvo_line100.jpg}
 		\label{ref:mbvo4}
 	}
-	\caption{Moment Based Volumetric Obscurance Beispiele mit verschiedenen Geometrien und Entfernungen}
+	\caption{Moment Based Volumetric Obscurance Beispiel mit Vergleich zu den anderen genutzen Techniken}
 \end{figure}
 
 Das Verfahren zur Moment Based Volumetric Obscurance war ebenfalls leicht umzusetzen, da sich die Implementierung kaum vom MSM unterscheidet. Das Verfahren bietet ein ästethisches Bild mit sehr wenig Rauschen. Es ähnelt dem Volumetric Obscurance mit Area Sampling.
+MBVO ist allerdings insgesamt noch etwas dunkler. Dies ist allerdings noch anpassbar und abhängig von der Szene. Insgesamt hat sich herausgestellt, dass es sehr gut verwendbar ist ein ein ästethisches Bild ergibt. Ausserdem ist es nicht so änfällig gegenüber Rauschen und braucht ebenfalls nicht so viel Leistung wie Line Sampling mit vielen Samples.
 
 % Literaturverzeichnis:
 \bibliography{lit}
