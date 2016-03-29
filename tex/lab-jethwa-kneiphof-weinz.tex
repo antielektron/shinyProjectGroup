@@ -279,17 +279,6 @@ Dies kann als eine Wahrscheinlichkeitsfunktion $z$ interpretiert werden. $z$ sag
 Dies wiederrum, führt uns zu den Variance Shadow Maps (VSM), welche nicht nur die Tiefe $z$, sondern auch $z^2$ in einer 2 Kanal Textur speichern. Diese, zunächst reduntante Information, kann nun zum Filtern und Anti-Aliasing genutzt werden. Dies wird deswegen ermöglicht, da wir durch die so gefilterten Vektoren der Variance Shadow Map, eine Rekonstruktion der tiefenabhängigen Schattenintensität ermöglichen.\cite{donnelly2006variance}\\ Dies ist bereits sehr effizient und mindert die Aliasing-Artefakte. Allerdings ist VSM weiterhin anfällig für Light-Leaking.\\
 Desweiteren können die ungefilterten Texel als Punkte in einer Parabel gesehen werden. Dies bedeutet, dass verschiedene Texel, verschiedene Punkte speichern. Dach dem Filtern, können diese Vektoren allerdings als Massezentrum jener Punkte, welche betrachtet wurden, verstanden werden. Diese, nicht länger redundante Information, gibt uns bereits Wissen über die Tiefenfunktion, da wir einen Erwartungswert von $z$ und $z^2$ interpretieren könnem welcher abhängig von der Tiefe ist. Diese werden auch Momente der Tiefenfunktion genannt und bereits 2 Momente ermöglichen uns eine Rekonstruktion und Approximierung der Tiefenfunktion. Vorteilhaft ist ebenfalls, das diese immer die Schattenintensität unterschätzt, also eine untere Schranke bildet. Algorithmisch ist die Rekonstrukion mit Chebyshev's Ungleichung möglich. \cite{donnelly2006variance}
 
-%ALTER TEIL
-ALTER TEIL:\\
-Im Gegensatz zu normalen Texturen, können Shadow Maps nicht einfach gefiltert werden und Anti-Aliasing ist ebenfalls nicht möglich. 
-Percentage Closer Filtering (PCF) ist ein Ansatz um dies zu ermöglichen und Aliasing zu vermindern. Diese Technik versucht den Anteil eines Texels zu erkennen, welcher von der Lichtquelle beleuchtet wird und nicht im Schatten liegt durch mehrfaches samplen der Shadow Map. 
-Mit Hilfe von Chebichev's Ungleichung ist eine gute Approximation für PCF erreichbar. \cite{reeves1987rendering}
-
-Variance Shadow Maps (VSMs) benutzten 2 Momente, also den Tiefenwerte und sein Quadrat.
-VSM können gefiltert werden und werden genutzt um PCF weiter zu approximieren.
-VSM ist hinsichtlich der MSM ein spezialfall für $m = 2$, also 2 statt 4 Momenten. Normalerweise betrachten wir die Tiefe um eine Shadow Map zu rendern. VSM nutzt die Tiefe und die quadrierte Tiefe und speichert diese in einer 2-Kanal Textur. Der Vorteil liegt darin, dass nun Pre-Processing Effekte genutzt werden um die so erstellte Variance Shadow Map zu filtern. \cite{donnelly2006variance}
-
-Desweiteren betrachen wir Moment Based Volumetric Obscurance. Also eine Volumetric Obscurance die auf die Moment Shadow Mapping Technologie aufbaut. Die eigentliche Volumetric Obscurance wird in den entsprechen Abschnitten weiter erläutert.
 
 % Main
 \section{Sample Distribution Shadow Maps}
@@ -789,7 +778,7 @@ In Abbildung \ref{ref:SBMF} sieht man das Ergebnis für den daraus resultierende
 VSM bietet uns bereits einen Ansatz für gefilterte Shadow Maps, besitzt aber auch noch ein paar Nachteile wie das angesprochene Light-Leaking. Wir möchten das Verfahren erweitern und 4 Momente nutzbar machen, um dunklere Schattenintensitäten zu erreichen und ein noch hochwertigeres Bild zu erhalten.\\
 Hierfür Nutzen wir das Hamburger Moment Shadow Mapping (im weiteren Verlauf MSM).
 Unser Ziel ist es eine Shadow Map mit 4 Kanälen zu nutzen, welche jeweils 16bit haben. Dadurch möchten wir eine gute Heuristik für gefilterte Hard Shadows, mit geringen Kosten erreichen. Wie bereits angesprochen, gibt uns VSM bereits eine untere Schranke, sodass die Tiefenfunktion bereits oberhalb dieser liegen.\\
-Desweiteren ist eine Minimierung der Wahrscheinlichkeit an einer bestimmten Tiefe wünschenswert, was im allgemeinen als General Moment Problem betitelt wird.
+Desweiteren ist eine Minimierung der Wahrscheinlichkeit an einer bestimmten Tiefe wünschenswert, was im allgemeinen als General Moment Problem betitelt wird.\\
 Dies wird durch eine Funktion mit verallgemeinerten Momenten gelöst. Die verallgemeinerten Momente werden durch eine zufällige Vektorvariable beschrieben. Diese definiert was in der Shadow Map gespeichert wird. Beispielsweise ist dies für VSM $b(z) = (z,z^2)$ oder für das angestrebe MSM $b(z) = (z,z^2,z^3,z^4)$. Die Werte der Momente dienen als Eingabe.\\
 Zusammengefasst möchten wir alsoe eine Auswahl eines Kandidaten aus der ShadowMap Heristik treffen. Desweiteren streben wir eine Verbesserung des Ergebnisses durch eine 4 Kanal Shadow Map an. Die beste Möglichkeit für Echtzeitrendering bietet hier das Hamburger Moment Shadow Mapping. Der vollständigkeithalber, sei gesagt, das etwa Trigonometrisches MSM optima gewesen wäre. Allerdings ist es zu kompliziert und unstabil, wenn auch besser gegen Light Leaking anwendbar. Dennoch ist es wünschenswert, ein Verfahren zu nutzen das auch für Echtzeitverfahren nutzbar ist.\cite{msm}\\
 % MSM
@@ -867,188 +856,69 @@ Der Algorithmus beginnt mit dem berechnen der beiden unbekannten Anstiegspunkten
 Dies sind die Wurzeln aus der quadratischen Gleichung (2). Die Koeffizienten dieser Gleichung sind die Ergebnisse eines linearen 3x3 Gleichungssystems (3).
 Nach dem berechnen dieser 3 Anstiegspunkte, muss ein weiteres lineares 3x3 Gleichungssystem (3) gelöst werden, um die Gewichte $w$ zu erhalten, welchte die korrekten Momente produzieren. Schließlich nutzen wir die Gewichte und die Anstiegspunkte um die Wahrscheinlichkeit zu berechnen (4).\cite{msm}
 \subsection{Algorithmus: Moment Based Volumetric Obscurance}
-Motivation und Erweiterung des MSM\\
-
-
-\subsection{Algorithmus: Moment Based Volumetric Obscurance}
-Für die Moment Based Volumetric Obscurance benötigen wir noch Gewichte aus dem Moment Shadow Mapping. Diese finden sich in Algorithmus 2 und werden in unserer Implementierung weiter genutzt.
-Hierfür nutzen wir die Funktion $Es(f) = \sum w_i*f(z_i)$ \cite{mbvo} auf Basis von $S = \sum w_i*\delta$ aus dem MSM Algorithmus. Durch angleichen unserer Implementierung um die Gewichte $w_i$ zu erhalten, können wir die Funktion für das MBVO berechnen. Auch diese haben wir später mit Hilfe des HLSL Codes gelöst. Diese liefert uns den gewünschten Term für die Moment Based Volumetric Obscurance. Allerdings haben wir während der Implementierung noch kein stimmiges Bild erhalten, welches aber im Abschnitt der Implementierung weiter erläutert wird. Weiterführen wird der Algorithmus im Anhang erläutert, durch zusätzliche Notizen, welche wir für die Projekgruppe erhalten haben. Diese beziehen sich im speziellen auf die MBVO mit Momenten.\cite{mbvo}
+Moment Based Volumetric Obscurance funktioniert grundlegend wie das bereits beschriebene Volumetric Obscurance mit Area Sampling. Allerdings nutzen wir für als Filter Region den Tiefen Buffer, welcher uns eine wohldefinierte, aber unbekannte Z Funktion, mit linearen Tiefenwerten liefert. Hier machen wir uns die Moment Technik zunutze, da wir diese Funktion durch 4 Momente beschreiben können, welche uns zunächst wenige Informationen liefern. Ähnlich wie beim Moment Shadow Mapping können wir dies also folgendermaßen beschreiben:
+$$ b := E_z(b) \in \mathbb{R}^m $$
+Wir versuchen also einen Term für die Volumetric Obscurance, auf Basis der Tiefeninformationen zu approximieren. Ausserdem möchten wir den Obscuranceterm in einem Tiefeninterval von $z_a$ $\in$ $\mathbb{R}$ bis $z_b$ $\in$ $\mathbb{R}$ berechnen.
+Hierraus ergibt sich folgender Term durch $\mathbb{E}_z(f)$: 
+$$ f(z)
+\begin{cases}
+\phantom{} 1 & \text{falls } z < z_a\\ 
+\frac{z-z_a}{z_b-z_a} & \text{falls } z_a \leq z \leq z_b\\
+0 & \text{falls } z_b < z
+\end{cases}
+$$
+Unsere Annahme hierfür basiert darauf, dass es nicht mehr als 3 unterschiedliche Tiefenwerte in der gerade betrachteten Region gibt, gegeben durch $n:=\frac{m}{2}+1$ mit $m=4$ (Momenten). Dies sind also jene Tiefenwerte die wir durch die Z Distribution betrachten. Wir wissen, dass eine der Tiefenwerte durch $z_f$ beschrieben wird, wenn dieser ist das einzig explizit gegebene sample aus der Filter-Region. Durch dieses Wissen können wir eine Funktion $S$ aufstellen, mit unterstützung von $z_1=z_f$ und weiteren Stützpunkten $z_2,...,z_n \in \mathbb{R}$  und den korrekten Momenten $\mathbb{E}_s(b)=b$. Diese können wir schreiben als:
+$$ 
+S = \sum_{i=1}^{n} w_i \cdot \delta_{z_i} 
+$$
+Hier lässt sich bereits der Bezug zum Moment Shadow Mapping herstellen. Desweiteren wird $\delta_{z_i}$ als Diraksche Delta Funktion verstandten mit unterstützung bei $z_i$ und $w_1,...,w_n \in [0,1]$.
+Dies kann durch das Moment Shadow Mapping bzw. dessen Techniken robust und effizient berechnet werden, indem wir das Verfahren noch etwas modifizieren:
+$$ 
+\mathbb{E}_s(f) = \sum_{i=1}^{n} w_i \cdot f_{z_i} 
+$$
+Durch Anpassung des MSM Algorithmus, können wir also einen Term für die Volumetric Obscurance berechnen, welches in der Implementierung wenig Anpassung benötigte.
+Diese Herangehensweise stammen aus den Notizen von Christoph Peters\cite{mbvo}.
 
 % MSM
 \subsection{Implementierung}
-blubber
-\subsection{Implementierung: Moment Based Volumetric Obscurance}
-Annahme: Für betrachteten Sample Auschnitt gibt es 3 Tiefenwerte.
-%Alter Teil:
-Alter Teil:\\
-Wir implementieren die Hamburger Moment Shadow Mapping Technik. 
-Zuerst wird eine Moment Shadow Map gerendert. Der Unterschied zur normalen Shadow Map ist, das zusätzlich noch 4 Momente, bestehend aus der Tiefe $z$ sowie $z^2,z^3,z^4$ der Shadow Map gespeichert werden. Diese reduntanten Tiefeninformationen können noch zum filtern genutzt werden. Wir verwenden hierfür einen Gauss Filter und für Anti-Aliasing MSAA. Eine weitere Möglichkeit wäre Mip-Mapping welches wir zukünfig auch noch nutzen möchten. Da wir bereits eine Shadow Map rendern, müssen wir  noch eine Funktion nutzen um die Momente zu generieren und diese in einer 4 Kanal Textur speichern. Hiefür nutzen wir eine RGBA Textur.
-Im zweiten Schritt der Implementierung, wird ein gefiltertes Sample aus der Moment Shadow Map, sowie die Tiefe eines Shadow Map Fragments genutzt, um eine gefilterte Schatten Intensität zu erhalten.
-Wir nutzen hierfür eine weitere Funktion um diese Berechnungen durzuführen und einen Wert für die Schattenintensität zu generieren, welchen wir im Programm nutzen können. Dies ist im Abschnitt Algorithmus bereits näher erläutert.
-Im Shader haben wir dann folgendes angewendet um oben genanntes umzusetzen.
-Das Erstellen der Momente passiert in einem eigenen Shader. Die Momente werden gesampelt und dann weiter an den Fragment Shader gereicht.
-Im Fragment Shader, verarbeiten wir die Momente. Das heißt wir benutzen zwei Funktion um oben genannte gefilterte Samples zu generieren und diese dann in eine Schattenintensität umzuwandeln. Hierfür haben wir den gegeben Direct X Shader in OpenGL übersetzt. Beachtenswert war, das Matrixtransformationen etwas anders gehandhabt werden als in DirectX und ein paar Standardfunktionen selbstgeschrieben werden müssen, was in den ersten Versuchen zu Fehlern in den Momenten geführt hat. Nun führen wir den GLGS Code auf, welchen wir aus dem gegebenen HLSL Code geändert haben und dieser wird mit obigen Schritten erläutert.
-
-\begin{lstlisting}[language=GLSL]
-void main()
-{
-    ivec3 pos = ivec3(gl_GlobalInvocationID.xyz);
-
-    vec4 moments = vec4(0, 0, 0, 0);
-    for (int i = 0; i < sampleCount; i++)
-    {
-        float depth = texelFetch(depthSampler, pos, i).x;
-        float square = depth * depth;
-        moments += vec4(depth, square, square*depth, 
-        square*square);
-    }
-    moments /= sampleCount;
-
-	vec4 fragMoments = transpose(mat4(
-	-2.07224649,	32.23703778,
-	-68.571074599,	39.3703274134,
-    	 13.7948857237,	-59.4683975703,
-    	 82.0359750338,	-35.364903257,
-    	  0.105877704,	-1.9077466311,
-    	  9.3496555107,	-6.6543490743,
-    	  9.7924062118,	-33.7652110555,
-    	 47.9456096605,	-23.9728048165)
-    )	* moments;
-	fragMoments.x += 0.035955884801;
-
-    imageStore(momentImage, pos, fragMoments);
-}
-\end{lstlisting}
-
-Hier werden im create\_moments\_Shader, die Momente $z, z^2, z^3, z^4$, wobei
-$z$ der Tiefe aus dem Depth Buffer entspricht,
-generiert und durch eine Matrix transformiert.
-Dies geschieht damit eine 16-bit Quantifikation ausreicht und ein besseres speichern in einer Textur
-möglich ist
-
-\begin{lstlisting}[language=GLSL]
-void sampleOptimized4MomentsShadowMap(out vec4 out4Moments, 
-	vec4 shadowMapValue)
-{
-    shadowMapValue.x -= 0.035955884801f;
-    out4Moments = transpose(mat4(     			
-    		0.2227744146, 0.0771972861,
-    		0.7926986636, 0.0319417555,
-     		0.1549679261, 0.1394629426,
-     		0.7963415838, -0.172282317,
-     		0.1451988946, 0.2120202157,
-     		0.7258694464, -0.2758014811,
-     		0.163127443, 0.2591432266,
-     		0.6539092497, -0.3376131734))
-    * shadowMapValue;
-
-}
-\end{lstlisting}
-Hier werden die Samples rückgerechnet, damit ein Filtern und Anti-Aliasing ermöglicht wird.
-Dies geschieht im Fragment\_Shader
-\begin{lstlisting}[language=GLSL]
-float computeMSMShadwowIntensity(vec4 in4Moments, float depth, 
-	float depthBias, float momentBias)
-{
-    vec4 b = mix(in4Moments, vec4(0.5,0.5,0.5,0.5), momentBias);
-    vec3 z;
-    z.x = depth-depthBias;
-    float L32D22= -b.x * b.y + b.z;
-    float D22= -b.x * b.x + b.y;
-    float SquaredDepthVariance=-b.y * b.y + b.w;
-    float D33D22=dot(vec2(SquaredDepthVariance,-L32D22),
-                     vec2(D22, L32D22));
-    float InvD22=1.0/D22;
-    float L32=L32D22*InvD22;
-    vec3 c=vec3(1.0,z.x,z.x*z.x);
-    c.y-=b.x;
-    c.z-=b.y+L32*c.y;
-    c.y*=InvD22;
-    c.z*=D22/D33D22;
-    c.y-=L32*c.z;
-    c.x-=dot(c.yz,b.xy);
-    float p=c.y/c.z;
-    float q=c.x/c.z;
-    float r=sqrt((p*p*0.25)-q);
-    z.y=-p*0.5-r;
-    z.z=-p*0.5+r;
-    vec4 Switch=
-        (z.z<z.x)?vec4(z.y,z.x,1.0,1.0):
-       ((z.y<z.x)?vec4(z.x,z.y,0.0,1.0):
-        vec4(0.0,0.0,0.0,0.0));
-    float Quotient=(Switch.x*z.z-b.x*
-    			(Switch.x+z.z)+b.y)/
-    			((z.z-Switch.y)
-    			*(z.x-z.y));
-    return 1-clamp(Switch.z+Switch.w*Quotient,0,1);
-    
-}
-\end{lstlisting}
-\begin{lstlisting}[language=GLSL]
-float simpleShadowTerm()
-{
-    
-    int index = getCascade();
-
-    vec4 lightViewPosition=cascadeViewMatrix[index]
-    		*vec4(worldPosition, 1.);
-    vec2 uv=vec2(lightViewPosition.xy*0.5+0.5);
-    vec4 shadowMapValue=texture2DArray(shadowMapSampler, 
-    		vec3(uv,index));
-    float depth=lightViewPosition.z*0.5+0.5;
-    vec4 shadowMapMoments;
-    sampleOptimized4MomentsShadowMap(shadowMapMoments,
-    		shadowMapValue);
-    return computeMSMShadwowIntensity(shadowMapMoments,
-    		depth,0.005,3e-5);
-\end{lstlisting}
-Letzendlich können wir die Schattenintensität berechnen, auf Basis des Algorithmus 3 aus dem MSM Paper.\cite{msm}
+Für die Implementierung des MSM Algorithmuses hatten wir HLSL Code gegeben \cite{msm}.
+Diesen haben wir für GLSL umgeschrieben, was nur wenig Anpassungen benötigte und leicht umseztbar war.\\
+Für das rendern der Shadow Map benötigten wir eine 4 Kanal Textur. Diese speichert die Momente $z,z^2,z^3,z^4$. Die Momente werden bei uns in einem eigenen Shader erstellt. Da diese nicht mit Double Precision Werten gespeichert werden können, denn dies würde zu unakzeptabler Speichernutzun führen, müssen diese noch komprimiert werden. Damit der Informationsverlust bei der Quantifizierung gemindert wird, nutzen wir einen Biased Moment Vektor. Ausserdem sind 16 bit pro gespeichertem Moment hierfür wünschenswert, was uns zu einer weiteren Quantifizierung führt. Beides hatten wir bereits im Algorithmus gegeben und konnten dies einfach übernehmen um das Hamburger Moment Shadow Mapping umzsetzen.\\
+Die gesampelten Momente werden im Fragment Shader eingelesen und weiter verarbeitet, wie im Algorithmus-Teil beschrieben. Nun hatten wir auch die Möglichkeit Filtern und Anti-Aliasing anzuwenden.˜˜
+Wir haben wir uns für Gauss Filtern, mit einem 9x9 Kernel, sowie Multi Sample Anti-Aliasing (MSAA) entschieden. Beides wird durch die Momente ermöglicht, da diese nun gefiltert und anti-aliased werden können. MSAA sorgt wie Super Sampling dafür, dass Kanten weicher erscheinen. MSAA kann auf der Grafikhardware berechnet werden und ermöglicht es, bei schrägen Linien, jeden benachbarten Pixel mit seinen Nachbarpixeln zu vergleichen. Die Farben werden so angepasst, das eine weichere Kante entsteht. Dadurch erreichen wir, das unsere Schatten nicht mehr so stark von der Treppchenbildung des Aliasing betroffen sind. \\Der Gauss Filter hat einen ähnlichen Effekt. Allerdings wirkt das Bild verwaschener und ähnelt eher Softshadows. Wir haben beides so implementiert, das es auch zusammen genutzt werden kann. Ausserdem kann MSAA von 1-fach bis 16-fach genutzt werden, was allerdings viel Leistung benötigt.\\
+Letzendlich können wir die Schattenintensität berechnen.
 Die Funktionen rufen wir in der simpleShadowTerm() Funktion auf und geben diese letzendlich als Wert für die Textur zurück.
 \begin{figure}[H]
 	\centering
-	\subfloat[Depth1]{
+	\subfloat[Tiefe]{
 
 		\includegraphics[width = 6cm]{msm_assets/depthbuffer/menga_depth.png}
 		\label{ref:momentz}
 	}
-    \subfloat[Moments]{
+    \subfloat[aus Tiefe generierte Momente]{
 
 		\includegraphics[width = 6cm]{msm_assets/depthbuffer/menga_moments.png}
 		\label{ref:momentnew}
 	}
 	
-	\subfloat[Calculated Moments]{
+	\subfloat[ungefilterte Momente]{
 		\includegraphics[width = 6cm]{msm_assets/depthbuffer/menga_transformed.png}
 		\label{ref:momentcalc}
 	}
-	\subfloat[Gauss filtered Moment]{
+	\subfloat[Gauss Filter und Momente]{
 		\includegraphics[width = 6cm]{msm_assets/depthbuffer/menga_transformed_gauss.png}
 		\label{ref:momentgauss}
 	}
-	\caption{Die Bilder zeigen den Tiefenwert aus Depth Buffer, generierte Momente aus create\_moment.glsl Shader, dann kalkulierte Momente und schließloch mit Gauss gefilterte Momente}
+	\caption{Die Bilder zeigen den Tiefenwert aus Depth Buffer, generierte Momente aus create\_moment.glsl Shader und schließlich mit Gauss gefilterte Momente zum Verlgleich}
 \end{figure}
+\subsection{Implementierung: Moment Based Volumetric Obscurance}
 
-\subsection{Moment Based Volumetric Obscurance}
-Für das Moment Based Volumetric Obscurance benutzen wir die gleiche Herangehensweise. Allerdings hat es sich herausgestellt, dass die OpenGL beim Mip-Mappen der 4 Momente zu Artefakten führt. Dies entspricht dem samplen im Fragment Shader aus der Implementierung des Moment Shadow Mapping. Problematisch ist hier der Umgang mit dem Alpha Kanal, da dieser den 4. Moment nicht korrekt darstellt und so keinen  korrekten Wert für die Vomuletric Obscurance liefert. Hier wäre eine eigene Implementierung des Mipmapping nötig, was wir in Zukunft versuchen werden. Möglicherweise sind hier noch weitere Feineinstellung und Variablen nötig um ein stimmiges Bild zu erhalten. Technisch gesehen, funktiert das Verfahren.
-\begin{lstlisting}[language=GLSL]
-// Modified MSMShadowIntensity function
-void computeMSMWeights(out vec3 Weight, out vec3 outz, vec4 in4Moments, 
-float depth, float depthBias, float momentBias)
-{
 
-vec4 b = mix(in4Moments, vec4(0.5,0.5,0.5,0.5), momentBias);
-//
-...
-//
-Weight.x=(z.y*z.z-b.x*(z.y+z.z)+b.y)/((z.x-z.y)*(z.x-z.z));
-Weight.y=(z.x*z.z-b.x*(z.x+z.z)+b.x)/((z.z-z.y)*(z.x-z.y));
-Weight.z=1.0-Weight.x-Weight.y;
-}
-\end{lstlisting}
-Das ganze haben wurde in einem Compose Shader implementiert und die Funktionen aus dem MSM weitestgehend übernommen.
-Wir wählen ebenfalls 4 Momente um die Volumetric Obscurance zu approximieren und berechnen die benötigten Gewichte durch eine Abbänderung der MSM Funktionen. Dies ist ebenfalls im Abschnitt Algorithmus näher erläutert.
-Im Shader wird die Funktion zum generieren der Schattenintensität um eine Berechnung der Gewichte erweitert, sodass diese für die Volumetric Obscurance nutzbar ausgegeben werden können. Nun werden die Gewichte aufsummiert und mit den $F(z)$ Werten aus dem Algorithmus multipliziert. Im weiteren Verlauf wird dies noch mit dem Area Sampling aus der Volumetric Obscurance erweitert. Dies ist im Abschnitt Volumetric Obscurance näher erläutert.
-Momentan färbt die MBVO Konturen der Geometrie sehr dunkel ein.
+
+Für das Moment Based Volumetric Obscurance benutzen wir die gleiche Herangehensweise.
+Aus dem Algorithmus für das MSM haben wir die Gewichte $w_i$ ausgelesen und konnten hiermit den Term für die Volumetric Obscurance berechnen, wie im Abschnitt Algorithmus beschrieben. Hierfür waren nur wenig Anpassungen am gegeben HLSL Code nötig um diese in die beschrieben Volumetric Obscurance einzusetzen. Das weitere Verfahren entspricht dem aus dem Abschnitt Area Sampling, welches nur durch die Momente angepasst wurde. \\
+Desweiteren haben wir 32-bit für die Momente genutzt. Deswegen war eine Quantifizierung nicht nötig.\\
+Allerdings hat es sich herausgestellt, dass die OpenGL beim Mip-Mappen der 4 Momente zu Artefakten führt. Dies entspricht dem samplen im Fragment Shader aus der Implementierung des Moment Shadow Mapping. Problematisch ist hier der Umgang mit dem Alpha Kanal, da dieser den 4. Moment nicht korrekt darstellt und so keinen  korrekten Wert für die Vomuletric Obscurance liefert. Deswegen mussten wir zwei 2-Kanal Texturen nutzen um die 4 Momenten auf diese aufzuteilen. Danach funktionierte das Mip-Mapping.
 
 
 
@@ -1202,8 +1072,7 @@ Mip-Mapping hat dieses Problem nicht.
 	\caption{Moment Based Volumetric Obscurance Beispiele mit verschiedenen Geometrien und Entfernungen}
 \end{figure}
 
-Das Verfahren zur Moment Based Volumetric Obscurance war ebenfalls leicht umzusetzen, da sich die Implementierung kaum vom MSM unterscheidet. Aufgrund von anfänglichen Artefakten, haben wir aber eine sample Methode entfernt, welches ein stimmigeres Bild ergab. Insgesamt ist das Bild aber noch nicht stimmig genug, hier müssen wir weiter mit den Werten experimentieren, damit keine Cell Shading Optik erscheint. Möglicherweise ist das Moment Based Volumetric Obscurance aber ebenfalls für grossflächiges Filtern andwendbar, welches noch weitere Experimente benötigt.
-(Füge Bilder für MBVO ein mit Vergleich zu VO)
+Das Verfahren zur Moment Based Volumetric Obscurance war ebenfalls leicht umzusetzen, da sich die Implementierung kaum vom MSM unterscheidet. Das Verfahren bietet ein ästethisches Bild mit sehr wenig Rauschen. Es ähnelt dem Volumetric Obscurance mit Area Sampling.
 
 % Literaturverzeichnis:
 \bibliography{lit}
